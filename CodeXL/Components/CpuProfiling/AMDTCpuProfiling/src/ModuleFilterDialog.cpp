@@ -17,6 +17,7 @@
 // Infra:
 #include <AMDTApplicationComponents/Include/acFunctions.h>
 #include <AMDTOSWrappers/Include/osFilePath.h>
+#include <AMDTOSWrappers/Include/osGeneralFunctions.h>
 #include <AMDTApplicationComponents/Include/acMessageBox.h>
 
 // AMDTApplicationFramework:
@@ -197,7 +198,7 @@ void ModuleFilterDialog::intializeData()
 
 
                 // Check if this module is a system module:
-                m_pTableDisplaySettings->m_isSystemModuleList[i] = AuxIsSystemModule(modulePath);
+                m_pTableDisplaySettings->m_isSystemModuleList[i] = osIsSystemModule(modulePath.asString());
 
                 pItemName->setFlags(pItemName->flags() ^ Qt::ItemIsEditable);
                 pItemName->data(Qt::CheckStateRole);
@@ -252,7 +253,7 @@ void ModuleFilterDialog::onCheckSystemModule(int state)
         QString name = m_pModuleTree->item(i, 1)->text();
         name.append(m_pModuleTree->item(i, 0)->text());
 
-        if (AuxIsSystemModule(acQStringToGTString(name)))
+        if (osIsSystemModule(acQStringToGTString(name)))
         {
             m_pModuleTree->setRowHidden(i, (state == Qt::Unchecked));
         }

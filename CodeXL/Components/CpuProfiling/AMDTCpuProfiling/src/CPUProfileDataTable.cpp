@@ -10,6 +10,7 @@
 #include <AMDTBaseTools/Include/gtAssert.h>
 #include <AMDTOSWrappers/Include/osFilePath.h>
 #include <AMDTOSWrappers/Include/osDebugLog.h>
+#include <AMDTOSWrappers/Include/osGeneralFunctions.h>
 #include <AMDTApplicationComponents/Include/acFunctions.h>
 #include <AMDTApplicationComponents/Include/acItemDelegate.h>
 #include <AMDTApplicationComponents/Include/acMessageBox.h>
@@ -398,7 +399,7 @@ QPixmap* CPUProfileDataTable::moduleIcon(const osFilePath& filePath, bool is32Bi
     int iconIndex = 0;
 
     // Is this a system module?
-    bool isSystem = AuxIsSystemModule(filePath);
+    bool isSystem = osIsSystemModule(filePath.asString());
 
     if (isSystem && is32Bit)
     {
