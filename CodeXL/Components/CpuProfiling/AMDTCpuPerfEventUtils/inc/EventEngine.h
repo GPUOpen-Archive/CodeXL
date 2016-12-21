@@ -10,7 +10,7 @@
 #ifndef _EVENTENGINE_H_
 #define _EVENTENGINE_H_
 
-#include <QDir>
+#include <AMDTOSWrappers/Include/osDirectory.h>
 
 #include "EventsFile.h"
 #include "IbsEvents.h"
@@ -38,13 +38,13 @@ public:
     EventEngine() = default;
     virtual ~EventEngine() = default;
 
-    bool Initialize(QString eventsDirectory);
-    QString GetEventFilePath(gtUInt32 cpuFamily, gtUInt32 cpuModel);
+    bool Initialize(const osDirectory& eventsDirectory);
+    osFilePath GetEventFilePath(gtUInt32 cpuFamily, gtUInt32 cpuModel);
     EventsFile* GetEventFile(gtUInt32 cpuFamily, gtUInt32 cpuModel);
 
 private:
     // Directory where the event files reside
-    QDir m_eventFileDirectory;
+    osDirectory m_eventFileDirectory;
 };
 
 //Is the event value the arbitrary timer event

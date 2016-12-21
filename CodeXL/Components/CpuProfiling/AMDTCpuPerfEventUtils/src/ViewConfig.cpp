@@ -498,8 +498,10 @@ bool ViewConfig::AddColumnsToElement(TiXmlElement* pRootElem)
 //
 // Write the view configuration element to the XML output stream.
 //
-bool ViewConfig::WriteConfigFile(const std::string& configFileName, const std::string& /*installDir*/)
+bool ViewConfig::WriteConfigFile(const std::string& configFileName, const std::string& /*pathToDtd*/)
 {
+    // pathToDtd is the path to DTD file. TinyXml doesn't support DTD, hence ignore it.
+
     TiXmlDocument configDoc;
 
     bool rc = constructDomTree(&configDoc);
@@ -518,41 +520,66 @@ bool ViewConfig::constructDomTree(TiXmlDocument* pConfigDoc)
     {
         // Add <?xml version="1.0"?>
         TiXmlDeclaration* decl = new TiXmlDeclaration("1.0", "", "");
-        pConfigDoc->LinkEndChild(decl);
+        if (decl)
+        {
+            pConfigDoc->LinkEndChild(decl);
+        }
 
         // Skip !DOCTYPE element, as it is not supported by TinyXml.
-        // <!DOCTYPE view_configuration SYSTEM \"" + InstallDir + "ViewConfigs/viewconfig.dtd\">
+        // <!DOCTYPE view_configuration SYSTEM \"" + pathToDtd + "ViewConfigs/viewconfig.dtd\">
 
         // Add <view_configuration> to root.
         TiXmlElement* pViewConfigElem = new TiXmlElement("view_configuration");
-        pConfigDoc->LinkEndChild(pViewConfigElem);
 
-        // Add <view> to <view_configuration>.
-        TiXmlElement* pViewElem = new TiXmlElement("view");
-        pViewElem->SetAttribute("name", m_configName.data());
-        pViewConfigElem->LinkEndChild(pViewElem);
+        if (pViewConfigElem)
+        {
+            pConfigDoc->LinkEndChild(pViewConfigElem);
 
-        // Add <data> to <view>.
-        TiXmlElement* pDataElem = new TiXmlElement("data");
-        AddEventsToElement(pDataElem);
-        pViewElem->LinkEndChild(pDataElem);
+            // Add <view> to <view_configuration>.
+            TiXmlElement* pViewElem = new TiXmlElement("view");
 
-        // Add <output> to <view>
-        TiXmlElement* pOutputElem = new TiXmlElement("output");
-        AddColumnsToElement(pOutputElem);
-        pViewElem->LinkEndChild(pOutputElem);
+            if (pViewElem)
+            {
+                pViewConfigElem->LinkEndChild(pViewElem);
 
-        // Add <tool_tip> to <view>
-        TiXmlElement* pTooltipElem = new TiXmlElement("tool_tip");
-        TiXmlText* pTextElem = new TiXmlText(m_toolTip.data());
-        pTooltipElem->LinkEndChild(pTextElem);
-        pViewElem->LinkEndChild(pTooltipElem);
+                // Set attribute "name" to <view>.
+                pViewElem->SetAttribute("name", m_configName.data());
 
-        // Add <description> to <view>
-        TiXmlElement* pDescElem = new TiXmlElement("description");
-        pTextElem = new TiXmlText(m_description.data());
-        pDescElem->LinkEndChild(pTextElem);
-        pViewElem->LinkEndChild(pDescElem);
+                // Add <data> to <view>.
+                TiXmlElement* pDataElem = new TiXmlElement("data");
+                if (pDataElem)
+                {
+                    AddEventsToElement(pDataElem);
+                    pViewElem->LinkEndChild(pDataElem);
+                }
+
+                // Add <output> to <view>
+                TiXmlElement* pOutputElem = new TiXmlElement("output");
+                if (pOutputElem)
+                {
+                    AddColumnsToElement(pOutputElem);
+                    pViewElem->LinkEndChild(pOutputElem);
+                }
+
+                // Add <tool_tip> to <view>
+                TiXmlElement* pTooltipElem = new TiXmlElement("tool_tip");
+                if (pTooltipElem)
+                {
+                    TiXmlText* pTextElem = new TiXmlText(m_toolTip.data());
+                    pTooltipElem->LinkEndChild(pTextElem);
+                    pViewElem->LinkEndChild(pTooltipElem);
+                }
+
+                // Add <description> to <view>
+                TiXmlElement* pDescElem = new TiXmlElement("description");
+                if (pDescElem)
+                {
+                    TiXmlText* pTextElem = new TiXmlText(m_description.data());
+                    pDescElem->LinkEndChild(pTextElem);
+                    pViewElem->LinkEndChild(pDescElem);
+                }
+            }
+        }
     }
 
     return true;
@@ -670,20 +697,14 @@ bool ViewConfig::parseDomTree(TiXmlElement* pRoot)
                         cs.sorting = GetSortType(attrStr);
                     }
 
-                    TiXmlNode* pNode = pColElement->FirstChild();
-
-                    if ((pNode != nullptr) && (pNode->Type() == TiXmlNode::TINYXML_ELEMENT))
+                    TiXmlElement* pElement = pColElement->FirstChildElement();
+                    if (pElement)
                     {
-                        TiXmlElement* pElement = pNode->ToElement();
+                        // Process pElement
+                        ParseColumnSpecElement(pElement, cs);
 
-                        if (pElement)
-                        {
-                            // Process pElement
-                            ParseColumnSpecElement(pElement, cs);
-
-                            // Insert column into m_columnList
-                            m_columnList.push_back(cs);
-                        }
+                        // Insert column into m_columnList
+                        m_columnList.push_back(cs);
                     }
 
                     pColElement = pColElement->NextSiblingElement("column");

@@ -7,52 +7,64 @@
 ///
 //==================================================================================
 
-#include <QtCore>
+#include <sstream>
 #include <EventEngine.h>
 #include <AMDTOSWrappers/Include/osCpuid.h>
 
 
-bool EventEngine::Initialize(QString eventsDirectory)
+static gtString toHexString(uint64_t num)
 {
-    m_eventFileDirectory.setPath(eventsDirectory);
-
-    if (!m_eventFileDirectory.exists())
-    {
-        m_eventFileDirectory.setPath("");
-        return false;
-    }
-
-    return true;
+    std::wstringstream ss;
+    ss << std::hex << num << std::dec;
+    return gtString(ss.str().data());
 }
 
-QString EventEngine::GetEventFilePath(gtUInt32 cpuFamily, gtUInt32 cpuModel)
+bool EventEngine::Initialize(const osDirectory& eventsDirectory)
 {
-    QString fileName;
+    bool rc = false;
+
+    if (eventsDirectory.exists())
+    {
+        m_eventFileDirectory = eventsDirectory;
+        rc = true;
+    }
+    else
+    {
+        osFilePath emptyFilePath;
+        m_eventFileDirectory.setDirectoryPath(emptyFilePath);
+    }
+
+    return rc;
+}
+
+osFilePath EventEngine::GetEventFilePath(gtUInt32 cpuFamily, gtUInt32 cpuModel)
+{
+    gtString fileName;
+    fileName.append(L"0x").append(toHexString(cpuFamily));
 
     // If the model mask is needed
     if (cpuFamily >= FAMILY_OR)
     {
-        //since the model is like 0x10-1f, just need the mask (like 0x10), so shift right by 4 bits
-        fileName = "0x" + QString::number(cpuFamily, 16) + "_0x" + QString::number(cpuModel >> 4, 16);
+        // since the model is like 0x10-1f, just need the mask (like 0x10), so shift right by 4 bits
+        fileName.append(L"_0x").append(toHexString(cpuModel >> 4));
     }
-    else
+
+    osFilePath filePathStr;
+    filePathStr.setFileDirectory(m_eventFileDirectory);
+    filePathStr.setFileName(fileName);
+    filePathStr.setFileExtension(L"xml");
+
+    if (!filePathStr.exists())
     {
-        fileName = "0x" + QString::number(cpuFamily, 16);
+        return osFilePath();
     }
 
-    fileName += ".xml";
-
-    if (!m_eventFileDirectory.exists(fileName))
-    {
-        return QString();
-    }
-
-    return m_eventFileDirectory.absoluteFilePath(fileName);
+    return filePathStr;
 }
 
 EventsFile* EventEngine::GetEventFile(gtUInt32 cpuFamily, gtUInt32 cpuModel)
 {
-    QString fullPathString = GetEventFilePath(cpuFamily, cpuModel);
+    osFilePath fullPathString = GetEventFilePath(cpuFamily, cpuModel);
 
     if (fullPathString.isEmpty())
     {
@@ -61,7 +73,10 @@ EventsFile* EventEngine::GetEventFile(gtUInt32 cpuFamily, gtUInt32 cpuModel)
 
     EventsFile* pEventFile = new EventsFile();
 
-    if (pEventFile != nullptr && pEventFile->Open(fullPathString.toStdString()))
+    std::string fullPath;
+    fullPathString.asString().asUtf8(fullPath);
+
+    if (pEventFile != nullptr && pEventFile->Open(fullPath))
     {
         return pEventFile;
     }

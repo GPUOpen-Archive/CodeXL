@@ -1807,8 +1807,11 @@ bool CommandsHandler::isEventFileAvailable()
     eventFilePath.appendSubDirectory(L"Events");
 
     EventEngine eventEngine;
+    osDirectory fileDirectory;
 
-    if (!eventEngine.Initialize(acGTStringToQString(eventFilePath.asString())))
+    eventFilePath.getFileDirectory(fileDirectory);
+
+    if (!eventEngine.Initialize(fileDirectory))
     {
         ReportErrorMessage(false, AF_STR_Empty, L"Unable to find the event files directory: %ls", eventFilePath.asString().asCharArray());
         retVal = false;
@@ -1826,7 +1829,7 @@ bool CommandsHandler::isEventFileAvailable()
         else
         {
             ReportErrorMessage(false, AF_STR_Empty, L"Unable to find the event file: %ls",
-                               eventEngine.GetEventFilePath(cpuInfo.getFamily(), cpuInfo.getModel()).toStdWString().c_str());
+                               eventEngine.GetEventFilePath(cpuInfo.getFamily(), cpuInfo.getModel()).asString().asCharArray());
         }
     }
 
@@ -1842,8 +1845,11 @@ HRESULT CommandsHandler::verifyAndSetEvents(EventConfiguration** ppDriverEvents)
     eventFilePath.appendSubDirectory(L"Events");
 
     EventEngine eventEngine;
+    osDirectory fileDirectory;
 
-    if (!eventEngine.Initialize(acGTStringToQString(eventFilePath.asString())))
+    eventFilePath.getFileDirectory(fileDirectory);
+
+    if (!eventEngine.Initialize(fileDirectory))
     {
         ReportErrorMessage(false, AF_STR_Empty, L"Unable to find the event files directory: %ls", eventFilePath.asString().asCharArray());
         hr = E_NOFILE;
@@ -1858,7 +1864,7 @@ HRESULT CommandsHandler::verifyAndSetEvents(EventConfiguration** ppDriverEvents)
         if (nullptr == pEventFile)
         {
             ReportErrorMessage(false, AF_STR_Empty, L"Unable to find the event file: %ls",
-                               eventEngine.GetEventFilePath(cpuInfo.getFamily(), model).toStdWString().c_str());
+                               eventEngine.GetEventFilePath(cpuInfo.getFamily(), model).asString().asCharArray());
             hr = E_NOFILE;
         }
     }

@@ -399,7 +399,10 @@ bool CustomProfileProjectSettingsExtension::SaveCurrentSettings()
     osFilePath eventFilePath(osFilePath::OS_CODEXL_DATA_PATH);
     eventFilePath.appendSubDirectory(L"Events");
 
-    if (m_eventEngine.Initialize(acGTStringToQString(eventFilePath.asString())))
+    osDirectory fileDirectory;
+    eventFilePath.getFileDirectory(fileDirectory);
+
+    if (m_eventEngine.Initialize(fileDirectory))
     {
         m_pEventFile = m_eventEngine.GetEventFile(cpuInfo.getFamily(), cpuInfo.getModel());
     }
@@ -535,7 +538,10 @@ bool CustomProfileProjectSettingsExtension::InitializeFromProfileType(const QStr
         osFilePath eventFilePath(osFilePath::OS_CODEXL_DATA_PATH);
         eventFilePath.appendSubDirectory(L"Events");
 
-        if (m_eventEngine.Initialize(acGTStringToQString(eventFilePath.asString())))
+        osDirectory fileDirectory;
+        eventFilePath.getFileDirectory(fileDirectory);
+
+        if (m_eventEngine.Initialize(fileDirectory))
         {
             m_pEventFile = m_eventEngine.GetEventFile(cpuInfo.getFamily(), cpuInfo.getModel());
         }

@@ -113,7 +113,7 @@ public:
     bool IsIbsOPSampling()
     {
         IbsConfig ibsConfig;
-        m_profileDcConfig.GetIBSInfo(&ibsConfig);
+        m_profileDcConfig.GetIBSInfo(ibsConfig);
         return ibsConfig.opSampling;
     }
 

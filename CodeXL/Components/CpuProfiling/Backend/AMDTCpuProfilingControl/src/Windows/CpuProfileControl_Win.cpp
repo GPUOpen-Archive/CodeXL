@@ -28,8 +28,6 @@
 #include <Psapi.h>
 #include <Ntsecapi.h>
 
-#include <qstring.h>
-
 
 #if AMDT_ADDRESS_SPACE_TYPE == AMDT_64_BIT_ADDRESS_SPACE
     #define INSTALL_DIR_REG_KEY L"SOFTWARE\\Wow6432Node\\AMD\\CodeAnalyst\\Key\0"
@@ -275,13 +273,16 @@ bool helpVerifyEventFileAvailable(gtUInt32 clientId)
 {
     if (NULL == gp_eventsFile)
     {
-        osCpuid cpuid;
         gtString pathVar;
         osGetCurrentProcessEnvVariableValue(L"CPUPerfAPIDataPath", pathVar);
-        EventEngine eventEngine;
 
-        if (eventEngine.Initialize(QString::fromWCharArray(pathVar.asCharArray())))
+        EventEngine eventEngine;
+        osDirectory fileDirectory;
+        fileDirectory.setDirectoryFullPathFromString(pathVar);
+
+        if (eventEngine.Initialize(fileDirectory))
         {
+            osCpuid cpuid;
             gp_eventsFile = eventEngine.GetEventFile(cpuid.getFamily(), cpuid.getModel());
         }
 
@@ -805,29 +806,28 @@ isProfileCore(EVENT_PROPERTIES& eventProp, unsigned int coreId)
     return ret;
 }
 
-bool GetAppPath(QString& appPath)
+bool GetAppPath(gtString& appPath)
 {
+    bool retVal = false;
+
     // Assumption: processEnum[32|64].exe will reside in the dir in which codexl.exe resides;
     osFilePath filePath;
-    bool retVal = false;
 
     // First, see if the dll path is set (like VS)
     retVal = osGetCurrentApplicationDllsPath(filePath);
 
     if (!retVal)
     {
-        //Since the dll path is not set, assume the dlls are in the
+        // Since the dll path is not set, assume the dlls are in the
         // same path as the exe.
         // Get the absolute path for the application - codexl.exe
         retVal = osGetCurrentApplicationPath(filePath);
     }
 
-    if (false == retVal)
+    if (retVal)
     {
-        return retVal;
+        appPath = filePath.fileDirectoryAsString();
     }
-
-    appPath = QString::fromWCharArray(filePath.fileDirectoryAsString().asCharArray());
 
     return retVal;
 }
@@ -1460,13 +1460,9 @@ HRESULT CpuPerfStartProfiling(
         fnCleanupJitInformation();
 
         //Start the ti capture
-        wchar_t dirPath[OS_MAX_PATH] = { L'\0' };
-        QString appPath;
-
+        gtString appPath;
         GetAppPath(appPath);
-        appPath.toWCharArray(dirPath);
-
-        hr = fnStartCapture(startCount.QuadPart, dirPath);
+        hr = fnStartCapture(startCount.QuadPart, appPath.asCharArray());
 
         if (FAILED(hr))
         {

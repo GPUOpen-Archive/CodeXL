@@ -142,7 +142,7 @@ public:
     bool ReadConfigFile(const std::string& configFileName);
 
     // Write the current view configuration in XML to the specified file
-    bool WriteConfigFile(const std::string& configFileName, const std::string& installDir);
+    bool WriteConfigFile(const std::string& configFileName, const std::string& pathToDtd);
 
     // Find data/event configuration association by id or value
     bool FindAssocById(const std::string& id, DataAssoc& assoc);

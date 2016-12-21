@@ -7,29 +7,31 @@
 ///        (for custom profiling or every other profiling type).
 ///
 //==================================================================================
+#pragma once
 
-#ifndef _DCCONFIG_H_
-#define _DCCONFIG_H_
+#include <string>
+#include <vector>
+#include <cstdint>
 
-// Include Qt-related definitions
-#include <qstring.h>
-#include <qfile.h>
-#include <qtextstream.h>
-#include <QXmlDefaultHandler>
-
-#include <AMDTBaseTools/Include/gtList.h>
 #include "CpuPerfEventUtilsDLLBuild.h"
 #include "EventEncoding.h"
 
+#if defined (_WIN32)
+// Error description: 'identifier' : class 'type' needs to have dll-interface to be used by clients of class 'type2'
+// However, this warning is caused by private members that do not have DLL exports definitions.
+#pragma warning( disable : 4251 )
+#endif
 
 struct DcEventConfig
 {
     PERF_CTL pmc;               // PERF_CTL
-    gtUInt64 eventCount;        // Event count aka "sampling period"; this os PERF_CTR
+    uint64_t eventCount = 0;    // Event count aka "sampling period"; this os PERF_CTR
+
+    DcEventConfig() { pmc.perf_ctl = 0; }
 };
 
 // Do not use the following type in DLL client code
-typedef gtList<DcEventConfig> EventConfigList;
+typedef std::vector<DcEventConfig> EventConfigList;
 
 enum DcConfigType
 {
@@ -43,16 +45,16 @@ enum DcConfigType
 
 struct IbsConfig
 {
-    gtUInt64 fetchMaxCount = 0;          // Maximum value of periodic fetch counter
-    gtUInt64 opMaxCount    = 0;          // Maximum value of periodic op counter
+    uint64_t fetchMaxCount = 0;          // Maximum value of periodic fetch counter
+    uint64_t opMaxCount    = 0;          // Maximum value of periodic op counter
     bool fetchSampling     = false;      // Enable IBS fetch sampling
     bool opSampling        = false;      // Enable IBS op sampling
-    bool opCycleCount      = false;      //Whether the op sampling is by cycle or dispatch
+    bool opCycleCount      = true;       // Whether the op sampling is by cycle or dispatch
 };
 
 struct CluConfig
 {
-    gtUInt64 cluMaxCount = 0;        // Maximum value of periodic op counter while CLU profiling
+    uint64_t cluMaxCount = 0;        // Maximum value of periodic op counter while CLU profiling
     bool cluSampling     = false;    // Enable CLU sampling
     bool cluCycleCount   = false;    // Whether the op sampling is by cycle or dispatch while CLU profiling
 };
@@ -61,7 +63,10 @@ struct CluConfig
 // CDCConfig class declaration
 ////////////////////////////////////////////////////////////////////////////////////
 
-class CP_EVENT_API DcConfig : public QXmlDefaultHandler
+class TiXmlElement;
+class TiXmlDocument;
+
+class CP_EVENT_API DcConfig
 {
 public:
     ///////////////////////////////////////////////////////////////////////////////
@@ -69,131 +74,80 @@ public:
     ///////////////////////////////////////////////////////////////////////////////
     DcConfig();
     DcConfig(const DcConfig& original);
-    ~DcConfig();
-    const DcConfig& operator = (const DcConfig& rhs);
+    ~DcConfig() { m_ebpConfigList.clear(); };
+    const DcConfig& operator=(const DcConfig& rhs);
 
     ///////////////////////////////////////////////////////////////////////////////
     // Client functions for all DC configuration types
     ///////////////////////////////////////////////////////////////////////////////
     // Return the configuration type (TBP, EBP, ...)
-    DcConfigType GetConfigType();
+    DcConfigType GetConfigType() { return m_configType; };
     // Return the configuration name in configName
-    void GetConfigName(QString& configName);
+    void GetConfigName(std::string& configName) { configName = m_configName; };
     // Return the configuration tool type in toolTip
-    void GetToolTip(QString& toolTip);
+    void GetToolTip(std::string& toolTip) { toolTip = m_toolTip; };
     // Return the configuration description in description
-    void GetDescription(QString& description);
+    void GetDescription(std::string& description) { description = m_description; };
 
     // Set the configuration type
-    void SetConfigType(DcConfigType configType);
+    void SetConfigType(DcConfigType configType) { m_configType = configType; };
     // Set the configuration name
-    void SetConfigName(const QString configName);
+    void SetConfigName(const std::string& configName) { m_configName = configName; };
     // Set the configuration tool tip
-    void SetToolTip(const QString toolTip);
+    void SetToolTip(const std::string& toolTip) { m_toolTip = toolTip; };
     // Set the configuration description
-    void SetDescription(const QString description);
+    void SetDescription(const std::string& description) { m_description = description; };
 
     // Read a DC configuration in XML from the specified file
-    bool ReadConfigFile(const wchar_t* configFileName);
+    bool ReadConfigFile(const std::string& configFileName);
     // Write the current configuration in XML to the specified file
-    bool WriteConfigFile(const wchar_t* configFileName, const wchar_t* pathToDtd);
+    bool WriteConfigFile(const std::string& configFileName, const std::string& pathToDtd);
 
     ///////////////////////////////////////////////////////////////////////////////
     // Client functions for TBP DC configurations
     ///////////////////////////////////////////////////////////////////////////////
     // Set the TBP timer interval (sample period)
-    void SetTimerInterval(float interval);
+    void SetTimerInterval(float interval) { m_tbpInterval = interval; };
     // Get the TBP timer interval
-    float GetTimerInterval();
+    float GetTimerInterval() { return m_tbpInterval; };
 
     ///////////////////////////////////////////////////////////////////////////////
     // Client functions for EBP DC configurations
     ///////////////////////////////////////////////////////////////////////////////
     // Set event groups and multiplex period for the configuration
-    void SetEventInfo(DcEventConfig* pEventCfg, int numberOfEvents);
-    // Set event groups and multiplex period for the configuration
-    void SetEventInfo(const gtVector<DcEventConfig>& eventsConfigVector);
+    void SetEventInfo(const std::vector<DcEventConfig>& eventsConfigVector) { m_ebpConfigList = eventsConfigVector; };
     // Return the number of event groups in the configuration
-    int GetNumberOfEvents();
-    // Get the event groups; Copy data to caller-supplied array of event groups
-    void GetEventInfo(DcEventConfig* pEventConfig, int numberOfEvents);
+    uint32_t GetNumberOfEvents() { return m_ebpConfigList.size(); };
     // Get the event groups; Copy data to caller-supplied vector event groups
-    void GetEventInfo(gtVector<DcEventConfig>& eventsConfigVector);
+    void GetEventInfo(std::vector<DcEventConfig>& eventsConfigVector) { eventsConfigVector = m_ebpConfigList; };
 
     ///////////////////////////////////////////////////////////////////////////////
     // Client functions for IBS DC configurations
     ///////////////////////////////////////////////////////////////////////////////
     // Set IBS configuration info using the specified struct
-    void SetIBSInfo(IbsConfig* pIBS);
+    void SetIBSInfo(const IbsConfig& inIBS) { m_ibsConfig = inIBS; };
     // Get IBS configuration info; Copy info to caller-supplied struct
-    void GetIBSInfo(IbsConfig* pIBS);
+    void GetIBSInfo(IbsConfig& outIBS) { outIBS = m_ibsConfig; };
 
     ///////////////////////////////////////////////////////////////////////////////
     // Client functions for CLU DC configurations
     ///////////////////////////////////////////////////////////////////////////////
     // Set CLU configuration info using the specified struct
-    void SetCLUInfo(CluConfig* pCLU);
+    void SetCLUInfo(const CluConfig& inCLU) { m_cluConfig = inCLU; };
     // Get CLU configuration info; Copy info to caller-supplied struct
-    void GetCLUInfo(CluConfig* pCLU);
-
-    ///////////////////////////////////////////////////////////////////////////////
-    // Callback functions which override QXmlDefaultHandler
-    ///////////////////////////////////////////////////////////////////////////////
-    bool startDocument();
-    bool endDocument();
-    bool startElement(const QString& namespaceURI, const QString& localName, const QString& qName, const QXmlAttributes& atts);
-    bool endElement(const QString& namespaceURI, const QString& localName, const QString& qName);
-    bool characters(const QString& ch);
+    void GetCLUInfo(CluConfig& outCLU) { outCLU = m_cluConfig; };
 
 private:
-    // Common configuration attributes
+    bool parseDomTree(TiXmlElement* pRoot);
+    bool constructDomTree(TiXmlDocument* pConfigDoc);
+
+private:
     DcConfigType     m_configType;        // Kind of configuration (TBP, EBP, ...)
-    QString          m_configName;        // Configuration name
-    QString          m_toolTip;           // Configuration's tool tip
-    QString          m_description;       // Description of the configuration
-    // Time-based profiling configuration attributes
-    float            m_interval;          // Timer interval (sample period)
-    // Event-based profiling configuration attributes
-    int              m_numberOfEvents;    // Number of event groups
-    DcEventConfig*    m_pEventConfigs;       // Points to array of event groups
-    // IBS configuration attributes
-    IbsConfig        m_IBSConfig;         // Holds IBS-specific configuration info
-    // CLU configuration attributes
+    std::string      m_configName;        // Configuration name
+    std::string      m_toolTip;           // Configuration's tool tip
+    std::string      m_description;       // Description of the configuration
+    float            m_tbpInterval;       // Timer interval (sample period)
+    IbsConfig        m_ibsConfig;         // Holds IBS-specific configuration info
     CluConfig        m_cluConfig;         // Holds CLU-specific configuration info
-
-    // Private data members for XML handling
-    EventConfigList  m_eventConfigList;    // Holds event configure as they come in
-    bool             m_toolTipIsOpen;     // Tooltip is currently open when true
-    bool             m_descriptionIsOpen; // Description is currently open
-    bool             m_xmlSemanticError;  // Is true on XML semantic error
-
-    ///////////////////////////////////////////////////////////////////////////////
-    // Private functions to assist configuration writing
-    ///////////////////////////////////////////////////////////////////////////////
-    // Write tool tip element to the XML stream
-    void WriteTooltip(QTextStream& xmlStream, QString& text);
-    // Write description element to the XML stream
-    void WriteDescription(QTextStream& xmlStream, QString& text);
-    // Write string-valued attribute to the XML stream
-    void WriteStringAttr(QTextStream& xmlStream, const char* attr, QString& value);
-    // Write integer-valued attribute (decimal format) to the XML stream
-    void WriteDecimalAttr(QTextStream& xmlStream, const char* attr, gtUInt64 value);
-    // Write integer-valued attribute (hexadecimal format) to the XML stream
-    void WriteHexAttr(QTextStream& xmlStream, const char* attr, gtUInt64 value);
-    // Write float-valued attribute (decimal format) to the XML stream
-    void WriteFloatAttr(QTextStream& xmlStream, const char* attr, float value);
-    // Write Boolean-valued attribute to the XML stream
-    void WriteBoolAttr(QTextStream& xmlStream, const char* attr, bool value);
-    // Write an event group element to the XML stream
-    void WriteEvent(QTextStream& xmlStream, DcEventConfig* pEvt);
-    // Write TBP configuration to the XML stream
-    void WriteTBP(QTextStream& xmlStream);
-    // Write EBP configuration to the XML stream
-    void WriteEBP(QTextStream& xmlStream);
-    // Write IBS configuration to the XML stream
-    void WriteIBS(QTextStream& xmlStream);
-    // Write CLU configuration to the XML stream
-    void WriteCLU(QTextStream& xmlStream);
+    EventConfigList  m_ebpConfigList;     // Holds event configure as they come in
 };
-
-#endif // _DCCONFIG_H_

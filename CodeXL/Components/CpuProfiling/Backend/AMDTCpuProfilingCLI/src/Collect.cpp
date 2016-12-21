@@ -6,6 +6,8 @@
 ///
 //==================================================================================
 
+#include <string>
+
 // Backend:
 #include <AMDTCpuPerfEventUtils/inc/EventEngine.h>
 #include <AMDTCpuProfilingControl/inc/CpuProfileControl.h>
@@ -204,9 +206,9 @@ HRESULT CpuProfileCollect::StopProfiling()
                     {
                         CpuProfilePmcEventCount eventCountData;
                         eventCountData.m_coreId = coreId;
-                        eventCountData.m_nbrEvents = m_nbrCountEvents;
+                        eventCountData.m_nbrEvents = static_cast<gtUInt32>(m_nbrCountEvents);
 
-                        m_error = fnGetAllEventCounts(coreId, this->m_nbrCountEvents, &eventCountData.m_eventCountValue[0]);
+                        m_error = fnGetAllEventCounts(coreId, static_cast<gtUInt32>(this->m_nbrCountEvents), &eventCountData.m_eventCountValue[0]);
 
                         int idx = 0;
 
@@ -298,16 +300,11 @@ HRESULT CpuProfileCollect::StopTPProfiling()
 
 gtString CpuProfileCollect::GetProfileTypeStr()
 {
-    QString profileName;
+    std::string profileName;
     m_profileDcConfig.GetConfigName(profileName);
 
     gtString str;
-    str.resize(profileName.length());
-
-    if (profileName.length())
-    {
-        str.resize(profileName.toWCharArray(&str[0]));
-    }
+    str.fromUtf8String(profileName);
 
     return str;
 }
@@ -664,7 +661,9 @@ void CpuProfileCollect::ValidateProfile()
 
     if (profileFilePath.exists())
     {
-        m_profileDcConfig.ReadConfigFile(profileFilePath.asString().asCharArray());
+        std::string configFilePath;
+        profileFilePath.asString().asUtf8(configFilePath);
+        m_profileDcConfig.ReadConfigFile(configFilePath);
 
         // if it is special TBP, set the sampling interval given by the user
         if (m_args.GetTbpSamplingInterval())
@@ -683,7 +682,7 @@ void CpuProfileCollect::ValidateProfile()
             {
                 if (ibsConfig.fetchSampling || ibsConfig.opSampling)
                 {
-                    m_profileDcConfig.SetIBSInfo(&ibsConfig);
+                    m_profileDcConfig.SetIBSInfo(ibsConfig);
                     m_profileDcConfig.SetConfigType(DCConfigIBS);
                 }
 
@@ -694,7 +693,7 @@ void CpuProfileCollect::ValidateProfile()
                     m_profileDcConfig.SetConfigType(type);
                 }
 
-                m_profileDcConfig.SetConfigName(QString::fromWCharArray(L"Custom"));
+                m_profileDcConfig.SetConfigName("Custom");
             }
         }
         else if (!IsTP())
@@ -897,11 +896,12 @@ void CpuProfileCollect::VerifyAndSetEvents(EventConfiguration** ppDriverSampleEv
         eventFilePath.appendSubDirectory(L"Data");
         eventFilePath.appendSubDirectory(L"Events");
 
-        gtString eventFilePathStr = eventFilePath.fileDirectoryAsString();
+        osDirectory fileDirectory;
+        eventFilePath.getFileDirectory(fileDirectory);
 
-        if (!eventEngine.Initialize(QString::fromWCharArray(eventFilePathStr.asCharArray(), eventFilePathStr.length())))
+        if (!eventEngine.Initialize(fileDirectory))
         {
-            reportError(false, L"Unable to find the event files directory: %ls", eventFilePathStr.asCharArray());
+            reportError(false, L"Unable to find the event files directory: %ls", fileDirectory.asString().asCharArray());
             m_error = E_NOFILE;
         }
     }
@@ -915,14 +915,14 @@ void CpuProfileCollect::VerifyAndSetEvents(EventConfiguration** ppDriverSampleEv
         if (nullptr == pEventFile)
         {
             reportError(false, L"Unable to find the event file: %ls",
-                eventEngine.GetEventFilePath(cpuInfo.getFamily(), model).toStdWString().c_str());
+                eventEngine.GetEventFilePath(cpuInfo.getFamily(), model).asString().asCharArray());
             m_error = E_NOFILE;
         }
     }
 
     // Get the Events info from the DcConfig
-    DcEventConfig* pEvents = new DcEventConfig[nbrOfEvents];
-    m_profileDcConfig.GetEventInfo(pEvents, nbrOfEvents);
+    std::vector<DcEventConfig> eventConfigList;
+    m_profileDcConfig.GetEventInfo(eventConfigList);
 
     *ppDriverSampleEvents = nullptr;
     *ppDriverCountEvents = nullptr;
@@ -944,30 +944,26 @@ void CpuProfileCollect::VerifyAndSetEvents(EventConfiguration** ppDriverSampleEv
     int processEvents = 2;
     do
     {
-        DcEventConfig* pCurrentConfig = pEvents;
-
-        for (int i = 0; (i < nbrOfEvents) && (S_OK == m_error); i++)
+        for (const auto& currentconfig : eventConfigList)
         {
-            if (processEvents == 2 && !pCurrentConfig->pmc.bitSampleEvents)
+            if (processEvents == 2 && !currentconfig.pmc.bitSampleEvents)
             {
-                pCurrentConfig++;
                 continue;
             }
 
-            if (processEvents == 1 && pCurrentConfig->pmc.bitSampleEvents)
+            if (processEvents == 1 && currentconfig.pmc.bitSampleEvents)
             {
-                pCurrentConfig++;
                 continue;
             }
 
             //validate the event
-            unsigned int evSelect = GetEvent12BitSelect(pCurrentConfig->pmc);
+            unsigned int evSelect = GetEvent12BitSelect(currentconfig.pmc);
 
             // Duplicate events in custom xml file leads to issues during collection/translation.
             // If there are any duplicate events, report an error
-            if (eventsMap.find(pCurrentConfig->pmc.perf_ctl) == eventsMap.end())
+            if (eventsMap.find(currentconfig.pmc.perf_ctl) == eventsMap.end())
             {
-                eventsMap.insert(gtMap<gtUInt64, gtUInt64>::value_type(pCurrentConfig->pmc.perf_ctl, pCurrentConfig->eventCount));
+                eventsMap.insert(gtMap<gtUInt64, gtUInt64>::value_type(currentconfig.pmc.perf_ctl, currentconfig.eventCount));
             }
             else
             {
@@ -976,13 +972,13 @@ void CpuProfileCollect::VerifyAndSetEvents(EventConfiguration** ppDriverSampleEv
                 break;
             }
 
-            bool retVal = pEventFile->ValidateEvent(evSelect, pCurrentConfig->pmc.ucUnitMask);
+            bool retVal = pEventFile->ValidateEvent(evSelect, currentconfig.pmc.ucUnitMask);
 
             // Don't allow events which are not valid on this cpu
             // TBD: should we check for - (eventData.m_minValidModel > model)
             if (!retVal)
             {
-                reportError(false, L"The configuration erronously contains an event (%#x) which is not\n"
+                reportError(false, L"The configuration erroneously contains an event (%#x) which is not\n"
                     L"available on this system.  Please choose a different\n"
                     L"configuration.", evSelect);
                 m_error = E_NOTAVAILABLE;
@@ -1023,23 +1019,23 @@ void CpuProfileCollect::VerifyAndSetEvents(EventConfiguration** ppDriverSampleEv
 #endif // AMDT_LINUX_OS
 
             // Save the event configuration that will be written to the hardware
-            auto it = m_pmcEventMsrMap.find(pCurrentConfig->pmc.perf_ctl);
+            auto it = m_pmcEventMsrMap.find(currentconfig.pmc.perf_ctl);
             pmcMsrId = (it != m_pmcEventMsrMap.end()) ? (*it).second : evCounter;
 
-            if (pCurrentConfig->pmc.bitSampleEvents)
+            if (currentconfig.pmc.bitSampleEvents)
             {
-                (*ppDriverSampleEvents)[m_nbrSampleEvents].performanceEvent = pCurrentConfig->pmc.perf_ctl;
-                (*ppDriverSampleEvents)[m_nbrSampleEvents].value = pCurrentConfig->eventCount;
+                (*ppDriverSampleEvents)[m_nbrSampleEvents].performanceEvent = currentconfig.pmc.perf_ctl;
+                (*ppDriverSampleEvents)[m_nbrSampleEvents].value = currentconfig.eventCount;
                 (*ppDriverSampleEvents)[m_nbrSampleEvents].eventCounter = pmcMsrId;
                 m_nbrSampleEvents++;
             }
             else
             {
-                (*ppDriverCountEvents)[m_nbrCountEvents].performanceEvent = pCurrentConfig->pmc.perf_ctl;
-                (*ppDriverCountEvents)[m_nbrCountEvents].value = pCurrentConfig->eventCount;
+                (*ppDriverCountEvents)[m_nbrCountEvents].performanceEvent = currentconfig.pmc.perf_ctl;
+                (*ppDriverCountEvents)[m_nbrCountEvents].value = currentconfig.eventCount;
                 (*ppDriverCountEvents)[m_nbrCountEvents].eventCounter = pmcMsrId;
                 m_nbrCountEvents++;
-                m_countEventVec.push_back(pCurrentConfig->pmc.perf_ctl);
+                m_countEventVec.push_back(currentconfig.pmc.perf_ctl);
             }
 
             if (++evCounter == maxCounter)
@@ -1047,7 +1043,10 @@ void CpuProfileCollect::VerifyAndSetEvents(EventConfiguration** ppDriverSampleEv
                 evCounter = 0;
             }
 
-            pCurrentConfig++;
+            if (S_OK != m_error)
+            {
+                break;
+            }
         }
 
         processEvents--;
@@ -1073,11 +1072,6 @@ void CpuProfileCollect::VerifyAndSetEvents(EventConfiguration** ppDriverSampleEv
     if (nullptr != pEventFile)
     {
         delete pEventFile;
-    }
-
-    if (nullptr != pEvents)
-    {
-        delete[] pEvents;
     }
 }
 
@@ -1230,7 +1224,7 @@ void CpuProfileCollect::SetEbpConfig()
                 // TODO: support for more than 64 cores ?
                 gtUInt64 cpuCoreMask = m_args.GetCoreAffinityMask();
                 m_error = fnSetEventConfiguration(pDriverSampleEvents,
-                                                  m_nbrSampleEvents,
+                                                  static_cast<gtUInt32>(m_nbrSampleEvents),
                                                   cpuCoreMask);
 
                 if (!SUCCEEDED(m_error))
@@ -1244,7 +1238,7 @@ void CpuProfileCollect::SetEbpConfig()
                 gtUInt64 cpuCoreMask = m_args.GetCoreAffinityMask();
 
                 m_error = fnSetCountingConfiguration(pDriverCountEvents,
-                                                     m_nbrCountEvents,
+                                                     static_cast<gtUInt32>(m_nbrCountEvents),
                                                      cpuCoreMask);
 
                 if (!SUCCEEDED(m_error))
@@ -1275,10 +1269,10 @@ void CpuProfileCollect::SetIbsConfig()
     if (isStateReady() && isOK() && isIbs)
     {
         IbsConfig ibsConfig;
-        m_profileDcConfig.GetIBSInfo(&ibsConfig);
+        m_profileDcConfig.GetIBSInfo(ibsConfig);
 
         CluConfig cluConfig;
-        m_profileDcConfig.GetCLUInfo(&cluConfig);
+        m_profileDcConfig.GetCLUInfo(cluConfig);
 
         if (ibsConfig.fetchSampling || ibsConfig.opSampling || cluConfig.cluSampling)
         {
@@ -1362,7 +1356,7 @@ void CpuProfileCollect::SetIbsConfig()
         {
             bool opSample = false;
             bool opCycleCount = false;
-            unsigned long opInterval = 0;
+            gtUInt64 opInterval = 0;
 
             if (ibsConfig.opSampling || cluConfig.cluSampling)
             {
@@ -1384,11 +1378,13 @@ void CpuProfileCollect::SetIbsConfig()
             // Profile only on selected cores specified in the CPU Affinity Mask
             // TODO: support for more than 64 cores ?
             gtUInt64 cpuCoreMask = m_args.GetCoreAffinityMask();
+            gtUInt64 fetchPeriod = ibsConfig.fetchSampling ? ibsConfig.fetchMaxCount : 0;
+            gtUInt64 opPeriod = opSample ? opInterval : 0;
             m_error = fnSetIbsConfiguration(cpuCoreMask,
-                                            ibsConfig.fetchSampling ? ibsConfig.fetchMaxCount : 0,
-                                            opSample ? opInterval : 0,
+                                            static_cast<gtUInt32>(fetchPeriod),
+                                            static_cast<gtUInt32>(opPeriod),
                                             true,
-                                            (!opCycleCount));
+                                            !opCycleCount);
 
             if (!isOK())
             {

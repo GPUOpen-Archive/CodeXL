@@ -258,9 +258,10 @@ bool ProfilerDataDBWriter::InitializeEventsXMLFile(gtUInt32 cpuFamily, gtUInt32 
         eventFilePath.appendSubDirectory(L"Data");
         eventFilePath.appendSubDirectory(L"Events");
 
-        const gtString eventFilePathStr = eventFilePath.fileDirectoryAsString();
+        osDirectory fileDirectory;
+        eventFilePath.getFileDirectory(fileDirectory);
 
-        if (!eventEngine.Initialize(QString::fromWCharArray(eventFilePathStr.asCharArray(), eventFilePathStr.length())))
+        if (!eventEngine.Initialize(fileDirectory))
         {
             rv = false;
         }
@@ -269,11 +270,14 @@ bool ProfilerDataDBWriter::InitializeEventsXMLFile(gtUInt32 cpuFamily, gtUInt32 
     if (rv)
     {
         // Get event file path
-        QString eventFile;
+        osFilePath eventFile;
         eventFile = eventEngine.GetEventFilePath(cpuFamily, cpuModel);
 
         // Initialize event file
-        if (!eventsFile.Open(eventFile.toStdString()))
+        std::string eventFileUtf8;
+        eventFile.asString().asUtf8(eventFileUtf8);
+
+        if (!eventsFile.Open(eventFileUtf8))
         {
             rv = false;
         }

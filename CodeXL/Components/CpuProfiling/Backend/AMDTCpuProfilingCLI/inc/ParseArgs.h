@@ -71,7 +71,7 @@ public:
     int   GetUnwindInterval() const { return m_unwindInterval; }
     int   GetUnwindDepth() const { return m_unwindDepth; }
     CpuProfileCssScope GetCSSScope() const { return m_cssScope; }
-    int   IsCSSWithFpoSupport() const { return m_cssSupportFpo; }
+    bool  IsCSSWithFpoSupport() const { return m_cssSupportFpo; }
     void  DisableCSS() { m_isCSSEnabled = m_cssWithDefaultValues = false; }
 
     int GetTbpSamplingInterval() const { return m_tbpSamplingInterval; }

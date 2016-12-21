@@ -156,8 +156,10 @@ bool ProfileConfigs::AddConfiguration(const osFilePath& configPath, osCpuid* pCp
     bool bRet = true;
     DcConfig*   pTemp = new DcConfig();
 
+    std::string configFilePath;
+    configPath.asString().asUtf8(configFilePath);
 
-    if (!pTemp->ReadConfigFile(configPath.asString().asCharArray()))
+    if (!pTemp->ReadConfigFile(configFilePath))
     {
         bRet = false;
     }
@@ -170,9 +172,12 @@ bool ProfileConfigs::AddConfiguration(const osFilePath& configPath, osCpuid* pCp
 
     if (bRet)
     {
-        QString profileName;
+        std::string profileName;
         pTemp->GetConfigName(profileName);
-        gtString gName = acQStringToGTString(profileName);
+
+        gtString gName;
+        gName.fromUtf8String(profileName);
+
         ConfigMap::const_iterator itFind = m_configs.find(gName);
 
         if (itFind == m_configs.end())
@@ -229,7 +234,7 @@ bool ProfileConfigs::getProfileConfigByType(const gtString& profileSessionType, 
 
             //IBS
             IbsConfig config;
-            itFind->second->GetIBSInfo(&config) ;
+            itFind->second->GetIBSInfo(config) ;
             pProfileSessionData->m_fetchSample = config.fetchSampling;
             pProfileSessionData->m_opSample = config.opSampling;
             pProfileSessionData->m_opCycleCount = config.opCycleCount;
@@ -238,7 +243,7 @@ bool ProfileConfigs::getProfileConfigByType(const gtString& profileSessionType, 
 
             //CLU
             CluConfig cluConfig;
-            itFind->second->GetCLUInfo(&cluConfig) ;
+            itFind->second->GetCLUInfo(cluConfig) ;
             pProfileSessionData->m_cluSample = cluConfig.cluSampling;
             pProfileSessionData->m_cluCycleCount = cluConfig.cluCycleCount;
             pProfileSessionData->m_cluInterval = cluConfig.cluMaxCount;
@@ -257,9 +262,9 @@ gtString ProfileConfigs::getProfileDescription(gtString name)
 
     if (itFind != m_configs.end())
     {
-        QString description;
+        std::string description;
         itFind->second->GetDescription(description);
-        strRet = acQStringToGTString(description);
+        strRet.fromUtf8String(description);
     }
 
     return strRet;
@@ -281,13 +286,13 @@ void ProfileConfigs::setCustomConfig(const CPUSessionTreeItemData* pConfig)
     tempIbs.opCycleCount = pConfig->m_opCycleCount;
     tempIbs.opMaxCount = pConfig->m_opInterval;
     tempIbs.opSampling = pConfig->m_opSample;
-    it->second->SetIBSInfo(&tempIbs);
+    it->second->SetIBSInfo(tempIbs);
     //Clu part
     CluConfig tempClu;
     tempClu.cluCycleCount = pConfig->m_cluCycleCount;
     tempClu.cluMaxCount = pConfig->m_cluInterval;
     tempClu.cluSampling = pConfig->m_cluSample;
-    it->second->SetCLUInfo(&tempClu);
+    it->second->SetCLUInfo(tempClu);
     //Event part
     it->second->SetEventInfo(pConfig->m_eventsVector);
 
@@ -310,8 +315,13 @@ void ProfileConfigs::setCustomConfig(const CPUSessionTreeItemData* pConfig)
 
     basePath.appendSubDirectory(L"Profiles");
 
-    it->second->WriteConfigFile(configDirPath.asString().asCharArray(),
-                                basePath.asString().asCharArray());
+    std::string configFilePath;
+    configDirPath.asString().asUtf8(configFilePath);
+
+    std::string baseDir;
+    basePath.asString().asUtf8(baseDir);
+
+    it->second->WriteConfigFile(configFilePath, baseDir);
 }
 
 void ProfileConfigs::loadCustomConfig()
@@ -324,8 +334,10 @@ void ProfileConfigs::loadCustomConfig()
 
     DcConfig* pTemp = new DcConfig();
 
+    std::string configFilePath;
+    configDirPath.asString().asUtf8(configFilePath);
 
-    if (!pTemp->ReadConfigFile((wchar_t*)configDirPath.asString().asCharArray()))
+    if (!pTemp->ReadConfigFile(configFilePath))
     {
         //Ensure directory exists
         osDirectory existCheck;
@@ -339,7 +351,10 @@ void ProfileConfigs::loadCustomConfig()
         //Create new, with only a timer event
         pTemp->SetTimerInterval(DEFAULT_TIMER_INTERVAL);
         pTemp->SetConfigType(DCConfigMultiple);
-        pTemp->SetConfigName(QString::fromWCharArray(CUSTOM_PROFILE_NAME.asCharArray()));
+
+        std::string customProfileName;
+        CUSTOM_PROFILE_NAME.asUtf8(customProfileName);
+        pTemp->SetConfigName(customProfileName);
     }
 
     m_configs[CUSTOM_PROFILE_NAME] = pTemp;
@@ -379,7 +394,7 @@ bool ProfileConfigs::isProfileTypeIBS(DcConfig* pConfig, const EventEncodeVec& e
     }
 
     IbsConfig ibsInfo;
-    pConfig->GetIBSInfo(&ibsInfo);
+    pConfig->GetIBSInfo(ibsInfo);
 
     // verify:
     // 1. All events in the event vector, are either IBS_FETCH or IBS_OP
@@ -447,38 +462,31 @@ gtString ProfileConfigs::getProfileTypeByEventConfigs(const EventEncodeVec& even
                 if ((numberOfEvents > 0) && (numberOfEvents == eventConfigVec.size()))
                 {
                     // Allocate a pointer for the events config
-                    DcEventConfig* pEventsConfig = new DcEventConfig[numberOfEvents];
-
+                    std::vector<DcEventConfig> eventConfigList;
 
                     // Get the events info
-                    pConfig->GetEventInfo(pEventsConfig, numberOfEvents);
-                    GT_IF_WITH_ASSERT(pEventsConfig != nullptr)
+                    pConfig->GetEventInfo(eventConfigList);
+
+                    // Verify: all the eventmasks and their sampling period
+                    for (const auto& eventConfig : eventConfigList)
                     {
-                        // Verify: all the eventmasks and their sampling period
-                        DcEventConfig* pCurrentConfig = pEventsConfig;
+                        isEqual = false;
+                        EventMaskType eventMask = EncodeEvent(eventConfig.pmc);
 
-                        for (unsigned int i = 0 ; i < numberOfEvents; i++)
+                        for (unsigned int j = 0; j < numberOfEvents; j++)
                         {
-                            isEqual = false;
-                            EventMaskType eventMask = EncodeEvent(pCurrentConfig->pmc);
+                            isEqual = (eventMask == eventConfigVec[j].eventMask)
+                                && (eventConfig.eventCount == eventConfigVec[j].eventCount);
 
-                            for (unsigned int j = 0; j < numberOfEvents; j++)
-                            {
-                                isEqual = (eventMask == eventConfigVec[j].eventMask)
-                                          && (pCurrentConfig->eventCount == eventConfigVec[j].eventCount);
-
-                                if (isEqual)
-                                {
-                                    break;
-                                }
-                            }
-
-                            if (!isEqual)
+                            if (isEqual)
                             {
                                 break;
                             }
+                        }
 
-                            pCurrentConfig++;
+                        if (!isEqual)
+                        {
+                            break;
                         }
                     }
                 }
