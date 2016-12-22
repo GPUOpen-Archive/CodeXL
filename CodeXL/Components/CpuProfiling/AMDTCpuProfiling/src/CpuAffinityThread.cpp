@@ -29,7 +29,7 @@
     #include <sys/syscall.h>
 #endif
 
-CpuAffinityThread::CpuAffinityThread(unsigned int core, CoreTopology* pSessionTopology):
+CpuAffinityThread::CpuAffinityThread(unsigned int core, AMDTCpuTopology* pSessionTopology):
     osThread(L"CpuAffinityThread"), m_core(core), m_pSessionTopology(pSessionTopology)
 {
 }
@@ -112,8 +112,9 @@ int CpuAffinityThread::entryPoint()
 #endif
 
     osCpuid cpuInfo;
-    m_pSessionTopology->processor = cpuInfo.getcore();
-    m_pSessionTopology->numaNode = cpuInfo.getNodeId();
+    //m_pSessionTopology->m_coreId = cpuInfo.getcore();
+    m_pSessionTopology->m_numaNodeId = cpuInfo.getNodeId();
+    m_pSessionTopology->m_processorId = cpuInfo.getcore(); // Physical processor id
 
     return 0;
 }

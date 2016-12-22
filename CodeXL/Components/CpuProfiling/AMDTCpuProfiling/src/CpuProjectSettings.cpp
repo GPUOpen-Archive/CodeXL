@@ -735,16 +735,15 @@ void CpuProjectSettings::OnExecutableChanged(const QString& exePath, bool isChan
 void CpuProjectSettings::InitializeCoresTree()
 {
     // Create topology map to read the cores from:
-    CoreTopologyMap tempTopology;
+    typedef gtMap<unsigned int, AMDTCpuTopology> AMDTCoreTopologyMap;
+    AMDTCoreTopologyMap tempTopologyMap;
 
     // For each core, use the CpuAffinityThread to find the processor and node:
     for (int count = 0; count < m_coreCount; count++)
     {
-        CoreTopology oneCore;
-        oneCore.numaNode = 0;
-        oneCore.processor = 0;
-
+        AMDTCpuTopology oneCore(0,0,0);
         CpuAffinityThread threadAff(count, &oneCore);
+
         threadAff.execute();
 
         // Wait for the thread to finish.  It should take 1 ms at the most:
@@ -755,20 +754,19 @@ void CpuProjectSettings::InitializeCoresTree()
 #endif
         }
 
-        tempTopology.insert(CoreTopologyMap::value_type(count, oneCore));
+        tempTopologyMap.insert(AMDTCoreTopologyMap::value_type(count, oneCore));
     }
 
     // Iterate the core in the topology map:
     QMap<int, QTreeWidgetItem*> sockMap;
-    CoreTopologyMap::iterator it = tempTopology.begin();
 
-    for (; it != tempTopology.end(); it++)
+    for (auto& it : tempTopologyMap)
     {
 
-        QString cpuName = CP_STR_cpuProfileProjectSettingsCPUPrefix + QString::number(it->second.processor);
+        QString cpuName = CP_STR_cpuProfileProjectSettingsCPUPrefix + QString::number(it.second.m_processorId);
         QTreeWidgetItem* pCPUItem = nullptr;
 
-        if (!sockMap.contains(it->second.processor))
+        if (!sockMap.contains(it.second.m_processorId))
         {
             pCPUItem = new CPUTreeItem;
 
@@ -777,23 +775,23 @@ void CpuProjectSettings::InitializeCoresTree()
             m_pCoresTree->addTopLevelItem(pCPUItem);
             pCPUItem->setFlags(pCPUItem->flags() | Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
             pCPUItem->setCheckState(0, Qt::Checked);
-            sockMap.insert(it->second.processor, pCPUItem);
+            sockMap.insert(it.second.m_processorId, pCPUItem);
         }
         else
         {
-            pCPUItem = sockMap[it->second.processor];
+            pCPUItem = sockMap[it.second.m_processorId];
         }
 
         GT_IF_WITH_ASSERT(pCPUItem != nullptr)
         {
             // Get the core number and build name:
-            int core = it->first;
+            int core = it.first;
             QString coreName = CP_STR_cpuProfileProjectSettingsCorePrefix + QString::number(core);
 
             CoreTreeItem* pCoreItem = new CoreTreeItem;
 
             pCoreItem->setText(0, coreName);
-            pCoreItem->m_mask = 1ULL << it->first;
+            pCoreItem->m_mask = 1ULL << it.first;
 
             pCoreItem->setFlags(pCPUItem->flags() | Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
             pCoreItem->setCheckState(0, Qt::Checked);

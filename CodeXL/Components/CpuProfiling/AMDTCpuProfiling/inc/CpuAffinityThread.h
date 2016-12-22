@@ -6,23 +6,18 @@
 /// \brief  A brief file description that Doxygen makes note of.
 ///
 //==================================================================================
-// $Id: //devtools/main/CodeXL/Components/CpuProfiling/AMDTCpuProfiling/inc/CpuAffinityThread.h#6 $
-// Last checkin:   $DateTime: 2016/04/18 06:02:03 $
-// Last edited by: $Author:  AMD Developer Tools Team
-// Change list:    $Change: 569613 $
-//=============================================================
+
 #ifndef _CPUAFFINITYTHREAD_H
 #define _CPUAFFINITYTHREAD_H
 
 //AMDTOsWrappers
 #include <AMDTOSWrappers/Include/osThread.h>
-
-#include <AMDTCpuProfilingRawData/inc/CpuProfileInfo.h>
+#include <AMDTCommonHeaders/AMDTCommonProfileDataTypes.h>
 
 class CpuAffinityThread : public osThread
 {
 public:
-    CpuAffinityThread(unsigned int core, CoreTopology* pSessionTopology);
+    CpuAffinityThread(unsigned int core, AMDTCpuTopology* pSessionTopology);
     ~CpuAffinityThread();
 
     // Overrides osThread
@@ -38,6 +33,6 @@ private:
     unsigned int m_core;
 
     // The topology of the core
-    CoreTopology* m_pSessionTopology;
+    AMDTCpuTopology* m_pSessionTopology;
 };
 #endif //_CPUAFFINITYTHREAD_H
