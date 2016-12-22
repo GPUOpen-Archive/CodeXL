@@ -20,15 +20,12 @@
 #include <cwchar>
 #include <climits>
 #include <string>
+#include <map>
 
 #include <AMDTOSWrappers/Include/osCriticalSectionLocker.h>
 #include <AMDTOSWrappers/Include/osFilePath.h>
 #include <AMDTProfilingAgentsData/inc/JclReader.h>
 #include <AMDTProfilingAgentsData/inc/JclWriter.h>
-
-
-// Map of <process id, jcl*>
-typedef gtMap<gtUInt64, JclWriter*> JclMap;
 
 
 // This is the constructor of a class
@@ -303,7 +300,7 @@ HRESULT JitTaskInfo::WriteJavaJncFiles(/*[in]*/ const wchar_t* pDirectory)
         qtstrDir = "."; //set as local directory
     }
 
-    JclMap jclMap;
+    std::map<gtUInt64, JclWriter*> jclMap;
 
     for (const auto& mapItem : m_JitInfoMap)
     {
@@ -327,7 +324,8 @@ HRESULT JitTaskInfo::WriteJavaJncFiles(/*[in]*/ const wchar_t* pDirectory)
             newJcl = procDir + QString::number(mapItem.first.processId) + ".jcl";
 
             JclWriter* pWriter = new JclWriter(newJcl.toStdWString().c_str(),
-                                               mapItem.second.categoryName.asCharArray(), (int)mapItem.first.processId);
+                                               mapItem.second.categoryName.asCharArray(),
+                                               (int)mapItem.first.processId);
 
             if (NULL == pWriter)
             {
@@ -340,8 +338,7 @@ HRESULT JitTaskInfo::WriteJavaJncFiles(/*[in]*/ const wchar_t* pDirectory)
                 return E_FAIL;
             }
 
-            auto res = jclMap.emplace(mapItem.first.processId, pWriter);
-            jclIt = res.first;
+            jclIt = jclMap.insert({mapItem.first.processId, pWriter}).first;
         }
 
         //write the jit block to the jcl file
