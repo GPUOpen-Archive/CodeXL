@@ -12,12 +12,8 @@
 // Change list:    $Change: 569055 $
 //=====================================================================
 
-#include <QtCore>
-#include <QDir>
 #include <QFileInfo>
 
-//Commented out until config.h is added to repository or it is #ifdeffed only for Linux
-//#include "config.h"
 #include <CpuProfileDataTranslation.h>
 #include <CpuProfileDataMigrator.h>
 

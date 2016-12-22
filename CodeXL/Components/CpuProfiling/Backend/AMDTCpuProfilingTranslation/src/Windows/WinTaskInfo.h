@@ -10,13 +10,6 @@
 #ifndef _WINTASKINFO_H_
 #define _WINTASKINFO_H_
 
-// Suppress Qt header warnings
-#pragma warning(push)
-#pragma warning(disable : 4127 4718)
-#include <QMap>
-#include <QList>
-#pragma warning(pop)
-
 #include <AMDTBaseTools/Include/gtASCIIString.h>
 #include <AMDTBaseTools/Include/gtHashMap.h>
 #include "TaskInfoMapper.h"
@@ -189,7 +182,6 @@ public:
 
 private:
     bool GetUserPeModInfo(TiModuleInfo* pModInfo, TiTimeType systemTimeTick, ModuleMap::value_type& item);
-    bool GetUserOclModInfo(TiModuleInfo* pModInfo, TiTimeType systemTimeTick, ModuleMap::value_type& item);
 
     // generate temp file name for driver, snapshot file names
     HRESULT GenerateTempFiles();
@@ -207,7 +199,7 @@ private:
     void OnThreadCreation(const TASK_INFO_RECORD& tiRecord);
     void OnThreadDeletion(const TASK_INFO_RECORD& tiRecord);
 
-    // Calculate the mdoule unload time.
+    // Calculate the module unload time.
     void CalculateEndTime();
 
     // calculate kernel module size.
@@ -258,11 +250,8 @@ private:
     // structure of time mark
     struct TimeMark
     {
-        DWORD     sysTime_ms;     // system time in milliseconds
-        gtUInt64  cpuTimeStamp;   // cpu time stamp (no longer used)
-
-        // constructor for time mark
-        TimeMark() : sysTime_ms(0), cpuTimeStamp(0) {}
+        DWORD     sysTime_ms = 0;     // system time in milliseconds
+        gtUInt64  cpuTimeStamp = 0;   // cpu time stamp (no longer used)
     };
 
     // enumeration of time stamp measurement type

@@ -10,23 +10,25 @@
 // Suppress Qt header warnings
 #pragma warning(push)
 #pragma warning(disable : 4127 4718)
-#include <QtCore>
 #include <QFile>
 #include <QDir>
-#include <QMap>
 #pragma warning(pop)
 
 #include "JitTaskInfo.h"
-#include <stdio.h>
-#include <assert.h>
-#include <wchar.h>
-#include <limits.h>
+#include <cstdio>
+#include <cassert>
+#include <cwchar>
+#include <climits>
 #include <string>
 
 #include <AMDTOSWrappers/Include/osCriticalSectionLocker.h>
 #include <AMDTOSWrappers/Include/osFilePath.h>
 #include <AMDTProfilingAgentsData/inc/JclReader.h>
 #include <AMDTProfilingAgentsData/inc/JclWriter.h>
+
+
+// Map of <process id, jcl*>
+typedef gtMap<gtUInt64, JclWriter*> JclMap;
 
 
 // This is the constructor of a class
@@ -289,9 +291,6 @@ HRESULT JitTaskInfo::ReadJavaJitInformation(const wchar_t* pDirectory, const wch
     return hr;
 }
 
-typedef QMap<gtUInt64, JclWriter*> JclMap; //process id, jcl...
-typedef QMap<ModuleKey, int> ModIdMap;
-
 //Note that the directory string should not end in a "\"
 HRESULT JitTaskInfo::WriteJavaJncFiles(/*[in]*/ const wchar_t* pDirectory)
 {
@@ -304,35 +303,31 @@ HRESULT JitTaskInfo::WriteJavaJncFiles(/*[in]*/ const wchar_t* pDirectory)
         qtstrDir = "."; //set as local directory
     }
 
-    JitBlockInfoMap::iterator mapIt;
     JclMap jclMap;
-    JclMap::iterator jclIt;
 
-    for (mapIt = m_JitInfoMap.begin(); mapIt != m_JitInfoMap.end(); ++mapIt)
+    for (const auto& mapItem : m_JitInfoMap)
     {
         //If the block wasn't used, go to the next one.
-        JitBlockInfoMap::value_type& item = *mapIt;
-
-        if (!wcslen(item.second.movedJncFileName))
+        if (!wcslen(mapItem.second.movedJncFileName))
         {
             //delete the jit file, if not used
-            QFile::remove(QString::fromWCharArray(item.second.jncFileName));
+            QFile::remove(QString::fromWCharArray(mapItem.second.jncFileName));
             continue;
         }
 
         // Make directory for Jnc/Jcl if not already exist
-        QString procDir = qtstrDir + QString(osFilePath::osPathSeparator) + QString::number(item.first.processId) + QString(osFilePath::osPathSeparator);
+        QString procDir = qtstrDir + QString(osFilePath::osPathSeparator) + QString::number(mapItem.first.processId) + QString(osFilePath::osPathSeparator);
 
-        jclIt = jclMap.find(item.first.processId);
+        auto jclIt = jclMap.find(mapItem.first.processId);
 
         //If there is not a jcl file for this jnc, add it
         if (jclMap.end() == jclIt)
         {
             QString newJcl;
-            newJcl = procDir + QString::number(item.first.processId) + ".jcl";
+            newJcl = procDir + QString::number(mapItem.first.processId) + ".jcl";
 
             JclWriter* pWriter = new JclWriter(newJcl.toStdWString().c_str(),
-                                               item.second.categoryName.asCharArray(), (int)item.first.processId);
+                                               mapItem.second.categoryName.asCharArray(), (int)mapItem.first.processId);
 
             if (NULL == pWriter)
             {
@@ -345,46 +340,54 @@ HRESULT JitTaskInfo::WriteJavaJncFiles(/*[in]*/ const wchar_t* pDirectory)
                 return E_FAIL;
             }
 
-            jclIt = jclMap.insert(item.first.processId, pWriter);
+            auto res = jclMap.emplace(mapItem.first.processId, pWriter);
+            jclIt = res.first;
         }
 
         //write the jit block to the jcl file
         JitLoadRecord element;
-        element.blockStartAddr = item.first.moduleLoadAddr;
-        element.blockEndAddr = element.blockStartAddr + m_tiModMap [item.first].moduleSize;
-        element.loadTimestamp = item.first.moduleLoadTime;
-        wcscpy(element.classFunctionName, m_tiModMap [mapIt->first].moduleName);
-        wcscpy(element.jncFileName, item.second.movedJncFileName);
-        wcscpy(element.srcFileName, item.second.srcFileName);
-        jclIt.value()->WriteLoadRecord(&element);
+        element.blockStartAddr = mapItem.first.moduleLoadAddr;
+        element.blockEndAddr = element.blockStartAddr + m_tiModMap[mapItem.first].moduleSize;
+        element.loadTimestamp = mapItem.first.moduleLoadTime;
+        wcscpy(element.classFunctionName, m_tiModMap[mapItem.first].moduleName);
+        wcscpy(element.jncFileName, mapItem.second.movedJncFileName);
+        wcscpy(element.srcFileName, mapItem.second.srcFileName);
+
+        if (jclIt->second != nullptr)
+        {
+            jclIt->second->WriteLoadRecord(&element);
+        }
 
         //rename from temp->jncFile to temp->translatedJncFile
         QString new_jnc = procDir + QString(osFilePath::osPathSeparator) +
-                          QString::fromWCharArray(item.second.movedJncFileName);
-        QString oldFile = QString::fromWCharArray(item.second.jncFileName);
+                          QString::fromWCharArray(mapItem.second.movedJncFileName);
+        QString oldFile = QString::fromWCharArray(mapItem.second.jncFileName);
         QFile::rename(oldFile, new_jnc);
 
         //add unload info, if known
-        if (TI_TIMETYPE_MAX != m_tiModMap [mapIt->first].moduleUnloadTime)
+        if (TI_TIMETYPE_MAX != m_tiModMap[mapItem.first].moduleUnloadTime)
         {
             JitUnloadRecord block;
-            block.blockStartAddr = item.first.moduleLoadAddr;
-            block.unloadTimestamp = m_tiModMap [mapIt->first].moduleUnloadTime;
-            jclIt.value()->WriteUnloadRecord(&block);
+            block.blockStartAddr = mapItem.first.moduleLoadAddr;
+            block.unloadTimestamp = m_tiModMap[mapItem.first].moduleUnloadTime;
+
+            if (jclIt->second != nullptr)
+            {
+                jclIt->second->WriteUnloadRecord(&block);
+            }
         }
     }
 
     //delete and close the jcl writer(s)
-    for (jclIt = jclMap.begin(); jclIt != jclMap.end(); jclIt++)
+    for (auto& jcl : jclMap)
     {
-        delete jclIt.value();
+        delete jcl.second;
     }
 
     jclMap.clear();
 
     return hr;
 }
-
 
 //Note that the directory string should not end in a "\"
 HRESULT JitTaskInfo::ReadOldJitInfo(/* [in] */ const wchar_t* pDirectory)
