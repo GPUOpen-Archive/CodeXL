@@ -7,15 +7,13 @@
 ///
 //==================================================================================
 
+#include <algorithm>
+
 #include <AMDTCpuProfilingTranslation/inc/Windows/TaskInfoInterface.h>
+#include <AMDTOSWrappers/Include/osDirectory.h>
 #include <AMDTOSWrappers/Include/osFilePath.h>
 #include "WinTaskInfo.h"
 
-// Suppress Qt header warnings
-#pragma warning(push)
-#pragma warning(disable : 4800)
-#include <QDir>
-#pragma warning(pop)
 
 // TODO: Finalize the value of this key
 #if AMDT_ADDRESS_SPACE_TYPE == AMDT_64_BIT_ADDRESS_SPACE
@@ -90,7 +88,7 @@ HRESULT fnWriteJncFiles(/*[in]*/ const wchar_t* directory)
     HRESULT hr_java = g_TaskInfo.WriteJavaJncFiles(directory);
     HRESULT hr_clr = g_TaskInfo.WriteCLRJncFiles(directory);
 
-    // Probably, we can have seperate APIs for Java and CLR
+    // Probably, we can have separate APIs for Java and CLR
     // For now, returning E_FAIL if either function fail
     if (hr_java != S_OK || hr_clr != S_OK)
     {
@@ -457,50 +455,53 @@ FILETIME fnSynchronize(FILETIME start, gtUInt64 deltaTick, int core,
 }
 
 
-//We clear out all jit directories where the process id is not currently in
-//  use.
-void helpClearDir(const wchar_t* pDirName, QList<unsigned long>* pPidList)
+// We clear out all jit directories where the process id is not currently in use.
+void helpClearDir(const wchar_t* pDirName, gtVector<gtUInt32>& pidList)
 {
-    //the jit dir may contain a bunch of directories with the pid as the name
-    QDir searchDir(QString::fromWCharArray(pDirName));
+    // the jit dir may contain a bunch of directories with the pid as the name
+    osDirectory searchDir;
+    searchDir.setDirectoryFullPathFromString(pDirName);
 
     if (searchDir.exists())
     {
-        QFileInfoList di_list = searchDir.entryInfoList(QDir::AllDirs);
+        // Sort the pidList, so that we can perform binary search.
+        std::sort(pidList.begin(), pidList.end());
 
-        //while directories are left
-        for (int i = 0; i < di_list.size(); i++)
+        gtList<osFilePath> di_list;
+        searchDir.getSubDirectoriesPaths(osDirectory::SORT_BY_NAME_ASCENDING, di_list);
+
+        // while directories are left
+        for (auto& dirPath : di_list)
         {
-            unsigned long pid = di_list.at(i).fileName().toULong();
+            // Extract only the folder name
+            gtString dirName;
+            dirPath.getFileName(dirName);
 
-            //check if pid is on the snapshot list, and therefore running
-            if ((0 != pid) && (-1 == pPidList->indexOf(pid)))
+            // Convert folder name string to pid.
+            gtUInt32 pid = 0;
+            dirName.toUnsignedIntNumber(pid);
+
+            // Convert pid to string
+            gtString tempName(std::to_wstring(pid).data());
+
+            // Check if folder name and pid as string are same. If not, then skip this folder.
+            // Else check if pid is on the snapshot list, and therefore running.
+            if ((dirName == tempName) && (false == std::binary_search(pidList.begin(), pidList.end(), pid)))
             {
-                QString pidDir(QString::fromWCharArray(pDirName));
-                pidDir += QString(osFilePath::osPathSeparator) + di_list.at(i).fileName();
-
-                //if it's not running, delete the dir
-                QDir dir(pidDir);
-
-                if (dir.exists())
+                if (dirPath.exists())
                 {
-                    QFileInfoList fi_list = dir.entryInfoList();
-
-                    for (int j = 0; j < fi_list.size(); j++)
-                    {
-                        dir.remove(fi_list.at(j).fileName());
-                    }
-
-                    dir.rmdir(pidDir);
+                    osDirectory pidDir(dirPath);
+                    pidDir.deleteRecursively();
                 }
             }
         }
 
-        di_list = searchDir.entryInfoList(QStringList("*.css"), QDir::Files);
+        di_list.clear();
+        searchDir.getContainedFilePaths(L"*.css", osDirectory::SORT_BY_NAME_ASCENDING, di_list, false);
 
-        for (int j = 0; j < di_list.size(); j++)
+        for (const auto& cssFilePath : di_list)
         {
-            searchDir.remove(di_list.at(j).fileName());
+            searchDir.deleteFile(cssFilePath.asString());
         }
     }
 }
@@ -509,10 +510,8 @@ void helpClearDir(const wchar_t* pDirName, QList<unsigned long>* pPidList)
 //  so as not to fill up the user's computer.
 HRESULT fnCleanupJitInformation()
 {
-    DWORD* procArray = NULL;
-    uint procCount = 0;
-    uint i;
-    QList <unsigned long> pidList;
+    DWORD* procArray = nullptr;
+    gtUInt32 procCount = 0;
 
     DWORD modNum = 1024;
     bool bRepeat = true;
@@ -524,7 +523,7 @@ HRESULT fnCleanupJitInformation()
     {
         procArray = (DWORD*)malloc(sizeof(DWORD) * modNum);
 
-        if (NULL == procArray)
+        if (nullptr == procArray)
         {
             break;
         }
@@ -534,7 +533,7 @@ HRESULT fnCleanupJitInformation()
         if (!EnumProcesses(procArray, (sizeof(DWORD) * modNum), &cbNeeded))
         {
             free(procArray);
-            procArray = NULL;
+            procArray = nullptr;
             break;
         }
 
@@ -543,7 +542,7 @@ HRESULT fnCleanupJitInformation()
         if (procCount > modNum)
         {
             free(procArray);
-            procArray = NULL;
+            procArray = nullptr;
             modNum = procCount;
             procCount = 0;
         }
@@ -551,29 +550,30 @@ HRESULT fnCleanupJitInformation()
         {
             bRepeat = false;
         }
-
     }
 
-    //walk the snapshow, for each proc, save the id
-    for (i = 0; i < procCount; i++)
+    gtVector<gtUInt32> pidList;
+    pidList.reserve(procCount);
+
+    //walk the snapshot, for each proc, save the id
+    for (gtUInt32 i = 0; i < procCount; i++)
     {
-        pidList.append(procArray[i]);
+        pidList.push_back(procArray[i]);
     }
 
     //cleanup snapshot
     if (procArray)
     {
         free(procArray);
-        procArray = NULL;
+        procArray = nullptr;
     }
 
-    wchar_t pidDirName[OS_MAX_PATH + 1];
-    pidDirName[0] = L'\0';
+    wchar_t pidDirName[OS_MAX_PATH + 1] = { 0 };
     GetTempPathW(OS_MAX_PATH, pidDirName);
 
-    helpClearDir(pidDirName, &pidList);
-    pidList.clear();
-    return 0;
+    helpClearDir(pidDirName, pidList);
+
+    return S_OK;
 }
 
 
