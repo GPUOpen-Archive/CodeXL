@@ -15,7 +15,6 @@ env.Append( CPPPATH = [
 ])
 
 UseTinyXml(env)
-UseQtNoGraphics(env)
 
 env.Append (LIBS = [
 	"CXLBaseTools",
