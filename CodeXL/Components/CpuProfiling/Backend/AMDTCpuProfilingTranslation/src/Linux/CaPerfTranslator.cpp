@@ -12,8 +12,6 @@
 // Change list:    $Change: 569055 $
 //=====================================================================
 
-#include <QtCore>
-#include <QtWidgets>
 #include <QFile>
 #include <QDir>
 
@@ -21,16 +19,16 @@
     #include "config.h"
 #endif // HAVE_CONFIG_H
 
-#include <stdio.h>
 #include <unistd.h>
-#include <stdlib.h>
-#include <stdint.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/utsname.h>
 #include <sys/time.h>
 #include <fcntl.h>
-#include <wchar.h>
+#include <cstdio>
+#include <cstdlib>
+#include <cstdint>
+#include <cwchar>
 #include <sstream>
 #include <iostream>
 #include <iomanip>
