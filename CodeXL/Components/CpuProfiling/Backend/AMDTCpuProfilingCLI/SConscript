@@ -6,7 +6,7 @@ from CXL_init import *
 appName = "CodeXLCpuProfiler-bin"
 
 env = CXL_env.Clone()
-UseBoost(env)
+
 compiler_base_flags = "-D_LINUX -DLINUX -Wall -Werror -Wextra -g -fmessage-length=0 -Wno-unknown-pragmas -pthread -std=c++11 -DAMDT_BUILD_SUFFIX="
 
 if (env['CXL_build'] == 'debug'):
