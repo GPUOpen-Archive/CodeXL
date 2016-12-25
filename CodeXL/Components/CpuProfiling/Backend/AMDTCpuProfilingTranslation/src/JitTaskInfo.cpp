@@ -7,13 +7,6 @@
 ///
 //==================================================================================
 
-// Suppress Qt header warnings
-#pragma warning(push)
-#pragma warning(disable : 4127 4718)
-#include <QFile>
-#include <QDir>
-#pragma warning(pop)
-
 #include "JitTaskInfo.h"
 #include <cstdio>
 #include <cassert>
@@ -24,6 +17,7 @@
 
 #include <AMDTOSWrappers/Include/osCriticalSectionLocker.h>
 #include <AMDTOSWrappers/Include/osFilePath.h>
+#include <AMDTOSWrappers/Include/osDirectory.h>
 #include <AMDTProfilingAgentsData/inc/JclReader.h>
 #include <AMDTProfilingAgentsData/inc/JclWriter.h>
 
@@ -98,68 +92,38 @@ TiTimeType JitTaskInfo::CalculateDeltaTick(gtUInt64 rawTick) const
 #endif
 }
 
-bool CopyFilesToDestionDir(QString srcDirName, QString destDirName, QStringList nameFilter = QStringList())
+bool CopyFilesToDestionDir(const gtString& srcDirName, const gtString& destDirName, gtList<gtString>& nameFilter)
 {
-    bool retValue = true;
-
-    QDir srcDir(srcDirName);
-
-    if (!srcDir.exists())
-    {
-        return false;
-    }
-
-    QDir destDir(destDirName);
-
-    //Make the destination if it doesn't exist
-    if ((!destDir.exists()) && (!destDir.mkpath(destDirName)))
-    {
-        return false;
-    }
-
-    QFileInfoList di_list = srcDir.entryInfoList(nameFilter, QDir::Files);
-
-    for (int i = 0; i < di_list.size(); i++)
-    {
-        QString srcFile = srcDirName + QString(osFilePath::osPathSeparator) + di_list.at(i).fileName();
-        QString destFile = destDirName + QString(osFilePath::osPathSeparator) + di_list.at(i).fileName();
-
-        if (!QFile::exists(destFile))
-        {
-            bool ret = false;
-            int retry = 0;
-
-            do
-            {
-                ret = QFile::copy(srcFile, destFile);
-            }
-            while (!ret && (++retry < 5));
-        }
-    }
-
-    return retValue;
+    osDirectory srcDir(srcDirName);
+    return srcDir.copyFilesToDirectory(destDirName, nameFilter);
 }
 
-//Note that the directory string should not end in a "\"
+// Note that the directory string should not end in a "\"
 HRESULT JitTaskInfo::ReadJavaJitInformation(const wchar_t* pDirectory, const wchar_t* pSessionDir)
 {
     HRESULT hr = S_OK;
 
-    QString dirQstr = QString::fromWCharArray(pDirectory);
+    gtString searchDirStr(pDirectory);
+    osDirectory searchDir(searchDirStr);
 
-    //for each process id directory in the given directory
-    QDir search_dir(dirQstr);
-
-    if (search_dir.exists())
+    if (searchDir.exists())
     {
-        QFileInfoList di_list = search_dir.entryInfoList(QDir::AllDirs);
+        gtList<osFilePath> subDirLst;
+        searchDir.getSubDirectoriesPaths(osDirectory::SORT_BY_NAME_ASCENDING, subDirLst);
 
-        //while there are directories left,
-        for (int i = 0; i < di_list.size(); i++)
+        // while there are directories left
+        for (const auto& subDirPath : subDirLst)
         {
-            unsigned long tPid = di_list.at(i).fileName().toULong();
+            gtString subDirName;
+            subDirPath.getFileName(subDirName);
 
-            if (0 == tPid)
+            gtUInt64 tPid = 0;
+            subDirName.toUnsignedInt64Number(tPid);
+
+            gtString pidAsString(std::to_wstring(tPid).data());
+
+            // If dirName is not a valid number, then skip it.
+            if ((0 == tPid) || (subDirName != pidAsString))
             {
                 continue;
             }
@@ -167,30 +131,34 @@ HRESULT JitTaskInfo::ReadJavaJitInformation(const wchar_t* pDirectory, const wch
             JitRecordType jitRecordType;
             std::wstring javaApp;
 
-            QString tempPath = dirQstr + QString(osFilePath::osPathSeparator) + di_list.at(i).fileName();
-            // QString oldPath = tempPath;
+            gtString subDirPathStr = subDirPath.asString();
 
-            QString jcl_file = tempPath + QString(osFilePath::osPathSeparator) + di_list.at(i).fileName();
-            jcl_file += ".jcl";
+            gtString jclFilePathStr(subDirPathStr);
+            jclFilePathStr.append(osFilePath::osPathSeparator).append(subDirName).append(L".jcl");
 
-            if (!QFile::exists(jcl_file))
+            osFilePath file(jclFilePathStr);
+
+            if (!file.exists())
             {
                 continue;
             }
 
-            QString sess_pid = QString::fromWCharArray(pSessionDir) + QString(osFilePath::osPathSeparator) + di_list.at(i).fileName();
-            QDir sess_pid_dir;
-            sess_pid_dir.mkpath(sess_pid);
+            gtString sessionDirPathStr(pSessionDir);
+
+            gtString sessionSubDirPathStr(pSessionDir);
+            sessionSubDirPathStr.append(osFilePath::osPathSeparator).append(subDirName);
+
+            osDirectory sessionSubDir(sessionSubDirPathStr);
+            sessionSubDir.create();
 
             // copy file from temp dir to session dir;
-            CopyFilesToDestionDir(dirQstr + QString(osFilePath::osPathSeparator) + di_list.at(i).fileName(), sess_pid);
+            gtList<gtString> emptyFilter;
+            CopyFilesToDestionDir(subDirPathStr, sessionSubDirPathStr, emptyFilter);
 
-            //TODO: Baskar: remove the jcl file too..
-            // QFile::remove(jcl_file);
-
-            //read the copied jcl file
-            jcl_file = sess_pid + QString(osFilePath::osPathSeparator) + di_list.at(i).fileName() + ".jcl";
-            JclReader jclReader(jcl_file.toStdWString().c_str());
+            // read the copied jcl file
+            jclFilePathStr = sessionSubDirPathStr;
+            jclFilePathStr.append(osFilePath::osPathSeparator).append(subDirName).append(L".jcl");
+            JclReader jclReader(jclFilePathStr.asCharArray());
 
             if (!jclReader.ReadHeader(&javaApp))
             {
@@ -198,9 +166,7 @@ HRESULT JitTaskInfo::ReadJavaJitInformation(const wchar_t* pDirectory, const wch
                 continue;
             }
 
-            bool bitness = jclReader.Is32Bit();
-            gtUInt64 jitProcessID = di_list.at(i).fileName().toULongLong();
-            m_bitnessMap[jitProcessID] = bitness;
+            m_bitnessMap[tPid] = jclReader.Is32Bit();
 
             while (jclReader.ReadNextRecordType(&jitRecordType))
             {
@@ -226,12 +192,10 @@ HRESULT JitTaskInfo::ReadJavaJitInformation(const wchar_t* pDirectory, const wch
                     m_tiModMap.insert(ModuleMap::value_type(t_modKey, t_modValue));
                     m_JitModCount++;
 
-                    QString repPath = QString::fromWCharArray(jitLoadBlock.jncFileName);
-                    //TODO: Baskar: before replacing remove the old file
-                    // QFile::remove(QString::fromWCharArray(jit_load_block.jncFileName));
+                    gtString repPath(jitLoadBlock.jncFileName);
 
-                    repPath.replace(tempPath, sess_pid);
-                    wcscpy(jitLoadBlock.jncFileName, repPath.toStdWString().c_str());
+                    repPath.replace(searchDirStr, sessionDirPathStr);
+                    wcscpy(jitLoadBlock.jncFileName, repPath.asCharArray());
 
                     const JitBlockValue tJitBlockValue(javaApp.c_str(), jitLoadBlock.jncFileName, jitLoadBlock.srcFileName);
                     m_JitInfoMap.insert(JitBlockInfoMap::value_type(t_modKey, tJitBlockValue));
@@ -247,57 +211,50 @@ HRESULT JitTaskInfo::ReadJavaJitInformation(const wchar_t* pDirectory, const wch
 
                     jitUnloadBlock.unloadTimestamp = CalculateDeltaTick(jitUnloadBlock.unloadTimestamp);
 
-                    //find old record module, and alter unload time.
-                    ModuleMap::iterator it;
-
-                    for (it = m_tiModMap.begin(); it != m_tiModMap.end(); ++it)
+                    // find old record module, and alter unload time.
+                    for (auto& mapItem : m_tiModMap)
                     {
-                        ModuleMap::value_type& item1 = *it;
-
-                        //note that item.first is the key, and item.second is the value
-                        if (item1.first.processId != tPid)
+                        // note that item.first is the key, and item.second is the value
+                        if (mapItem.first.processId != tPid)
                         {
                             continue;
                         }
 
-                        if (item1.first.moduleLoadAddr != jitUnloadBlock.blockStartAddr)
+                        if (mapItem.first.moduleLoadAddr != jitUnloadBlock.blockStartAddr)
                         {
                             continue;
                         }
 
-                        if (item1.first.moduleLoadTime >= jitUnloadBlock.unloadTimestamp)
+                        if (mapItem.first.moduleLoadTime >= jitUnloadBlock.unloadTimestamp)
                         {
                             continue;
                         }
 
-                        item1.second.moduleUnloadTime = (TiTimeType)jitUnloadBlock.unloadTimestamp;
+                        mapItem.second.moduleUnloadTime = (TiTimeType)jitUnloadBlock.unloadTimestamp;
                     }
                 }
-            } //end while ReadNextRecordType
+            }
 
-            // scope closes jcl file
-
-            //TODO: Baskar: delete the tmp dir that contains the jcl/jnc files
-            // QDir dir(oldPath);
-            // if (dir.exists(oldPath)) {
-            //  dir.rmdir(oldPath);
-            // }
+            // Delete the subDir that contains the jcl/jnc files
+            osDirectory subDir(subDirPath);
+            subDir.deleteRecursively();
         }
     }
 
     return hr;
 }
 
-//Note that the directory string should not end in a "\"
+// Note that the directory string should not end in a "\"
 HRESULT JitTaskInfo::WriteJavaJncFiles(/*[in]*/ const wchar_t* pDirectory)
 {
     HRESULT hr = S_OK;
 
-    QString qtstrDir = QString::fromWCharArray(pDirectory);
+    gtString strDir(pDirectory);
 
-    if (qtstrDir.isEmpty())
+    if (strDir.isEmpty())
     {
-        qtstrDir = "."; //set as local directory
+        // set as local directory
+        strDir = L".";
     }
 
     std::map<gtUInt64, JclWriter*> jclMap;
@@ -307,27 +264,32 @@ HRESULT JitTaskInfo::WriteJavaJncFiles(/*[in]*/ const wchar_t* pDirectory)
         //If the block wasn't used, go to the next one.
         if (!wcslen(mapItem.second.movedJncFileName))
         {
-            //delete the jit file, if not used
-            QFile::remove(QString::fromWCharArray(mapItem.second.jncFileName));
+            // delete the jit file, if not used
+            osFilePath filepath(mapItem.second.jncFileName);
+            osFile fileToDel(filepath);
+            fileToDel.deleteFile();
             continue;
         }
 
         // Make directory for Jnc/Jcl if not already exist
-        QString procDir = qtstrDir + QString(osFilePath::osPathSeparator) + QString::number(mapItem.first.processId) + QString(osFilePath::osPathSeparator);
+        gtString procDir(strDir);
+        procDir.append(osFilePath::osPathSeparator);
+        procDir.appendUnsignedIntNumber(static_cast<gtUInt32>(mapItem.first.processId));
 
         auto jclIt = jclMap.find(mapItem.first.processId);
 
         //If there is not a jcl file for this jnc, add it
         if (jclMap.end() == jclIt)
         {
-            QString newJcl;
-            newJcl = procDir + QString::number(mapItem.first.processId) + ".jcl";
+            gtString newJcl(procDir);
+            newJcl.append(osFilePath::osPathSeparator);
+            newJcl.appendUnsignedIntNumber(static_cast<gtUInt32>(mapItem.first.processId)).append(L".jcl");
 
-            JclWriter* pWriter = new JclWriter(newJcl.toStdWString().c_str(),
+            JclWriter* pWriter = new JclWriter(newJcl.asCharArray(),
                                                mapItem.second.categoryName.asCharArray(),
                                                (int)mapItem.first.processId);
 
-            if (NULL == pWriter)
+            if (nullptr == pWriter)
             {
                 return E_FAIL;
             }
@@ -355,13 +317,14 @@ HRESULT JitTaskInfo::WriteJavaJncFiles(/*[in]*/ const wchar_t* pDirectory)
             jclIt->second->WriteLoadRecord(&element);
         }
 
-        //rename from temp->jncFile to temp->translatedJncFile
-        QString new_jnc = procDir + QString(osFilePath::osPathSeparator) +
-                          QString::fromWCharArray(mapItem.second.movedJncFileName);
-        QString oldFile = QString::fromWCharArray(mapItem.second.jncFileName);
-        QFile::rename(oldFile, new_jnc);
+        // Rename from temp->jncFile to temp->translatedJncFile
+        gtString newJnc(procDir);
+        newJnc.append(osFilePath::osPathSeparator).append(mapItem.second.movedJncFileName);
 
-        //add unload info, if known
+        osFilePath oldFile(mapItem.second.jncFileName);
+        oldFile.Rename(newJnc);
+
+        // add unload info, if known
         if (TI_TIMETYPE_MAX != m_tiModMap[mapItem.first].moduleUnloadTime)
         {
             JitUnloadRecord block;
@@ -375,7 +338,7 @@ HRESULT JitTaskInfo::WriteJavaJncFiles(/*[in]*/ const wchar_t* pDirectory)
         }
     }
 
-    //delete and close the jcl writer(s)
+    // delete and close the jcl writer(s)
     for (auto& jcl : jclMap)
     {
         delete jcl.second;
@@ -386,28 +349,35 @@ HRESULT JitTaskInfo::WriteJavaJncFiles(/*[in]*/ const wchar_t* pDirectory)
     return hr;
 }
 
-//Note that the directory string should not end in a "\"
+// Note that the directory string should not end in a "\"
 HRESULT JitTaskInfo::ReadOldJitInfo(/* [in] */ const wchar_t* pDirectory)
 {
     HRESULT hr = S_OK;
 
-    //for each process id directory in the given directory
-    QString jitDir = QString::fromWCharArray(pDirectory);
-    QDir search_dir(jitDir);
+    // for each process id directory in the given directory
+    gtString jitDir(pDirectory);
+    osDirectory search_dir(jitDir);
 
     if (!search_dir.exists())
     {
         return E_ACCESSDENIED;
     }
 
-    QFileInfoList di_list = search_dir.entryInfoList(QStringList("*.jcl"));
+    gtList<osFilePath> di_list;
+    search_dir.getContainedFilePaths(L"*.jcl", osDirectory::SORT_BY_NAME_ASCENDING, di_list, false);
 
-    //while there are jcl files left,
-    for (int i = 0; i < di_list.size(); i++)
+    // while there are jcl files left
+    for (const auto& jclFile : di_list)
     {
-        unsigned long tPid = di_list.at(i).fileName().section(".", 0, 0).toULong();
+        gtString filename;
+        jclFile.getFileName(filename);
 
-        if (0 == tPid)
+        gtUInt64 tPid = 0;
+        filename.toUnsignedInt64Number(tPid);
+
+        gtString pidAsString(std::to_wstring(tPid).data());
+
+        if ((0 == tPid) || (filename != pidAsString))
         {
             continue;
         }
@@ -415,9 +385,8 @@ HRESULT JitTaskInfo::ReadOldJitInfo(/* [in] */ const wchar_t* pDirectory)
         JitRecordType jit_record_type;
         std::wstring javaApp;
 
-        //read the jcl file
-        QString jclFile = jitDir + QString(osFilePath::osPathSeparator) + di_list.at(i).fileName();
-        JclReader jclReader(jclFile.toStdWString().c_str());
+        // read the jcl file
+        JclReader jclReader(jclFile.asString().asCharArray());
 
         if (!jclReader.ReadHeader(&javaApp))
         {
@@ -452,33 +421,31 @@ HRESULT JitTaskInfo::ReadOldJitInfo(/* [in] */ const wchar_t* pDirectory)
                 JitUnloadRecord jit_unload_block;
                 jclReader.ReadUnLoadRecord(&jit_unload_block);
 
-                //find old record module, and alter unload time.
-                for (ModuleMap::iterator it = m_tiModMap.begin(), itEnd = m_tiModMap.end(); it != itEnd; ++it)
+                // find old record module, and alter unload time.
+                for (auto& mapItem : m_tiModMap)
                 {
-                    ModuleMap::value_type& item1 = *it;
-
-                    //note that item.first is the key, and item.second is the value
-                    if (item1.first.processId != tPid)
+                    // note that item.first is the key, and item.second is the value
+                    if (mapItem.first.processId != tPid)
                     {
                         continue;
                     }
 
-                    if (item1.first.moduleLoadAddr != jit_unload_block.blockStartAddr)
+                    if (mapItem.first.moduleLoadAddr != jit_unload_block.blockStartAddr)
                     {
                         continue;
                     }
 
-                    if (item1.first.moduleLoadTime >= jit_unload_block.unloadTimestamp)
+                    if (mapItem.first.moduleLoadTime >= jit_unload_block.unloadTimestamp)
                     {
                         continue;
                     }
 
-                    if (TI_TIMETYPE_MAX != item1.second.moduleUnloadTime)
+                    if (TI_TIMETYPE_MAX != mapItem.second.moduleUnloadTime)
                     {
                         continue;
                     }
 
-                    item1.second.moduleUnloadTime = (TiTimeType)jit_unload_block.unloadTimestamp;
+                    mapItem.second.moduleUnloadTime = (TiTimeType)jit_unload_block.unloadTimestamp;
                 }
             }
         }
@@ -499,7 +466,7 @@ bool JitTaskInfo::GetUserJitModInfo(TiModuleInfo* pModInfo, TiTimeType systemTim
     // The module name is the JIT function name.
     wcsncpy(pModInfo->pFunctionName, item.second.moduleName, pModInfo->funNameSize);
 
-    JitBlockValue* pJitBlock = NULL;
+    JitBlockValue* pJitBlock = nullptr;
 
     ModuleKey modKey(pModInfo->processID, item.first.moduleLoadAddr, item.first.moduleLoadTime);
     JitBlockInfoMap::iterator jitIter = m_JitInfoMap.find(modKey);
@@ -522,7 +489,7 @@ bool JitTaskInfo::GetUserJitModInfo(TiModuleInfo* pModInfo, TiTimeType systemTim
 
 #endif
 
-    bool found = (NULL != pJitBlock);
+    bool found = (nullptr != pJitBlock);
 
     if (found)
     {
@@ -628,7 +595,7 @@ HRESULT JitTaskInfo::GetModuleInfo(TiModuleInfo* pModInfo)
 {
     HRESULT hr = S_FALSE;
 
-    if (NULL == pModInfo)
+    if (nullptr == pModInfo)
     {
         return hr;
     }

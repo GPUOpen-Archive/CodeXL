@@ -18,22 +18,16 @@
 #include <AMDTOSWrappers/Include/osCriticalSectionLocker.h>
 #include <AMDTOSWrappers/Include/osAtomic.h>
 #include <AMDTOSWrappers/Include/osFilePath.h>
+#include <AMDTOSWrappers/Include/osDirectory.h>
+#include <AMDTOSWrappers/Include/osFile.h>
 #include <AMDTOSWrappers/Include/osDebugLog.h>
 
 #include <AMDTExecutableFormat/inc/PeFile.h>
-#include <AMDTProfilingAgentsData/inc/JclReader.h>
 #include <AMDTProfilingAgentsData/inc/JclWriter.h>
 #include <AMDTProfilingAgentsData/inc/Windows/CelReader.h>
 #include <AMDTProfilingAgentsData/inc/Windows/CelWriter.h>
 
 #include <tlhelp32.h>
-
-// Suppress Qt header warnings
-#pragma warning(push)
-#pragma warning(disable : 4800)
-#include <QDir>
-#pragma warning(pop)
-
 
 #define AMDTPROCESSENUM32_NAME  L"\\CXLProcessEnum" AMDT_DEBUG_SUFFIX_W AMDT_BUILD_SUFFIX_W
 #define AMDTPROCESSENUM64_NAME  L"\\CXLProcessEnum-x64" AMDT_DEBUG_SUFFIX_W AMDT_BUILD_SUFFIX_W
@@ -41,7 +35,7 @@
 // canonical linear address
 #define ERBT_713_NON_CANONICAL_MASK 0x0000FFFFFFFFFFFF
 
-bool CopyFilesToDestionDir(QString srcDirName, QString destDirName, QStringList nameFilter = QStringList());
+bool CopyFilesToDestionDir(const gtString& srcDirName, const gtString& destDirName, gtList<gtString>& nameFilter);
 
 // This is the constructor of a class
 WinTaskInfo::WinTaskInfo()
@@ -3870,85 +3864,103 @@ typedef gtMap<ModuleKey, int> ModIdMap;
 
 #ifndef CXL_SUPPORTS_INTERPRETED_CODE
 
-// key (unsigned __64) is moduleID from CLR, QString is CLR module name.
-typedef gtMap<gtUInt64, QString> CLRModMap;
+// key (unsigned __64) is moduleID from CLR, gtString is CLR module name.
+typedef gtMap<gtUInt64, gtString> CLRModMap;
 
-//Function id is key, load addr is value
+// Function id is key, load addr is value
 typedef gtMap<FunctionID, gtUInt64> FunIdToAddrMap;
 
-//Note that the directory string should not end in a "\"
+// Note that the directory string should not end in a "\"
 HRESULT WinTaskInfo::ReadCLRJitInformation(/* [in] */ const wchar_t* clrdirectory,
-                                                      const wchar_t* sessionDir)
+                                                      const wchar_t* sessiondirectory)
 {
     HRESULT hr = S_OK;
     CLRModMap clrModMap;
     FunIdToAddrMap clrFunMap;
-    unsigned long clrPid = 0;
 
-    //for each process id directory in the given directory
-    QDir search_dir(QString::fromWCharArray(clrdirectory));
+    // for each process id directory in the given directory
+    osFilePath searchDirPath(clrdirectory);
+    osDirectory searchDir(searchDirPath);
 
-    if (search_dir.exists())
+    if (searchDir.exists())
     {
-        QFileInfoList di_list = search_dir.entryInfoList(QDir::AllDirs);
+        gtUInt64 clrPid = 0;
 
-        //while there are directories left,
-        for (int i = 0; i < di_list.size(); i++)
+        gtList<osFilePath> subDirList;
+        searchDir.getSubDirectoriesPaths(osDirectory::SORT_BY_NAME_ASCENDING, subDirList);
+
+        // while there are directories left
+        for (const auto& subDirPath : subDirList)
         {
-            QString tempPath = QString::fromWCharArray(clrdirectory)
-                               + di_list.at(i).fileName();
+            // Only sub-directory name
+            gtString subDirName;
+            subDirPath.getFileName(subDirName);
 
-            QString celFile = tempPath;
-            celFile += QString(osFilePath::osPathSeparator) + di_list.at(i).fileName() + ".cel";
+            subDirName.toUnsignedInt64Number(clrPid);
+            gtString currPidAsStr(std::to_wstring(clrPid).data());
 
-            if (!QFile::exists(celFile))
+            // if unable to convert subDirName to number, then skip
+            if ((0 == clrPid) || (subDirName != currPidAsStr))
             {
                 continue;
             }
 
-            clrPid = di_list.at(i).fileName().toULong();
+            // Sub-directory full path
+            gtString subDirPathStr = subDirPath.asString();
 
-            if (0 == clrPid)
+            // cel file full path
+            gtString celFilePathStr = subDirPathStr;
+            celFilePathStr.append(osFilePath::osPathSeparator).append(subDirName).append(L".cel");
+
+            // Create cel file object
+            osFilePath celFilePath(celFilePathStr);
+            osFile celFile(celFilePath);
+
+            // if cel file doesn't exist, then skip
+            if (!celFile.exists())
             {
                 continue;
             }
 
-            QString sess_pid = QString::fromWCharArray(sessionDir) + QString(osFilePath::osPathSeparator) + di_list.at(i).fileName();
-            QDir sess_pid_dir;
-            sess_pid_dir.mkpath(sess_pid);
+            // session directory full path
+            gtString sessionDirPathStr(sessiondirectory);
+            sessionDirPathStr.append(osFilePath::osPathSeparator).append(subDirName);
 
-            // copy file from temp dir to session dir;
-            CopyFilesToDestionDir(tempPath, sess_pid);
-            QDir tCurrentDir(sess_pid);
+            // create session directory object
+            osDirectory sessionDir(sessionDirPathStr);
+            sessionDir.create();
 
-            QFileInfoList pjsFile_list = tCurrentDir.entryInfoList(QStringList("*.pjs"));
+            // copy file from current sub dir to session dir
+            gtList<gtString> emptyFilter;
+            CopyFilesToDestionDir(subDirPathStr, sessionDirPathStr, emptyFilter);
 
-            //while there are files left,
-            for (int j = 0; j < pjsFile_list.size(); j++)
+            gtList<osFilePath> pjsFileList;
+            sessionDir.getContainedFilePaths(L"*.pjs", osDirectory::SORT_BY_DATE_ASCENDING, pjsFileList, false);
+
+            // while there are files left
+            for (const auto& pjsFilePath : pjsFileList)
             {
-                QString pjsFileName = pjsFile_list.at(j).fileName();
+                gtString pjsFileName;
+                pjsFilePath.getFileName(pjsFileName);
 
-                QString pjsFilePath = sess_pid + QString(osFilePath::osPathSeparator) + pjsFileName;
-
-                pjsFileName.remove(pjsFileName.length() - 4, 4);
-                PreJitModSymbolFile tSymFile(pjsFilePath.toStdWString().c_str());
-                m_PJSMap.insert(PreJitModSymbolMap::value_type(pjsFileName.toStdWString().c_str(), tSymFile));
+                m_PJSMap.insert({ pjsFileName.asCharArray(), pjsFilePath.asString().asCharArray() });
             }
 
             clrModMap.clear();
             clrFunMap.clear();
 
-            CelReader tClrReader;
-            celFile = sess_pid + QString(osFilePath::osPathSeparator) + di_list.at(i).fileName() + ".cel";
+            // new cel file full path
+            celFilePathStr = sessionDirPathStr;
+            celFilePathStr.append(osFilePath::osPathSeparator).append(subDirName).append(L".cel");
 
-            if (!tClrReader.Open(celFile.toStdWString().c_str()))
+            CelReader tClrReader;
+
+            if (!tClrReader.Open(celFilePathStr.asCharArray()))
             {
                 continue;
             }
 
-            bool bitness  = tClrReader.Is32BitProcess();
-            gtUInt64 jitProcessID = di_list.at(i).fileName().toULongLong();
-            m_bitnessMap[jitProcessID] = bitness;
+            m_bitnessMap[clrPid] = tClrReader.Is32BitProcess();
 
             DWORD recType = tClrReader.GetNextRecordType();
 
@@ -3995,7 +4007,7 @@ HRESULT WinTaskInfo::ReadCLRJitInformation(/* [in] */ const wchar_t* clrdirector
 
                         if (S_OK == hr1)
                         {
-                            clrModMap[modRec.modId] = QString::fromWCharArray(modRec.modName);
+                            clrModMap[modRec.modId] = gtString(modRec.modName);
                         }
                     }
                     break;
@@ -4021,7 +4033,6 @@ HRESULT WinTaskInfo::ReadCLRJitInformation(/* [in] */ const wchar_t* clrdirector
                         {
                             // Due to OS had truncated assembly for some ngened assembly;
                             // need to update Ngened assembly full path.
-                            // Lei 05/04/2010
                             ModuleMap::iterator j;
                             j = m_tiModMap.lower_bound(ModuleKey(clrPid, assemblyLoadAddr, TI_TIMETYPE_MAX));
 
@@ -4070,19 +4081,17 @@ HRESULT WinTaskInfo::ReadCLRJitInformation(/* [in] */ const wchar_t* clrdirector
                         if (S_OK == hr1)
                         {
                             gtUInt64 tModuleId = funcRec.modId;
-                            QString tModuleName = clrModMap[tModuleId];
-                            QString tClassFunc;
+                            gtString tModuleName = clrModMap[tModuleId];
 
                             gtUInt64 tLoadAddress = funcRec.jitLoadAddr;
                             clrFunMap[funcRec.funcId] = tLoadAddress;
                             funcRec.loadTime = CalculateDeltaTick(funcRec.loadTime);
                             ModuleKey t_modKey(clrPid, tLoadAddress, (TiTimeType)funcRec.loadTime);
 
-                            tClassFunc = QString::fromWCharArray(funcRec.className) +
-                                         "::" + QString::fromWCharArray(funcRec.funcName);
+                            gtString tClassFunc;
+                            tClassFunc.append(funcRec.className).append(L"::").append(funcRec.funcName);
 
-                            ModuleValue t_modValue(0, static_cast<gtUInt64>(funcRec.codeSize),
-                                                   TI_TIMETYPE_MAX, tClassFunc.toStdWString().c_str(), evManaged);
+                            ModuleValue t_modValue(0, funcRec.codeSize, TI_TIMETYPE_MAX, tClassFunc.asCharArray(), evManaged);
                             t_modValue.instanceId = m_nextModInstanceId++;
 
                             m_tiModMap.insert(ModuleMap::value_type(t_modKey, t_modValue));
@@ -4090,12 +4099,13 @@ HRESULT WinTaskInfo::ReadCLRJitInformation(/* [in] */ const wchar_t* clrdirector
 
                             FindModuleId(t_modValue.moduleName, t_modValue.moduleId);
 
-                            tModuleName.append(".jit");
-                            QString repPath = QString::fromWCharArray(funcRec.jncFileName);
-                            repPath.replace(tempPath, sess_pid);
-                            wcscpy(funcRec.jncFileName, repPath.toStdWString().c_str());
+                            tModuleName.append(L".jit");
 
-                            JitBlockValue tJitBlockValue(tModuleName.toStdWString().c_str(), funcRec.jncFileName, L"UnknownJITSource");
+                            gtString repPath(funcRec.jncFileName);
+                            repPath.replace(subDirPathStr, sessionDirPathStr);
+                            wcscpy(funcRec.jncFileName, repPath.asCharArray());
+
+                            JitBlockValue tJitBlockValue(tModuleName.asCharArray(), funcRec.jncFileName, L"UnknownJITSource");
                             m_JitClrMap.insert(JitBlockInfoMap::value_type(t_modKey, tJitBlockValue));
                         }
                     }
@@ -4106,34 +4116,31 @@ HRESULT WinTaskInfo::ReadCLRJitInformation(/* [in] */ const wchar_t* clrdirector
                         FunctionID funcId;
                         gtUInt64 systime;
                         hr1 = tClrReader.GetFunctionUnloadStarted(&funcId, &systime);
-                        ModuleMap::iterator it;
 
-                        for (it = m_tiModMap.begin(); it != m_tiModMap.end(); ++it)
+                        for (auto& mapItem : m_tiModMap)
                         {
-                            ModuleMap::value_type& item1 = *it;
-
-                            //note that item.first is the key, and item.second is the value
-                            if (item1.first.processId != clrPid)
+                            // note that item.first is the key, and item.second is the value
+                            if (mapItem.first.processId != clrPid)
                             {
                                 continue;
                             }
 
-                            if (item1.first.moduleLoadAddr != clrFunMap[funcId])
+                            if (mapItem.first.moduleLoadAddr != clrFunMap[funcId])
                             {
                                 continue;
                             }
 
-                            if (item1.first.moduleLoadTime >= systime)
+                            if (mapItem.first.moduleLoadTime >= systime)
                             {
                                 continue;
                             }
 
-                            if (TI_TIMETYPE_MAX != item1.second.moduleUnloadTime)
+                            if (TI_TIMETYPE_MAX != mapItem.second.moduleUnloadTime)
                             {
                                 continue;
                             }
 
-                            item1.second.moduleUnloadTime = CalculateDeltaTick(systime);
+                            mapItem.second.moduleUnloadTime = CalculateDeltaTick(systime);
                         }
                     }
                 }
@@ -4147,11 +4154,17 @@ HRESULT WinTaskInfo::ReadCLRJitInformation(/* [in] */ const wchar_t* clrdirector
             }
 
             tClrReader.Close();
+
+            // Delete the subDir that contains the cel/jnc/pjs files
+            osDirectory subDir(subDirPath);
+            subDir.deleteRecursively();
         }
     }
 
     clrModMap.clear();
     clrFunMap.clear();
+
+
 
     return hr;
 }
@@ -4161,16 +4174,17 @@ HRESULT WinTaskInfo::ReadCLRJitInformation(/* [in] */ const wchar_t* clrdirector
 // Map of <process id, cel*>
 typedef gtMap<gtUInt64, CelWriter*> CelMap;
 
-//Note that the directory string should not end in a "\"
+// Note that the directory string should not end in a "\"
 HRESULT WinTaskInfo::WriteCLRJncFiles(/*[in]*/ const wchar_t* directory)
 {
     HRESULT hr = S_OK;
 
-    QString qtstrDir = QString::fromWCharArray(directory);
+    gtString strDir(directory);
 
-    if (qtstrDir.isEmpty())
+    if (strDir.isEmpty())
     {
-        qtstrDir = ".";    //set as local directory
+        // set as local directory
+        strDir = L".";
     }
 
     CelMap cel_map;
@@ -4180,26 +4194,33 @@ HRESULT WinTaskInfo::WriteCLRJncFiles(/*[in]*/ const wchar_t* directory)
 
     for (const auto& mapItem : m_JitClrMap)
     {
-        //If the block wasn't used, go to the next one.
+        // If the block wasn't used, go to the next one.
         if (!wcslen(mapItem.second.movedJncFileName))
         {
-            QFile::remove(QString::fromWCharArray(mapItem.second.jncFileName));
+            osFilePath filePath(mapItem.second.jncFileName);
+            osFile fileToDel(filePath);
+            fileToDel.deleteFile();
             continue;
         }
 
-        QString procDir = qtstrDir + "/" + QString::number(mapItem.first.processId) + "/";
+        gtString procDir = strDir;
+        procDir.append(osFilePath::osPathSeparator);
+        procDir.appendUnsignedIntNumber(static_cast<gtUInt32>(mapItem.first.processId));
+        //procDir.append(osFilePath::osPathSeparator);
 
         auto cel_it = cel_map.find(mapItem.first.processId);
 
-        //If there is not a cel file for this jnc, add it
+        // If there is not a cel file for this jnc, add it
         if (cel_map.end() == cel_it)
         {
-            QString new_cel;
-            new_cel = procDir + QString(osFilePath::osPathSeparator) + QString::number(mapItem.first.processId) + ".cel";
+            gtString new_cel(procDir);
+            new_cel.append(osFilePath::osPathSeparator);
+            new_cel.appendUnsignedIntNumber(static_cast<gtUInt32>(mapItem.first.processId));
+            new_cel.append(L".cel");
 
             CelWriter* pWriter = new CelWriter();
 
-            if (NULL == pWriter)
+            if (nullptr == pWriter)
             {
                 return E_FAIL;
             }
@@ -4211,7 +4232,7 @@ HRESULT WinTaskInfo::WriteCLRJncFiles(/*[in]*/ const wchar_t* directory)
                 bitness = 64;
             }
 
-            if (!pWriter->Initialize(new_cel.toStdWString().c_str(), bitness))
+            if (!pWriter->Initialize(new_cel.asCharArray(), bitness))
             {
                 delete pWriter;
                 return E_FAIL;
@@ -4222,7 +4243,7 @@ HRESULT WinTaskInfo::WriteCLRJncFiles(/*[in]*/ const wchar_t* directory)
 
         if (modIdMap.end() != modIdMap.find(mapItem.first))
         {
-            //write the module name to the jcl file
+            // write the module name to the jcl file
             if (cel_it->second != nullptr)
             {
                 cel_it->second->WriteModuleLoadFinished(
@@ -4233,20 +4254,29 @@ HRESULT WinTaskInfo::WriteCLRJncFiles(/*[in]*/ const wchar_t* directory)
             modIdMap[mapItem.first] = modId++;
         }
 
-        //rename from temp->jncFile to temp->translatedJncFile
-        QString new_jnc = procDir + QString(osFilePath::osPathSeparator) + QString::fromWCharArray(mapItem.second.movedJncFileName);
-        QString oldFile = QString::fromWCharArray(mapItem.second.jncFileName);
-        QFile::rename(oldFile, new_jnc);
+        // rename from temp->jncFile to temp->translatedJncFile
+        gtString new_jnc(procDir);
+        new_jnc.append(osFilePath::osPathSeparator).append(mapItem.second.movedJncFileName);
 
-        QString classFun = QString::fromWCharArray(m_tiModMap[mapItem.first].moduleName);
+        osFilePath oldFilePath(gtString(mapItem.second.jncFileName));
+        oldFilePath.Rename(new_jnc);
 
         if (cel_it->second != nullptr)
         {
+            gtString classFun(m_tiModMap[mapItem.first].moduleName);
+            gtStringTokenizer tokenizer(classFun, L"::");
+
+            gtString className;
+            tokenizer.getNextToken(className);
+
+            gtString funcName;
+            tokenizer.getNextToken(funcName);
+
             cel_it->second->ReWriteJITCompilation(
                 modIdMap[mapItem.first],
                 funcId,
-                classFun.section("::", 0, 0).toStdWString().c_str(),
-                classFun.section("::", 1, 1).toStdWString().c_str(),
+                className.asCharArray(),
+                funcName.asCharArray(),
                 mapItem.second.movedJncFileName,
                 mapItem.first.moduleLoadTime,
                 mapItem.first.moduleLoadAddr,
@@ -4262,7 +4292,7 @@ HRESULT WinTaskInfo::WriteCLRJncFiles(/*[in]*/ const wchar_t* directory)
         }
     }
 
-    //delete and close the CEL writer(s)
+    // delete and close the CEL writer(s)
     for (auto& cel : cel_map)
     {
         delete cel.second;
@@ -4275,11 +4305,12 @@ HRESULT WinTaskInfo::WriteCLRJncFiles(/*[in]*/ const wchar_t* directory)
     {
         if (symFile.second.bHasSample)
         {
-            QString pjsFileName = QString::fromWCharArray(directory);
-            pjsFileName.append(osFilePath::osPathSeparator);
-            pjsFileName.append(QString::fromWCharArray(symFile.first.wString));
-            pjsFileName.append(QString::fromWCharArray(L".pjs"));
-            QFile::rename(QString::fromWCharArray(symFile.second.symbolFilePath), pjsFileName);
+            osFilePath oldPjsFilePath(symFile.second.symbolFilePath);
+
+            osFilePath newPjsFilePath(oldPjsFilePath);
+            newPjsFilePath.setFileName(symFile.first.wString);
+
+            oldPjsFilePath.Rename(newPjsFilePath.asString());
         }
     }
 
