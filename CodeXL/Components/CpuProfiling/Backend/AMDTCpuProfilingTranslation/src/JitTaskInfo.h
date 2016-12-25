@@ -10,6 +10,7 @@
 #ifndef _JITTASKINFO_H_
 #define _JITTASKINFO_H_
 
+#include <tuple>
 #include <JitTaskInfoMapper.h>
 
 #if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
