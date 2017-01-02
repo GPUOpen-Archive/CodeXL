@@ -1623,6 +1623,24 @@ HRESULT PrdTranslator::OpenTaskInfoFile()
     return hr;
 }
 
+bool PrdTranslator::IsFilteredProcess(gtList<DWORD>& filteredPids, DWORD pid)
+{
+    bool ret = false;
+
+    if (!filteredPids.empty())
+    {
+        auto filteredPid = std::find_if(filteredPids.begin(), filteredPids.end(),
+            [&pid](DWORD const& aPid) { return aPid == pid; });
+
+        if (filteredPid != filteredPids.end())
+        {
+            ret = true;
+        }
+    }
+
+    return ret;
+}
+
 
 HRESULT PrdTranslator::ThreadTranslateDataPrdFile(QString proFile,
                                                   MissedInfoType* pMissedInfo,
@@ -1678,7 +1696,7 @@ HRESULT PrdTranslator::ThreadTranslateDataPrdFile(QString proFile,
     _wstati64(m_dataFile.toStdWString().c_str(), &fileStat);
 
     //if applicable, get the list of filtered processes
-    QList<DWORD> filters;
+    gtList<DWORD> filters;
 
     if (!processFilters.isEmpty())
     {
@@ -1694,13 +1712,13 @@ HRESULT PrdTranslator::ThreadTranslateDataPrdFile(QString proFile,
             if (processFilters.contains(QString::fromWCharArray(allProcArray[i].pqiProcessName),
                                         Qt::CaseInsensitive))
             {
-                filters.append(allProcArray[i].pqiProcessID);
+                filters.push_back(allProcArray[i].pqiProcessID);
             }
         }
 
         delete [] allProcArray;
 
-        if (filters.isEmpty())
+        if (filters.empty())
         {
             m_ThreadHR = E_ABORT;
             return m_ThreadHR;
@@ -1809,7 +1827,7 @@ HRESULT PrdTranslator::ThreadTranslateDataPrdFile(QString proFile,
             {
                 threadPRDReader.ConvertSampleData(tRawRec, &prdRecord);
 
-                if ((!filters.isEmpty()) && (!filters.contains(prdRecord.m_PID)))
+                if (!filters.empty() && !IsFilteredProcess(filters, prdRecord.m_PID))
                 {
                     continue;
                 }
@@ -1924,7 +1942,7 @@ HRESULT PrdTranslator::ThreadTranslateDataPrdFile(QString proFile,
                         continue;
                     }
 
-                    if ((!filters.isEmpty()) && (!filters.contains(ibsFetch.m_PID)))
+                    if (!filters.empty() && !IsFilteredProcess(filters, ibsFetch.m_PID))
                     {
                         continue;
                     }
@@ -2025,7 +2043,7 @@ HRESULT PrdTranslator::ThreadTranslateDataPrdFile(QString proFile,
                         continue;
                     }
 
-                    if ((!filters.isEmpty()) && (!filters.contains(ibsOp.m_PID)))
+                    if (!filters.empty() && !IsFilteredProcess(filters, ibsOp.m_PID))
                     {
                         continue;
                     }
@@ -4341,7 +4359,7 @@ HRESULT PrdTranslator::TranslateKernelCallStack(PRD_KERNEL_CSS_DATA_RECORD& kern
                                                 PrdReaderThread& threadPRDReader,
                                                 ProcessInfo*& pProcessInfo,
                                                 ProcessIdType& processInfoId,
-                                                const QList<DWORD>& filters,
+                                                const gtList<DWORD>& filters,
                                                 ProcessIdType processId,
                                                 ThreadIdType threadId,
                                                 gtUInt64 timeStamp,
@@ -4372,7 +4390,7 @@ HRESULT PrdTranslator::TranslateKernelCallStack(PRD_KERNEL_CSS_DATA_RECORD& kern
 
     // Ignore CSS data that is not in the filters (if applicable) or is in the System process
     // CLU profiles IBS Op event, process CSS data for IBS sample only when profiling IBS Op.
-    if ((filters.isEmpty() || filters.contains(processId)) &&
+    if ((filters.empty() || IsFilteredProcess(const_cast<gtList<DWORD>&>(filters), processId)) &&
         (0 != processId) && (4 != processId) && (8 != processId) &&
         (!IsIbsOpEvent(eventType) || m_runInfo->m_isProfilingIbsOp))
     {

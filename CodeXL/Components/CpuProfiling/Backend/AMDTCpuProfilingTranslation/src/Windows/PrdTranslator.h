@@ -332,7 +332,7 @@ private:
                                      PrdReaderThread& threadPRDReader,
                                      ProcessInfo*& pProcessInfo,
                                      ProcessIdType& processInfoId,
-                                     const QList<DWORD>& filters,
+                                     const gtList<DWORD>& filters,
                                      ProcessIdType processId,
                                      ThreadIdType threadId,
                                      gtUInt64 timeStamp,
@@ -491,6 +491,8 @@ private:
     bool WriteJitInfoIntoDB(const NameModuleMap& modMap,
         gtVector<std::tuple<gtUInt32, gtUInt32, gtUInt32, gtUInt64, gtUInt64, gtUInt64>>& inlinedJitInfo);
 
+    bool IsFilteredProcess(gtList<DWORD>& filteredPids, DWORD pid);
+
     QString m_dataFile;
     bool    m_collectStat;
 
@@ -523,7 +525,7 @@ private:
     RunInfo* m_runInfo;
 
     BOOL m_is64Sys;
-    PidFilterList m_pidFilterList;
+    PidFilterList m_pidFilterList;  // TODO: Seems to be unused
 
     PfnProgressBarCallback m_pfnProgressBarCallback;
     apProfileProgressEvent m_progressEvent;
