@@ -12,9 +12,6 @@
 // Qt:
 #include <QAbstractItemModel>
 
-// Backend
-#include <AMDTCpuProfilingRawData/inc/CpuProfileFunction.h>
-
 // Local:
 #include <inc/SourceCodeViewUtils.h>
 
@@ -144,15 +141,11 @@ private:
     QString m_sessionDir;
     QString m_moduleName;
 
-    ProcessIdType m_pid = AMDT_PROFILE_ALL_PROCESSES;
-    ProcessIdType m_newPid = AMDT_PROFILE_ALL_PROCESSES;
-    ThreadIdType m_tid = AMDT_PROFILE_ALL_THREADS;
-    ThreadIdType m_newTid = AMDT_PROFILE_ALL_THREADS;
+    AMDTProcessId m_pid = AMDT_PROFILE_ALL_PROCESSES;
+    AMDTProcessId m_newPid = AMDT_PROFILE_ALL_PROCESSES;
+    AMDTThreadId m_tid = AMDT_PROFILE_ALL_THREADS;
+    AMDTThreadId m_newTid = AMDT_PROFILE_ALL_THREADS;
     AMDTFunctionId m_funcId = 0;
-
-    // FIMXE: this mem-var never set, only accessed.
-    const CpuProfileFunction* m_pDisplayedFunction = nullptr;
-
     AMDTModuleType m_modType = AMDT_MODULE_TYPE_NONE;
 
     bool m_isModuleCached = false;

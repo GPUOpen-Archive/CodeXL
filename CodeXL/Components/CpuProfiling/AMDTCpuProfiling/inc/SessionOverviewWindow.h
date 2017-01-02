@@ -51,18 +51,11 @@ public:
 
     bool openSourceCodeView(QTableWidgetItem* pTableItem);
 
-    /// \brief Name:        findModuleHandler
-    /// \brief Description: Finds the modules handler for the requested module file path
-    /// \param filePath - the modules file path
-    /// \return CpuProfileModule - the output module handler
-    const CpuProfileModule* findModuleHandler(const osFilePath& filePath) const;
-
     /// Updates the current tables display according to the needed update type:
     /// \param updateType the type of update needs to be performed (see SettingsDifference for details):
     virtual void UpdateTableDisplay(unsigned int updateType);
 
 public slots:
-
     void onViewChanged() {};
     virtual void onEditCopy();
     virtual void onEditSelectAll();
@@ -70,12 +63,10 @@ public slots:
     virtual void onFindNext();
 
 signals:
-    void functionActivated(gtVAddr functionAddress, ProcessIdType pid, ThreadIdType tid, const CpuProfileModule* pModule);
     void opensourceCodeViewSig(std::tuple<AMDTFunctionId, const gtString&, AMDTUInt32, AMDTUInt32> funcModInfo);
     void hotspotIndicatorChanged(const QString& text);
 
 protected slots:
-
     void openProcessesView();
     void openModulesView();
     void openFunctionsView();
@@ -83,13 +74,9 @@ protected slots:
     void onTableItemActivated(QTableWidgetItem* pActivateItem);
     void onTableContextMenuActionTriggered(CPUProfileDataTable::TableContextMenuActionType actionType, QTableWidgetItem* pTableItem);
 
-
 private:
-
     bool displaySession();
-
     void activateTableItem(QTableWidgetItem* pActivateItem, CPUProfileDataTable* pDataTable);
-
     bool displaySessionProperties();
     bool displaySessionDataTables();
     bool fillHotspotIndicatorCombo();
@@ -137,8 +124,8 @@ private:
     void openFunctionViewForProcess(QTableWidgetItem* pTableItem);
     bool displaySessionExecutionDetails(afHTMLContent& content);
     bool displaySessionProfileDetails(afHTMLContent& content);
-private:
 
+private:
     // Widgets:
     ProcessesDataTable*     m_pProcessesTable           = nullptr;
     ModulesDataTable*       m_pModulesTable             = nullptr;

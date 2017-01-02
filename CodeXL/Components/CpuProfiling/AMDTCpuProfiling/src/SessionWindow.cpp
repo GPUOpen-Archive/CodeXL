@@ -482,7 +482,7 @@ bool CpuSessionWindow::onViewModulesView(SYSTEM_DATA_TAB_CONTENT aggregateBy)
 void CpuSessionWindow::onViewSourceViewSlot(std::tuple<AMDTFunctionId, const gtString&, AMDTUInt32, AMDTUInt32> funcModInfo)
 {
     QString modName = acGTStringToQString(std::get<1>(funcModInfo));
-    AMDTUInt32 pid = std::get<3>(funcModInfo);
+    AMDTProcessId pid = std::get<3>(funcModInfo);
     QString caption = modName + " - Source/Disassembly";
     QWidget* pOldTab = FindTab(caption);
     SessionSourceCodeView* pSourceCodeView = (SessionSourceCodeView*)pOldTab;
@@ -523,10 +523,23 @@ void CpuSessionWindow::onViewSourceViewSlot(std::tuple<AMDTFunctionId, const gtS
     }
 }
 
-void CpuSessionWindow::onViewSourceView(gtVAddr Address, ProcessIdType pid, ThreadIdType tid, const CpuProfileModule* pModDetail)
+void CpuSessionWindow::onViewSourceView(gtVAddr Address, AMDTProcessId pid, AMDTThreadId tid, AMDTModuleId modId)
 {
+    AMDTProfileModuleInfoVec modInfoVec;
+    bool ret = false;
+    gtString modPath;
 
-    QString modName = acGTStringToQString(pModDetail->getPath());
+    if (AMDT_PROFILE_ALL_MODULES != modId)
+    {
+        ret = m_pProfDataRd->GetModuleInfo(pid, modId, modInfoVec);
+
+        if (ret && (modInfoVec.size() > 0))
+        {
+            modPath = modInfoVec[0].m_name;
+        }
+    }
+
+    QString modName = acGTStringToQString(modPath);
     QString caption = modName + " - Source/Disassembly";
     QWidget* pOldTab = FindTab(caption);
     SessionSourceCodeView* pSourceCodeView = (SessionSourceCodeView*)pOldTab;
@@ -540,7 +553,6 @@ void CpuSessionWindow::onViewSourceView(gtVAddr Address, ProcessIdType pid, Thre
         m_sessionFile.getFileDirectory(sessionDir);
         QString sessionFileStr = acGTStringToQString(sessionDir.directoryPath().asString());
         pSourceCodeView = new SessionSourceCodeView(m_pTabWidget, this, sessionFileStr);
-
 
         createdNewView = true;
         pSourceCodeView->setDisplayedItemData((afApplicationTreeItemData*)m_pSessionTreeItemData);
@@ -1006,16 +1018,15 @@ bool CpuSessionWindow::displaySessionSource()
 
         GT_IF_WITH_ASSERT(pItemData != nullptr)
         {
-            osFilePath moduleFilePath = acQStringToGTString(pItemData->m_exeFullPath);
+            // TODO: find the modId for this pItemData->m_exeFullPath;
+            AMDTModuleId modId = AMDT_PROFILE_ALL_MODULES;
 
-            // Get the module hander for this file path:
-            const CpuProfileModule* pModule = m_pOverviewWindow->findModuleHandler(moduleFilePath);
+            onViewSourceView(0, 0, 0, modId);
 
-            GT_IF_WITH_ASSERT(pModule != nullptr)
-            {
-                onViewSourceView(0, 0, 0, pModule);
-                retVal = true;
-            }
+            //auto funcModInfo = std::make_tuple(0, acQStringToGTString(pItemData->m_exeFullPath), AMDT_PROFILE_ALL_MODULES, AMDT_PROFILE_ALL_PROCESSES);
+            //onViewSourceViewSlot(funcModInfo);
+
+            retVal = true;
         }
     }
 

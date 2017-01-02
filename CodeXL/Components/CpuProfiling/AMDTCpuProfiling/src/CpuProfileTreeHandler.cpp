@@ -23,7 +23,7 @@
 #include <AMDTSharedProfiling/inc/StringConstants.h>
 
 // Backend:
-#include <AMDTCpuProfilingRawData/inc/CpuProfileReader.h>
+#include <AMDTCpuProfilingDataAccess/inc/AMDTCpuProfilingDataAccess.h>
 
 /// Local:
 #include <inc/CpuProfileTreeHandler.h>
@@ -186,24 +186,25 @@ bool CpuProfileTreeHandler::ExtendSessionHTMLPropeties(afTreeItemType sessionTre
 
         // If there is an available profile data file, open it
         gtString content;
-        CpuProfileReader profileReader;
+        cxlProfileDataReader profileReader;
 
-        if (profileReader.open(pSessionData->m_pParentData->m_filePath.asString().asCharArray()))
+        if (profileReader.OpenProfileData(pSessionData->m_pParentData->m_filePath.asString()))
         {
-            CpuProfileInfo* pProfileInfo = profileReader.getProfileInfo();
+            // Get the profile session data from the profile reader:
+            AMDTProfileSessionInfo sessionInfo;
 
-            if (nullptr != pProfileInfo)
+            if (profileReader.GetProfileSessionInfo(sessionInfo))
             {
-                unsigned int cpuFamily = pProfileInfo->m_cpuFamily;
-                unsigned int cpuModel = pProfileInfo->m_cpuModel;
-                unsigned int cpuCount = pProfileInfo->m_numCpus;
+                unsigned int cpuFamily = sessionInfo.m_cpuFamily;
+                unsigned int cpuModel = sessionInfo.m_cpuModel;
+                unsigned int cpuCount = sessionInfo.m_coreCount;
                 content = L"CPU Details: ";
                 content.appendFormattedString(CP_overviewPageProfileCPUDetailsStr, cpuFamily, cpuModel, cpuCount);
                 htmlContent.addHTMLItem(afHTMLContent::AP_HTML_LINE, content);
             }
-
-            profileReader.close();
         }
+
+        profileReader.CloseProfileData();
 
         // Profile Duration
         gtString duration = acDurationAsString(pSessionData->m_profileDuration);

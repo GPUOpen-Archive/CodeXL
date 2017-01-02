@@ -1004,7 +1004,7 @@ void SessionOverviewWindow::onTableContextMenuActionTriggered(CPUProfileDataTabl
                 AMDTProfileFunctionData  functionData;
                 m_pProfDataRdr->GetFunctionDetailedProfileData(funcId.toInt(), AMDT_PROFILE_ALL_PROCESSES, AMDT_PROFILE_ALL_THREADS, functionData);
 
-                QList<ProcessIdType> pidList;
+                QList<AMDTProcessId> pidList;
 
                 for (const auto& pid : functionData.m_pidsList)
                 {
@@ -1106,13 +1106,6 @@ bool SessionOverviewWindow::openSourceCodeView(QTableWidgetItem* pTableItem)
         }
     }
     return ret;
-}
-
-const CpuProfileModule* SessionOverviewWindow::findModuleHandler(const osFilePath& filePath) const
-{
-    GT_UNREFERENCED_PARAMETER(filePath);
-    const CpuProfileModule* pRetVal = nullptr;
-    return pRetVal;
 }
 
 void SessionOverviewWindow::openFunctionViewForFunction(QTableWidgetItem* pTableItem)
@@ -1292,7 +1285,7 @@ void SessionOverviewWindow::openFunctionViewForProcess(QTableWidgetItem* pTableI
                 pFunctionsView = pSessionWindow->sessionFunctionsView();
                 GT_IF_WITH_ASSERT(pFunctionsView != nullptr)
                 {
-                    ProcessIdType pid = 0;
+                    AMDTProcessId pid = 0;
                     QString processFileName;
                     bool rc = m_pProcessesTable->findProcessDetails(pTableItem->row(), pid, processFileName);
                     GT_IF_WITH_ASSERT(rc)

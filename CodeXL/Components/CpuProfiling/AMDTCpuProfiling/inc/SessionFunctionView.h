@@ -41,9 +41,8 @@ public:
     /// Select and set the focus on the selected function
     /// \param - functionName the function name
     /// \param - pid the process ID
-    //void selectFunction(const QString& functionName, ProcessIdType pid);
+    //void selectFunction(const QString& functionName, AMDTProcessId pid);
     void selectFunction(const QString& funcId);
-
 
     /// Display the functions for the requested module
     /// \param - moduleFullPath the module full path
@@ -64,11 +63,9 @@ public:
     ///Local CLU status
     bool m_CLUNoteShown;
 signals:
-    void functionActivated(gtVAddr functionAddress, ProcessIdType pid, ThreadIdType tid, const CpuProfileModule* pModule);
     void opensourceCodeViewSig(std::tuple<AMDTFunctionId, const gtString&, AMDTUInt32, AMDTUInt32> funcModInfo);
 
 public slots:
-
     void onViewChanged() {};
     void onOpenModuleSelector(const QString& link);
     void onCellChanged();
@@ -79,14 +76,13 @@ public slots:
     virtual void onFindNext();
 
 protected slots:
-
     void onDisplayFilterChanged(int index);
     void onSelectPid(int index);
     void onTableItemActivated(QTableWidgetItem* pActivateItem);
     void onTableContextMenuActionTriggered(CPUProfileDataTable::TableContextMenuActionType actionType, QTableWidgetItem* pTableItem);
     void onOpenDisplayFilterDialog();
-protected:
 
+protected:
     /// \brief Name:        displaySessionDataTables
     /// \brief Description: Display the session data tables with the current demands
     bool displaySessionDataTables();
@@ -125,7 +121,7 @@ private:
 
     //void addModulesForPID(uint pid);
     void updateDataFromPidComboBox();
-    ProcessIdType getCurrentPid();
+    AMDTProcessId getCurrentPid();
     bool m_updateData;
     AMDTModuleId m_moduleId = AMDT_PROFILE_ALL_MODULES;
 

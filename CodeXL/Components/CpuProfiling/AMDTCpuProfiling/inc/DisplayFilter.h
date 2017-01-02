@@ -26,12 +26,10 @@
 #include <AMDTBaseTools/Include/AMDTDefinitions.h>
 
 // PROJECT INCLUDES
-#include <AMDTCpuProfilingRawData/inc/CpuProfileInfo.h>
 #include <AMDTCpuProfilingDataAccess/inc/AMDTCpuProfilingDataAccess.h>
 
 // Local:
 #include <inc/StdAfx.h>
-
 
 enum SeparateByType
 {
@@ -136,7 +134,7 @@ public:
     QString m_hotSpotIndicatorColumnCaption;
 
     /// Only show modules / functions that are related to this PID:
-    QList<ProcessIdType> m_filterByPIDsList;
+    QList<AMDTProcessId> m_filterByPIDsList;
 
     /// The name of the module to filter by:
     QStringList m_filterByModulePathsList;

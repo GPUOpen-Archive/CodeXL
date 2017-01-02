@@ -33,8 +33,7 @@
 // Local
 #include <inc/StdAfx.h>
 
-#include <AMDTCpuProfilingRawData/inc/CpuProfileReader.h>
-
+// Project
 #include <inc/DisplayFilter.h>
 
 // Threshold for CLU
@@ -132,8 +131,7 @@ public:
     /// \brief Description: Open the call graph view for the activated function
     /// \param[in]          funcName - the name of the function
     /// \param[in]          pid the process ID of the function
-    //void openCallGraphViewForFunction(const QString& funcName, ProcessIdType pid);
-    void openCallGraphViewForFunction(AMDTFunctionId funcId, ProcessIdType pid);
+    void openCallGraphViewForFunction(AMDTFunctionId funcId, AMDTProcessId pid);
 
     /// Sets the flag stating which change should be performed once the view is displayed:
     /// The type of change that should be applied
@@ -180,7 +178,7 @@ protected:
     void updateHint(const QString& hint);
 
     /// Process name -> PID:
-    bool ProcessNameToPID(const QString& processName, ProcessIdType& pid);
+    bool ProcessNameToPID(const QString& processName, AMDTProcessId& pid);
 
     /// Update CLU note window content
     void UpdateNoteWindowContent(gtVector<float>& cluDataVector);

@@ -368,7 +368,7 @@ public:
 
     void showPid(unsigned int pid);
     bool ShowParentChild(AMDTFunctionId functionId);
-    void selectFunction(AMDTFunctionId functionId, ProcessIdType pid);
+    void selectFunction(AMDTFunctionId functionId, AMDTProcessId pid);
     void ShowPaths(AMDTFunctionId functionId);
 
     ColumnSpec m_cuurentColSpec;

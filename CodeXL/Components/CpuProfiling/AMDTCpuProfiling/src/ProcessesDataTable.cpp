@@ -116,7 +116,7 @@ bool ProcessesDataTable::fillSummaryTable(int counterIdx)
     return retVal;
 }
 
-bool ProcessesDataTable::findProcessDetails(int rowIndex, ProcessIdType& pid, QString& processFileName)
+bool ProcessesDataTable::findProcessDetails(int rowIndex, AMDTProcessId& pid, QString& processFileName)
 {
     QTableWidgetItem* pidWidget = item(rowIndex, m_processIdColumn);
     pid = pidWidget->text().toUInt();

@@ -49,7 +49,7 @@ public:
     /// \param pid[out] - the process file name
     /// \param processFileName[out] - the process id
     /// \return true on success false on failure
-    bool findProcessDetails(int rowIndex, ProcessIdType& pid, QString& processFileName);
+    bool findProcessDetails(int rowIndex, AMDTProcessId& pid, QString& processFileName);
 
     // returns processes table type
     TableType GetTableType() const;

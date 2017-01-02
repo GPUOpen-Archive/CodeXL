@@ -532,7 +532,7 @@ void DataTab::openCallGraphView()
 }
 
 
-void DataTab::openCallGraphViewForFunction(AMDTFunctionId functionId, ProcessIdType pid)
+void DataTab::openCallGraphViewForFunction(AMDTFunctionId functionId, AMDTProcessId pid)
 {
     // Make sure that the function view is opened for this session:
     openCallGraphView();
@@ -594,7 +594,7 @@ void DataTab::UpdateTableDisplaySettings()
     }
 }
 
-bool DataTab::ProcessNameToPID(const QString& processName, ProcessIdType& pid)
+bool DataTab::ProcessNameToPID(const QString& processName, AMDTProcessId& pid)
 {
     bool retVal = false;
 

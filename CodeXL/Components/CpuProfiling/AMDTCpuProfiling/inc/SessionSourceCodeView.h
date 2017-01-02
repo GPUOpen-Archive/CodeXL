@@ -45,7 +45,7 @@ public:
     /// a requested module
     void AddSourceCodeItemToExplorer();
 
-    void DisplayAddress(gtVAddr addr, ProcessIdType pid, ThreadIdType tid);
+    void DisplayAddress(gtVAddr addr, AMDTProcessId pid, AMDTThreadId tid);
 
     // Overrides DataTab:
     /// Updates the current tables display according to the needed update type:

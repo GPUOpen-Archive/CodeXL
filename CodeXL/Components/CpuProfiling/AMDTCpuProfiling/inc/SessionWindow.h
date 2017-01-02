@@ -107,7 +107,7 @@ public slots:
     void onTabCurrentChange(int index);
     void onNavigateToDifferentTab(const QString& dest);
     bool onViewModulesView(SYSTEM_DATA_TAB_CONTENT aggregateBy);
-    void onViewSourceView(gtVAddr Address, ProcessIdType pid, ThreadIdType tid, const CpuProfileModule* pModDetail);
+    void onViewSourceView(gtVAddr Address, AMDTProcessId pid, AMDTThreadId tid, AMDTModuleId modId);
     void onViewSourceViewSlot(std::tuple<AMDTFunctionId, const gtString&, AMDTUInt32, AMDTUInt32> funcModInfo);
     void onViewCallGraphView(unsigned long pid);
     void onViewFunctionTab(unsigned long pid);

@@ -640,7 +640,7 @@ bool SessionSourceCodeView::IsAddressInCurrentFunction(gtVAddr addr)
     return retVal;
 }
 
-void SessionSourceCodeView::DisplayAddress(gtVAddr addr, ProcessIdType pid, ThreadIdType tid)
+void SessionSourceCodeView::DisplayAddress(gtVAddr addr, AMDTProcessId pid, AMDTThreadId tid)
 {
     GT_IF_WITH_ASSERT(m_pFunctionsComboBoxAction != nullptr)
     {
@@ -821,34 +821,10 @@ void SessionSourceCodeView::OnPIDComboChange(int index)
             // set tid to ALL_TIDS
             m_pTreeViewModel->m_tid = AMDT_PROFILE_ALL_THREADS;
 
+            // TODO: CpuProfileDataAccess should provide a new API that returns the list of threads
+            // for a given functionId and processId. Alternatively enhance GetFunctionInfo()..
+            // now tidList is always empty
             QStringList tidList;
-
-            // For each sample
-            if (m_pTreeViewModel->m_pDisplayedFunction != nullptr)
-            {
-                AptAggregatedSampleMap::const_iterator sit = m_pTreeViewModel->m_pDisplayedFunction->getBeginSample();
-                AptAggregatedSampleMap::const_iterator send = m_pTreeViewModel->m_pDisplayedFunction->getEndSample();
-
-                for (; sit != send; ++sit)
-                {
-                    bool isSamePid = (sit->first.m_pid == m_pTreeViewModel->m_pid) || m_pTreeViewModel->m_pid == SHOW_ALL_PIDS;
-
-                    if (SHOW_ALL_TIDS == sit->first.m_tid ||
-                        !isSamePid ||
-                        !IsAddressInCurrentFunction(sit->first.m_addr + m_pTreeViewModel->m_pDisplayedFunction->getBaseAddr()))
-                    {
-                        continue;
-                    }
-
-                    int found_index = tidList.indexOf(QString::number(sit->first.m_tid));
-
-                    if (0 > found_index)
-                    {
-                        tidList << QString::number(sit->first.m_tid);
-                    }
-                }
-            }
-
             bool isMultiTID =  false;
 
             if (pTIDComboBox->count() > 0)

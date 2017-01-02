@@ -78,7 +78,7 @@ void ModuleFilterDialog::intializeLayout()
 
     if (1 == m_pTableDisplaySettings->m_filterByPIDsList.size())
     {
-        gtUInt64 onePID = m_pTableDisplaySettings->m_filterByPIDsList.at(0);
+        AMDTProcessId onePID = m_pTableDisplaySettings->m_filterByPIDsList.at(0);
         PID.setNum(onePID);
 
         gtVector<AMDTProfileProcessInfo> procInfo;

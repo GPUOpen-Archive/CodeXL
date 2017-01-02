@@ -432,7 +432,7 @@ void SessionModulesView::onProcessesTableCellChanged()
     GT_IF_WITH_ASSERT((m_pTopProcessesTable != nullptr) && (m_pBottomModulesTable != nullptr) &&
                       (m_pBottomLabel != nullptr))
     {
-        ProcessIdType selectedProcessID = AMDT_PROFILE_ALL_PROCESSES;
+        AMDTProcessId selectedProcessID = AMDT_PROFILE_ALL_PROCESSES;
         std::vector<AMDTUInt64> selectedProcessIdVec;
 
         foreach (QTableWidgetItem* pSelectedItem, m_pTopProcessesTable->selectedItems())
@@ -590,7 +590,7 @@ void SessionModulesView::activateTableItem(QTableWidgetItem* pActivateItem, CPUP
 {
     bool isProcessesTable = false;
     bool isModulesTable = false;
-    ProcessIdType pid = 0;
+    AMDTProcessId pid = 0;
     QStringList modulesFilePaths;
     AMDTModuleId mId = AMDT_PROFILE_ALL_MODULES;
 

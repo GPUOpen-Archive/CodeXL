@@ -1952,7 +1952,7 @@ void SessionCallGraphView::UpdateTableDisplay(unsigned int updateType)
     qApp->restoreOverrideCursor();
 }
 
-void SessionCallGraphView::selectFunction(AMDTFunctionId funcID, ProcessIdType pid)
+void SessionCallGraphView::selectFunction(AMDTFunctionId funcID, AMDTProcessId pid)
 {
     GT_IF_WITH_ASSERT(nullptr != m_pPidComboAction)
     {

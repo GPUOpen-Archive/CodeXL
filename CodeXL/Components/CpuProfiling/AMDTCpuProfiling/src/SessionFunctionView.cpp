@@ -189,7 +189,7 @@ bool SessionFunctionView::displaySessionDataTables()
         if (0 == moduleShown)
         {
             // all process
-            int pid = AMDT_PROFILE_ALL_PROCESSES;
+            AMDTProcessId pid = AMDT_PROFILE_ALL_PROCESSES;
 
             // single process
             if (1 == m_functionsTablesFilter.m_filterByPIDsList.size())
@@ -347,9 +347,9 @@ void SessionFunctionView::selectFunction(const QString& funcId)
     }
 }
 
-ProcessIdType SessionFunctionView::getCurrentPid()
+AMDTProcessId SessionFunctionView::getCurrentPid()
 {
-    ProcessIdType pid = 0;
+    AMDTProcessId pid = 0;
 
     GT_IF_WITH_ASSERT(nullptr != m_pPIDComboBoxAction)
     {
@@ -391,7 +391,7 @@ void SessionFunctionView::filterByPID(int pid)
         {
             if (0 != pPIDComboBox->itemText(i).compare(CP_profileAllProcesses))
             {
-                ProcessIdType currendPID = 0;
+                AMDTProcessId currendPID = 0;
                 bool rc = ProcessNameToPID(pPIDComboBox->itemText(i), currendPID);
 
                 if (rc && ((unsigned int)pid == currendPID))
@@ -595,7 +595,7 @@ void SessionFunctionView::updateDataFromPidComboBox()
         m_functionsTablesFilter.m_isModule32BitList.clear();
         m_functionsTablesFilter.m_isSystemModuleList.clear();
 
-        AMDTUInt32 pid = 0;
+        AMDTProcessId pid = 0;
 
         if (CP_profileAllProcesses == pPIDComboBox->currentText())
         {
@@ -606,7 +606,7 @@ void SessionFunctionView::updateDataFromPidComboBox()
             {
                 if (0 != pPIDComboBox->itemText(i).compare(CP_profileAllProcesses))
                 {
-                    AMDTUInt32 currentPID = 0;
+                    AMDTProcessId currentPID = 0;
                     bool rc = ProcessNameToPID(pPIDComboBox->itemText(i), currentPID);
 
                     if (rc)
@@ -777,7 +777,7 @@ void SessionFunctionView::onTableContextMenuActionTriggered(CPUProfileDataTable:
         }
         else if (actionType == CPUProfileDataTable::DISPLAY_FUNCTION_IN_CALLGRAPH_VIEW)
         {
-            ProcessIdType pid = getCurrentPid();
+            AMDTProcessId pid = getCurrentPid();
             openCallGraphViewForFunction(m_pFunctionTable->getFunctionId(pTableItem->row()).toInt(), pid);
         }
     }
