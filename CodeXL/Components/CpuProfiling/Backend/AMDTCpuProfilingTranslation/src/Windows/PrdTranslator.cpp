@@ -66,12 +66,12 @@ enum HardcodedEventType
     #define KERNEL_SPACE_START  0x80000000
 #endif
 
-const QString UNKNOWN_MODULE_STR = "Unknown Module";
-#define UNKNOWN_KERNEL_SAMPLES  L"Unknown Kernel Samples"
-#define UNKNOWN_MODULE_PID_BUF_LEN 30
+#define CP_UNKNOWN_MODULE_STR         L"Unknown Module"
+#define UNKNOWN_KERNEL_SAMPLES        L"Unknown Kernel Samples"
+#define UNKNOWN_MODULE_PID_BUF_LEN    30
 
-const QString TI_FILE_EXT = ".ti";
-const QString PRD_FILE_EXT = ".prd";
+#define CP_PRD_FILE_EXT    L"prd"
+#define CP_TI_FILE_EXT     L"ti"
 
 #define MAX_CPUS            256
 
@@ -369,7 +369,7 @@ PrdTranslator::ProcessInfo& PrdTranslator::AcquireProcessInfo(ProcessIdType pid)
 }
 
 //Uses taskinfo dataFile(.prd->.ti),
-PrdTranslator::PrdTranslator(QString dataFile, bool collectStat) : m_pfnProgressBarCallback(nullptr),
+PrdTranslator::PrdTranslator(gtString dataFile, bool collectStat) : m_pfnProgressBarCallback(nullptr),
     m_progressEvent(L"CpuProfile", L"Preparing raw data translation...", 0),
     m_pProfilingDrivers(nullptr),
     m_countProfilingDrivers(0U)
@@ -541,7 +541,7 @@ unsigned int PrdTranslator::GetProfileType()
 {
     PrdReader prdReader;
 
-    if (S_OK != prdReader.Initialize(m_dataFile.toStdWString().c_str()))
+    if (S_OK != prdReader.Initialize(m_dataFile.asCharArray()))
     {
         return PROF_INVALIDTYPE;
     }
@@ -574,7 +574,7 @@ bool PrdTranslator::GetProfileEvents(DcEventConfig* pEventConfig, unsigned int n
 
     PrdReader prdReader;
 
-    if (S_OK != prdReader.Initialize(m_dataFile.toStdWString().c_str()))
+    if (S_OK != prdReader.Initialize(m_dataFile.asCharArray()))
     {
         return false;
     }
@@ -622,11 +622,9 @@ bool PrdTranslator::GetProfileEvents(DcEventConfig* pEventConfig, unsigned int n
 #endif
 
 
-bool PrdTranslator::InitPrdReader(PrdReader* pReader, const wchar_t* pFileName, gtUInt64* pLastUserCssRecordOffset, QString& errorString)
+bool PrdTranslator::InitPrdReader(PrdReader* pReader, const wchar_t* pFileName, gtUInt64* pLastUserCssRecordOffset, gtString& errorString)
 {
     bool bRet = true;
-    // avoid unreferenced formal parameter warning because th eonly reference is inside an if block
-    (void) errorString;
 
     if ((nullptr == pReader) || (nullptr == pFileName))
     {
@@ -648,10 +646,8 @@ bool PrdTranslator::InitPrdReader(PrdReader* pReader, const wchar_t* pFileName, 
 
     if (S_OK != hr)
     {
-        gtString msg;
-        msg.appendFormattedString(L"Can't open raw data file. (%ls)\nMaybe no samples were taken.", pFileName);
-        OS_OUTPUT_DEBUG_LOG(msg.asCharArray(), OS_DEBUG_LOG_ERROR);
-        errorString.fromWCharArray(msg.asCharArray());
+        errorString.appendFormattedString(L"Can't open raw data file. (%ls)\nMaybe no samples were taken.", pFileName);
+        OS_OUTPUT_DEBUG_LOG(errorString.asCharArray(), OS_DEBUG_LOG_ERROR);
 
         return false;
     }
@@ -1138,7 +1134,7 @@ void PrdTranslator::AggregateUnknownModuleSampleData(
         // unknown user module
         wchar_t buf[UNKNOWN_MODULE_PID_BUF_LEN] = {L'\0'};
         swprintf(buf, sizeof(buf) - 1, L" (PID %d)", sampInfo.pid);
-        tmp_modName = UNKNOWN_MODULE_STR.toStdWString().c_str();
+        tmp_modName = gtString(CP_UNKNOWN_MODULE_STR);
         tmp_modName += gtString(buf);
     }
 
@@ -1284,7 +1280,7 @@ void PrdTranslator::AggregatePidSampleData(
             gtString tmp;
             wchar_t buf[UNKNOWN_MODULE_PID_BUF_LEN] = {L'\0'};
             swprintf(buf, sizeof(buf) - 1, L" (PID %lld)", prdRecord.m_PID);
-            tmp = UNKNOWN_MODULE_STR.toStdWString().c_str();
+            tmp = gtString(CP_UNKNOWN_MODULE_STR);
             tmp += gtString(buf);
             temp_process.setPath(tmp);
             temp_process.m_is32Bit = b_is32bit;
@@ -1349,9 +1345,7 @@ void PrdTranslator::AggregatePidSampleData(
     // For managed code, overwrite the process name.
     if (evJavaModule == pModInfo->moduleType || evManaged == pModInfo->moduleType)
     {
-        QString tmp = QString::fromWCharArray(p_it->second.getPath().asCharArray());
-
-        if (tmp.contains(UNKNOWN_MODULE_STR))
+        if (p_it->second.getPath().findFirstOf(CP_UNKNOWN_MODULE_STR) != -1)
         {
             p_it->second.setPath(gtString(pModInfo->pModulename));
         }
@@ -1512,9 +1506,8 @@ HRESULT GetModuleInfoHelper(void* pVoid, TiModuleInfo* pModInfo, eRecordType dat
 //Writes the data to the file in proFile, heh heh
 HRESULT PrdTranslator::TranslateData(QString proFile,
                                      MissedInfoType* pMissedInfo,
-                                     QStringList processFilters,
-                                     QStringList targetPidList,
-                                     QString& errorString,
+                                     gtList<gtString>& processFilters,
+                                     gtString& errorString,
                                      bool bThread,
                                      bool bCLUtil,
                                      bool bLdStCollect,
@@ -1533,7 +1526,7 @@ HRESULT PrdTranslator::TranslateData(QString proFile,
     QString sessionDir = proFile.section('\\', 0, -2);
     QString sessionName = proFile.section('\\', -1);
 
-    if (m_dataFile.toLower().endsWith(".prd"))
+    if (m_dataFile.toLowerCase().endsWith(L".prd"))
     {
         startTime = GetTickCount();
         hr = OpenTaskInfoFile();
@@ -1552,7 +1545,7 @@ HRESULT PrdTranslator::TranslateData(QString proFile,
     m_pfnProgressBarCallback = pfnProgressBarCallback;
     UpdateProgressBar(10ULL, 100ULL);
 
-    if (m_dataFile.toLower().endsWith(".prd"))
+    if (m_dataFile.toLowerCase().endsWith(L".prd"))
     {
         startTime = GetTickCount();
 
@@ -1606,13 +1599,12 @@ HRESULT PrdTranslator::TranslateData(QString proFile,
 HRESULT PrdTranslator::OpenTaskInfoFile()
 {
     HRESULT hr = S_OK;
-    QString tiFile;
+    osFilePath tiFile(m_dataFile);
 
-    tiFile = m_dataFile;
-    tiFile.replace(PRD_FILE_EXT, TI_FILE_EXT);
+    tiFile.setFileExtension(CP_TI_FILE_EXT);
 
     //get the info from the ti file
-    hr = fnReadModuleInfoFile(tiFile.toStdWString().c_str());
+    hr = fnReadModuleInfoFile(tiFile.asString().asCharArray());
 
     if (S_OK != hr)
     {
@@ -1644,7 +1636,7 @@ bool PrdTranslator::IsFilteredProcess(gtList<DWORD>& filteredPids, DWORD pid)
 
 HRESULT PrdTranslator::ThreadTranslateDataPrdFile(QString proFile,
                                                   MissedInfoType* pMissedInfo,
-                                                  QStringList& processFilters,
+                                                  gtList<gtString>& processFilters,
                                                   MemoryMap& mapAddress,
                                                   PrdReader& tPrdReader,
                                                   PrdReaderThread& threadPRDReader,
@@ -1693,12 +1685,12 @@ HRESULT PrdTranslator::ThreadTranslateDataPrdFile(QString proFile,
     pMissedInfo->missedCount = 0;
 
     struct _stati64 fileStat;
-    _wstati64(m_dataFile.toStdWString().c_str(), &fileStat);
+    _wstati64(m_dataFile.asCharArray(), &fileStat);
 
     //if applicable, get the list of filtered processes
     gtList<DWORD> filters;
 
-    if (!processFilters.isEmpty())
+    if (!processFilters.empty())
     {
         //TODO: error checking
         unsigned int procCount = 0;
@@ -1709,8 +1701,12 @@ HRESULT PrdTranslator::ThreadTranslateDataPrdFile(QString proFile,
         //TODO: verify for java
         for (unsigned int i = 0; i < procCount; i++)
         {
-            if (processFilters.contains(QString::fromWCharArray(allProcArray[i].pqiProcessName),
-                                        Qt::CaseInsensitive))
+            gtString aProcessName(allProcArray[i].pqiProcessName);
+
+            auto aFilteredProcess = std::find_if(processFilters.begin(), processFilters.end(),
+                [&aProcessName](gtString const& aProcess) { return (aProcess.compareNoCase(aProcessName) == 0); });
+
+            if (aFilteredProcess != processFilters.end())
             {
                 filters.push_back(allProcArray[i].pqiProcessID);
             }
@@ -3042,8 +3038,8 @@ HRESULT PrdTranslator::GetBufferRecordCount(PrdReader& tPrdReader, LPVOID baseAd
 //Writes the data to the file in proFile,
 HRESULT PrdTranslator::TranslateDataPrdFile(QString proFile,
                                             MissedInfoType* pMissedInfo,
-                                            QStringList processFilters,
-                                            QString& errorString,
+                                            gtList<gtString>& processFilters,
+                                            gtString& errorString,
                                             bool bThread,
                                             bool bCLUtil,
                                             bool bLdStCollect)
@@ -3062,7 +3058,7 @@ HRESULT PrdTranslator::TranslateDataPrdFile(QString proFile,
     //}
 
     struct _stati64 fileStat;
-    _wstati64(m_dataFile.toStdWString().c_str(), &fileStat);
+    _wstati64(m_dataFile.asCharArray(), &fileStat);
 
 
     startTime = GetTickCount();
@@ -3097,7 +3093,7 @@ HRESULT PrdTranslator::TranslateDataPrdFile(QString proFile,
     MemoryMap mapAddress;
     gtUInt64 lastUserCssRecordOffset = 0ULL;
 
-    if (!InitPrdReader(&tPrdReader, m_dataFile.toStdWString().c_str(), &lastUserCssRecordOffset, errorString))
+    if (!InitPrdReader(&tPrdReader, m_dataFile.asCharArray(), &lastUserCssRecordOffset, errorString))
     {
         return E_ACCESSDENIED;
     }
@@ -3112,7 +3108,7 @@ HRESULT PrdTranslator::TranslateDataPrdFile(QString proFile,
     m_durationSec = tPrdReader.GetProfileDuration();
 
     // Memory map the file..
-    res = mapAddress.Map(m_dataFile.toStdWString().c_str());
+    res = mapAddress.Map(m_dataFile.asCharArray());
 
     if (S_OK != res)
     {
@@ -4163,14 +4159,12 @@ HRESULT PrdTranslator::WriteProfile(const QString& proFile,
     return res;
 }
 
-
 unsigned int PrdTranslator::GetCpuCount() const
 {
     SYSTEM_INFO sysinfo;
     GetSystemInfo(&sysinfo);
     return sysinfo.dwNumberOfProcessors;
 }
-
 
 bool PrdTranslator::GetProfileEventCount(int* pEventCount)
 {
@@ -4181,7 +4175,7 @@ bool PrdTranslator::GetProfileEventCount(int* pEventCount)
 
     PrdReader prdReader;
 
-    if (S_OK != prdReader.Initialize(m_dataFile.toStdWString().c_str()))
+    if (S_OK != prdReader.Initialize(m_dataFile.asCharArray()))
     {
         return false;
     }
@@ -5348,7 +5342,7 @@ bool PrdTranslator::GetIbsConfig(IbsConfig* pConfig)
 
     PrdReader prdReader;
 
-    if (S_OK != prdReader.Initialize(m_dataFile.toStdWString().c_str()))
+    if (S_OK != prdReader.Initialize(m_dataFile.asCharArray()))
     {
         return false;
     }
@@ -5370,7 +5364,7 @@ bool PrdTranslator::GetTimerInterval(gtUInt64* resolution)
 
     PrdReader prdReader;
 
-    if (S_OK != prdReader.Initialize(m_dataFile.toStdWString().c_str()))
+    if (S_OK != prdReader.Initialize(m_dataFile.asCharArray()))
     {
         return false;
     }
@@ -5415,7 +5409,7 @@ void PrdTranslator::addJavaInlinedMethods(CpuProfileModule&  mod,
         const CpuProfileFunction& tmpFunction = (*it).second;
         // Construct the JNC file path and Open the JNCfile
         wchar_t jncName[OS_MAX_PATH] = { L'\0' };
-        gtString path(m_dataFile.toStdWString().c_str());
+        gtString path(m_dataFile);
         osFilePath tmpPath(path);
         swprintf(jncName, OS_MAX_PATH, L"%s\\%s",
                  tmpPath.fileDirectoryAsString().asCharArray(),

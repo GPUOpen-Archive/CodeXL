@@ -6,11 +6,6 @@
 /// \brief CPU profile data translation interface implementation.
 ///
 //==================================================================================
-// $Id: //devtools/main/CodeXL/Components/CpuProfiling/Backend/AMDTCpuProfilingTranslation/src/CpuProfileDataTranslation.cpp#14 $
-// Last checkin:   $DateTime: 2016/04/14 01:44:54 $
-// Last edited by: $Author:  AMD Developer Tools Team
-// Change list:    $Change: 569055 $
-//=====================================================================
 
 #include <QFileInfo>
 
@@ -96,7 +91,7 @@ static HRESULT helpHandlePrdFile(const wchar_t* pFilePath, ReaderHandle** pReade
     bool collectStats = osGetCurrentProcessEnvVariableValue(L"CODEXL_CPU_TRANS_STATS", envVal);
     gtString path = pFilePath;
 
-    PrdTranslator* pDataTranslator = new PrdTranslator(QString::fromStdWString(pFilePath), collectStats);
+    PrdTranslator* pDataTranslator = new PrdTranslator(pFilePath, collectStats);
 
     if (nullptr == pDataTranslator)
     {
@@ -243,12 +238,12 @@ HRESULT fnCpuProfileDataTranslate(
         outPath.replace('/', '\\');
 
         MissedInfoType missedInfo;
-        QString errorString;
+        gtString errorString;
+        gtList<gtString> processFilters;
 
         hr = pDataTranslator->TranslateData(outPath,
                                             &missedInfo, //MissedInfoType *pMissedInfo
-                                            QStringList(), //QStringList processFilters
-                                            QStringList(), //QStringList targetPidList
+                                            processFilters,
                                             errorString, //QWidget *pApp = NULL
                                             false, //bool bThread = false
                                             false, //bool bCLUtil = false

@@ -10,7 +10,6 @@
 #ifndef _PRDTRANSLATOR_H_
 #define _PRDTRANSLATOR_H_
 
-
 #include <memory>
 
 #include <QStringList>
@@ -159,7 +158,7 @@ class PrdTranslator
 {
 public:
     //Uses taskinfo dataFile(.prd->.ti),
-    PrdTranslator(QString dataFile, bool collectStat = false);
+    PrdTranslator(gtString dataFile, bool collectStat = false);
     ~PrdTranslator();
 
     void SetNumWorkerThreads(DWORD numThreads) { m_numWorkerThreads = numThreads; }
@@ -168,9 +167,8 @@ public:
 
     HRESULT TranslateData(QString proFile,
                           MissedInfoType* pMissedInfo,
-                          QStringList processFilters,
-                          QStringList targetPidList,
-                          QString& errorString,
+                          gtList<gtString>& processFilters,
+                          gtString& errorString,
                           bool bThread = false,
                           bool bCLUtil = false,
                           bool bLdStCollect = false,
@@ -178,7 +176,7 @@ public:
 
     HRESULT ThreadTranslateDataPrdFile(QString  proFile,
                                        MissedInfoType* pMissedInfo,
-                                       QStringList& processFilters,
+                                       gtList<gtString>& processFilters,
                                        MemoryMap& mapAddress,
                                        PrdReader& tPrdReader,
                                        PrdReaderThread& threadPrdReader,
@@ -284,7 +282,7 @@ private:
     void AddBytesToProgressBar(gtUInt64 bytes);
     void AsyncAddBytesToProgressBar(gtUInt64 bytes);
 
-    bool InitPrdReader(PrdReader* pReader, const wchar_t* pFileName, gtUInt64* pLastUserCssRecordOffset, QString& errorString);
+    bool InitPrdReader(PrdReader* pReader, const wchar_t* pFileName, gtUInt64* pLastUserCssRecordOffset, gtString& errorString);
 
     unsigned int GetCpuCount() const;
 
@@ -343,9 +341,13 @@ private:
 
     void CssMapCleanup();
 
-    HRESULT TranslateDataPrdFile(QString proFile, MissedInfoType* pMissedInfo,
-                                 QStringList processFilters, QString& errorString, bool bThread = false,
-                                 bool bCLUtil = false, bool bLdStCollect = false);
+    HRESULT TranslateDataPrdFile(QString proFile,
+                                 MissedInfoType* pMissedInfo,
+                                 gtList<gtString>& processFilters,
+                                 gtString& errorString,
+                                 bool bThread = false,
+                                 bool bCLUtil = false,
+                                 bool bLdStCollect = false);
 
     bool AggregateSampleData(
         RecordDataStruct prdRecord,
@@ -493,7 +495,7 @@ private:
 
     bool IsFilteredProcess(gtList<DWORD>& filteredPids, DWORD pid);
 
-    QString m_dataFile;
+    gtString m_dataFile;
     bool    m_collectStat;
 
     // Number of worker threads to be created for processing the PRD file.
@@ -559,7 +561,7 @@ struct ThreadPrdData
     PrdTranslator*      pCDXptr;
     QString             sessionPath;        // NOT REQUIRED
     MissedInfoType*     pMissedInfo;
-    QStringList*        pProcessFilters;
+    gtList<gtString>*   pProcessFilters;
     MemoryMap*          pMapAddress;
     PrdReader*          pPrdReader;        // Global PRD Reader
     PrdReaderThread*    threadPrdReader;   // Thread specific PRD reader
