@@ -203,7 +203,7 @@ private:
     uint64_t          m_flags;        // Not Reqd ?
     uint64_t          m_state;        // session state
 
-    std::string       m_outputFile;   // QFile ?
+    std::string       m_outputFile;
     std::string       m_errStr;
 };
 

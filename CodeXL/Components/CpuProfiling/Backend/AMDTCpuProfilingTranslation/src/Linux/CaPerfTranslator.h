@@ -373,7 +373,7 @@ private:
 
     HRESULT _getJavaModuleforSample(TiModuleInfo* pModInfo, gtUInt32 pid, gtUInt64 time, gtUInt64 ip);
 
-    bool _removeJavaJncTmpDir(const QString& directory);
+    bool _removeJavaJncTmpDir(const gtString& directory);
 
     void _addIbsEvent(unsigned int event);
     void _addIbsFetchEventsToMap();

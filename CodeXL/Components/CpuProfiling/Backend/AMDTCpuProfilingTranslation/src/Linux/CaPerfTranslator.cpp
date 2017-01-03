@@ -12,8 +12,6 @@
 // Change list:    $Change: 569055 $
 //=====================================================================
 
-#include <QFile>
-#include <QDir>
 
 #ifdef HAVE_CONFIG_H
     #include "config.h"
@@ -62,6 +60,7 @@
 #include <AMDTOSWrappers/Include/osGeneralFunctions.h>
 #include <AMDTOSWrappers/Include/osProductVersion.h>
 #include <AMDTOSWrappers/Include/osApplication.h>
+#include <AMDTOSWrappers/Include/osDirectory.h>
 #include <AMDTCpuProfilingRawData/inc/Linux/CaPerfDataReader.h>
 #include <AMDTCpuProfilingRawData/inc/Linux/PerfData.h>
 #include <AMDTCpuProfilingRawData/inc/RunInfo.h>
@@ -550,57 +549,55 @@ HRESULT CaPerfTranslator::dumpPerfData(const std::string& perfDataPath)
 
 
 bool
-CaPerfTranslator::_removeJavaJncTmpDir(const QString& directory)
+CaPerfTranslator::_removeJavaJncTmpDir(const gtString& directory)
 {
-    QDir tmpDir(directory);
+    osDirectory tmpDir;
+    tmpDir.setDirectoryFullPathFromString(directory);
 
     if (tmpDir.exists())
     {
-        QFileInfoList di_list = tmpDir.entryInfoList(QDir::AllDirs);
+        gtList<osFilePath> di_list;
+        tmpDir.getSubDirectoriesPaths(osDirectory::SORT_BY_NAME_ASCENDING, di_list);
 
         // for each process id directory in the given directory
-        for (int i = 0; i < di_list.size(); i++)
+        for (auto& jncDirPath : di_list)
         {
-            pid_t pid = di_list.at(i).fileName().toULong();
+            gtString jncDir;
+            bool rc = jncDirPath.getFileName(jncDir);
 
-            if (0 == pid)
+            if (rc)
             {
-                continue;
-            }
+                pid_t pid = 0;
+                jncDir.toIntNumber(pid);
 
-            PidProcessMap::iterator it = m_procMap.find(pid);
-
-            if (it == m_procMap.end())
-            {
-                // This pid does not belong this profile run, ignore
-                continue;
-            }
-
-            // If the Java process is still running, don't remove the tmp JNC dir
-            char filename[PATH_MAX];
-            memset(filename, 0, sizeof(filename));
-            snprintf(filename, sizeof(filename), "/proc/%d/status", pid);
-
-            if (0 == (access(filename, F_OK)))
-            {
-                continue;
-            }
-
-            QDir jncDir(di_list.at(i).absoluteFilePath());
-
-            if (jncDir.exists())
-            {
-                // remove all the files in this tmp java jnc dir.
-                // This will not have any subdirs
-                QFileInfoList jncList = jncDir.entryInfoList(QDir::Files | QDir::NoDotAndDotDot);
-
-                for (int j = 0; j < jncList.size(); j++)
+                if (0 == pid)
                 {
-                    QFile::remove(jncList.at(j).absoluteFilePath());
+                    continue;
                 }
 
-                // Remove the tmp jnc dir
-                jncDir.rmdir(di_list.at(i).absoluteFilePath());
+                PidProcessMap::iterator it = m_procMap.find(pid);
+
+                if (it == m_procMap.end())
+                {
+                    // This pid does not belong this profile run, ignore
+                    continue;
+                }
+
+                // If the Java process is still running, don't remove the tmp JNC dir
+                char filename[PATH_MAX];
+                memset(filename, 0, sizeof(filename));
+                snprintf(filename, sizeof(filename), "/proc/%d/status", pid);
+
+                if (0 == (access(filename, F_OK)))
+                {
+                    continue;
+                }
+
+                if (jncDirPath.exists())
+                {
+                    osDirectory aJncDir(jncDirPath);
+                    aJncDir.deleteRecursively();
+                }
             }
         }
     }
@@ -787,7 +784,7 @@ HRESULT CaPerfTranslator::translatePerfDataToCaData(const std::string& outPath, 
 
     // Fix for BUG400722: Removed the residual JNC files created from
     // Java profiling on temp dir.
-    _removeJavaJncTmpDir(QString::fromWCharArray(javaJncTmpDir));
+    _removeJavaJncTmpDir(javaJncTmpDir);
 
     // If there are no samples collected, return appropriate
     // error code.
