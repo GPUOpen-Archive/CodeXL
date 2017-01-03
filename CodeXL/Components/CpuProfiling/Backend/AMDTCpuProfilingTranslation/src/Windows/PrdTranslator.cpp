@@ -6,11 +6,6 @@
 /// \brief This is the interface for the PRD file translation.
 ///
 //==================================================================================
-// $Id: //devtools/main/CodeXL/Components/CpuProfiling/Backend/AMDTCpuProfilingTranslation/src/Windows/PrdTranslator.cpp#85 $
-// Last checkin:   $DateTime: 2016/04/18 05:31:05 $
-// Last edited by: $Author:  AMD Developer Tools Team
-// Change list:    $Change: 569611 $
-//=====================================================================
 
 #include <AMDTBaseTools/Include/gtString.h>
 #include <AMDTBaseTools/Include/gtHashSet.h>
@@ -38,10 +33,6 @@
 
 // canonical linear address
 #define ERBT_713_NON_CANONICAL_MASK 0x0000FFFFFFFFFFFF
-
-#if SUPPORT_CLU
-    #include "CluWriter.h"
-#endif
 
 #include "../ExecutableAnalyzer.h"
 #include "PrdUserCss.h"
@@ -1523,9 +1514,6 @@ HRESULT PrdTranslator::TranslateData(QString proFile,
     HRESULT hr = S_OK;
     DWORD startTime;
 
-    QString sessionDir = proFile.section('\\', 0, -2);
-    QString sessionName = proFile.section('\\', -1);
-
     if (m_dataFile.toLowerCase().endsWith(L".prd"))
     {
         startTime = GetTickCount();
@@ -1559,38 +1547,6 @@ HRESULT PrdTranslator::TranslateData(QString proFile,
             OS_OUTPUT_FORMAT_DEBUG_LOG(OS_DEBUG_LOG_DEBUG, L"Elapsed Time: TranslateDataPrdFile (%d ms)", (GetTickCount() - startTime));
         }
     }
-
-#if SUPPORT_CLU
-
-    if ((nullptr != m_pCLU) && bCLUtil && (S_OK == hr))
-    {
-        startTime = GetTickCount();
-        m_pCLU->CacheLineCleanup();
-        wchar_t sessDir[MAX_PATH];
-        wchar_t sessName[MAX_PATH];
-        sessionDir.toWCharArray(sessDir);
-        sessDir[sessionDir.size()] = L'\0';
-        sessionName.toWCharArray(sessName);
-        sessName[sessionName.size()] = L'\0';
-        hr = m_pCLU->generateCluFile(sessDir, sessName, pApp);
-
-        if (m_collectStat)
-        {
-            OS_OUTPUT_FORMAT_DEBUG_LOG(OS_DEBUG_LOG_DEBUG, L"Elapsed Time: Generating CLU file (%d ms)", (GetTickCount() - startTime));
-        }
-    }
-
-#endif
-
-#if SUPPORT_CLU
-
-    if (bCLUtil)
-    {
-        delete m_pCLU;
-        m_pCLU = nullptr;
-    }
-
-#endif
 
     return hr;
 }
