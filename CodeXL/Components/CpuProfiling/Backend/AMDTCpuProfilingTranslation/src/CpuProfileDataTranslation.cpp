@@ -13,6 +13,7 @@
 #include <CpuProfileDataMigrator.h>
 
 #include <AMDTOSWrappers/Include/osProcess.h>
+#include <AMDTOSWrappers/Include/osDirectory.h>
 
 #if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
     // Windows only stuff
@@ -232,16 +233,12 @@ HRESULT fnCpuProfileDataTranslate(
     {
         pDataTranslator->SetDebugSymbolsSearchPath(pSearchPath, pServerList, pCachePath);
 
-        //Get absolute path
-        QFileInfo outFile(QString::fromStdWString(pFileName));
-        QString outPath = outFile.absoluteFilePath();
-        outPath.replace('/', '\\');
-
+        osFilePath outFile(pFileName);
         MissedInfoType missedInfo;
         gtString errorString;
         gtList<gtString> processFilters;
 
-        hr = pDataTranslator->TranslateData(outPath,
+        hr = pDataTranslator->TranslateData(outFile,
                                             &missedInfo, //MissedInfoType *pMissedInfo
                                             processFilters,
                                             errorString, //QWidget *pApp = NULL
@@ -263,7 +260,7 @@ HRESULT fnCpuProfileDataTranslate(
 
     ///////////////////////////////////////////////////////
     //Get absolute path
-    // NOTE: "pFileName" is the directory to store the output
+    // NOTE: "pFileName" is the directory to store the output    
     QFileInfo outDir(QString::fromStdWString(pFileName));
     QString outDirPath = outDir.absoluteFilePath();
     outDirPath.replace('\\', '/');

@@ -12,8 +12,6 @@
 
 #include <memory>
 
-#include <QStringList>
-
 #include "MemoryMap.h"
 #include "CluInfo.h"
 #include <AMDTCpuPerfEventUtils/inc/EventEncoding.h>
@@ -165,7 +163,7 @@ public:
 
     DWORD GetNumWorkerThreads()  const { return m_numWorkerThreads; }
 
-    HRESULT TranslateData(QString proFile,
+    HRESULT TranslateData(const osFilePath& proFile,
                           MissedInfoType* pMissedInfo,
                           gtList<gtString>& processFilters,
                           gtString& errorString,
@@ -174,7 +172,7 @@ public:
                           bool bLdStCollect = false,
                           PfnProgressBarCallback pfnProgressBarCallback = NULL);
 
-    HRESULT ThreadTranslateDataPrdFile(QString  proFile,
+    HRESULT ThreadTranslateDataPrdFile(const osFilePath& proFile,
                                        MissedInfoType* pMissedInfo,
                                        gtList<gtString>& processFilters,
                                        MemoryMap& mapAddress,
@@ -207,12 +205,6 @@ public:
         gtVector<std::tuple<gtUInt32, gtUInt32, gtUInt32, gtUInt64, gtUInt64, gtUInt64>>& inlinedJitInfo);
 
     void SetDebugSymbolsSearchPath(const wchar_t* pSearchPath, const wchar_t* pServerList, const wchar_t* pCachePath);
-
-    //FIXME [Suravee]: Should not need this
-    //  bool GetProfileEvents(DcEventConfig *pEvents, unsigned int numOfEvents, EventNormValueMap *pNorms = NULL);
-
-    //FIXME [Suravee]: Should not need this
-    //  bool GetIbsConfig(IbsConfig *pConfig);
 
 private:
     struct TimeRange
@@ -341,7 +333,7 @@ private:
 
     void CssMapCleanup();
 
-    HRESULT TranslateDataPrdFile(QString proFile,
+    HRESULT TranslateDataPrdFile(const osFilePath& proFile,
                                  MissedInfoType* pMissedInfo,
                                  gtList<gtString>& processFilters,
                                  gtString& errorString,
@@ -412,7 +404,10 @@ private:
         UINT8 L1DcSize,
         PrdTranslationStats* const pStats);
 
-    void AggregateCluData(PidProcessMap* pPMap, NameModuleMap* pMMap, QString proFile, PrdTranslationStats* const pStats);
+    void AggregateCluData(PidProcessMap* pPMap,
+                          NameModuleMap* pMMap,
+                          const osFilePath& proFile,
+                          PrdTranslationStats* const pStats);
 
     static HRESULT CreatePRDView(PrdReader& tPrdReader,
                                  gtUInt64 offset,
@@ -428,7 +423,7 @@ private:
 
     bool AggregateThreadMaps(PidProcessList& procList, NameModuleList& modList, ModInstanceList& modInstanceList);
 
-    HRESULT WriteProfile(const QString& proFile,
+    HRESULT WriteProfile(const osFilePath& proFile,
                          PrdReader& tPrdReader,
                          const MissedInfoType* pMissedInfo,
                          const PidProcessMap& processMap,
@@ -555,11 +550,10 @@ private:
     std::unique_ptr<ProfilerDataDBWriter> m_dbWriter;
 };
 
-
 struct ThreadPrdData
 {
     PrdTranslator*      pCDXptr;
-    QString             sessionPath;        // NOT REQUIRED
+    osFilePath          sessionPath;
     MissedInfoType*     pMissedInfo;
     gtList<gtString>*   pProcessFilters;
     MemoryMap*          pMapAddress;
@@ -586,7 +580,6 @@ struct ThreadPrdData
 
     PrdTranslationStats stats;
 };
-
 
 class TiProcessWorkingSetQuery : public ProcessWorkingSetQuery
 {

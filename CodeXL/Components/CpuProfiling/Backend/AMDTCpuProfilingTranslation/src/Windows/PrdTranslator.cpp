@@ -547,72 +547,6 @@ unsigned int PrdTranslator::GetProfileType()
     return types;
 }
 
-//FIXME [Suravee]: Should not need this
-#if 0
-bool PrdTranslator::GetProfileEvents(DcEventConfig* pEventConfig, unsigned int numOfEvents, EventNormValueMap* pNorms)
-{
-    bool bRet = false;
-
-    if (nullptr == pEventConfig)
-    {
-        return false;
-    }
-
-    if (nullptr != pNorms)
-    {
-        pNorms->clear();
-    }
-
-    PrdReader prdReader;
-
-    if (S_OK != prdReader.Initialize(m_dataFile.asCharArray()))
-    {
-        return false;
-    }
-
-    unsigned int groupNum;
-    unsigned int cfgCnt = 0;
-
-    groupNum = prdReader.GetEventGroupCount();
-    cfgCnt = prdReader.GetEventCount();
-
-    if (numOfEvents >= cfgCnt)
-    {
-        EventCfgInfo* pEvtCfg = new EventCfgInfo[cfgCnt];
-
-        if (nullptr != pEvtCfg)
-        {
-            HRESULT hr = prdReader.GetEventInfo(pEvtCfg, cfgCnt);
-
-            if (S_OK == hr)
-            {
-                DcEventConfig* pE = pEventConfig;
-
-                for (unsigned int i = 0; i < cfgCnt; i++)
-                {
-                    pE[i].pmc.perf_ctl = pEvtCfg[i].ctl.perf_ctl;
-                    pE[i].eventCount = pEvtCfg[i].ctr;
-
-                    if (nullptr != pNorms)
-                    {
-                        EventMaskType encodedEvent = EncodeEvent(pEvtCfg[i].ctl);
-                        (*pNorms) [encodedEvent] = pEvtCfg[i].ctr * groupNum / pEvtCfg[i].numApperance;
-                    }
-                }
-
-                prdReader.Close();
-            }
-
-            delete [] pEvtCfg;
-            pEvtCfg = nullptr;
-        }
-    }
-
-    return true;
-}
-#endif
-
-
 bool PrdTranslator::InitPrdReader(PrdReader* pReader, const wchar_t* pFileName, gtUInt64* pLastUserCssRecordOffset, gtString& errorString)
 {
     bool bRet = true;
@@ -722,7 +656,7 @@ bool PrdTranslator::InitPrdReader(PrdReader* pReader, const wchar_t* pFileName, 
             if (static_cast<gtInt64>(pEvtCfg[i].ctr) > 0)
             {
                 EventMaskType encodedEvent = EncodeEvent(pEvtCfg[i].ctl);
-                m_norms[encodedEvent] = pEvtCfg[i].ctr * groupNum / pEvtCfg[i].numApperance;
+                m_norms[encodedEvent] = static_cast<float>(pEvtCfg[i].ctr * groupNum / pEvtCfg[i].numApperance);
                 m_eventMap.insert(EventMap::value_type(encodedEvent, (gtUInt32)m_norms[encodedEvent]));
             }
         }
@@ -797,7 +731,7 @@ void PrdTranslator::AggregateKnownModuleSampleData(
     unsigned srcLineNum = 0U;
     gtUInt32 functionId = UNKNOWN_FUNCTION_ID;
 
-    PidModaddrKey key(pModInfo->processID, pModInfo->ModuleStartAddr);
+    PidModaddrKey key(static_cast<ProcessIdType>(pModInfo->processID), pModInfo->ModuleStartAddr);
     PidModaddrItrMap::iterator pmait = pidModaddrItrMap.find(key);
 
     if (pmait == pidModaddrItrMap.end())
@@ -859,7 +793,7 @@ void PrdTranslator::AggregateKnownModuleSampleData(
                 ss << pModInfo->pJncName;
             }
 
-            funcSize = pModInfo->Modulesize;
+            funcSize = static_cast<gtUInt32>(pModInfo->Modulesize);
             srcFileName = pModInfo->pJavaSrcFileName;
             jncFileName = ss.str().c_str();
             functionId = pModInfo->instanceId;
@@ -1028,7 +962,7 @@ void PrdTranslator::InitNewModule(CpuProfileModule& mod,
     mod.m_base = pModInfo->ModuleStartAddr;
     mod.m_moduleId = pModInfo->moduleId;
     mod.m_moduleInstanceInfo.emplace_back(pModInfo->processID, pModInfo->ModuleStartAddr, pModInfo->instanceId);
-    mod.m_size = pModInfo->Modulesize;
+    mod.m_size = static_cast<gtUInt32>(pModInfo->Modulesize);
 
     if (m_is64Sys)
     {
@@ -1060,7 +994,7 @@ void PrdTranslator::InitNewModule(CpuProfileModule& mod,
 
             if (b64bitSystemDir)
             {
-                b64bitSystemDir = Wow64DisableWow64FsRedirection(&oldValue);
+                b64bitSystemDir = (Wow64DisableWow64FsRedirection(&oldValue) == TRUE);
             }
 
             if (nullptr != pModInfo->pPeFile)
@@ -1223,13 +1157,13 @@ bool PrdTranslator::AggregateSampleData(RecordDataStruct prdRecord,
 
     //bit 17 OS, bit 16 USR >> 16 = prdRecord.m_eventBitMask
     SampleInfo sampInfo(prdRecord.m_RIP,
-                        prdRecord.m_PID,
-                        prdRecord.m_ThreadHandle,
+                        static_cast<ProcessIdType>(prdRecord.m_PID),
+                        static_cast<ThreadIdType>(prdRecord.m_ThreadHandle),
                         prdRecord.m_ProcessorID,
                         EncodeEvent(prdRecord.m_EventType,
                                     prdRecord.m_EventUnitMask,
-                                    (prdRecord.m_eventBitMask & 2),
-                                    (prdRecord.m_eventBitMask & 1)));
+                                    (prdRecord.m_eventBitMask & 2) ? true : false,
+                                    (prdRecord.m_eventBitMask & 1) ? true : false));
 
     if ((nullptr != pModInfo->pModulename) && (wcslen(pModInfo->pModulename)))
     {
@@ -1257,7 +1191,7 @@ void PrdTranslator::AggregatePidSampleData(
     unsigned int samplesCount)
 {
     // HOTSPOT
-    PidProcessMap::iterator p_it = pPMap->find(prdRecord.m_PID);
+    PidProcessMap::iterator p_it = pPMap->find(static_cast<ProcessIdType>(prdRecord.m_PID));
 
     if (pPMap->end() == p_it)
     {
@@ -1301,7 +1235,7 @@ void PrdTranslator::AggregatePidSampleData(
 
                 if (b64bitSystemDir)
                 {
-                    b64bitSystemDir = Wow64DisableWow64FsRedirection(&oldValue);
+                    b64bitSystemDir = (Wow64DisableWow64FsRedirection(&oldValue) == TRUE);
                 }
 
                 ExecutableFile* pExecutable = ExecutableFile::Open(processName);
@@ -1330,7 +1264,7 @@ void PrdTranslator::AggregatePidSampleData(
 
         temp_process.m_hasCss = false;
         pPMap->insert(PidProcessMap::value_type(static_cast<ProcessIdType>(prdRecord.m_PID), temp_process));
-        p_it = pPMap->find(prdRecord.m_PID);
+        p_it = pPMap->find(static_cast<gtUInt32>(prdRecord.m_PID));
     }
 
     // For managed code, overwrite the process name.
@@ -1347,7 +1281,9 @@ void PrdTranslator::AggregatePidSampleData(
         //bit 17 OS, bit 16 USR >> 16 = prdRecord.m_eventBitMask
         SampleKey sKey(prdRecord.m_ProcessorID,
                        EncodeEvent(prdRecord.m_EventType,
-                                   prdRecord.m_EventUnitMask, (prdRecord.m_eventBitMask & 2), (prdRecord.m_eventBitMask & 1)));
+                                   prdRecord.m_EventUnitMask,
+                                   ((prdRecord.m_eventBitMask & 2) == 0x2),
+                                   ((prdRecord.m_eventBitMask & 1) == 0x1)));
 
         p_it->second.addSamples(sKey, samplesCount);
     }
@@ -1367,7 +1303,7 @@ enum eRecordType
 
 // This is helper function to get initialize module info structure and get module
 // information via task info interface
-HRESULT GetModuleInfoHelper(void* pVoid, TiModuleInfo* pModInfo, eRecordType dataType, QString modPath)
+HRESULT GetModuleInfoHelper(void* pVoid, TiModuleInfo* pModInfo, eRecordType dataType, const osFilePath& modPath, bool isClu = false)
 {
     if (!pVoid || !pModInfo)
     {
@@ -1448,33 +1384,20 @@ HRESULT GetModuleInfoHelper(void* pVoid, TiModuleInfo* pModInfo, eRecordType dat
     pModInfo->ModuleStartAddr = 0;
     pModInfo->Modulesize = 0;
     pModInfo->pSessionDir = sSessionDir;
-    pModInfo->pSessionDir[0] = L'\0';
     pModInfo->pPeFile = nullptr;
     pModInfo->CSvalue = 0;
     pModInfo->FunStartAddr = 0;
     pModInfo->kernel = false;
 
-    int pos = modPath.lastIndexOf('\\');
-
-    if (-1 != pos && OS_MAX_PATH >= pos)
+    // Session dir is required only for CLU ?
+    if (isClu)
     {
-        int sz = modPath.size();
+        osDirectory sessionDir;
+        bool rc = modPath.getFileDirectory(sessionDir);
 
-        if (OS_MAX_PATH < sz)
+        if (rc)
         {
-            if ((OS_MAX_PATH * 2) > sz)
-            {
-                wchar_t tmp[OS_MAX_PATH * 2];
-                modPath.toWCharArray(tmp);
-
-                memcpy(pModInfo->pSessionDir, tmp, pos * sizeof(wchar_t));
-                pModInfo->pSessionDir[pos] = L'\0';
-            }
-        }
-        else
-        {
-            modPath.toWCharArray(pModInfo->pSessionDir);
-            pModInfo->pSessionDir[pos] = L'\0';
+            wcscpy_s(pModInfo->pSessionDir, OS_MAX_PATH, sessionDir.asString().asCharArray());
         }
     }
 
@@ -1495,7 +1418,7 @@ HRESULT GetModuleInfoHelper(void* pVoid, TiModuleInfo* pModInfo, eRecordType dat
 //E_ACCESSDENIED - Could not read raw data file
 //E_ABORT - No samples for the process filters provided
 //Writes the data to the file in proFile, heh heh
-HRESULT PrdTranslator::TranslateData(QString proFile,
+HRESULT PrdTranslator::TranslateData(const osFilePath& proFile,
                                      MissedInfoType* pMissedInfo,
                                      gtList<gtString>& processFilters,
                                      gtString& errorString,
@@ -1590,7 +1513,7 @@ bool PrdTranslator::IsFilteredProcess(gtList<DWORD>& filteredPids, DWORD pid)
 }
 
 
-HRESULT PrdTranslator::ThreadTranslateDataPrdFile(QString proFile,
+HRESULT PrdTranslator::ThreadTranslateDataPrdFile(const osFilePath& proFile,
                                                   MissedInfoType* pMissedInfo,
                                                   gtList<gtString>& processFilters,
                                                   MemoryMap& mapAddress,
@@ -1664,7 +1587,7 @@ HRESULT PrdTranslator::ThreadTranslateDataPrdFile(QString proFile,
 
             if (aFilteredProcess != processFilters.end())
             {
-                filters.push_back(allProcArray[i].pqiProcessID);
+                filters.push_back(static_cast<DWORD>(allProcArray[i].pqiProcessID));
             }
         }
 
@@ -1779,7 +1702,7 @@ HRESULT PrdTranslator::ThreadTranslateDataPrdFile(QString proFile,
             {
                 threadPRDReader.ConvertSampleData(tRawRec, &prdRecord);
 
-                if (!filters.empty() && !IsFilteredProcess(filters, prdRecord.m_PID))
+                if (!filters.empty() && !IsFilteredProcess(filters, static_cast<DWORD>(prdRecord.m_PID)))
                 {
                     continue;
                 }
@@ -1796,8 +1719,8 @@ HRESULT PrdTranslator::ThreadTranslateDataPrdFile(QString proFile,
                 unsigned int core = prdRecord.m_ProcessorID;
                 EventMaskType eventType = EncodeEvent(prdRecord.m_EventType,
                                                       prdRecord.m_EventUnitMask,
-                                                      (prdRecord.m_eventBitMask & 2),
-                                                      (prdRecord.m_eventBitMask & 1));
+                                                      ((prdRecord.m_eventBitMask & 2) == 0x2),
+                                                      ((prdRecord.m_eventBitMask & 1) == 0x1));
 
                 //If we are saving the thread info,
                 if (bThread)
@@ -1894,7 +1817,7 @@ HRESULT PrdTranslator::ThreadTranslateDataPrdFile(QString proFile,
                         continue;
                     }
 
-                    if (!filters.empty() && !IsFilteredProcess(filters, ibsFetch.m_PID))
+                    if (!filters.empty() && !IsFilteredProcess(filters, static_cast<DWORD>(ibsFetch.m_PID)))
                     {
                         continue;
                     }
@@ -1995,7 +1918,7 @@ HRESULT PrdTranslator::ThreadTranslateDataPrdFile(QString proFile,
                         continue;
                     }
 
-                    if (!filters.empty() && !IsFilteredProcess(filters, ibsOp.m_PID))
+                    if (!filters.empty() && !IsFilteredProcess(filters, static_cast<DWORD>(ibsOp.m_PID)))
                     {
                         continue;
                     }
@@ -2992,7 +2915,7 @@ HRESULT PrdTranslator::GetBufferRecordCount(PrdReader& tPrdReader, LPVOID baseAd
 //E_ACCESSDENIED - Could not read raw data file
 //E_ABORT - No samples for the process filters provided
 //Writes the data to the file in proFile,
-HRESULT PrdTranslator::TranslateDataPrdFile(QString proFile,
+HRESULT PrdTranslator::TranslateDataPrdFile(const osFilePath& proFile,
                                             MissedInfoType* pMissedInfo,
                                             gtList<gtString>& processFilters,
                                             gtString& errorString,
@@ -3016,9 +2939,11 @@ HRESULT PrdTranslator::TranslateDataPrdFile(QString proFile,
     struct _stati64 fileStat;
     _wstati64(m_dataFile.asCharArray(), &fileStat);
 
-
     startTime = GetTickCount();
-    fnReadCLRJitInformation(proFile.section("\\", 0, -2).toStdWString().c_str());
+    osDirectory sessionDir;
+    proFile.getFileDirectory(sessionDir);
+
+    fnReadCLRJitInformation(sessionDir.asString().asCharArray());
 
     if (m_collectStat)
     {
@@ -3028,7 +2953,7 @@ HRESULT PrdTranslator::TranslateDataPrdFile(QString proFile,
     UpdateProgressBar(40ULL, 100ULL);
 
     startTime = GetTickCount();
-    fnReadJitInformation(proFile.section("\\", 0, -2).toStdWString().c_str());
+    fnReadJitInformation(sessionDir.asString().asCharArray());
 
     if (m_collectStat)
     {
@@ -3320,7 +3245,7 @@ HRESULT PrdTranslator::TranslateDataPrdFile(QString proFile,
 
     if (m_dbWriter)
     {
-        bool rc = m_dbWriter->Initialize(proFile.toStdWString().c_str());
+        bool rc = m_dbWriter->Initialize(proFile.asString().asCharArray());
 
         if (!rc)
         {
@@ -3351,14 +3276,14 @@ HRESULT PrdTranslator::TranslateDataPrdFile(QString proFile,
                 info->m_sessionStartTime = m_runInfo->m_profStartTime;
                 info->m_sessionEndTime = m_runInfo->m_profEndTime;
                 info->m_cssEnabled = m_runInfo->m_isCSSEnabled;
-                info->m_unwindDepth = m_runInfo->m_cssUnwindDepth;
-                info->m_unwindScope = m_runInfo->m_cssScope;
+                info->m_unwindDepth = static_cast<gtUInt16>(m_runInfo->m_cssUnwindDepth);
+                info->m_unwindScope = static_cast<gtUInt16>(m_runInfo->m_cssScope);
                 info->m_cssFPOEnabled = m_runInfo->m_isCssSupportFpo;
                 info->m_systemDetails = m_runInfo->m_osName;
                 info->m_sessionScope = m_runInfo->m_profScope;
                 info->m_coreAffinity = m_runInfo->m_cpuAffinity;
                 info->m_coreCount = m_runInfo->m_cpuCount;
-                info->m_cssInterval = m_runInfo->m_cssInterval;
+                info->m_cssInterval = static_cast<gtUInt16>(m_runInfo->m_cssInterval);
                 info->m_codexlCollectorVer = m_runInfo->m_codexlVersion;
 
                 // Get CodeXL version
@@ -3488,7 +3413,7 @@ HRESULT PrdTranslator::TranslateDataPrdFile(QString proFile,
     // If the PRD file size < CXL_PRD_MIN_SIZE_FOR_THREADPOOL (20MB ?), do not create any thread pool.
     if (oneChunk)
     {
-        res = CreatePRDView(tPrdReader, 0, fileStat.st_size, mapAddress, &firstWeightRecOffset);
+        res = CreatePRDView(tPrdReader, 0, static_cast<gtUInt32>(fileStat.st_size), mapAddress, &firstWeightRecOffset);
 
         if (S_OK != res)
         {
@@ -3497,7 +3422,7 @@ HRESULT PrdTranslator::TranslateDataPrdFile(QString proFile,
         }
 
         baseAddress = static_cast<gtUByte*>(mapAddress.GetMappedAddress()) + firstWeightRecOffset;
-        cnt = (fileStat.st_size - firstWeightRecOffset) / CAPRDRECORDSIZE;
+        cnt = static_cast<unsigned int>((fileStat.st_size - firstWeightRecOffset) / CAPRDRECORDSIZE);
 
 #if ENABLE_PRD_DEBUG_OUTPUT && (AMDT_BUILD_CONFIGURATION == AMDT_DEBUG_BUILD)
         OS_OUTPUT_FORMAT_DEBUG_LOG(OS_DEBUG_LOG_DEBUG, L"baseAddress(0x%p), firstWeightRecOffset(%u), Number of Records(%u)",
@@ -3538,7 +3463,7 @@ HRESULT PrdTranslator::TranslateDataPrdFile(QString proFile,
             // Create a View and get the offset of the first weight record...
             while (true)
             {
-                length = (bytesToBeProcessed > mapviewSize) ? mapviewSize : bytesToBeProcessed;
+                length = static_cast<gtUInt32>((bytesToBeProcessed > mapviewSize) ? mapviewSize : bytesToBeProcessed);
                 res = CreatePRDView(tPrdReader, bytesProcessedSoFar, length, mapAddress, &firstWeightRecOffset);
 
                 if (S_OK == res)
@@ -3599,7 +3524,7 @@ HRESULT PrdTranslator::TranslateDataPrdFile(QString proFile,
                 // we need to figure out the number of missed records - PROF_REC_MISSED
                 if (PROF_REC_MISSED == recType)
                 {
-                    cnt = (totalMapViewBytes - mapViewBytesRead) / PRD_RECORD_SIZE;
+                    cnt = static_cast<gtUInt32>((totalMapViewBytes - mapViewBytesRead) / PRD_RECORD_SIZE);
                 }
 
                 // Create the workunit...
@@ -4063,7 +3988,7 @@ bool PrdTranslator::AggregateThreadMaps(PidProcessList& procList, NameModuleList
 }
 
 
-HRESULT PrdTranslator::WriteProfile(const QString& proFile,
+HRESULT PrdTranslator::WriteProfile(const osFilePath& proFile,
                                     PrdReader& tPrdReader,
                                     const MissedInfoType* pMissedInfo,
                                     const PidProcessMap& processMap,
@@ -4080,7 +4005,10 @@ HRESULT PrdTranslator::WriteProfile(const QString& proFile,
     //  Write out all the jit jnc that were sampled during the profile
     //  to the <session name>.dir directory, assumes that the output file is
     //  being written to the same directory
-    fnWriteJncFiles(proFile.section('\\', 0, -2).toStdWString().c_str());
+    osDirectory sessionDir;
+    proFile.getFileDirectory(sessionDir);
+
+    fnWriteJncFiles(sessionDir.asString().asCharArray());
 
     // <jitId, moduleId, instanceId, pid, loadAddr, size>
     gtVector<std::tuple<gtUInt32, gtUInt32, gtUInt32, gtUInt64, gtUInt64, gtUInt64>> inlinedJitInfo;
@@ -4189,9 +4117,10 @@ void PrdTranslator::FinalizeUserCallStack(ProcessInfo& processInfo,
             if (itTime != pPeriodicCallStackMap->end() && tsc <= itTime->first.m_end)
             {
                 UserCallStack& userCallStack = itTime->second;
+                gtUInt16 ibsEvtType = static_cast<gtUInt16>(eventType);
 
                 if (instructionPtr == userCallStack.m_pSampleSite->m_traverseAddr ||
-                    IsIbsFetchEvent(eventType) || IsIbsOpEvent(eventType) || IsIbsCluEvent(eventType))
+                    IsIbsFetchEvent(ibsEvtType) || IsIbsOpEvent(ibsEvtType) || IsIbsCluEvent(ibsEvtType))
                 {
                     EventSampleInfo eventSample;
                     eventSample.m_pSite = userCallStack.m_pSampleSite;
@@ -4342,7 +4271,7 @@ HRESULT PrdTranslator::TranslateKernelCallStack(PRD_KERNEL_CSS_DATA_RECORD& kern
     // CLU profiles IBS Op event, process CSS data for IBS sample only when profiling IBS Op.
     if ((filters.empty() || IsFilteredProcess(const_cast<gtList<DWORD>&>(filters), processId)) &&
         (0 != processId) && (4 != processId) && (8 != processId) &&
-        (!IsIbsOpEvent(eventType) || m_runInfo->m_isProfilingIbsOp))
+        (!IsIbsOpEvent(static_cast<gtUInt16>(eventType)) || m_runInfo->m_isProfilingIbsOp))
     {
 #if ENABLE_PRD_DEBUG_OUTPUT
         OS_OUTPUT_FORMAT_DEBUG_LOG(OS_DEBUG_LOG_EXTENSIVE, L"Calling BuildCallStack... thread(%d)", GetCurrentThreadId());
@@ -4752,7 +4681,10 @@ void PrdTranslator::AddCluEventsToMap()
     }
 
 
-void PrdTranslator::AggregateCluData(PidProcessMap* pPMap, NameModuleMap* pMMap, QString  proFile, PrdTranslationStats* const pStats)
+void PrdTranslator::AggregateCluData(PidProcessMap* pPMap,
+                                     NameModuleMap* pMMap,
+                                     const osFilePath& proFile,
+                                     PrdTranslationStats* const pStats)
 {
     DWORD startTime = 0L;
 
@@ -4769,7 +4701,7 @@ void PrdTranslator::AggregateCluData(PidProcessMap* pPMap, NameModuleMap* pMMap,
 
         BEGIN_TICK_COUNT();
         TiModuleInfo modInfo;
-        GetModuleInfoHelper((void*)&key, &modInfo, evCLURecord, proFile);
+        GetModuleInfoHelper((void*)&key, &modInfo, evCLURecord, proFile, true);
         END_TICK_COUNT(findModuleInfo);
 
         if (IsProfilingDriver(modInfo.sampleAddr))
@@ -4779,7 +4711,7 @@ void PrdTranslator::AggregateCluData(PidProcessMap* pPMap, NameModuleMap* pMMap,
 
         RecordDataStruct prdRecord;
         prdRecord.m_PID           = key.ProcessID;
-        prdRecord.m_ProcessorID   = key.core;
+        prdRecord.m_ProcessorID   = static_cast<gtUByte>(key.core);
         prdRecord.m_RIP           = key.RIP;
         prdRecord.m_ThreadHandle  = key.ThreadID;
         prdRecord.m_EventUnitMask = 0;
@@ -4787,9 +4719,9 @@ void PrdTranslator::AggregateCluData(PidProcessMap* pPMap, NameModuleMap* pMMap,
 
         AGG_CLU_EVENT_COUNT(DE_IBS_CLU_PERCENTAGE, data.sumMax);
         AGG_CLU_EVENT_COUNT(DE_IBS_CLU_SPANNING, data.SpanCount);
-        AGG_CLU_EVENT_COUNT(DE_IBS_CLU_EVICT_COUNT, data.tot_evictions);
+        AGG_CLU_EVENT_COUNT(DE_IBS_CLU_EVICT_COUNT, static_cast<unsigned int>(data.tot_evictions));
         AGG_CLU_EVENT_COUNT(DE_IBS_CLU_ACCESS_COUNT, data.num_rw);
-        AGG_CLU_EVENT_COUNT(DE_IBS_CLU_BYTE_COUNT, data.tot_rw);
+        AGG_CLU_EVENT_COUNT(DE_IBS_CLU_BYTE_COUNT, static_cast<unsigned int>(data.tot_rw));
     }
 
     if (pidModaddrItrMap != nullptr)
@@ -5290,30 +5222,6 @@ bool PrdTranslator::ProcessIbsOpRecord(const IBSOpRecordData& ibsOpRec,
     return (true) ;
 }
 
-//FIXME [Suravee]: Should not need this
-#if 0
-bool PrdTranslator::GetIbsConfig(IbsConfig* pConfig)
-{
-    if (nullptr == pConfig) { return false; }
-
-    PrdReader prdReader;
-
-    if (S_OK != prdReader.Initialize(m_dataFile.asCharArray()))
-    {
-        return false;
-    }
-
-    prdReader.GetIBSConfig(&m_ibsFetchCount, &m_ibsOpCount);
-
-    pConfig->fetchMaxCount = m_ibsFetchCount;
-    pConfig->fetchSampling = (m_ibsFetchCount != 0);
-    pConfig->opMaxCount = m_ibsOpCount;
-    pConfig->opSampling = (m_ibsOpCount != 0);
-    return true;
-}
-#endif
-
-
 bool PrdTranslator::GetTimerInterval(gtUInt64* resolution)
 {
     if (nullptr == resolution) { return false; }
@@ -5505,7 +5413,7 @@ PrdTranslator::CheckForJavaInlinedFunction(
 
                         if (fit == inlinedFuncMap.end())
                         {
-                            CpuProfileFunction func1(javaFuncName, funcAddr, (stopAddr - funcAddr), func.getJncFileName(), javaSrcFileName);
+                            CpuProfileFunction func1(javaFuncName, funcAddr, static_cast<gtUInt32>((stopAddr - funcAddr)), func.getJncFileName(), javaSrcFileName);
                             func1.m_functionId = ++nextFuncId;
                             fit = inlinedFuncMap.insert(AddrFunctionMultMap::value_type(funcAddr, func1));
                             fit->second.insertSample(aAptKey, aSample);
@@ -5684,7 +5592,7 @@ PrdTranslator::CheckForNestedJavaInlinedFunction(
 
                         if (fit == inlinedFuncMap.end())
                         {
-                            CpuProfileFunction func1(javaFuncName, funcAddr, (stopAddr - funcAddr), func.getJncFileName(), javaSrcFileName);
+                            CpuProfileFunction func1(javaFuncName, funcAddr, static_cast<gtUInt32>((stopAddr - funcAddr)), func.getJncFileName(), javaSrcFileName);
                             func1.m_functionId = ++nextFuncId;
                             fit = inlinedFuncMap.insert(AddrFunctionMultMap::value_type(funcAddr, func1));
                             fit->second.insertSample(aAptKey, aSample);
