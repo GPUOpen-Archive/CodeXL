@@ -56,7 +56,6 @@ protected:
     /* Read next line from opened input file stream */
     int readLine(gtString& str);
 
-    /* String tokenize function based on QString::section() */
     bool section(gtString& retStr, const gtString& line, const wchar_t* sep, int start, int stop = 0);
 
     // Wrapper for input stream seekg API

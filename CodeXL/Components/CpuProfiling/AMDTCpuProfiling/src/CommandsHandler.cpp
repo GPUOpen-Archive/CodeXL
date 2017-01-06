@@ -1639,23 +1639,8 @@ HRESULT CommandsHandler::onStopProfiling(bool stopAndExit)
 
             if (SUCCEEDED(hr))
             {
-#if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
                 //Windows needs the path including the data file
                 startTranslating(pHandle, m_profileSession.m_pParentData->m_filePath.asString(), false);
-#else
-
-                // NOTICE: On linux, if the last character is '/', the ebp file path cannot be built.
-                // This is a workaround for this issue:
-                gtString sessionDir = osFilePath(m_profileSession.m_pParentData->m_filePath.asString()).fileDirectoryAsString();
-                OS_OUTPUT_DEBUG_LOG(sessionDir.asCharArray(), OS_DEBUG_LOG_ERROR);
-
-                if (sessionDir[sessionDir.length() - 1] == '/')
-                {
-                    sessionDir[sessionDir.length() - 1] = 0;
-                }
-
-                startTranslating(pHandle, sessionDir, false);
-#endif
             }
             else
             {

@@ -98,11 +98,7 @@ HRESULT CpuProfileReport::Translate()
         }
 
         hr = fnCpuProfileDataTranslate(pHandle,
-#if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
                                        outputFilePath.asString().asCharArray(),
-#else
-                                       outputFilePath.fileDirectoryAsString().asCharArray(),
-#endif
                                        nullptr,
                                        pSearchPath,
                                        pServerList,

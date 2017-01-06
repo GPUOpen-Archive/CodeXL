@@ -7,8 +7,6 @@
 ///
 //==================================================================================
 
-#include <QFileInfo>
-
 #include <CpuProfileDataTranslation.h>
 #include <CpuProfileDataMigrator.h>
 
@@ -226,6 +224,8 @@ HRESULT fnCpuProfileDataTranslate(
         return E_INVALIDARG;
     }
 
+    osFilePath outFile(pFileName);
+
 #if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
     PrdTranslator* pDataTranslator = static_cast<PrdTranslator*>(pReaderHandle);
 
@@ -233,7 +233,6 @@ HRESULT fnCpuProfileDataTranslate(
     {
         pDataTranslator->SetDebugSymbolsSearchPath(pSearchPath, pServerList, pCachePath);
 
-        osFilePath outFile(pFileName);
         MissedInfoType missedInfo;
         gtString errorString;
         gtList<gtString> processFilters;
@@ -247,68 +246,51 @@ HRESULT fnCpuProfileDataTranslate(
                                             false,
                                             pfnProgressBarCallback); //bool bLdStCollect = false
     }
-
 #else // WINDOWS_ONLY
-
     (void)pfnProgressBarCallback; // unused
-
-    // For Linux, we don't handle dataset stuff yet
-
     CaPerfTranslator* pTrans = static_cast<CaPerfTranslator*>(pReaderHandle);
 
     pTrans->SetDebugSymbolsSearchPath(pSearchPath, pServerList, pCachePath);
 
-    ///////////////////////////////////////////////////////
-    //Get absolute path
-    // NOTE: "pFileName" is the directory to store the output    
-    QFileInfo outDir(QString::fromStdWString(pFileName));
-    QString outDirPath = outDir.absoluteFilePath();
-    outDirPath.replace('\\', '/');
+    osDirectory outDir;
+    outFile.getFileDirectory(outDir);
 
     if (!outDir.exists())
     {
-        wchar_t tmp[OS_MAX_PATH] = {L'\0'};
-        outDirPath.toWCharArray(tmp);
-        fwprintf(stderr, L"Directory %ls does not exist\n", tmp);
+        fwprintf(stderr, L"Directory %ls does not exist\n", pFileName);
         return E_FAIL;
     }
 
-    ///////////////////////////////////////////////////////
-    // Get session Name
-    std::string sessionName;
-    sessionName = std::string(outDir.baseName().toLatin1());
-
-    ///////////////////////////////////////////////////////
     // Setup CSS file
-    std::string cssFile;
-    cssFile = cssFile + std::string(outDirPath.toLatin1());// + "/" + sessionName + ".css";
+    osFilePath cssFilePath(outFile);
+    cssFilePath.setFileExtension(L"css");
 
-    if (S_OK != pTrans->setupCssFile(cssFile))
+    if (S_OK != pTrans->setupCssFile(std::string(cssFilePath.asString().asASCIICharArray())))
     {
-        fwprintf(stderr, L"Failed to setup CSS file %s\n", cssFile.c_str());
+        fwprintf(stderr, L"Failed to setup CSS file %s\n", cssFilePath.asString().asASCIICharArray());
         hr = E_FAIL;
     }
 
-    ///////////////////////////////////////////////////////
     // Translate
     int ret = 0;
+    gtString sessionDir = outDir.asString();
 
-    if ((S_OK == hr) && (0 != (ret = pTrans->translatePerfDataToCaData(std::string(outDirPath.toLatin1())))))
+    if (sessionDir[sessionDir.length() - 1] == '/')
+    {
+        sessionDir[sessionDir.length() - 1] = 0;
+    }
+
+    if ((S_OK == hr) && (0 != (ret = pTrans->translatePerfDataToCaData(std::string(sessionDir.asASCIICharArray())))))
     {
         hr = ((static_cast<int>(E_NODATA) == ret) || (static_cast<int>(E_INVALIDDATA) == ret)) ? ret : E_FAIL;
     }
 
-    ///////////////////////////////////////////////////////
-    // Write EBP
-    std::string ebpFile;
-    ebpFile = ebpFile + std::string(outDirPath.toLatin1()) + "/" + sessionName + ".ebp";
-
-    if ((S_OK == hr) && (0 != pTrans->writeEbpOutput(ebpFile)))
+    // Write cxlcpdb file
+    if ((S_OK == hr) && (0 != pTrans->writeEbpOutput(std::string(outFile.asString().asASCIICharArray()))))
     {
-        fwprintf(stderr, L"Failed to write EBP data (%s)\n", ebpFile.c_str());
+        fwprintf(stderr, L"Failed to write cxlcpdb data (%s)\n", outFile.asString().asASCIICharArray());
         hr = E_FAIL;
     }
-
 #endif // WINDOWS_ONLY
 
     return hr;
