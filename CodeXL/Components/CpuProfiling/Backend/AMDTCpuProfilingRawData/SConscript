@@ -34,8 +34,6 @@ env_no_c11.Append( CPPPATH = [
 	env['CXL_commonproj_dir'],
 ])
 
-UseQtNoGraphics(env)
-
 # There are uses of %llx in some spots
 env.Append(CPPFLAGS = '-fno-strict-aliasing')
 

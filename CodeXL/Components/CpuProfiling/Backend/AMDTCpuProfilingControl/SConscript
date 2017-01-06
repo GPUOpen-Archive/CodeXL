@@ -16,8 +16,6 @@ env.Append( CPPPATH = [
 	env['CXL_common_dir'] + '/../CodeXL/Components/CpuProfiling',
 ])
 
-UseQtNoGraphics(env)
-
 env.Append (LIBS = [
 	"CXLBaseTools",
 	"CXLOSWrappers",
