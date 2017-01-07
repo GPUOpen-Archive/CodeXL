@@ -10,8 +10,6 @@
 #include <cstring>
 #include <algorithm>
 
-//#include <qtIgnoreCompilerWarnings.h>
-
 #include <AMDTBaseTools/Include/AMDTDefinitions.h>
 #include <AMDTBaseTools/Include/gtMap.h>
 #include <AMDTBaseTools/Include/gtSet.h>

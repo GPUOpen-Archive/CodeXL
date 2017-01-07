@@ -7,8 +7,6 @@
 ///
 //==================================================================================
 
-#pragma warning( disable : 4127 )
-
 #include <Windows/PrdReader.h>
 #include <AMDTOSWrappers/Include/osDebugLog.h>
 #include <AMDTOSWrappers/Include/osCpuid.h>

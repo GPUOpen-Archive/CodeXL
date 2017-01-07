@@ -7,13 +7,8 @@
 //==================================================================================
 
 #include <stdio.h>
-
 #include <JvmsParser.h>
-
-#pragma warning(push)
-#pragma warning(disable : 4311 4312 4718) //ignore qt warnings
 #include "JavaJncReader_Win.h"
-#pragma warning(pop)
 
 static FILE* debugFP = nullptr;
 
