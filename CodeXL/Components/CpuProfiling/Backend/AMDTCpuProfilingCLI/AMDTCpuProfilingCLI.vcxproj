@@ -32,7 +32,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>
-      <PreprocessorDefinitions>QT_LARGEFILE_SUPPORT;QT_DLL;QT_CORE_LIB;QT_THREAD_SUPPORT;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)\inc;$(ProjectDir)\..;$(ProjectDir)\..\..;$(CommonProjectsDir)\AMDTCommonHeaders\;$(ProjectDir)\..\..\..\ThreadProfiling\Backend\AMDTThreadProfileAPI\inc\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>

@@ -18,13 +18,10 @@ env.Append( CPPPATH = [
 	".",
 	"inc",
 	"..",
-	"../ProfileAgents",
 	env['CXL_common_dir'] + '/../CodeXL/Components/CpuProfiling/Backend',
 	env['CXL_common_dir'] + '/../CodeXL/Components/CpuProfiling',
 	env['CXL_commonproj_dir'] + '/AMDTCommonHeaders',
 	env['CXL_commonproj_dir'],
-	env['CXL_common_dir'] + '/Lib/Ext/Java/jdk1.7.0_17/include',
-	env['CXL_common_dir'] + '/Lib/Ext/Java/jdk1.7.0_17/include/linux',
 ])
 
 env_no_c11.Append( CPPPATH = [

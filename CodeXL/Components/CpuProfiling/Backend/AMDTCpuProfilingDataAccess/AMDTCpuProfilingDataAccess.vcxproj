@@ -94,7 +94,6 @@
   </ImportGroup>
   <ImportGroup Label="CommonPropertySheets">
     <Import Project="$(SolutionDir)\CodeXLCommonProjects.props" />
-    <Import Project="$(AMDTCommonExt)\Qt\Global-QT.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">

@@ -26,7 +26,6 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="$(SolutionDir)\CodeXLCommonProjects.props" />
     <Import Project="$(SolutionDir)\..\Components\CodeXLComponent.props" />
-    <Import Project="$(AMDTCommonExt)\Qt\Global-QT-nographics.props" />
   </ImportGroup>
   <ItemDefinitionGroup>
     <ClCompile>

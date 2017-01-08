@@ -28,12 +28,11 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="$(SolutionDir)\CodeXLCommonProjects.props" />
     <Import Project="$(SolutionDir)\..\Components\CodeXLComponent.props" />
-    <Import Project="$(AMDTCommonExt)\Qt\Global-QT-nographics.props" />
   </ImportGroup>
   <ItemDefinitionGroup>
     <ClCompile>
       <PreprocessorDefinitions>AMDT_CPU_PROFILING_TRANSLATION_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(CommonProjectsDir)\AMDTCommonHeaders;$(ProjectDir);$(ProjectDir)\inc;$(ProjectDir)\..;$(ProjectDir)\..\ProfileAgents;$(ProjectDir)\..\..\ProfilingAgents;$(SolutionDir)\..\Components\CpuProfiling;$(SolutionDir)\..\Components\DatabaseLayer;$(SolutionDir)\..\Components\CodeXLDrivers;$(CommonDir)\Lib\Ext\Java\jdk1.7.0_17\include;$(CommonDir)\Lib\Ext\Java\jdk1.7.0_17\include\win32;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(CommonProjectsDir)\AMDTCommonHeaders;$(ProjectDir);$(ProjectDir)\inc;$(ProjectDir)\..;$(ProjectDir)\..\..\ProfilingAgents;$(SolutionDir)\..\Components\CpuProfiling;$(SolutionDir)\..\Components\DatabaseLayer;$(SolutionDir)\..\Components\CodeXLDrivers;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <AdditionalDependencies>psapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
