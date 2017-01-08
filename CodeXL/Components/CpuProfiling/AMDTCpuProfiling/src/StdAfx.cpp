@@ -21,7 +21,7 @@
 #include <QFile>
 #include <QDir>
 #include <QTextStream>
-#include <qfiledialog.h>
+#include <QFileDialog>
 
 #include "inc/StdAfx.h"
 

@@ -24,7 +24,6 @@ class CustomProfileProjectSettingsExtension;
 class CpuGlobalSettings;
 class CpuProjectHandler;
 class tpProjectSettingsExtension;
-class MenuActions;
 
 /// This class is responsible for controlling the framework interaction
 class AMDT_CPU_PROF_API AmdtCpuProfiling

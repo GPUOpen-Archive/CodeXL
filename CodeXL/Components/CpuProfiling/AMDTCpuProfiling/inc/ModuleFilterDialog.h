@@ -20,8 +20,7 @@
 #include <QLabel>
 #include <QBoxLayout>
 #include <QFileInfo>
-
-#include <qheaderview.h>
+#include <QHeaderView>
 
 // Infra:
 #include <AMDTBaseTools/Include/gtAssert.h>

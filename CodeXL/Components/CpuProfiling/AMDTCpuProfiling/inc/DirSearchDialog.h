@@ -17,10 +17,11 @@
 // Qt:
 #include <QtCore>
 #include <QtWidgets>
-#include <qdialog.h>
+#include <QDialog>
 
 // Generated:
 #include <tmp/ui/ui_iDirSearch.h>
+
 class DirSearchDialog : public QDialog, public Ui_iDirSearch
 {
     Q_OBJECT

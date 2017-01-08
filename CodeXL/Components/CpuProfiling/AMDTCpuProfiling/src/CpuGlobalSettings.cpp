@@ -13,7 +13,6 @@
 //qt
 #include <QtCore>
 #include <QtWidgets>
-#include <qfiledialog.h>
 
 //infrastructure
 #include <AMDTBaseTools/Include/gtAssert.h>

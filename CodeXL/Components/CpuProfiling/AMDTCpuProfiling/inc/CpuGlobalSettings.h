@@ -69,7 +69,6 @@ protected slots:
 
 protected:
     void updateGui(bool bReset = false);
-    void defaultSymbolDir();
 
 protected:
 
