@@ -40,13 +40,9 @@
 #include <inc/CpuProfileTreeHandler.h>
 
 #if defined (_WIN32)
-    #pragma warning( push )
-    #pragma warning( disable : 4091)
-    #pragma warning( disable : 4458)
     #include <cor.h>
     #include <corhdr.h>
     #include <corprof.h>
-    #pragma warning( pop )
 #endif
 
 #define FUNCTIONS_COMBO_MAX_LEN 75
@@ -607,37 +603,6 @@ void SessionSourceCodeView::OnItemCollapsed(const QModelIndex& index)
             m_userDisplayInformation.m_expandedTreeItems.removeAll(topLevelItemIndex);
         }
     }
-}
-
-bool SessionSourceCodeView::IsAddressInCurrentFunction(gtVAddr addr)
-{
-    bool retVal = false;
-
-    if (m_pTreeViewModel->m_currentSymbolIterator != m_pTreeViewModel->m_symbolsInfoList.end())
-    {
-        if (addr == m_pTreeViewModel->m_currentSymbolIterator->m_va)
-        {
-            retVal = true;
-        }
-        else
-        {
-            // We assume the m_symInfoList is sorted by the symbolRVA.
-            // Here, we check if the address is within the symbol
-            auto rStartItr = m_pTreeViewModel->m_symbolsInfoList.rbegin();
-            auto eRndItr = m_pTreeViewModel->m_symbolsInfoList.rbegin();
-
-            for (auto itr = rStartItr; itr != eRndItr; ++itr)
-            {
-                if (addr >= itr->m_va)
-                {
-                    retVal = (*m_pTreeViewModel->m_currentSymbolIterator == *itr);
-                    break;
-                }
-            }
-        }
-    }
-
-    return retVal;
 }
 
 void SessionSourceCodeView::DisplayAddress(gtVAddr addr, AMDTProcessId pid, AMDTThreadId tid)

@@ -157,10 +157,6 @@ private:
 
     gtVAddr m_newAddress = 0;
 
-    FuncSymbolsList m_symbolsInfoList;
-    FuncSymbolsList::iterator m_currentSymbolIterator;
-    FuncSymbolsList::iterator m_lastSymIt;
-
     // Contain the tree root item:
     SourceViewTreeItem* m_pRootItem = nullptr;
 

@@ -60,8 +60,6 @@ SourceCodeTreeModel::SourceCodeTreeModel(const QString& sessionDir,
     // m_newAddress holds the addr value for the DisplayAddress.
     // DisplayAddress sets m_newAddress back to its default value i.e. 0.
     m_newAddress = 0;
-    m_currentSymbolIterator = m_symbolsInfoList.end();
-    m_lastSymIt = m_symbolsInfoList.end();
 
     // Create the tree root item:
     m_pRootItem = new SourceViewTreeItem(SOURCE_VIEW_DEFAULT_DEPTH, nullptr);
@@ -85,7 +83,6 @@ SourceCodeTreeModel::~SourceCodeTreeModel()
     m_srcLineDataVec.clear();
     m_headerTooltips.clear();
     m_headerCaptions.clear();
-    m_symbolsInfoList.clear();
     m_srcLinesCache.clear();
 
     m_pSessionSourceCodeTreeView = nullptr;

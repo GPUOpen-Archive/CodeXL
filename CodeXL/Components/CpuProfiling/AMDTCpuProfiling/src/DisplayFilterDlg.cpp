@@ -28,6 +28,9 @@
 #include <bitset>
 #include <algorithm>
 
+// Enable/disable NUMA/Core support
+//#define AMDT_CP_NUMA_SUPPORT_ENABLED
+
 #define STR_CORE "Core"
 #define STR_All "All"
 
@@ -117,8 +120,8 @@ DisplayFilterDlg::displayDialog(const QString& sessionPath, bool enableOnlySyste
                 m_pCheckBoxSeparateColumnsBy->setEnabled(false);
                 m_pRadioButtonSeparateByNUMA->setEnabled(false);
                 m_pRadioButtonSeparateByCore->setEnabled(false);
-#if 0 // Uncomment when NUMa/CORE supported
 
+#ifdef AMDT_CP_NUMA_SUPPORT_ENABLED
                 if ((false == m_displayFilter->IsSeperatedByNumaEnabled()) ||
                     (false == m_displayFilter->IsSeperatedByCoreEnabled()))
                 {
@@ -145,7 +148,6 @@ DisplayFilterDlg::displayDialog(const QString& sessionPath, bool enableOnlySyste
                         m_pRadioButtonSeparateByCore->setChecked(true);
                     }
                 }
-
 #endif
                 m_displaySystemModules = !m_displayFilter->IsSystemModuleIgnored();
                 m_pCheckBoxDisplaySystemModules->setChecked(m_displaySystemModules);
@@ -558,8 +560,7 @@ void DisplayFilterDlg::onClickOk()
             return;
         }
 
-#if 0 // uncomment when NUMA/core enabled
-
+#ifdef AMDT_CP_NUMA_SUPPORT_ENABLED
         if (m_pCheckBoxSeparateColumnsBy->isChecked())
         {
 
@@ -576,7 +577,6 @@ void DisplayFilterDlg::onClickOk()
 
 #endif
         }
-
 #endif
         m_displayPercentageInColumn = m_pCheckBoxShowPercentageBars->isChecked();
         m_displayFilter->SetDisplaySamplePercent(m_displayPercentageInColumn);
@@ -635,7 +635,7 @@ void DisplayFilterDlg::disableAllControlsExceptSystemModule(bool disable)
         m_pComboBoxViewes->setEnabled(!disable);
         m_pCheckBoxShowPercentageBars->setEnabled(!disable);
 
-#if 0 //uncomment when NUMA/core enabled
+#ifdef AMDT_CP_NUMA_SUPPORT_ENABLED
         m_pCheckBoxSeparateColumnsBy->setEnabled(!disable);
 
         if (m_pCheckBoxSeparateColumnsBy->isChecked())
@@ -646,19 +646,14 @@ void DisplayFilterDlg::disableAllControlsExceptSystemModule(bool disable)
 #endif
         }
 
-#endif
-#if 0
-
-        // Notice: Sigal 10/9/2013: We have a bug, we cannot support separate by
+        // Note: We have a bug, we cannot support separate by
         // option in overview window. Therefore, we want to enable the user to change this option
         // whenever it is set.
         if (m_displaySettings.m_separateBy != SEPARATE_BY_NONE)
         {
             m_pCheckBoxSeparateColumnsBy->setEnabled(true);
         }
-
 #endif
-
     }
 }
 

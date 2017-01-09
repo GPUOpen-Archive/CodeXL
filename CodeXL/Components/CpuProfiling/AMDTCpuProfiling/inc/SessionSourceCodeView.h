@@ -99,7 +99,6 @@ private:
     void CreatePidTidComboBoxes();
     void CreateDisplayFilterLinkLabel();
     void CreateHotSpotIndicatorComboBox();
-    bool IsAddressInCurrentFunction(gtVAddr addr);
     bool UpdateDisplay();
     void UpdateColumnWidths();
     void UpdatePercentDelegate();
