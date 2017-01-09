@@ -1081,7 +1081,7 @@ bool SourceCodeTreeModel::isItemTopLevel(SourceViewTreeItem* pItem) const
 
 void SourceCodeTreeModel::SetModuleDetails(AMDTUInt32 moduleId, AMDTUInt32 processId)
 {
-    GT_IF_WITH_ASSERT(moduleId != AMDT_PROFILE_ALL_MODULES && processId != AMDT_PROFILE_ALL_PROCESSES)
+    GT_IF_WITH_ASSERT(moduleId != AMDT_PROFILE_ALL_MODULES)
     {
         GT_IF_WITH_ASSERT((nullptr != m_pProfDataRdr) && (nullptr != m_pDisplayFilter))
         {

@@ -750,11 +750,12 @@ void SessionOverviewWindow::initDisplayFilters()
 
         // Set the display filter for the processes table:
         m_processesTablesFilter.m_amountOfItemsInDisplay = 5;
+        m_processesTablesFilter.m_hotSpotIndicatorColumnCaption.clear();
         m_processesTablesFilter.m_displayedColumns.push_back(TableDisplaySettings::PROCESS_NAME_COL);
         m_processesTablesFilter.m_displayedColumns.push_back(TableDisplaySettings::PID_COL);
         m_processesTablesFilter.m_displayedColumns.push_back(TableDisplaySettings::SAMPLES_COUNT_COL);
 
-        if (false == m_isCLU)
+        if (!m_isCLU)
         {
             m_processesTablesFilter.m_displayedColumns.push_back(TableDisplaySettings::SAMPLES_PERCENT_COL);
         }
@@ -765,7 +766,7 @@ void SessionOverviewWindow::initDisplayFilters()
         m_modulesTablesFilter.m_displayedColumns.push_back(TableDisplaySettings::MODULE_NAME_COL);
         m_modulesTablesFilter.m_displayedColumns.push_back(TableDisplaySettings::SAMPLES_COUNT_COL);
 
-        if (false == m_isCLU)
+        if (!m_isCLU)
         {
             m_modulesTablesFilter.m_displayedColumns.push_back(TableDisplaySettings::SAMPLES_PERCENT_COL);
         }
@@ -776,14 +777,12 @@ void SessionOverviewWindow::initDisplayFilters()
         m_functionsTablesFilter.m_displayedColumns.push_back(TableDisplaySettings::FUNCTION_ID);
         m_functionsTablesFilter.m_displayedColumns.push_back(TableDisplaySettings::FUNCTION_NAME_COL);
         m_functionsTablesFilter.m_displayedColumns.push_back(TableDisplaySettings::SAMPLES_COUNT_COL);
+        m_functionsTablesFilter.m_displayedColumns.push_back(TableDisplaySettings::MODULE_NAME_COL);
 
         if (!m_isCLU)
         {
             m_functionsTablesFilter.m_displayedColumns.push_back(TableDisplaySettings::SAMPLES_PERCENT_COL);
         }
-
-        m_functionsTablesFilter.m_displayedColumns.push_back(TableDisplaySettings::MODULE_NAME_COL);
-
 
         if (m_isCLU)
         {
@@ -1072,39 +1071,30 @@ bool SessionOverviewWindow::openSourceCodeView(QTableWidgetItem* pTableItem)
         {
             int itemRow = pTableItem->row();
 
-            // get the function id
-            QString funcId = m_pFunctionsTable->getFunctionId(itemRow);
-            QString modPath = m_pFunctionsTable->getModuleName(itemRow);
+            gtUInt32 funcId = m_pFunctionsTable->getFunctionId(itemRow).toUInt();
+            gtString modPath = acQStringToGTString(m_pFunctionsTable->getModuleName(itemRow));
             AMDTUInt32 moduleId = AMDT_PROFILE_ALL_MODULES;
-            AMDTUInt32  processId = AMDT_PROFILE_ALL_PROCESSES;
 
-            //get the module id
+            // get the module id
             AMDTProfileModuleInfoVec moduleInfo;
             m_pProfDataRdr->GetModuleInfo(AMDT_PROFILE_ALL_PROCESSES, AMDT_PROFILE_ALL_MODULES, moduleInfo);
 
             for (const auto& mod : moduleInfo)
             {
-                if (mod.m_path == acQStringToGTString(modPath))
+                if (mod.m_path == modPath)
                 {
                     moduleId = mod.m_moduleId;
                     break;
                 }
             }
 
-            AMDTProfileDataVec processProfileData;
-            m_pProfDataRdr->GetProcessProfileData(AMDT_PROFILE_ALL_PROCESSES, moduleId, processProfileData);
+            auto funcModInfo = std::make_tuple(funcId, modPath, moduleId, AMDT_PROFILE_ALL_PROCESSES);
 
-            for (const auto& proc : processProfileData)
-            {
-                processId = proc.m_id;
-            }
-
-
-            auto funcModInfo = std::make_tuple(funcId.toInt(), acQStringToGTString(modPath), moduleId, processId);
             // Emit a function activated signal (will open a source code view):
             emit opensourceCodeViewSig(funcModInfo);
         }
     }
+
     return ret;
 }
 

@@ -16,6 +16,9 @@
 #include <QRadioButton>
 #include <QGridLayout>
 
+// Infra:
+#include <AMDTBaseTools/Include/gtVector.h>
+
 // AMDTApplicationFramework:
 #include <AMDTApplicationFramework/Include/afMainAppWindow.h>
 #include <AMDTApplicationFramework/Include/views/afApplicationTreeItemData.h>
@@ -24,10 +27,10 @@
 #include <memory>
 #include <vector>
 
-// Local:
-#include <inc/DisplayFilter.h>
 
 class CpuSessionWindow;
+class DisplayFilter;
+class cxlProfileDataReader;
 
 
 class DisplayFilterDlg : public QDialog
@@ -56,7 +59,6 @@ private:
     void disableAllControlsExceptSystemModule(bool disable);
     void addFinalLayout();
     void updateHiddenColumnList();
-    bool createConfigCounterMap();
 
 private slots:
     void onClickAllCoreItem(int state);
@@ -108,12 +110,10 @@ private:
     QHBoxLayout* m_pNUMALayout = nullptr;
     QHBoxLayout* m_pButtonBox = nullptr;
     bool m_enableOnlySystemModule = false;
-    std::shared_ptr<DisplayFilter> m_displayFilter = nullptr;
-
+    std::shared_ptr<DisplayFilter> m_displayFilter;
     std::shared_ptr<cxlProfileDataReader>   m_pProfDataReader;
-    std::shared_ptr<configNameCounterMap>   m_CongigrationMap;
     QString                                 m_cofigName;
-    gtVector<AMDTUInt32>                    m_selectedCounters;
+    gtVector<gtUInt32>                      m_selectedCounters;
     std::map<int, int>                      m_colIdxCounterIdMap;
     std::vector<gtString>                   m_notChecked;
 };

@@ -172,13 +172,7 @@ protected:
     /// Get a string from action type
     QString actionTypeToString(TableContextMenuActionType actionType);
 
-    /// Find the CLU percent column:
-    /// \param cluSampleColumnIndexList the indexes on which the CLU percentage columns is in
-    /// \param hotSpotCaption the current hot spot caption
-    /// \param isHotSpotCluPercent if hotSpotCaption is not empty, will contain true if the hot spot caption has percent content
-    void findCLUPercentColumn(QList<int>& cluSampleColumnIndexList, const QString& hotSpotCaption, bool& isHotSpotCluPercent);
-
-    // updates the 6th row (of top 5 table - hotspot) items data, to the current table sort order
+    /// updates the 6th row (of top 5 table - hotspot) items data, to the current table sort order
     void UpdateLastRowItemsSortOrder();
 
     bool delegateSamplePercent(int colNum);
