@@ -258,20 +258,45 @@ CXL_env.Depends(GpuDebuggingPlugins , FrameworkComponents)
 #############################################
 ProfilerCommonPlugins = []
 
-AMDTProfilerDAL_Obj = SConscript('Components/DatabaseLayer/AMDTProfilerDAL/SConscript', variant_dir=obj_variant_dir+'/AMDTProfilerDAL', duplicate=1)
+AMDTProfilerDAL_Obj = SConscript('Components/DatabaseLayer/AMDTProfilerDAL/SConscript', variant_dir=obj_variant_dir+'/AMDTProfilerDAL', duplicate=0)
 CXL_env.Depends( AMDTProfilerDAL_Obj,
 	OSWrappers_Obj +
 	BaseTools_Obj)
 
 ProfilerCommonPlugins += AMDTProfilerDAL_Obj
 
-AMDTDbAdapter_Obj = SConscript('Components/DatabaseLayer/AMDTDbAdapter/SConscript', variant_dir=obj_variant_dir+'/AMDTDbAdapter', duplicate=1)
+AMDTDbAdapter_Obj = SConscript('Components/DatabaseLayer/AMDTDbAdapter/SConscript', variant_dir=obj_variant_dir+'/AMDTDbAdapter', duplicate=0)
 CXL_env.Depends( AMDTDbAdapter_Obj,
-	OSWrappers_Obj +
-	BaseTools_Obj +
+    OSWrappers_Obj +
+    BaseTools_Obj +
     AMDTProfilerDAL_Obj)
 
 ProfilerCommonPlugins += AMDTDbAdapter_Obj
+
+libExecutableFormat_Obj = SConscript('../Common/Src/AMDTExecutableFormat/SConscript', variant_dir=obj_variant_dir+'/AMDTExecutableFormat', duplicate=0)
+CXL_env.Depends( libExecutableFormat_Obj, 
+	OSWrappers_Obj + 
+	BaseTools_Obj)
+
+ProfilerCommonPlugins += libExecutableFormat_Obj
+
+libProfilingAgentsData_Obj = SConscript('Components/CpuProfiling/ProfilingAgents/AMDTProfilingAgentsData/SConscript', variant_dir=obj_variant_dir+'/AMDTProfilingAgentsData', duplicate=0)
+CXL_env.Depends( libProfilingAgentsData_Obj, 
+	OSWrappers_Obj + 
+	BaseTools_Obj +
+	libExecutableFormat_Obj)
+
+ProfilerCommonPlugins += libProfilingAgentsData_Obj
+
+libTaskInfo_Obj = SConscript('Components/CommonProfileLibs/CXLTaskInfo/SConscript', variant_dir=obj_variant_dir+'/CXLTaskInfo', duplicate=0)
+CXL_env.Depends( libTaskInfo_Obj, 
+    OSWrappers_Obj + 
+    BaseTools_Obj +
+    libExecutableFormat_Obj +
+    libProfilingAgentsData_Obj) 
+
+ProfilerCommonPlugins += libTaskInfo_Obj
+
 
 ############################################
 #
@@ -282,12 +307,6 @@ CpuProfilingPlugins = []
 
 libDisassembler_Obj = SConscript('../Common/Src/AMDTDisassembler/SConscript', variant_dir=obj_variant_dir+'/AMDTDisassembler', duplicate=0)
 CpuProfilingPlugins += libDisassembler_Obj
-
-libExecutableFormat_Obj = SConscript('../Common/Src/AMDTExecutableFormat/SConscript', variant_dir=obj_variant_dir+'/AMDTExecutableFormat', duplicate=0)
-CXL_env.Depends( libExecutableFormat_Obj, 
-	OSWrappers_Obj + 
-	BaseTools_Obj)
-CpuProfilingPlugins += libExecutableFormat_Obj
 
 libCpuCallstackSampling_Obj = SConscript('Components/CpuProfiling/AMDTCpuCallstackSampling/SConscript', variant_dir=obj_variant_dir+'/AMDTCpuCallstackSampling', duplicate=0)
 CXL_env.Depends( libCpuCallstackSampling_Obj, 
@@ -302,13 +321,6 @@ CXL_env.Depends( libCpuPerfEventUtils_Obj,
 	OSWrappers_Obj + 
 	BaseTools_Obj)
 CpuProfilingPlugins += libCpuPerfEventUtils_Obj
-
-libProfilingAgentsData_Obj = SConscript('Components/CpuProfiling/ProfilingAgents/AMDTProfilingAgentsData/SConscript', variant_dir=obj_variant_dir+'/AMDTProfilingAgentsData', duplicate=1)
-CXL_env.Depends( libProfilingAgentsData_Obj, 
-	OSWrappers_Obj + 
-	BaseTools_Obj +
-	libExecutableFormat_Obj)
-CpuProfilingPlugins += libProfilingAgentsData_Obj
 
 if (CXL_env['CXL_use_java'] != ''):
     libJvmtiProfileAgent_Obj = SConscript('Components/CpuProfiling/ProfilingAgents/AMDTJvmtiAgent/SConscript', variant_dir=obj_variant_dir+'/AMDTJvmtiAgent', duplicate=0)
