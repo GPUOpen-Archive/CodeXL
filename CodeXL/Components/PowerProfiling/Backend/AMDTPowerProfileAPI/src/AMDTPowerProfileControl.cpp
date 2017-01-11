@@ -1008,6 +1008,8 @@ bool IsDgpuMMIOAccessible(AMDTUInt32 bus, AMDTUInt32 dev, AMDTUInt32 func)
 // This function will try for MAX_RETRY_COUNT time to access the smu logging
 bool IsSmuLogAccessible(SmuInfo* pSmu, DeviceType devType)
 {
+	(void)devType;
+
     // SMU Message Commands used to START & SAMPLE the PM status logging
     AMDTUInt32 tabId = 0x01;
     bool ret = false;
@@ -1059,38 +1061,30 @@ bool IsSmuLogAccessible(SmuInfo* pSmu, DeviceType devType)
 
         default:
         {
-            if (DEVICE_TYPE_DGPU == devType)
-            {
-                ret = true;
-            }
-            else
-            {
-                AMDTUInt32 retry = SMU_LOG_MSG_RETRY_MAX;
+			AMDTUInt32 retry = SMU_LOG_MSG_RETRY_MAX;
 
-                do
-                {
-                    // Initiate smu logging and stop loggin to check if smu is accessible
-                    ret = Smu7DriverMsg(pSmu, SMU_PM_STATUS_LOG_START);
+			do
+			{
+				// Initiate smu logging and stop loggin to check if smu is accessible
+				ret = Smu7DriverMsg(pSmu, SMU_PM_STATUS_LOG_START);
 
-                    if (true == ret)
-                    {
-                        break;
-                    }
+				if (true == ret)
+				{
+					break;
+				}
 
-                    SLEEP_IN_MS(50);
-                }
-                while (--retry);
+				SLEEP_IN_MS(50);
+			} while (--retry);
 
-                PwrTrace("Smu7DriverMsg: rety cnt %d", SMU_LOG_MSG_RETRY_MAX - retry);
+			PwrTrace("Smu7DriverMsg: rety cnt %d", SMU_LOG_MSG_RETRY_MAX - retry);
 
-                if (false == ret)
-                {
-                    PwrTrace("IsSmuLogAccessible: SMU_PM_STATUS_LOG_START failed");
-                }
-            }
+			if (false == ret)
+			{
+				PwrTrace("IsSmuLogAccessible: SMU_PM_STATUS_LOG_START failed");
+			}
 
-            break;
-        }
+			break;
+		}
     }
 
     return ret;
@@ -1496,7 +1490,7 @@ AMDTResult PwrGetSupportedCounters(CounterMap** pList)
                 {
                     if ((true == sysInfo.m_isAmdApu)
                         && (nullptr != sysInfo.m_pNodeInfo)
-                        &&(1 == sysInfo.m_smuTable.m_info[0].m_isAccessible))
+                        &&(sysInfo.m_smuTable.m_info[0].m_isAccessible))
                     {
                         if (SMU_IPVERSION_7_0 == sysInfo.m_pNodeInfo->m_smuIpVersion)
 
@@ -1526,8 +1520,11 @@ AMDTResult PwrGetSupportedCounters(CounterMap** pList)
                     || (SMU_IPVERSION_7_1 == smuInfo->m_smuIpVersion)
                     || (SMU_IPVERSION_7_2 == smuInfo->m_smuIpVersion))
                 {
-                    counterCnt = sizeof(g_CounterDgpuSmu7_0) / sizeof(AMDTPwrCounterBasicInfo);
-                    PwrFillSupportedCounters(g_CounterDgpuSmu7_0, counterCnt, &sysInfo, smuInfo->m_packageId, &clientId, dGpuPackageId++);
+					if (sysInfo.m_smuTable.m_info[smuCnt].m_isAccessible)
+					{
+					    counterCnt = sizeof(g_CounterDgpuSmu7_0) / sizeof(AMDTPwrCounterBasicInfo);
+					    PwrFillSupportedCounters(g_CounterDgpuSmu7_0, counterCnt, &sysInfo, smuInfo->m_packageId, &clientId, dGpuPackageId++);
+					}
                 }
             }
         }
