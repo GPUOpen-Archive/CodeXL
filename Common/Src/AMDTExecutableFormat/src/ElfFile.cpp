@@ -508,7 +508,7 @@ bool ElfFile::InitializeSymbolEngine(const wchar_t* pSearchPath,
                     // Stop such scenarios by comparing the file names.
 
                     // Find the filename in modulepath
-                    int i = wcslen(m_modulePath) - 1;
+                    size_t i = wcslen(m_modulePath) - 1;
 
                     while (i >= 0 && m_modulePath[i] != osFilePath::osPathSeparator)
                     {

@@ -762,9 +762,9 @@ JavaJncReader::_getSrcInfoFromBcAndMethodID(
     }
 
     // Get Source line
-    unsigned int num = it->second.lineNumberVec.size();
+    size_t num = it->second.lineNumberVec.size();
 
-    for (int i = num - 1; i >= 0; i--)
+    for (size_t i = num - 1; i >= 0; i--)
     {
         srcLine = it->second.lineNumberVec[i].line_number;
 
@@ -1101,14 +1101,14 @@ JavaJncReader::DumpStringTable(FILE* f)
     }
 
     std::string str;
-    unsigned int offset = 0;
+    gtInt64 offset = 0;
 
     fprintf(f, "DumpStringTable - (size:%llu) \n", m_string_table_size);
 
     while (offset < m_string_table_size)
     {
         GetStringFromOffset(offset, str);
-        fprintf(f, " %4u:%s\n", offset, str.c_str());
+        fprintf(f, " %4llu:%s\n", offset, str.c_str());
         offset += str.length() + 1;
     }
 
@@ -1212,12 +1212,12 @@ JavaJncReader::DumpJncMethodMap(FILE* f)
         return;
     }
 
-    fprintf(f, "DumpJncMethodMap - (size:%lu)\n", m_jncMethodMap.size());
+    fprintf(f, "DumpJncMethodMap - (size:%zu)\n", m_jncMethodMap.size());
 
     for (JNCMethodMap::iterator it = m_jncMethodMap.begin(), itEnd = m_jncMethodMap.end(); it != itEnd; ++it)
     {
         fprintf(f,
-                "id:%4llu, name:%s, signature:%s, sourceName:%s, numLineNumberEntry:%u\n",
+                "id:%4llu, name:%s, signature:%s, sourceName:%s, numLineNumberEntry:%zu\n",
                 it->second.id,
                 it->second.name.c_str(),
                 it->second.signature.c_str(),
@@ -1247,8 +1247,7 @@ JavaJncReader::DumpAddressRangeTable(FILE* f)
         return;
     }
 
-    fprintf(f, "DumpAddressRangeTable - (size:%u)\n",
-            m_addressRangeTable.size());
+    fprintf(f, "DumpAddressRangeTable - (size:%zu)\n", m_addressRangeTable.size());
 
     for (unsigned int i = 0; i < m_addressRangeTable.size(); i++)
     {
@@ -1275,8 +1274,7 @@ JavaJncReader::DumpJncPcStackInfoMap(FILE* f)
     int line = -1;
     std::string file;
 
-    fprintf(f, "DumpJncPcStackInfoMap - (size:%u)\n",
-            m_jncPcStackInfoMap.size());
+    fprintf(f, "DumpJncPcStackInfoMap - (size:%zu)\n", m_jncPcStackInfoMap.size());
 
     JncPcStackInfoMap::iterator it, itEnd;
 

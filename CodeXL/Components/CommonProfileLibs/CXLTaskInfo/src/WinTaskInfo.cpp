@@ -428,7 +428,7 @@ HRESULT WinTaskInfo::DriverSnapShot()
 
     // Enumerate driver info
     DWORD t_DriverArraySize = 0;
-    LPVOID* pDriverAddrArray = NULL;
+    LPVOID* pDriverAddrArray = nullptr;
     DWORD cbNeeded;
 
     EnumDeviceDrivers(NULL, 0, &cbNeeded);
@@ -453,7 +453,7 @@ HRESULT WinTaskInfo::DriverSnapShot()
                 if (GetDeviceDriverFileName(pDriverAddrArray[i], szDriverName, sizeof(szDriverName)))
                 {
                     // create key
-                    KernelModKey t_keModKey((DWORD) pDriverAddrArray[i], 0);
+                    KernelModKey t_keModKey(reinterpret_cast<gtUInt64>(pDriverAddrArray[i]), 0);
 
                     // convert driver module name
                     //string t_str = ConvertName(szDriverName);
@@ -862,7 +862,7 @@ void WinTaskInfo::ConvertName(wchar_t* pModulename, gtUInt64 procId) const
         // case like \WINNT or \WINDOWS
         if (GetWindowsDirectory(windowsDir, sizeof(windowsDir)))
         {
-            unsigned int winDirLen = wcslen(windowsDir);
+            size_t winDirLen = wcslen(windowsDir);
 
             if (!_wcsnicmp(pModulename, windowsDir + 2, winDirLen - 2))
             {
@@ -875,7 +875,7 @@ void WinTaskInfo::ConvertName(wchar_t* pModulename, gtUInt64 procId) const
         // case like \Windows\SysWOW64\ntdll.dll, only on 64-bit systems
         if ((isSys64) && (GetSystemWow64Directory(systemDir, OS_MAX_PATH)))
         {
-            unsigned int sysDirLen = wcslen(systemDir);
+            size_t sysDirLen = wcslen(systemDir);
 
             if (!_wcsnicmp(pModulename, systemDir + 2, sysDirLen - 2))
             {
@@ -889,7 +889,7 @@ void WinTaskInfo::ConvertName(wchar_t* pModulename, gtUInt64 procId) const
         // case like \WINNT\System32\ntoskrnl.exe
         if (GetSystemDirectory(systemDir, OS_MAX_PATH))
         {
-            unsigned int sysDirLen = wcslen(systemDir);
+            size_t sysDirLen = wcslen(systemDir);
 
             if (!_wcsnicmp(pModulename, systemDir + 2, sysDirLen - 2))
             {
@@ -1899,7 +1899,7 @@ void WinTaskInfo::GetDrivePartitionInfo()
         while (temp[0] != 0)
         {
             //we strip off the trailing backslash for the QueryDosDevice call
-            int curDriveSize = wcslen(temp);
+            size_t curDriveSize = wcslen(temp);
 
             if ((temp[curDriveSize - 1] == L'/') ||
                 (temp[curDriveSize - 1] == L'\\'))
