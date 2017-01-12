@@ -243,16 +243,19 @@ HRESULT CaPerfProfiler::startProfile(bool enable)
     // Now CaPerfProfiler is in INACTIVE state
     m_state = PERF_PROFILER_STATE_INACTIVE;
 
-    // In PERF we need to create a Sample Reader thread to read the samples and
-    // write them into the profile output file
-    ret = createSampleReaderThread();
-
-    if (S_OK != ret)
+    if (m_pPerfCfg->hasSampleEvents())
     {
-        OS_OUTPUT_FORMAT_DEBUG_LOG(OS_DEBUG_LOG_ERROR, L"Error while creating sample reader thread. ret(%d)", ret);
-        // TODO: cleanup the internal objects like CaPerfConfig
-        m_state = PERF_PROFILER_STATE_ERROR;
-        return E_FAIL;
+        // In PERF we need to create a Sample Reader thread to read the samples and
+        // write them into the profile output file
+        ret = createSampleReaderThread();
+
+        if (S_OK != ret)
+        {
+            OS_OUTPUT_FORMAT_DEBUG_LOG(OS_DEBUG_LOG_ERROR, L"Error while creating sample reader thread. ret(%d)", ret);
+            // TODO: cleanup the internal objects like CaPerfConfig
+            m_state = PERF_PROFILER_STATE_ERROR;
+            return E_FAIL;
+        }
     }
 
     // Now enable the profile
@@ -285,7 +288,10 @@ HRESULT CaPerfProfiler::stopProfile()
     }
 
     // stop the sample reader thread and wait for it to get terminated
-    stopSampleReaderThread();
+    if (m_pPerfCfg->hasSampleEvents())
+    {
+        stopSampleReaderThread();
+    }
 
     // Baskar: we need to close the file-descriptor's opened for the sampling-events.
     // PMCs won't be released by PERF, till we close these fd's.

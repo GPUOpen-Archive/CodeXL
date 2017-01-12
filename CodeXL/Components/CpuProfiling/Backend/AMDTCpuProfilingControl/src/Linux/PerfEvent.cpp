@@ -66,7 +66,7 @@ void PerfEvent::init(uint32_t type, uint32_t eventid, uint32_t unitmask, uint32_
     if (PERF_PROFILE_TYPE_RAW == m_type)
     {
         m_config = ((uint64_t)(((unitmask & 0xff) << 8) | (eventid & 0xff))
-                    | ((uint64_t)(eventid & 0xff00) << 24));
+                    | ((uint64_t)(eventid & 0xf00) << 24));
     }
     else if (PERF_PROFILE_TYPE_IBS_FETCH == m_type)
     {

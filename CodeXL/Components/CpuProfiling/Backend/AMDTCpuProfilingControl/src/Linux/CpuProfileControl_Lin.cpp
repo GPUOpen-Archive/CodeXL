@@ -49,6 +49,7 @@ enum CPU_PROFILE_TYPE
 //
 // Whether to use PERF or OProfile
 bool g_usePERF = true;
+bool g_hasCountEvents = false;
 
 /// Holds one client's shared information
 typedef struct
@@ -1219,7 +1220,7 @@ HRESULT CpuPerfStartProfiling(
         g_pProfileConfig->setReadFormat(getPerfReadFormat());
 
         // Add the sampling events
-        if (0 == gSamplingEventList.size())
+        if (!g_hasCountEvents && (0 == gSamplingEventList.size()))
         {
             g_errorString[clientId] = L"Profiling Configuration has not been set";
             return E_PENDING;
@@ -1601,6 +1602,7 @@ HRESULT CpuPerfSetCountingEvent(
                           0);
 
         (void) g_pProfileConfig->addCounterEvent(aEvent);
+        g_hasCountEvents = true;
         // TODO: Error checking
 
         hr = addCore(core);
@@ -1631,8 +1633,8 @@ HRESULT CpuPerfSetCountingEvent(
 //    should we replace eventCounterIndex with eventConfiguration for Linux.
 //
 HRESULT CpuPerfGetEventCount(/*in*/ unsigned int core,
-                                    /*in*/ unsigned int eventCounterIndex,
-                                    /*out*/ gtUInt64* pEventCount)
+                             /*in*/ unsigned int eventCounterIndex,
+                             /*out*/ gtUInt64* pEventCount)
 {
     (void)(core); // unused
     (void)(pEventCount); // unused
@@ -1804,6 +1806,7 @@ HRESULT CpuPerfSetCountingConfiguration(
                               0);
 
             g_pProfileConfig->addCounterEvent(aEvent);
+            g_hasCountEvents = true;
 
             if (profileAllCores)
             {
@@ -1839,16 +1842,7 @@ HRESULT CpuPerfGetCountingEventCount(
     unsigned int* pCount)
 {
     (void)(core); // unused
-    gtUInt32 clientId = helpGetClientId();
-    *pCount = 0;
-    //TODO refactor below always evaluates to true!
-    if ((g_profileType[clientId] != PROFILE_TYPE_EVENT_COUNTING)
-        || (g_profileType[clientId] != PROFILE_TYPE_PERF_EVENT_COUNTING))
-    {
-        return S_FALSE;
-    }
-
-    // retrieve from g_pProfileConfig
+    (void)(pCount);
 
     return E_NOTIMPL;
 }
@@ -1859,8 +1853,8 @@ HRESULT CpuPerfGetAllEventCounts(
     /*in*/ unsigned int size,
     /*out*/ gtUInt64* pCounts)
 {
-    (void)(core); // unused
     gtUInt32 clientId = helpGetClientId();
+    HRESULT ret = S_OK;
 
     if (NULL == g_pProfileSession)
     {
@@ -1877,9 +1871,32 @@ HRESULT CpuPerfGetAllEventCounts(
 
     memset(pCounts, 0, size * sizeof(gtUInt64));
 
-    // retrieve from g_pProfileConfig
+    PerfEventCountDataList* pCountData = nullptr;
+    ret = g_pProfileSession->readPMUCounters(&pCountData);
 
-    return E_NOTIMPL;
+    int idx = -1;
+
+    if (S_OK == ret)
+    {
+        uint64_t currConfig = 0xFFFFFFFFULL;
+
+        for (auto& aCountData : *pCountData)
+        {
+            if (aCountData.m_config != currConfig)
+            {
+                currConfig = aCountData.m_config;
+                pCounts[++idx] = 0;
+            }
+
+            // m_nbrValues will be 1
+            for (int i = 0; i < aCountData.m_nbrValues; i++)
+            {
+                pCounts[idx] += (aCountData.m_cpu == static_cast<int>(core)) ? aCountData.m_values[i] : 0;
+            }
+        }
+    }
+
+    return ret;
 }
 
 

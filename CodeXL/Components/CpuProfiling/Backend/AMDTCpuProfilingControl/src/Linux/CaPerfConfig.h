@@ -101,6 +101,9 @@ public:
     HRESULT enableProfile();
     HRESULT disableProfile();
 
+    bool hasSampleEvents() { return (m_samplingPerfEventList.size() > 0); }
+    bool hasCountEvents() { return (m_ctrPerfEventList.size() > 0); }
+
     int readSampleData();
     HRESULT readMmapBuffers();
     HRESULT readCounters(PerfEventCountDataList** countData = NULL);

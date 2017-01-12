@@ -922,6 +922,7 @@ HRESULT fnGetAllEventCounts(
         return E_INVALIDARG;
     }
 
+#if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
     unsigned int countEventsOnCore;
 
     if ((S_OK != fnGetCountingEventCount(core, &countEventsOnCore))
@@ -942,6 +943,7 @@ HRESULT fnGetAllEventCounts(
         g_errorString[clientId] = buffer;
         return E_OUTOFMEMORY;
     }
+#endif // AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
 
     //handle case where they set the events individually
     if ((Profiling != g_profilingState[clientId]) &&

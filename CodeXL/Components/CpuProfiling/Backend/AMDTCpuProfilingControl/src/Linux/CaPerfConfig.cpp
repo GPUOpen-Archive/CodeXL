@@ -421,15 +421,18 @@ HRESULT CaPerfConfig::initialize()
     }
 
     // FIXME: just for testing
-    HRESULT ret = m_dataWriter.init(getOutputFile().c_str(), isOverwrite());
-
-    if (S_OK != ret)
+    if (m_nbrSamplingPerfEvents > 0)
     {
-        OS_OUTPUT_FORMAT_DEBUG_LOG(OS_DEBUG_LOG_ERROR, L"initializing datafile failed... ret(%d)", ret);
-        return E_FAIL;
-    }
+        HRESULT ret = m_dataWriter.init(getOutputFile().c_str(), isOverwrite());
 
-    OS_OUTPUT_DEBUG_LOG(L"initializing datafile succeedded...", OS_DEBUG_LOG_EXTENSIVE);
+        if (S_OK != ret)
+        {
+            OS_OUTPUT_FORMAT_DEBUG_LOG(OS_DEBUG_LOG_ERROR, L"initializing datafile failed... ret(%d)", ret);
+            return E_FAIL;
+        }
+
+        OS_OUTPUT_DEBUG_LOG(L"initializing datafile succeedded...", OS_DEBUG_LOG_EXTENSIVE);
+    }
 
     return S_OK;
 }
@@ -728,50 +731,44 @@ HRESULT CaPerfConfig::startProfile(bool enable)
                 return ret;
             }
         }
-    }
 
-    //------------------------------------
-    // Event info stuff
+        // Event info stuff
+        // If there are any sampling events, initialize the respective
+        // internal structures.
+        ret = initSamplingEvents();
 
-    // If there are any sampling events, initialize the respective
-    // internal structures.
-    ret = initSamplingEvents();
+        if (S_OK != ret)
+        {
+            _checkPerfEventParanoid();
 
-    if (S_OK != ret)
-    {
-        _checkPerfEventParanoid();
+            // TODO: cleanup m_samplingPerfEventList, m_ctrPerfEventList, etc
+            return ret;
+        }
 
-        // TODO: cleanup m_samplingPerfEventList, m_ctrPerfEventList, etc
-        return ret;
-    }
+        ret = m_dataWriter.writeEventsConfig(m_ctrPerfEventList,
+                                             m_samplingPerfEventList);
 
-    ret = m_dataWriter.writeEventsConfig(
-              m_ctrPerfEventList,
-              m_samplingPerfEventList);
+        if (S_OK != ret)
+        {
+            return ret;
+        }
 
-    if (S_OK != ret)
-    {
-        return ret;
-    }
+        // Target Pid stuff
+        size_t numPids;
+        pid_t*  pids;
 
-    //------------------------------------
-    // Target Pid stuff
-    size_t numPids;
-    pid_t*  pids;
+        m_pmuTgt.getPids(&numPids, &pids);
 
-    m_pmuTgt.getPids(&numPids, &pids);
-
-    m_dataWriter.writeTargetPids(numPids, pids);
+        m_dataWriter.writeTargetPids(numPids, pids);
 
 #ifdef ENABLE_FAKETIMER
-    //------------------------------------
-    // Fake timer info stuff
-    m_dataWriter.writeFakeTimerInfo(&m_timerHackInfo);
+        // Fake timer info stuff
+        m_dataWriter.writeFakeTimerInfo(&m_timerHackInfo);
 #endif
 
-    //------------------------------------
-    // Kernel info stuff
-    m_dataWriter.writeKernelInfo(m_sampleRecSize);
+        // Kernel info stuff
+        m_dataWriter.writeKernelInfo(m_sampleRecSize);
+    }
 
     if (enable)
     {
@@ -789,7 +786,7 @@ HRESULT CaPerfConfig::enableProfile()
     // write the FORK, COMM & MMAP records for the target pids;
     // If we don't write the COMM/MMAP records here, for "profile paused" case,
     // we won't get these records. And source correlation is not possible.
-    if (! m_commRecord)
+    if ((m_nbrSamplingPerfEvents > 0) && (!m_commRecord))
     {
         m_commRecord = true;
 
@@ -839,7 +836,7 @@ HRESULT CaPerfConfig::enableProfile()
         }
     }
 
-    if (m_samplingPerfEventList.size() != 0)
+    if (m_nbrSamplingPerfEvents > 0)
     {
         CaPerfEvtList::iterator iter = m_samplingPerfEventList.begin();
 
@@ -1121,17 +1118,18 @@ HRESULT CaPerfConfig::readCounters(PerfEventCountDataList** countData)
 
     if (m_ctrPerfEventList.size() != 0)
     {
+        m_countData.clear();
         CaPerfEvtList::iterator iter = m_ctrPerfEventList.begin();
 
         for (; iter != m_ctrPerfEventList.end(); iter++)
         {
             ret = iter->getEventData(&data);
 
-            if (S_OK != ret)
-            {
-                OS_OUTPUT_DEBUG_LOG(L"Error in retrieving Counter Values", OS_DEBUG_LOG_ERROR);
-                break;
-            }
+            //if (S_OK != ret)
+            //{
+            //    OS_OUTPUT_DEBUG_LOG(L"Error in retrieving Counter Values", OS_DEBUG_LOG_ERROR);
+            //    break;
+            //}
 
             for (int i = 0; i < ret; i++)
             {

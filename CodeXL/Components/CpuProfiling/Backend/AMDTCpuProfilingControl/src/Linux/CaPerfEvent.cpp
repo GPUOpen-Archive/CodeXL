@@ -713,7 +713,7 @@ HRESULT CaPerfEvent::readCounterValue()
             continue;
         }
 
-        ret = readn(fd, values, (4 * sizeof(uint64_t)));
+        ret = readn(fd, values, sizeof(uint64_t));
 
         // on error, return
         if (-1 == ret)
@@ -725,6 +725,7 @@ HRESULT CaPerfEvent::readCounterValue()
 
         // PerfEventCountData has valid counter values read..
         m_pCountData[i].m_hasValidCountData = true;
+        m_pCountData[i].m_nbrValues = 1;
 
         // print the counter values...
         OS_OUTPUT_FORMAT_DEBUG_LOG(OS_DEBUG_LOG_DEBUG, L" Event(%d, %ld), Value(%ld, %ld, %ld, %d)",
