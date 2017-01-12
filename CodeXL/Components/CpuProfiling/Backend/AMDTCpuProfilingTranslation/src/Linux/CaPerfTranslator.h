@@ -29,12 +29,11 @@
 #include <AMDTExecutableFormat/inc/ProcessWorkingSet.h>
 #include <AMDTCpuCallstackSampling/inc/CallGraph.h>
 #include <AMDTCpuProfilingRawData/inc/ProfilerDataDBWriter.h>
-
+#include <CXLTaskInfo/inc/JitTaskInfo.h>
 #include <AMDTCpuProfilingRawData/inc/Linux/CaPerfHeader.h>
 #include <ProfilingAgents/AMDTProfilingAgentsData/inc/JavaJncReader.h>
 
 #include "CaPerfTranslatorIbs.h"
-#include "../JitTaskInfo.h"
 
 // Enable this macro to enable .ebp/.imd files generation, only for debugging purpose
 #define ENABLE_OLD_PROFILE_WRITER  0

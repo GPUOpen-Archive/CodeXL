@@ -292,7 +292,6 @@ libTaskInfo_Obj = SConscript('Components/CommonProfileLibs/CXLTaskInfo/SConscrip
 CXL_env.Depends( libTaskInfo_Obj, 
     OSWrappers_Obj + 
     BaseTools_Obj +
-    libExecutableFormat_Obj +
     libProfilingAgentsData_Obj) 
 
 ProfilerCommonPlugins += libTaskInfo_Obj
@@ -337,6 +336,7 @@ CXL_env.Depends( libCpuProfilingTranslation_Obj,
 	OSWrappers_Obj + 
 	BaseTools_Obj + 
 	libExecutableFormat_Obj + 
+    libTaskInfo_Obj +
 	libCpuCallstackSampling_Obj + 
 	libCpuPerfEventUtils_Obj + 
 	libCpuProfilingDataAccess_Obj)

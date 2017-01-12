@@ -69,6 +69,7 @@ env.Append(LIBS = [
     "CXLCpuProfilingDataAccess",
     "CXLBaseTools",
     "CXLOSWrappers",
+    "CXLTaskInfo",
     "libpthread",
 ])
 

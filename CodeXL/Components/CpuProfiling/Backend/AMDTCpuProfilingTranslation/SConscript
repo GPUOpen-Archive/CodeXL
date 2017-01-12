@@ -13,6 +13,7 @@ env.Append( CPPPATH = [
 	"..",
 	env['CXL_common_dir'] + '/../CodeXL/Components/CpuProfiling/Backend',
 	env['CXL_common_dir'] + '/../CodeXL/Components/CpuProfiling',
+	env['CXL_common_dir'] + '/../CodeXL/Components/CommonProfileLibs',
 	env['CXL_commonproj_dir'] + '/AMDTCommonHeaders',
 	env['CXL_commonproj_dir'],
 	env['CXL_common_dir'] + '/../CodeXL/Components/CpuProfiling/ProfilingAgents',
@@ -30,13 +31,13 @@ env.Append (LIBS = [
 	"CXLCpuPerfEventUtils",
 	"CXLProfilingAgentsData",
 	"CXLCpuProfilingRawData",
+    "CXLTaskInfo",
 ])
 
 sources = \
 [
     "src/CpuProfileDataTranslation.cpp",
     "src/ExecutableAnalyzer.cpp",
-    "src/JitTaskInfo.cpp",
     "src/Linux/CaPerfTranslator.cpp",
     "src/Linux/CaPerfTranslatorIbs.cpp",
     "src/CpuProfileDataMigrator.cpp",
