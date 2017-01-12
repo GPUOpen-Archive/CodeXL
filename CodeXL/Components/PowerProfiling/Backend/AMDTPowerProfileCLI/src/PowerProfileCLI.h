@@ -85,6 +85,7 @@
 
 // support options with -P
 #define PP_COUNTER_GROUP_POWER            L"power"
+#define PP_COUNTER_GROUP_ENERGY           L"energy"
 #define PP_COUNTER_GROUP_TEMPERATURE      L"temperature"
 #define PP_COUNTER_GROUP_FREQUENCY        L"frequency"
 #define PP_COUNTER_GROUP_CU_POWER         L"cu_power"

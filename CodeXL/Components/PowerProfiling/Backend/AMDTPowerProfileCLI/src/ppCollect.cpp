@@ -18,7 +18,8 @@
     #include <fstream>
 #endif
 
-#define MAX_PROFILE_COUNTER (256)
+#define MAX_PROFILE_COUNTER (600)
+#define MAX_DEVICE_CNT (150)
 //
 //  Public member functions
 //
@@ -435,8 +436,8 @@ AMDTResult ppCollect::EnableProfiling()
 
         if (NULL != pDeviceNode)
         {
-            m_deviceIdDescVec.resize(64); // FIXME - max 64 devices
-            m_deviceIdNameVec.resize(64); // FIXME - max 64 devices
+            m_deviceIdDescVec.resize(MAX_DEVICE_CNT);
+            m_deviceIdNameVec.resize(MAX_DEVICE_CNT);
 
             gtList<AMDTPwrDevice*> deviceList;
             deviceList.push_back(pDeviceNode);
@@ -842,6 +843,11 @@ bool ppCollect::AddCounterGroups()
                 validCounterGroup = false;
             }
         }
+        else if (!(*iter).compareNoCase(PP_COUNTER_GROUP_ENERGY))
+        {
+            deviceType = AMDT_PWR_DEVICE_CNT;
+            category = AMDT_PWR_CATEGORY_ENERGY;
+        }
         else if (!(*iter).compareNoCase(PP_COUNTER_GROUP_FREQUENCY))
         {
             deviceType = AMDT_PWR_DEVICE_CNT;
@@ -920,6 +926,12 @@ bool ppCollect::AddCounterGroups()
             {
                 ReportError(false, "Counter group (%s) sepecified with option -P doesn't have a valid counter.\n", (*iter).asASCIICharArray());
                 m_error = AMDT_ERROR_FAIL;
+            }
+
+            if(AMDT_PWR_CATEGORY_POWER == category)
+            {
+                category = AMDT_PWR_CATEGORY_CORRELATED_POWER;
+				AddCounters(deviceType, category);
             }
         }
         else

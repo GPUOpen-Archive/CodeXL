@@ -31,17 +31,17 @@
 //
 //  Reporter
 //
-#define PROCESS_INFO_TXT_HDR_FORMAT    "\nSNo\tPID\tSamples\tPower(Joules)\tPower(%%)\tName\t\t\t\t\t\tPath\n\n"
-#define PROCESS_INFO_CSV_HDR_FORMAT    "\nSNo,PID,Samples,Power(Joules),Power(%%),Name,Path\n"
-#define PROCESS_INFO_TXT_FORMAT        "%d\t%d\t%d\t%3.2f\t\t%3.2f\t\t%-45.45s\t%s\n"
-#define PROCESS_INFO_CSV_FORMAT        "%d,%d,%d,%3.2f,%3.2f,%s,%s\n"
+#define PROCESS_INFO_TXT_HDR_FORMAT    "\nSNo\tPID\tSamples\tPower(Joules)\tPower(%)\tName\t\t\t\t\t\tPath\n\n"
+#define PROCESS_INFO_CSV_HDR_FORMAT    "\nSNo,PID,Samples,Power(Joules),Power(%),Name,Path\n"
+#define PROCESS_INFO_TXT_FORMAT        "%d\t%d\t" U_FORMAT "\t%3.2f\t\t%3.2f\t\t%-45.45s\t%s\n"
+#define PROCESS_INFO_CSV_FORMAT        "%d,%d," U_FORMAT ",%3.2f,%3.2f,%s,%s\n"
 
-#define MODULE_INFO_TXT_HDR_FORMAT     "\nSNo\tPID\tProcess Name\t\t\t\t\tProcess Path\t\t\t\t\t\t\t\tSamples\tKernel\tPower(Joules)\tPower(%%)\tLoad Addr\t\tsize\t\t\tModule Name\t\t\t\t\tModule Path\n\n"
-#define MODULE_INFO_CSV_HDR_FORMAT     "\nSNo,PID,Process Name, Process Path, Samples,Kernel,Power(Joules),Power(%%),Load Addr,size,Module Name,ModulePath\n"
-#define MODULE_INFO_TXT_FORMAT         "%d\t%d\t%-45.45s\t%-65.85s\t%d\t%d\t%3.2f\t\t%3.2f\t\t0x%-8.8" H_FORMAT "\t\t%-1.8" D_FORMAT "\t\t%-45.45s\t%s\n"
+#define MODULE_INFO_TXT_HDR_FORMAT     "\nSNo\tPID\tProcess Name\t\t\t\t\tProcess Path\t\t\t\t\t\t\t\tSamples\tKernel\tPower(Joules)\tPower(%)\tLoad Addr\t\tsize\t\t\tModule Name\t\t\t\t\tModule Path\n\n"
+#define MODULE_INFO_CSV_HDR_FORMAT     "\nSNo,PID,Process Name, Process Path, Samples,Kernel,Power(Joules),Power(%),Load Addr,size,Module Name,ModulePath\n"
+#define MODULE_INFO_TXT_FORMAT         "%d\t%d\t%-45.45s\t%-65.85s\t" U_FORMAT "\t%d\t%3.2f\t\t%3.2f\t\t0x%-8.8" H_FORMAT "\t\t%-1.8" D_FORMAT "\t\t%-45.45s\t%s\n"
 
-#define MODULE_INFO_CSV_FORMAT         "%d,%d,%s,%s,%d,%d,%3.2f,%3.2f,0x%" H_FORMAT ",%" D_FORMAT ",%s,%s\n"
-
+#define MODULE_INFO_CSV_FORMAT         "%d,%d,%s,%s," U_FORMAT ",%d,%3.2f,%3.2f,0x%" H_FORMAT ",%" D_FORMAT ",%s,%s\n"
+#define MODILE_PROFILE_SUMMARY_FORMAT  "\nProfile Sesssion Power Consumption:\t%3.2f\nTotal PID record collected" U_FORMAT
 void ppReporter::ReportHeader()
 {
     m_dataStr.clear();
@@ -461,7 +461,7 @@ void ppReporterText::WriteProcessData(AMDTUInt32 recCnt, AMDTPwrProcessInfo*& pI
 {
     AMDTUInt32 cnt = 0;
     AMDTFloat32 totalPower = 0;
-    AMDTUInt32 totalRecords = 0;
+    AMDTUInt64 totalRecords = 0;
     AMDTPwrProcessInfo* recInfo = nullptr;
     m_dataStr.clear();
     m_dataStr.append("\n");
@@ -504,10 +504,7 @@ void ppReporterText::WriteProcessData(AMDTUInt32 recCnt, AMDTPwrProcessInfo*& pI
     }
 
     m_dataStr.clear();
-    sprintf(m_pDataStr,
-            "\nProfile Sesssion Power Consumption:\t%3.2f\nTotal PID record collected %d",
-            totalPower,
-            totalRecords);
+    sprintf(m_pDataStr, MODILE_PROFILE_SUMMARY_FORMAT, totalPower, totalRecords);
 
     m_dataStr.append(m_pDataStr);
     m_dataStr.append("\n");
@@ -806,7 +803,7 @@ void ppReporterCsv::WriteProcessData(AMDTUInt32 recCnt, AMDTPwrProcessInfo*& pIn
 {
     AMDTUInt32 cnt = 0;
     AMDTFloat32 totalPower = 0;
-    AMDTUInt32 totalRecords = 0;
+    AMDTUInt64  totalRecords = 0;
     AMDTPwrProcessInfo* recInfo = nullptr;
     m_dataStr.clear();
     m_dataStr.append("\n");
@@ -849,10 +846,7 @@ void ppReporterCsv::WriteProcessData(AMDTUInt32 recCnt, AMDTPwrProcessInfo*& pIn
     }
 
     m_dataStr.clear();
-    sprintf(m_pDataStr,
-            "\nProfile Sesssion Power Consumption:\t%3.2f\nTotal PID record collected %d",
-            totalPower,
-            totalRecords);
+    sprintf(m_pDataStr, MODILE_PROFILE_SUMMARY_FORMAT, totalPower, totalRecords);
 
     m_dataStr.append(m_pDataStr);
     m_reportFile.write(m_dataStr.c_str(), m_dataStr.length());

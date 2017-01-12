@@ -294,7 +294,7 @@ typedef struct
 typedef struct AMDTPwrProcessInfo
 {
     AMDTUInt32  m_pid;                                  /**< Process id */
-    AMDTUInt32  m_sampleCnt;                            /**< Number of PID samples */
+    AMDTUInt64  m_sampleCnt;                            /**< Number of PID samples */
     AMDTFloat32 m_power;                                /**< PID power indicator */
     AMDTFloat32 m_ipc;                                  /**< Agreegated IPC value */
     char        m_name[AMDT_PWR_EXE_NAME_LENGTH];       /**< Executable name */
@@ -311,7 +311,7 @@ typedef struct  ContextPowerData
     AMDTUInt32    m_coreId;         /**< Cpu core id */
     AMDTFloat32   m_ipcLoad;        /**< Agreegated IPC value */
     AMDTFloat32   m_power;          /**< Power consumed */
-    AMDTUInt32    m_sampleCnt;      /**< Number of samples */
+    AMDTUInt64    m_sampleCnt;      /**< Number of samples */
 } ContextPowerData;
 
 // AMDTPwrModuleData: Power with module information
@@ -322,7 +322,7 @@ typedef struct AMDTPwrModuleData
     char          m_processPath[AMDT_PWR_EXE_PATH_LENGTH];   /**< Path */
     AMDTFloat32   m_power;                                   /**< Power consumed */
     AMDTFloat32   m_ipcLoad;                                 /**< Agreegated IPC value */
-    AMDTUInt32    m_sampleCnt;                               /**< Number of PID samples */
+    AMDTUInt64    m_sampleCnt;                               /**< Number of PID samples */
     bool          m_isKernel;                                /**< Kernel/User module */
     char          m_moduleName[AMDT_PWR_EXE_NAME_LENGTH];    /**< Executable name */
     char          m_modulePath[AMDT_PWR_EXE_PATH_LENGTH];    /**< Path */

@@ -237,7 +237,7 @@ struct AMDTPwrAttributeInfo
 typedef struct PowerData
 {
     AMDTUInt32       m_numberOfPids;
-    AMDTUInt32       m_sampleCnt;
+    AMDTUInt64       m_sampleCnt;
     AMDTFloat32      m_totalIpc;
     AMDTPwrProcessInfo  m_process[MAX_PID_CNT];
 } PowerData;

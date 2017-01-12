@@ -43,7 +43,7 @@
     #define CODEXL_POWERPROFILE_CLI    "CodeXLPowerProfiler"
 #endif
 
-#define HISTOGRAM_COUNTER_MAX_CNT (10)
+#define HISTOGRAM_COUNTER_MAX_CNT (128)
 
 //
 //      Globals
@@ -128,25 +128,24 @@ static int PrintHelp()
     fprintf(stderr, "\n%s is a command-line tool for CodeXL's Power Profiler.\n", CODEXL_POWERPROFILE_CLI);
     fprintf(stderr, "\nUsage: %s <Options> [<Application>] [<Application Args>]\n", CODEXL_POWERPROFILE_CLI);
 
-    fprintf(stderr, "\n    -P  <profile options>      Specify profile options. Following options are supported.\n");
-    fprintf(stderr, "                                   power - collect all the available power counters\n");
-    fprintf(stderr, "                                   temperature - collect all the available temperature counters\n");
-    fprintf(stderr, "                                   frequency - collect all the available frequency counters\n");
-    fprintf(stderr, "                                   cu_power - collect cpu compute-unit power counters\n");
-    fprintf(stderr, "                                   cu_temperature - collect cpu compute-unit temperature counters\n");
-    fprintf(stderr, "                                   gpu_power - collect gpu power counters\n");
-    fprintf(stderr, "                                   gpu_temperature - collect gpu temperature counters\n");
-    fprintf(stderr, "                                   core - collect core specific attributes\n");
+    fprintf(stderr, "\n    -P  <profile options>      Specify profile options. Following options are supported, if available\n");
+    fprintf(stderr, "                                   power - collect all the available power counters, if available\n");
+    fprintf(stderr, "                                   temperature - collect all the available temperature counters, if available\n");
+    fprintf(stderr, "                                   frequency - collect all the available frequency counters, if available\n");
+    fprintf(stderr, "                                   cu_power - collect cpu compute-unit power counters, if available\n");
+    fprintf(stderr, "                                   cu_temperature - collect cpu compute-unit temperature counters, if available\n");
+    fprintf(stderr, "                                   gpu_power - collect gpu power counters, if available\n");
+    fprintf(stderr, "                                   gpu_temperature - collect gpu temperature counters, if available\n");
+    fprintf(stderr, "                                   core - collect core specific attributes, if available\n");
+    fprintf(stderr, "                                   energy - collect rapl energy specific counters, if available\n");
 #ifdef SVI2_COUNTERS_SUPPORTED
-    fprintf(stderr, "                                   SVI2 - collect all SVI2 counters\n");
+    fprintf(stderr, "                                   SVI2 - collect all SVI2 counters, if available\n");
 #endif
-    fprintf(stderr, "                                   dvfs - collect all the available dvfs counters\n");
+    fprintf(stderr, "                                   dvfs - collect all the available dvfs counters, if available\n");
     fprintf(stderr, "                                   all - collect all the supported counters\n");
     fprintf(stderr, "\n    -M  <profile mode>         Specify profile mode. Following profile modes are supported.\n");
     fprintf(stderr, "                                   process - process level profiling\n");
-#ifndef LINUX
     fprintf(stderr, "                                   module - module level profiling\n");
-#endif
     fprintf(stderr, "\n    -l                         List all the supported counters.\n");
 
     fprintf(stderr, "\n    -e <counter,...>           Specify the comma separated list of counter names to be collected.\n");
@@ -189,7 +188,7 @@ static int PrintHelp()
 
     fprintf(stderr, "\n    -h                         Display this help information.\n");
     fprintf(stderr, "\n    -v                         Print version string.\n");
-    fprintf(stderr, "\n    -z <db file output dir>    Export results to a *.cxlcpdb file which can be imported to CodeXL GUI\n");
+    fprintf(stderr, "\n    -z <db file output dir>    Export results to a *.cxldb file which can be imported to CodeXL GUI\n");
     fprintf(stderr, "                               application.\n");
 
     PrintExamples();
