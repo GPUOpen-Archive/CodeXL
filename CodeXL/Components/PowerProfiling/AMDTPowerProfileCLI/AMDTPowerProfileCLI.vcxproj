@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -31,11 +31,12 @@
   </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>
-      <AdditionalIncludeDirectories>$(ProjectDir)\..\..\;$(ProjectDir)..\;$(CommonDir);$(CommonProjectsDir)\AMDTCommonHeaders\;..\AMDTPowerProfileApi\Inc\;$(SolutionDir)\..\Components\DatabaseLayer;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)\..\..\;$(ProjectDir)..\;$(CommonDir);$(CommonProjectsDir)\AMDTCommonHeaders\;..\Backend\AMDTPowerProfileApi\Inc\;$(SolutionDir)\..\Components\DatabaseLayer;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <ImportLibrary Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
+      <AdditionalLibraryDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -56,19 +57,19 @@
     <ResourceCompile Include="AMDTPowerProfileCLI.rc" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\..\Common\Src\AMDTBaseTools\AMDTBaseToolsVS14.vcxproj">
+    <ProjectReference Include="..\..\..\..\Common\Src\AMDTBaseTools\AMDTBaseToolsVS14.vcxproj">
       <Project>{11221a7f-3883-418f-b286-b0ea1e28ef10}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\..\Common\Src\AMDTOSWrappers\AMDTOSWrappersVS14.vcxproj">
+    <ProjectReference Include="..\..\..\..\Common\Src\AMDTOSWrappers\AMDTOSWrappersVS14.vcxproj">
       <Project>{5d9222ac-39fb-4123-9497-78cea5be58ad}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\DatabaseLayer\AMDTDbAdapter\AMDTDbAdapter.vcxproj">
+    <ProjectReference Include="..\..\DatabaseLayer\AMDTDbAdapter\AMDTDbAdapter.vcxproj">
       <Project>{03d9da41-e510-4205-bcda-f988d507ef50}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\DatabaseLayer\AMDTProfilerDAL\AMDTProfilerDAL.vcxproj">
+    <ProjectReference Include="..\..\DatabaseLayer\AMDTProfilerDAL\AMDTProfilerDAL.vcxproj">
       <Project>{cb4c5f57-0177-4adc-866e-fc0e8527fbb7}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\AMDTPowerProfileAPI\AMDTPowerProfileAPI.vcxproj">
+    <ProjectReference Include="..\Backend\AMDTPowerProfileAPI\AMDTPowerProfileAPI.vcxproj">
       <Project>{5b9ef4de-1d94-43fa-9b28-5452055b8749}</Project>
     </ProjectReference>
   </ItemGroup>
