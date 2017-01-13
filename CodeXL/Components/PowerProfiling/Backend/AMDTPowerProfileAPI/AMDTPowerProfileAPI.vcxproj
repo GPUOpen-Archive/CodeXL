@@ -38,7 +38,7 @@
   </ImportGroup>
   <ItemDefinitionGroup>
     <ClCompile>
-      <AdditionalIncludeDirectories>..\AMDTPowerProfilingDrivers\Windows\inc\;..\AMDTPowerProfilingDrivers\inc\;..\inc;..\..\..\..\..\Common\Src\AMDTCommonHeaders\;.\inc;..\..\..\CpuProfiling\Backend\AMDTCpuProfilingTranslation\inc;..\..\..\CpuProfiling\Backend\AMDTCpuProfilingTranslation\inc\Windows;..\..\..\CpuProfiling\Backend;.\Non-OpenSource;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\CommonProfileLibs\CXLTaskInfo;$(ProjectDir)..\..\..\CommonProfileLibs;..\AMDTPowerProfilingDrivers\Windows\inc\;..\AMDTPowerProfilingDrivers\inc\;..\..\..\..\..\Common\Src\AMDTCommonHeaders\;.\inc;.\Non-OpenSource;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
@@ -99,8 +99,8 @@
     <ProjectReference Include="..\..\..\..\..\Common\Src\AMDTOSWrappers\AMDTOSWrappersVS14.vcxproj">
       <Project>{5d9222ac-39fb-4123-9497-78cea5be58ad}</Project>
     </ProjectReference>
-    <ProjectReference Condition="'$(Platform)'=='Win32'" Include="..\..\..\CpuProfiling\Backend\AMDTCpuProfilingTranslation\AMDTCpuProfilingTranslation.vcxproj">
-      <Project>{bfb56e73-d54d-4d80-9ca2-a52359ad6566}</Project>
+    <ProjectReference Include="..\..\..\CommonProfileLibs\CXLTaskInfo\CXLTaskInfo.vcxproj">
+      <Project>{44ec86aa-9f77-464f-aee2-ad8c8c11c77b}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

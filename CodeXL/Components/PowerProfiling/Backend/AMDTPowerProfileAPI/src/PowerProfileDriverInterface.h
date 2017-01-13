@@ -24,8 +24,7 @@ typedef bool (* fpSmuActivate)(bool);
 typedef bool (* fpEnableInternalCounters)(bool);
 
 #ifndef _LINUX
-    #include <TaskInfoInterface.h>
-    #include <CpuProfilingTranslationDLLBuild.h>
+    #include <CXLTaskInfo/inc/TaskInfoInterface.h>
     #include <AMDTDriverControl/inc/DriverControl.h>
 #endif
 

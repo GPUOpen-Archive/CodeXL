@@ -24,8 +24,7 @@
 #include <PowerProfileDriverInterface.h>
 
 #ifndef _LINUX
-    #include <TaskInfoInterface.h>
-    #include <CpuProfilingTranslationDLLBuild.h>
+    #include <CXLTaskInfo/inc/TaskInfoInterface.h>
 #endif
 
 #if (defined (AMDT_INTERNAL) || defined(AMDT_NDA))

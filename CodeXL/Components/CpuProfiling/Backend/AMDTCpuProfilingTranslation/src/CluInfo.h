@@ -21,7 +21,7 @@
 #include <AMDTCpuProfilingRawData/inc/CpuProfileModule.h>
 #include <AMDTExecutableFormat/inc/PeFile.h>
 #include <AMDTDisassembler/inc/LibDisassembler.h>
-#include <AMDTCpuProfilingTranslation/inc/Windows/TaskInfoInterface.h>
+#include <CXLTaskInfo/inc/TaskInfoInterface.h>
 
 #define MAX_UINT64 0xffffffffffffffffui64
 #define MAX_UINT32 0xffffffffU

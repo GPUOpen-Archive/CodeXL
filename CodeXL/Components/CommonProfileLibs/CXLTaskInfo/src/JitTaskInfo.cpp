@@ -1,5 +1,5 @@
 //==================================================================================
-// Copyright (c) 2013-2016 , Advanced Micro Devices, Inc.  All rights reserved.
+// Copyright (c) 2013-2017, Advanced Micro Devices, Inc.  All rights reserved.
 //
 /// \author AMD Developer Tools Team
 /// \file JitTaskInfo.cpp

@@ -15,7 +15,7 @@
 
 #if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
     // Windows only stuff
-    #include <AMDTCpuProfilingTranslation/inc/Windows/TaskInfoInterface.h>
+    #include <CXLTaskInfo/inc/TaskInfoInterface.h>
     #include "Windows/PrdTranslator.h"
 #else
     // Linux only stuff

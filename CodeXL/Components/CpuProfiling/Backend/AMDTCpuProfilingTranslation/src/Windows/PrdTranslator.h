@@ -17,7 +17,7 @@
 #include <AMDTCpuPerfEventUtils/inc/EventEncoding.h>
 #include <AMDTCpuProfilingRawData/inc/Windows/PrdReader.h>
 #include <AMDTCpuProfilingRawData/inc/RunInfo.h>
-#include <AMDTCpuProfilingTranslation/inc/Windows/TaskInfoInterface.h>
+#include <CXLTaskInfo/inc/TaskInfoInterface.h>
 #include <AMDTCpuProfilingTranslation/inc/CpuProfileDataTranslation.h>
 #include <AMDTProfilingAgentsData/inc/JavaJncReader.h>
 #include <AMDTCpuCallstackSampling/inc/CallGraph.h>

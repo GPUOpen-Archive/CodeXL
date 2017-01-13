@@ -32,7 +32,7 @@
   <ItemDefinitionGroup>
     <ClCompile>
       <PreprocessorDefinitions>AMDT_CPU_PROFILING_TRANSLATION_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(CommonProjectsDir)\AMDTCommonHeaders;$(ProjectDir);$(ProjectDir)\inc;$(ProjectDir)\..;$(ProjectDir)\..\..\ProfilingAgents;$(SolutionDir)\..\Components\CpuProfiling;$(SolutionDir)\..\Components\DatabaseLayer;$(SolutionDir)\..\Components\CodeXLDrivers;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\CommonProfileLibs\CXLTaskInfo;$(ProjectDir)..\..\..\CommonProfileLibs;$(CommonProjectsDir)\AMDTCommonHeaders;$(ProjectDir);$(ProjectDir)\inc;$(ProjectDir)\..;$(ProjectDir)\..\..\ProfilingAgents;$(SolutionDir)\..\Components\CpuProfiling;$(SolutionDir)\..\Components\DatabaseLayer;$(SolutionDir)\..\Components\CodeXLDrivers;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <AdditionalDependencies>psapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -45,7 +45,6 @@
     <ClCompile Include="src\CpuProfileDataTranslation.cpp" />
     <ClCompile Include="src\DllMain.cpp" />
     <ClCompile Include="src\ExecutableAnalyzer.cpp" />
-    <ClCompile Include="src\JitTaskInfo.cpp" />
     <ClCompile Include="src\Linux\CaPerfTranslator.cpp">
       <ExcludedFromBuild>true</ExcludedFromBuild>
     </ClCompile>
@@ -57,9 +56,7 @@
     <ClCompile Include="src\Windows\PrdTranslator.cpp" />
     <ClCompile Include="src\Windows\PrdUserCss.cpp" />
     <ClCompile Include="src\Windows\RcuScheduler.cpp" />
-    <ClCompile Include="src\Windows\TaskInfoInterface.cpp" />
     <ClCompile Include="src\Windows\ThreadPool.cpp" />
-    <ClCompile Include="src\Windows\WinTaskInfo.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\..\..\..\..\Common\Src\VersionInfo\VersionResource.rc" />
@@ -69,12 +66,9 @@
     <ClInclude Include="inc\CpuProfileDataMigrator.h" />
     <ClInclude Include="inc\CpuProfileDataTranslation.h" />
     <ClInclude Include="inc\CpuProfilingTranslationDLLBuild.h" />
-    <ClInclude Include="inc\JitTaskInfoMapper.h" />
-    <ClInclude Include="inc\Windows\TaskInfoInterface.h" />
     <ClInclude Include="src\Cache.h" />
     <ClInclude Include="src\CluInfo.h" />
     <ClInclude Include="src\ExecutableAnalyzer.h" />
-    <ClInclude Include="src\JitTaskInfo.h" />
     <ClInclude Include="src\Linux\CaPerfTranslator.h">
       <ExcludedFromBuild>true</ExcludedFromBuild>
     </ClInclude>
@@ -86,9 +80,7 @@
     <ClInclude Include="src\Windows\PrdUserCss.h" />
     <ClInclude Include="src\Windows\RcuHandler.h" />
     <ClInclude Include="src\Windows\RcuScheduler.h" />
-    <ClInclude Include="src\Windows\TaskInfoMapper.h" />
     <ClInclude Include="src\Windows\ThreadPool.h" />
-    <ClInclude Include="src\Windows\WinTaskInfo.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\..\Common\Src\AMDTAPIClasses\AMDTApiClasses.vcxproj">
@@ -117,6 +109,9 @@
     </ProjectReference>
     <ProjectReference Include="..\AMDTCpuProfilingRawData\AMDTCpuProfilingRawData.vcxproj">
       <Project>{83c7662a-4d27-403a-8072-fde0afa83cfb}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\CommonProfileLibs\CXLTaskInfo\CXLTaskInfo.vcxproj">
+      <Project>{44ec86aa-9f77-464f-aee2-ad8c8c11c77b}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

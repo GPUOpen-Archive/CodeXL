@@ -19,7 +19,7 @@
 #include <AMDTOSWrappers/Include/osProcess.h>
 #include <AMDTCpuPerfEventUtils/inc/EventEncoding.h>
 #include <AMDTCpuPerfEventUtils/inc/EventEngine.h>
-#include <AMDTCpuProfilingTranslation/inc/Windows/TaskInfoInterface.h>
+#include <CXLTaskInfo/inc/TaskInfoInterface.h>
 #include <AMDTCpuProfilingControl/inc/Windows/CpuUtilization.h>
 #include <AMDTDriverControl/inc/DriverControl.h>
 

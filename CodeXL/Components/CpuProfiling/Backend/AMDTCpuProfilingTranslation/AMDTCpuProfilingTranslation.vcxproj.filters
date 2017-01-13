@@ -19,18 +19,9 @@
     <Filter Include="Source Files\Linux">
       <UniqueIdentifier>{f8442316-a31d-434c-9b59-96fe367694fc}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Windows">
-      <UniqueIdentifier>{3ab4a8fe-2447-4212-a1b1-f1d8027c5f28}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\DllMain.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Windows\TaskInfoInterface.cpp">
-      <Filter>Source Files\Windows</Filter>
-    </ClCompile>
-    <ClCompile Include="src\JitTaskInfo.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Windows\PrdTranslator.cpp">
@@ -53,9 +44,6 @@
     </ClCompile>
     <ClCompile Include="src\Linux\CaPerfTranslatorIbs.cpp">
       <Filter>Source Files\Linux</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Windows\WinTaskInfo.cpp">
-      <Filter>Source Files\Windows</Filter>
     </ClCompile>
     <ClCompile Include="src\Cache.cpp">
       <Filter>Source Files</Filter>
@@ -85,18 +73,6 @@
     <ClInclude Include="inc\CpuProfilingTranslationDLLBuild.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Windows\TaskInfoMapper.h">
-      <Filter>Source Files\Windows</Filter>
-    </ClInclude>
-    <ClInclude Include="src\JitTaskInfo.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\Windows\TaskInfoInterface.h">
-      <Filter>Header Files\Windows</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\JitTaskInfoMapper.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\Windows\PrdTranslator.h">
       <Filter>Source Files\Windows</Filter>
     </ClInclude>
@@ -117,9 +93,6 @@
     </ClInclude>
     <ClInclude Include="src\Linux\CaPerfTranslatorIbs.h">
       <Filter>Source Files\Linux</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Windows\WinTaskInfo.h">
-      <Filter>Source Files\Windows</Filter>
     </ClInclude>
     <ClInclude Include="src\Cache.h">
       <Filter>Source Files</Filter>
