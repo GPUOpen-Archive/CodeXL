@@ -14,6 +14,7 @@ env.Append( CPPPATH = [
 	env['CXL_common_dir'] + '/../CodeXL/Components/CpuProfiling/Backend',
 	env['CXL_common_dir'] + '/../CodeXL/Components/CpuProfiling',
 	env['CXL_common_dir'] + '/../CodeXL/Components/CommonProfileLibs',
+	env['CXL_common_dir'] + '/../CodeXL/Components/CommonProfileLibs/CXLTaskInfo',
 	env['CXL_commonproj_dir'] + '/AMDTCommonHeaders',
 	env['CXL_commonproj_dir'],
 	env['CXL_common_dir'] + '/../CodeXL/Components/CpuProfiling/ProfilingAgents',
