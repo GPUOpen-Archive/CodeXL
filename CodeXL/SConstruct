@@ -430,7 +430,7 @@ CXL_env.Depends( libPowerProfileAPI_Obj,
  
 PowerProfilingPlugins += libPowerProfileAPI_Obj
 
-AMDTPowerProfileCLI_Obj = SConscript('Components/PowerProfiling/Backend/AMDTPowerProfileCLI/SConscript', variant_dir=obj_variant_dir+'/AMDTPowerProfileCLI', duplicate=1)
+AMDTPowerProfileCLI_Obj = SConscript('Components/PowerProfiling/AMDTPowerProfileCLI/SConscript', variant_dir=obj_variant_dir+'/AMDTPowerProfileCLI', duplicate=1)
 CXL_env.Depends( AMDTPowerProfileCLI_Obj,
 	OSWrappers_Obj +
 	BaseTools_Obj +
