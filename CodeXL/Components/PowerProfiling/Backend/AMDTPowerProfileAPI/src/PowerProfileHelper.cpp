@@ -23,7 +23,7 @@
 #include <string.h>
 #include <stdio.h>
 
-static AMDTInt32 g_isSmtEnable = -1;
+//static AMDTInt32 g_isSmtEnable = -1;
 AMDTPwrProfileAttributeList g_attributeList;
 
 // ReadPciAddress : PCIe Device address read
