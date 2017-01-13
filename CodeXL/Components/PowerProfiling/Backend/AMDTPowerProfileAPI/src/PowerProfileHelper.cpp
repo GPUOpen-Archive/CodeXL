@@ -23,6 +23,7 @@
 #include <string.h>
 #include <stdio.h>
 
+static AMDTInt32 g_isSmtEnable = -1;
 AMDTPwrProfileAttributeList g_attributeList;
 
 // ReadPciAddress : PCIe Device address read
@@ -128,29 +129,40 @@ AMDTUInt32 GetSupportedTargetPlatformId()
 {
     AMDTUInt32 family = 0;
     AMDTUInt32 model = 0;
-    bool isAmd = 0;
-    AMDTUInt32 idx = 0;
+    bool isAmd = false;
+    AMDTUInt32 idx = PLATFORM_INVALID;
 
     GetCpuFamilyDetails(&family, &model, &isAmd);
 
-    if ((0x15 == family) && (model >= 0x30 && model <= 0x3F))
+    if (0x15 == family)
     {
-        // Kaveri : 0x15 30 to 3F
-        idx = PLATFORM_KAVERI;
+        if (model >= 0x30 && model <= 0x3F)
+        {
+            // Kaveri : 0x15 30 to 3F
+            idx = PLATFORM_KAVERI;
+        }
+        else if (model >= 0x60 && model <= 0x6F)
+        {
+            // Carrizo: 0x15 60 to 6F
+            idx = PLATFORM_CARRIZO;
+        }
     }
-    else if ((0x15 == family) && (model >= 0x60 && model <= 0x6F))
+    else if (0x16 == family)
     {
-        // Carrizo: 0x15 60 to 6F
-        idx  = PLATFORM_CARRIZO;
+        if (model >= 0x30 && model <= 0x3F)
+        {
+            // Mullins : 0x16 30 to 3F
+            idx = PLATFORM_MULLINS;
+        }
     }
-    else if ((0x16 == family) && (model >= 0x30 && model <= 0x3F))
+
+    else if (0x17 == family)
     {
-        // Mullins : 0x16 30 to 3F
-        idx = PLATFORM_MULLINS;
-    }
-    else
-    {
-        idx = PLATFORM_INVALID;
+        if (model <= 0x0F)
+        {
+            // Res : 0x17 00 to 0F
+            idx = PLATFORM_ZEPPELIN;
+        }
     }
 
     return idx;

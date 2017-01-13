@@ -14,13 +14,19 @@
 #include <AMDTBaseTools/Include/gtMap.h>
 #include <AMDTBaseTools/Include/gtVector.h>
 
+// std includes
+#include <vector>
+
+// Enable SMU9
+#define ENABLE_SMU9
 #define MAX_CORE_CNT (64)
-#define MAX_COUNTER_CNT (100)
+#define MAX_PHYSICAL_CORE_CNT (64)
+#define MAX_COUNTER_CNT (250)
 #define MAX_CU_CNT (2)
 #define MAX_PID_CNT (500)
 #define MAX_INSTANCE_CNT (32)
 #define MAX_BIN_CNT (10)
-#define MAX_CONFIG_CNT          (10)
+#define MAX_CONFIG_CNT          (256)
 #define PWR_MAX_NAME_LEN        (64)
 #define PWR_MAX_DESC_LEN        (512)
 #define MAX_PATH_LEN            (260)
@@ -84,7 +90,7 @@ enum HardwareType
     GDT_STONEY,               ///< STONEY
     GDT_ELLESMERE,
     GDT_BAFFIN,
-    GDT_RESERVED,
+    GDT_ZEPPELIN,
     GDT_LAST,                   ///< last
     GDT_INVALID = 0xFFFFFFFF
 };

@@ -49,10 +49,12 @@
     DRIVER_VERSION | ((uint64)PCORE_MAJOR_VERSION << 56) | ((uint64)PCORE_MINOR_VERSION << 48) | ((uint64)PCORE_BUILD_VERSION << 32)
 
 // Supported platform
-#define PLATFORM_INVALID  0xFFFFFFUL
-#define PLATFORM_KAVERI   0x15303FUL
-#define PLATFORM_MULLINS  0x16303FUL
-#define PLATFORM_CARRIZO  0x15606FUL
+#define PLATFORM_INVALID    0xFFFFFFUL
+#define PLATFORM_KAVERI     0x15303FUL
+#define PLATFORM_MULLINS    0x16303FUL
+#define PLATFORM_CARRIZO    0x15606FUL
+#define PLATFORM_ZEPPELIN   0x170000UL
+
 
 #define BASIC_ATTRIBUTE_MASK 0xFF
 #define SMU_ATTRIBUTE_MASK 0x000001fffffffff0ULL
@@ -308,6 +310,17 @@ typedef struct
     /// The return status
     uint32 ulStatus;
 } FILE_HEADER, *PFILE_HEADER;
+
+/// \struct TARGET_SYSTEM_INFO
+/// Target HW information
+typedef struct
+{
+    uint32 m_physicalCores;
+    uint32 m_logicalCores;
+    uint32 m_socketCount;
+    uint32 m_isSmtEnabled;
+    uint32 m_status;
+} TARGET_SYSTEM_INFO, *PTARGET_SYSTEM_INFO;
 
 /// \struct DATA_BUFFERS
 /// Mainly used for online profiling mode

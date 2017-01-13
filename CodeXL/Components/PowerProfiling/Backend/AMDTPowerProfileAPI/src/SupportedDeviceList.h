@@ -154,5 +154,6 @@ PlatformInfo g_platformTable[] =
     // Kaveri -- will probably need multiple entries in g_deviceInfo for these
     { GDT_OROCHI, 0x15, 0x0, 0xf, DEVICE_TYPE_CPU_NO_SMU, "Orochi", "FX series"},
     { GDT_SPECTRE, 0x15, 0x30, 0x3f, DEVICE_TYPE_NPU_NO_SMU, "Spectre ", "Kaveri"},
+    { GDT_ZEPPELIN, 0x17, 0x00, 0x00, DEVICE_TYPE_CPU_WITH_SMU, "Zeppelin ", "ZP"},
 };
 #endif //_SUPPORTEDDEVICELIST_H_

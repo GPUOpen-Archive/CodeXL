@@ -43,6 +43,7 @@
 #include <sys/ioctl.h>
 #include <sys/mman.h>
 #include <unistd.h>
+#include <sys/time.h>
 
 #define PCORE_DEVICE_FILE_NAME      "/dev/amdtPwrProf"
 #define OLD_PCORE_DEVICE_FILE_NAME  "/dev/pcore"
@@ -59,7 +60,6 @@ AMDTUInt8* g_pSharedBuffer          = nullptr;
 //Function pointers for internal API
 fpSmuActivate g_fnSmuActivate = nullptr;
 fpEnableInternalCounters g_fnEnableInternalCounters = nullptr;
-
 
 namespace PwrProfDrvInterface
 {
@@ -104,17 +104,8 @@ int ProcessDataThread::entryPoint()
 
     while (false == g_stopProfile)
     {
-        // poll waits for POLLIN event or
-        // expire after 1000 msec if smapling period is
-        // less than 1 sec, otherwise sampling period + 1 sec
-        AMDTUInt32 waitMS = 1000;
-
-        if (m_samplingPeriod >= 1000)
-        {
-            waitMS = m_samplingPeriod + 1000;
-        }
-
-        ret = poll(&pollFd, 1, waitMS);
+        // poll waits for POLLIN event or expire after sampling period
+        ret = poll(&pollFd, 1, m_samplingPeriod);
 
         if (ret > 0)
         {
@@ -122,6 +113,10 @@ int ProcessDataThread::entryPoint()
             {
                 g_eventCb(&CbInfo);
             }
+        }
+        else if (ret == 0)
+        {
+            PwrTrace("Poll Time out.. ");
         }
         else
         {
@@ -542,3 +537,23 @@ bool PwrApiCleanUp(void)
     return PwrEnableSmu(false);
 }
 
+// PwrGetEnvironmentVariable: Get environment variable
+AMDTUInt32 PwrGetEnvironmentVariable(const char* pName)
+{
+(void)pName;
+#if 0
+    char* pValue = nullptr;
+    pValue = getenv(envName);
+
+    if (nullptr != pValue)
+    {
+        return (AMDTUInt32)atoi(pValue);
+    }
+    else
+    {
+        return 0;
+    }
+
+#endif
+    return 0;
+}

@@ -20,7 +20,7 @@
 #define CPUID_FnSizeIdentifiers 0x80000008
 #define CPUID_FnFeatureId 1
 
-
+#define CPUID_NodeIdentifiers_EBX_ThreadsPerCore (0xFF << 8)
 #define CPUID_FeatureId_EBX_LogicalProcessorCount 0xFF << 16
 #define CPUID_FnThermalAndPowerManagement_ECX_EffFreq  (1 << 0)
 
@@ -175,6 +175,8 @@ AMDTResult ReleaseMemoryPool(MemoryPool* pPool);
 AMDTUInt32 PwrGetLogicalProcessCount();
 
 
+// PwrGetEnvironmentVariable: Get environment variable
+AMDTUInt32 PwrGetEnvironmentVariable(const char * pName);
 
 #endif //_POWERPROFILEHELPER_H_
 
