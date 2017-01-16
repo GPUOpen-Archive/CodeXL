@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<!DOCTYPE dc_configuration SYSTEM "dcconfig.dtd">
+
+<!--     
+    Analyze instruction fetch and ITLB behavior using event-based profiling
+    Date: 16 Aug 2017
+    Version: 1.0
+    Processor: AMD family 17h
+    Copyright (c) 2017 Advanced Micro Devices, Inc. All rights reserved.
+ -->
+
+<dc_configuration>
+
+  <ebp name="Investigate Instruction Access" mux_period="1">
+
+
+    <tool_tip>Analyze fetch and ITLB behavior</tool_tip>
+
+    <description>Use this configuration to find instruction fetches with poor L1 instruction cache locality and poor ITLB behavior.</description>
+
+  </ebp>
+
+</dc_configuration>

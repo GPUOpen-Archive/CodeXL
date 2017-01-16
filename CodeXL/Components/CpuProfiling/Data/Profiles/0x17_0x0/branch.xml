@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<!DOCTYPE dc_configuration SYSTEM "dcconfig.dtd">
+
+<!--     
+    Analyze branch/near return prediction using event-based profiling
+    Date: 16 Jan 2017
+    Version: 1.0
+    Processor: AMD family 17h
+    Copyright (c) 2017 Advanced Micro Devices, Inc. All rights reserved.
+ -->
+
+<dc_configuration>
+
+  <ebp name="Investigate Branching" mux_period="1">
+
+
+    <tool_tip>Find mispredicted branches/near returns</tool_tip>
+
+    <description>Use this configuration to find poorly predicted branches and near returns.</description>
+
+  </ebp>
+
+</dc_configuration>
