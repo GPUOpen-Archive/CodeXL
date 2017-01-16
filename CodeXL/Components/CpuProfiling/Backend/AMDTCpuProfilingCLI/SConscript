@@ -36,7 +36,6 @@ env.Append( CPPPATH = [
     "./src/",
     env['CXL_common_dir'] + '/../CodeXL/Components/CpuProfiling/Backend',
     env['CXL_common_dir'] + '/../CodeXL/Components/CpuProfiling/',
-    env['CXL_common_dir'] + '/../CodeXL/Components/ThreadProfiling/Backend/AMDTThreadProfileAPI/inc',
     env['CXL_commonproj_dir'],
     env['CXL_commonproj_dir'] + "/AMDTCommonHeaders",
 ])

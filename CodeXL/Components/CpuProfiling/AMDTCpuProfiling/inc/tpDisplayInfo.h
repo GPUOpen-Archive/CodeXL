@@ -18,7 +18,7 @@
 #include <AMDTApplicationComponents/Include/acTreeCtrl.h>
 
 // Backend:
-#include <AMDTThreadProfileApi/inc/AMDTThreadProfileDataTypes.h>
+#include <AMDTThreadProfileAPI/inc/AMDTThreadProfileDataTypes.h>
 
 
 struct tpControlPanalData

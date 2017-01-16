@@ -21,7 +21,7 @@
 #include <AMDTApplicationFramework/Include/views/afBaseView.h>
 
 // Backend:
-#include <AMDTThreadProfileApi/inc/AMDTThreadProfileApi.h>
+#include <AMDTThreadProfileAPI/inc/AMDTThreadProfileApi.h>
 
 /// Is used for creation of thread branches in the session timeline. The class will contain the thread ID
 class tpThreadsTimelineBranch : public acTimelineBranch

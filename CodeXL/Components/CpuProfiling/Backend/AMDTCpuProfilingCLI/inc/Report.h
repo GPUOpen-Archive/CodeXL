@@ -23,7 +23,7 @@
 
 // Backend:
 #include <AMDTCpuProfilingDataAccess/inc/AMDTCpuProfilingDataAccess.h>
-#include <AMDTThreadProfileApi/inc/AMDTThreadProfileApi.h>
+#include <AMDTThreadProfileAPI/inc/AMDTThreadProfileApi.h>
 
 // Project:
 #include <ParseArgs.h>

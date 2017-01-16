@@ -11,7 +11,7 @@
 #include <qtIgnoreCompilerWarnings.h>
 
 // Backend:
-#include <AMDTThreadProfileApi/inc/AMDTThreadProfileApi.h>
+#include <AMDTThreadProfileAPI/inc/AMDTThreadProfileApi.h>
 #include <AMDTBaseTools/Include/gtAssert.h>
 
 // Infra:

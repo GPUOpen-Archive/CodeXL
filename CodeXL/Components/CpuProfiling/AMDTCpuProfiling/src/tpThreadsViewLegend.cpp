@@ -19,8 +19,8 @@
 #include <AMDTApplicationComponents/Include/acFunctions.h>
 
 // Backend:
-#include <AMDTThreadProfileApi/inc/AMDTThreadProfileDataTypes.h>
-#include <AMDTThreadProfileApi/inc/AMDTThreadProfileApi.h>
+#include <AMDTThreadProfileAPI/inc/AMDTThreadProfileDataTypes.h>
+#include <AMDTThreadProfileAPI/inc/AMDTThreadProfileApi.h>
 
 // Local:
 #include <inc/StringConstants.h>

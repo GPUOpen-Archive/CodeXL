@@ -19,7 +19,7 @@ class afApplicationTree;
 
 
 // Backend:
-#include <AMDTThreadProfileApi/inc/AMDTThreadProfileDataTypes.h>
+#include <AMDTThreadProfileAPI/inc/AMDTThreadProfileDataTypes.h>
 
 // AMDTSharedProfiling:
 #include <AMDTSharedProfiling/inc/SessionTypeTreeHandlerAbstract.h>

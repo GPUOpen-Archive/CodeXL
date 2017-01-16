@@ -31,8 +31,8 @@
 #include <Collect.h>
 #include <CommonUtils.h>
 
-#include <AMDTThreadProfileApi/inc/AMDTThreadProfileApi.h>
-#include <AMDTThreadProfileApi/inc/AMDTThreadProfileDataTypes.h>
+#include <AMDTThreadProfileAPI/inc/AMDTThreadProfileApi.h>
+#include <AMDTThreadProfileAPI/inc/AMDTThreadProfileDataTypes.h>
 
 // Standard Lib
 #if AMDT_BUILD_TARGET == AMDT_LINUX_OS

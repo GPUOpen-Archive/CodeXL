@@ -20,7 +20,7 @@
 #include <AMDTApplicationComponents/Include/acListCtrl.h>
 
 // Backend:
-#include <AMDTThreadProfileApi/inc/AMDTThreadProfileDataTypes.h>
+#include <AMDTThreadProfileAPI/inc/AMDTThreadProfileDataTypes.h>
 
 // Local:
 #include <inc/tpSessionData.h>
