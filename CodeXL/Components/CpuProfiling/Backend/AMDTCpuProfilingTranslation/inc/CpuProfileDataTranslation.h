@@ -12,7 +12,7 @@
 /** These APIs are used to aggregate the raw profile data from ".prd" or
     ".caperf" file and the processed data is written into a db file(cxlcpudb).
 
-    Processing of raw profile data is required to aggregate and attribute 
+    Processing of raw profile data is required to aggregate and attribute
     the samples to processes/load-modules/functions/source statements and
     instructions. Raw profile data files have a ".prd" extension and
     should be opened with \ref fnOpenProfile. A profile data file must be
@@ -23,7 +23,7 @@
     fnCpuProfileDataTranslate API. This api writes the processed CPU profile
     data into a db file. The profile data stored in db can be querried
     using cxlProfileDataReader class.
-    
+
     Once the data translation is completed, fnCloseProfile should be called
     to free the file handles. This will dispose off the reader handle.
 */
@@ -35,10 +35,35 @@
 #include "CpuProfilingTranslationDLLBuild.h"
 
 
-class apProfileProgressEvent;
+struct CP_TRANS_API CpuProfilerProgress
+{
+    CpuProfilerProgress(const gtString& profilerName, const gtString& progress, int value) :
+        m_profilerName(profilerName), m_progress(progress), m_value(value) {};
+    ~CpuProfilerProgress() = default;
 
-typedef void (*PfnProgressBarCallback)(apProfileProgressEvent& progressEvent);
+    const gtString& profileName() const { return m_profilerName; };
+    void setProfileName(const gtString& profilerName) { m_profilerName = profilerName; }
 
+    const gtString& progress() const { return m_progress; };
+    void setProgress(const gtString& progress) { m_progress = progress; }
+
+    int value() const { return m_value; };
+    void setValue(int value) { m_value = value; }
+
+    bool aborted() const { return m_aborted; };
+    void setAborted(bool aborted) { m_aborted = aborted; }
+
+    bool increment() const { return m_increment; };
+    void setIncrement(bool increment) { m_increment = increment; }
+
+    gtString m_profilerName;
+    gtString m_progress;
+    int m_value = 0;
+    bool m_aborted = false;
+    bool m_increment = false;
+};
+
+typedef void(*PfnProgressBarCallback)(CpuProfilerProgress& progressEvent);
 
 /****************************************************************************/
 

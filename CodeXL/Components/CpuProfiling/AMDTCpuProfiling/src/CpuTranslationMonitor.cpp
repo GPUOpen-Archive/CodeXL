@@ -31,8 +31,12 @@
 #include <inc/CpuProjectHandler.h>
 #include <inc/Auxil.h>
 
-static void ProgressBarCallback(apProfileProgressEvent& eve)
+static void ProgressBarCallback(CpuProfilerProgress& cpProgress)
 {
+    apProfileProgressEvent eve(cpProgress.profileName(), cpProgress.progress(), cpProgress.value());
+    eve.setAborted(cpProgress.aborted());
+    eve.setIncrement(cpProgress.increment());
+
     apEventsHandler::instance().registerPendingDebugEvent(eve);
 }
 

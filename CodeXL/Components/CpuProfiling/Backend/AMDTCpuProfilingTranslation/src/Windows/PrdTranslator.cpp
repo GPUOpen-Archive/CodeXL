@@ -360,33 +360,15 @@ PrdTranslator::ProcessInfo& PrdTranslator::AcquireProcessInfo(ProcessIdType pid)
 }
 
 //Uses taskinfo dataFile(.prd->.ti),
-PrdTranslator::PrdTranslator(gtString dataFile, bool collectStat) : m_pfnProgressBarCallback(nullptr),
-    m_progressEvent(L"CpuProfile", L"Preparing raw data translation...", 0),
-    m_pProfilingDrivers(nullptr),
-    m_countProfilingDrivers(0U)
+PrdTranslator::PrdTranslator(gtString dataFile, bool collectStat) :
+    m_progressEvent(L"CpuProfile", L"Preparing raw data translation...", 0)
 {
     m_dataFile = dataFile;
-    CssMapCleanup();
-    m_eventMap.clear();
-    m_ibsFetchCount = 0;
-    m_ibsOpCount = 0;
     m_collectStat = collectStat;
-    m_pCluInfo = nullptr;
-    m_runInfo = nullptr;
-    m_hrFreq = 0;
-    m_numWorkerThreads = 0;
 
-    m_is64Sys = false;
 #if AMDT_ADDRESS_SPACE_TYPE != AMDT_64_BIT_ADDRESS_SPACE
     IsWow64Process(GetCurrentProcess(), &m_is64Sys);
 #endif
-
-    m_progressAsync = 0;
-    m_useProgressSyncObject = false;
-
-    m_pSearchPath = nullptr;
-    m_pServerList = nullptr;
-    m_pCachePath = nullptr;
 }
 
 PrdTranslator::~PrdTranslator()
@@ -1628,14 +1610,12 @@ HRESULT PrdTranslator::ThreadTranslateDataPrdFile(const osFilePath& proFile,
 
     while (bytes <= totalBytes)
     {
+        HRESULT hr = E_FAIL;
         TiModuleInfo modInfo;
-        //memset(&modInfo, 0, sizeof(TiModuleInfo));
 
         iterBytes = bytes;
         bytes = threadPRDReader.GetBytesRead();
         *pByteRead  = threadBytesReadSoFar + bytes;
-        HRESULT hr = E_FAIL;
-
         iterBytes = bytes - iterBytes;
 
         if (bMainThread)

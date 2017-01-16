@@ -83,9 +83,6 @@
     <ClInclude Include="src\Windows\ThreadPool.h" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\..\Common\Src\AMDTAPIClasses\AMDTApiClasses.vcxproj">
-      <Project>{f62443fc-1d1f-43d1-bf19-a208c38fc0c1}</Project>
-    </ProjectReference>
     <ProjectReference Include="..\..\..\..\..\Common\Src\AMDTBaseTools\AMDTBaseToolsVS14.vcxproj">
       <Project>{11221a7f-3883-418f-b286-b0ea1e28ef10}</Project>
     </ProjectReference>

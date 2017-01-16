@@ -25,7 +25,6 @@
 #include <AMDTOSWrappers/Include/osReadWriteLock.h>
 #include <AMDTOSWrappers/Include/osCriticalSection.h>
 #include <AMDTOSWrappers/Include/osSynchronizationObject.h>
-#include <AMDTAPIClasses/Include/Events/apProfileProgressEvent.h>
 #include <AMDTExecutableFormat/inc/ProcessWorkingSet.h>
 #include <AMDTBaseTools/Include/gtFlatMap.h>
 #include <AMDTCpuProfilingRawData/inc/ProfilerDataDBWriter.h>
@@ -490,18 +489,22 @@ private:
 
     bool IsFilteredProcess(gtList<DWORD>& filteredPids, DWORD pid);
 
+    ProcessInfo* FindProcessInfo(ProcessIdType pid) const;
+    ProcessInfo& AcquireProcessInfo(ProcessIdType pid);
+
+    friend class PrdUserCssRcuHandler;
+    friend class PrdUserCssRcuHandlerPool;
+
+private:
     gtString m_dataFile;
-    bool    m_collectStat;
+    bool     m_collectStat = false;
 
     // Number of worker threads to be created for processing the PRD file.
-    DWORD   m_numWorkerThreads;
+    DWORD   m_numWorkerThreads = 0;
 
-    //
-    // The following two variables retain the IBS fetch
-    // and op maximum periodic count.
-    //
-    unsigned int m_ibsFetchCount;
-    unsigned int m_ibsOpCount;
+    // The following two variables retain the IBS fetch and op maximum periodic count.
+    unsigned int m_ibsFetchCount = 0;
+    unsigned int m_ibsOpCount = 0;
 
     //
     // The event map is a list of the events that were sampled
@@ -513,39 +516,33 @@ private:
     EventNormValueMap m_norms;
 
     // thread sync
-    HRESULT m_ThreadHR;
-    gtUInt64 m_hrFreq;
-    unsigned int m_durationSec;
+    HRESULT m_ThreadHR = S_FALSE;
+    gtUInt64 m_hrFreq = 0;
+    unsigned int m_durationSec = 0;
 
-    CluInfo* m_pCluInfo;
+    CluInfo* m_pCluInfo = nullptr;
+    RunInfo* m_runInfo = nullptr;
 
-    RunInfo* m_runInfo;
-
-    BOOL m_is64Sys;
+    BOOL m_is64Sys = FALSE;
     PidFilterList m_pidFilterList;  // TODO: Seems to be unused
 
-    PfnProgressBarCallback m_pfnProgressBarCallback;
-    apProfileProgressEvent m_progressEvent;
-    gtUInt64 m_progressStride;
-    volatile gtUInt64 m_progressThreshold;
-    volatile gtInt32 m_progressAsync;
+    PfnProgressBarCallback m_pfnProgressBarCallback = nullptr;
+    //apProfileProgressEvent m_progressEvent;
+    CpuProfilerProgress m_progressEvent;
+    gtUInt64 m_progressStride = 0;
+    volatile gtUInt64 m_progressThreshold = 0;
+    volatile gtInt32 m_progressAsync = 0;
     osSynchronizationObject m_progressSyncObject;
-    bool m_useProgressSyncObject;
+    bool m_useProgressSyncObject = false;
 
     mutable osReadWriteLock m_processInfosLock;
     gtMap<ProcessIdType, ProcessInfo*> m_processInfos;
-    wchar_t* m_pSearchPath;
-    wchar_t* m_pServerList;
-    wchar_t* m_pCachePath;
+    wchar_t* m_pSearchPath = nullptr;
+    wchar_t* m_pServerList = nullptr;
+    wchar_t* m_pCachePath = nullptr;
 
-    KeModQueryInfo* m_pProfilingDrivers;
-    unsigned m_countProfilingDrivers;
-
-    ProcessInfo* FindProcessInfo(ProcessIdType pid) const;
-    ProcessInfo& AcquireProcessInfo(ProcessIdType pid);
-
-    friend class PrdUserCssRcuHandler;
-    friend class PrdUserCssRcuHandlerPool;
+    KeModQueryInfo* m_pProfilingDrivers = nullptr;
+    unsigned m_countProfilingDrivers = 0U;
 
     std::unique_ptr<ProfilerDataDBWriter> m_dbWriter;
 };
