@@ -33,7 +33,7 @@
   <ItemDefinitionGroup>
     <ClCompile>
       <PreprocessorDefinitions>_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)\inc;$(ProjectDir)\..;$(ProjectDir)\..\..;$(CommonProjectsDir)\AMDTCommonHeaders\;$(ProjectDir)\..\..\..\ThreadProfiling\Backend\AMDTThreadProfileAPI\inc\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)\inc;$(ProjectDir)\..;$(ProjectDir)\..\..;$(CommonProjectsDir)\AMDTCommonHeaders\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -73,9 +73,6 @@
     <ProjectReference Include="..\..\..\..\..\Common\Src\AMDTOSWrappers\AMDTOSWrappersVS14.vcxproj">
       <Project>{5d9222ac-39fb-4123-9497-78cea5be58ad}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\ThreadProfiling\Backend\AMDTThreadProfileAPI\AMDTThreadProfileAPI.vcxproj">
-      <Project>{5b3d32d8-9b36-479b-9bf1-20e76f361436}</Project>
-    </ProjectReference>
     <ProjectReference Include="..\..\AMDTCpuCallstackSampling\AMDTCpuCallstackSampling.vcxproj">
       <Project>{b0566507-33ca-4109-8bb6-4290ecc53fa0}</Project>
     </ProjectReference>
@@ -96,6 +93,9 @@
     </ProjectReference>
     <ProjectReference Include="..\AMDTCpuProfilingTranslation\AMDTCpuProfilingTranslation.vcxproj">
       <Project>{bfb56e73-d54d-4d80-9ca2-a52359ad6566}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\AMDTThreadProfileAPI\AMDTThreadProfileAPI.vcxproj">
+      <Project>{63fab7fe-de15-420b-b231-66c5bd95d319}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

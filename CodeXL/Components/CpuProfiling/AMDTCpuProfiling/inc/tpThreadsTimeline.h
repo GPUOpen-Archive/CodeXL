@@ -21,7 +21,7 @@
 #include <AMDTApplicationFramework/Include/views/afBaseView.h>
 
 // Backend:
-#include <AMDTThreadProfileApi.h>
+#include <AMDTThreadProfileApi/inc/AMDTThreadProfileApi.h>
 
 // Local:
 #include <inc/tpDisplayInfo.h>

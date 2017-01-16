@@ -23,10 +23,10 @@
 
 // Backend:
 #include <AMDTCpuProfilingDataAccess/inc/AMDTCpuProfilingDataAccess.h>
+#include <AMDTThreadProfileApi/inc/AMDTThreadProfileApi.h>
 
 // Project:
 #include <ParseArgs.h>
-#include <AMDTThreadProfileApi.h>
 #include <Reporter.h>
 #include <Utils.h>
 

@@ -9,8 +9,8 @@
 #ifndef _AMDTTHREADPROFILEAPI_H_
 #define _AMDTTHREADPROFILEAPI_H_
 
-#include <AMDTDefinitions.h>
-#include <AMDTThreadProfileDataTypes.h>
+#include <AMDTCommonHeaders/AMDTDefinitions.h>
+#include "AMDTThreadProfileDataTypes.h"
 
 #if defined(_WIN32)
     #if defined(AMDTTHREADPROFILEAPI_EXPORTS)

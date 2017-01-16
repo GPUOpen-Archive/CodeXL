@@ -46,8 +46,8 @@
 #include <AMDTCommonHeaders/AMDTDefinitions.h>
 
 // Backend:
-#include <AMDTThreadProfileDataTypes.h>
-#include <AMDTThreadProfileApi.h>
+#include <AMDTThreadProfileApi/inc/AMDTThreadProfileDataTypes.h>
+#include <AMDTThreadProfileApi/inc/AMDTThreadProfileApi.h>
 
 // Local:
 #include <inc/tpAppController.h>

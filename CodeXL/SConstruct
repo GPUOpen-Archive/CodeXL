@@ -353,15 +353,13 @@ CXL_env.Depends( libCpuProfilingControl_Obj,
 	libCpuProfilingTranslation_Obj)
 CpuProfilingPlugins += libCpuProfilingControl_Obj
 
-ThreadProfilingPlugins = []
-
-libThreadProfileAPI_Obj = SConscript('Components/ThreadProfiling/Backend/AMDTThreadProfileAPI/SConscript', variant_dir=obj_variant_dir+'/AMDTThreadProfileAPI', duplicate=1)
+libThreadProfileAPI_Obj = SConscript('Components/CpuProfiling/Backend/AMDTThreadProfileAPI/SConscript', variant_dir=obj_variant_dir+'/AMDTThreadProfileAPI', duplicate=1)
 CXL_env.Depends( libThreadProfileAPI_Obj,  
 	OSWrappers_Obj + 
 	BaseTools_Obj +
 	libCpuProfilingControl_Obj)
  
-ThreadProfilingPlugins += libThreadProfileAPI_Obj
+CpuProfilingPlugins += libThreadProfileAPI_Obj
 
 AMDTProfilingDataAccess_Obj = SConscript('Components/CpuProfiling/Backend/AMDTCpuProfilingDataAccess/SConscript', variant_dir=obj_variant_dir+'/AMDTCpuProfilingDataAccess', duplicate=1)
 CXL_env.Depends( AMDTProfilingDataAccess_Obj,
@@ -605,7 +603,6 @@ CodeXL_Full = \
     CpuProfilingPlugins + \
     PowerProfilingPlugins + \
     GpuProfilingPlugins + \
-    ThreadProfilingPlugins + \
     AMDTSystemInformationHelper + \
     AMDTTeaPot + \
     AMDTClassicMatMul + \
@@ -620,7 +617,6 @@ Alias( target='GpuProfiling', source=(GpuProfilingPlugins))
 Alias( target='GpuDebugging', source=(GpuDebuggingPlugins))
 Alias( target='KernelAnalyzer', source=(KernelAnalyzer))
 Alias( target='PowerProfiler', source=(PowerProfilingPlugins))
-Alias( target='ThreadProfiler', source=(ThreadProfilingPlugins))
 Alias( target='Teapot', source=(AMDTTeaPot))
 Alias( target='ClassicMatMul', source=(AMDTClassicMatMul))
 Alias( target='install'     , source=(CodeXL_Full))

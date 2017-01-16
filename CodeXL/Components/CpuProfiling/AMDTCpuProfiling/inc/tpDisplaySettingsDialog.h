@@ -21,7 +21,7 @@
 #include <QCheckBox>
 
 // Backend:
-#include <AMDTThreadProfileDataTypes.h>
+#include <AMDTThreadProfileApi/inc/AMDTThreadProfileDataTypes.h>
 
 // Local
 #include <inc/tpSessionData.h>

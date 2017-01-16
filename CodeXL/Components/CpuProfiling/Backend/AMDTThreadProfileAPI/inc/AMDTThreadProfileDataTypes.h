@@ -9,7 +9,7 @@
 #ifndef _AMDTTHREADPROFILEDATATYPES_H_
 #define _AMDTTHREADPROFILEDATATYPES_H_
 
-#include <AMDTDefinitions.h>
+#include <AMDTCommonHeaders/AMDTDefinitions.h>
 //#include <AMDTExecutableFormat/inc/SymbolEngine.h>
 
 typedef AMDTUInt32 AMDTProcessId;

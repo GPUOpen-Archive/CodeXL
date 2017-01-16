@@ -23,7 +23,7 @@
 #include <AMDTApplicationFramework/Include/views/afBaseView.h>
 
 // Backend:
-#include <AMDTThreadProfileDataTypes.h>
+#include <AMDTThreadProfileApi/inc/AMDTThreadProfileDataTypes.h>
 
 // Local
 #include <inc/tpSessionData.h>

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -31,7 +31,7 @@
   <ItemDefinitionGroup>
     <ClCompile>
       <PreprocessorDefinitions>QT_LARGEFILE_SUPPORT;QT_DLL;QT_GUI_LIB;QT_CORE_LIB;QT_THREAD_SUPPORT;AMDT_CPU_PROFILING_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)..\Backend;$(ProjectDir)..\ProfilingAgents;$(ProjectDir)..\..\ThreadProfiling\Backend\AMDTThreadProfileAPI\inc;$(CommonProjectsDir)AMDTCommonHeaders;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)..\Backend;$(ProjectDir)..\ProfilingAgents;$(CommonProjectsDir)AMDTCommonHeaders;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -406,9 +406,6 @@
     <ProjectReference Include="..\..\AMDTSharedProfiling\AMDTSharedProfiling.vcxproj">
       <Project>{033bb047-f8a8-4946-9fa4-0d2e25abd473}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\ThreadProfiling\Backend\AMDTThreadProfileAPI\AMDTThreadProfileAPI.vcxproj">
-      <Project>{5b3d32d8-9b36-479b-9bf1-20e76f361436}</Project>
-    </ProjectReference>
     <ProjectReference Include="..\AMDTCpuCallstackSampling\AMDTCpuCallstackSampling.vcxproj">
       <Project>{b0566507-33ca-4109-8bb6-4290ecc53fa0}</Project>
     </ProjectReference>
@@ -426,6 +423,9 @@
     </ProjectReference>
     <ProjectReference Include="..\Backend\AMDTCpuProfilingTranslation\AMDTCpuProfilingTranslation.vcxproj">
       <Project>{bfb56e73-d54d-4d80-9ca2-a52359ad6566}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\Backend\AMDTThreadProfileAPI\AMDTThreadProfileAPI.vcxproj">
+      <Project>{63fab7fe-de15-420b-b231-66c5bd95d319}</Project>
     </ProjectReference>
     <ProjectReference Include="..\ProfilingAgents\AMDTProfilingAgentsData\AMDTProfilingAgentsData.vcxproj">
       <Project>{f6da190f-ef40-43cc-9b8a-ba8e89e514f2}</Project>
