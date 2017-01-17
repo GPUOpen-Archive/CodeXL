@@ -216,7 +216,7 @@ bool AmdtDatabaseAdapter::InsertSessionConfiguration(const AMDTProfileSessionInf
     GT_ASSERT(isOk);
 
     // Insert the session end time.
-    if (IsTimelineMode() && (!sessionInfo.m_sessionEndTime.isEmpty()))
+    if (IsTimelineMode())
     {
         isOk = m_pDbAccessor->InsertSessionInfoKeyValue(AMDT_SESSION_INFO_KEY_SESSION_END_TIME, sessionInfo.m_sessionEndTime);
         GT_ASSERT(isOk);
@@ -320,6 +320,7 @@ bool AmdtDatabaseAdapter::GetSessionConfiguration(AMDTProfileSessionInfo& sessio
         // Get the session end time.
         isOk = m_pDbAccessor->GetSessionInfoValue(gtString(AMDT_SESSION_INFO_KEY_SESSION_END_TIME), sessionInfo.m_sessionEndTime);
         GT_ASSERT(isOk);
+
     }
 
     if (isOk && IsTimelineMode())
