@@ -358,7 +358,7 @@ HRESULT CommandsHandler::initializeSessionInfo()
     return hr;
 }
 
-HRESULT CommandsHandler::setupTimerConfiguration()
+HRESULT CommandsHandler::setupTimerConfiguration(gtString& errorMessage)
 {
     HRESULT hr = S_OK;
 
@@ -370,7 +370,7 @@ HRESULT CommandsHandler::setupTimerConfiguration()
 
         // Profile only on selected cores specified in the CPU Affinity Mask
         // TODO: supporting affinity mask for more than 64 cores (now profile can happen only on cores 0-64)
-        // Mohit: we also use the CPU Affinity Mask to set the affinity mask of the launched
+        // we also use the CPU Affinity Mask to set the affinity mask of the launched
         // process which restrict the launched process to run only on the cores specified in the
         // CPU Affinity Mask. This does not seem correct while doing system-wide profiling because
         // for the launched process, the samples shown, are collected from whole process execution
@@ -378,6 +378,15 @@ HRESULT CommandsHandler::setupTimerConfiguration()
         // on the cores specified in the of the CPU Affinity Mask. It seems that CodeAnalyst also had
         // this flaw. Probably at some point, we may want to think about it.
         hr = fnSetTimerConfiguration(m_profileSession.m_startAffinity, &resolution);
+
+        if (FAILED(hr))
+        {
+            const unsigned int sizeErrBuffer = 512U;
+            wchar_t errBuffer[sizeErrBuffer] = { 0 };
+
+            fnGetLastProfileError(sizeErrBuffer, errBuffer);
+            errorMessage = errBuffer;
+        }
     }
 
     return hr;
@@ -478,9 +487,18 @@ HRESULT CommandsHandler::setupEventConfiguration(gtString& errorMessage)
         {
             // Profile only on selected cores specified in the CPU Affinity Mask
             // TODO: supporting affinity mask for more than 64 cores (now profile can happen only on cores 0-64)
-            hr = fnSetEventConfiguration(pDriverEvents, m_profileSession.m_eventsVector.size(),
-                                         reinterpret_cast<gtUInt64*>(&m_profileSession.m_startAffinity), 1U);
+            hr = fnSetEventConfiguration(pDriverEvents,
+                                         m_profileSession.m_eventsVector.size(),
+                                         &m_profileSession.m_startAffinity,
+                                         1U);
+            if (FAILED(hr))
+            {
+                const unsigned int sizeErrBuffer = 512U;
+                wchar_t errBuffer[sizeErrBuffer] = { 0 };
 
+                fnGetLastProfileError(sizeErrBuffer, errBuffer);
+                errorMessage = errBuffer;
+            }
         }
 
         // Don't allow the event array allocated in verifyAndSetEventsto leak
@@ -582,7 +600,18 @@ HRESULT CommandsHandler::setupIbsConfiguration(gtString& errorMessage)
             // TODO: supporting affinity mask for more than 64 cores (now profile can happen only on cores 0-64)
             hr = fnSetIbsConfiguration(m_profileSession.m_fetchSample ? m_profileSession.m_fetchInterval : 0,
                                        opSample ? opInterval : 0,
-                                       true, (!opCycleCount), (gtUInt64*)&m_profileSession.m_startAffinity, 1);
+                                       true,
+                                       !opCycleCount,
+                                       &m_profileSession.m_startAffinity,
+                                       1);
+            if (FAILED(hr))
+            {
+                const unsigned int sizeErrBuffer = 512U;
+                wchar_t errBuffer[sizeErrBuffer] = { 0 };
+
+                fnGetLastProfileError(sizeErrBuffer, errBuffer);
+                errorMessage = errBuffer;
+            }
         }
     }
 
@@ -963,18 +992,22 @@ HRESULT CommandsHandler::SetupProfileSession(const gtString& profileType, osProc
             }
         }
 
-        //set up timer options
+        // set up timer options
         if (SUCCEEDED(retVal))
         {
-            retVal = setupTimerConfiguration();
+            errorMessage.makeEmpty();
+            retVal = setupTimerConfiguration(errorMessage);
 
             if (!SUCCEEDED(retVal))
             {
-                errorMessage.makeEmpty();
-                errorMessage.appendFormattedString(L"There was a problem configuring the timer profile. (error code 0x%lx)\n\n", retVal);
+                if (errorMessage.isEmpty())
+                {
+                    errorMessage.appendFormattedString(L"There was a problem configuring the timer profile. (error code 0x%lx)\n\n", retVal);
+                }
             }
         }
 
+        // set up EBP options
         if (SUCCEEDED(retVal))
         {
             errorMessage.makeEmpty();
@@ -989,6 +1022,7 @@ HRESULT CommandsHandler::SetupProfileSession(const gtString& profileType, osProc
             }
         }
 
+        // setup IBS options
         if (SUCCEEDED(retVal))
         {
             errorMessage.makeEmpty();

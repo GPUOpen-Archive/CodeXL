@@ -154,7 +154,7 @@ protected:
 private:
     HRESULT enableProfiling();
     HRESULT initializeSessionInfo();
-    HRESULT setupTimerConfiguration();
+    HRESULT setupTimerConfiguration(gtString& errorMessage);
     HRESULT setupEventConfiguration(gtString& errorMessage);
     HRESULT setupIbsConfiguration(gtString& errorMessage);
 

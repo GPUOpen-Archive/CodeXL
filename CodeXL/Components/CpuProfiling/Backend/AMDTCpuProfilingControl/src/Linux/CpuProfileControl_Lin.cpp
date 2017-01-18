@@ -2378,11 +2378,9 @@ HRESULT CpuPerfSetIbsConfiguration(
     /*in*/ bool profileAllCores)
 {
     HRESULT hr = S_OK;
-
     gtUInt32 clientId = helpGetClientId();
 
-    if ((NULL == g_pProfileSession)
-        || (INVALID_CLIENT == clientId))
+    if ((nullptr == g_pProfileSession) || (INVALID_CLIENT == clientId))
     {
         g_invalidClientErr = L"fnEnableProfiling was not called";
         return E_ACCESSDENIED;
@@ -2411,12 +2409,10 @@ HRESULT CpuPerfSetIbsConfiguration(
         return E_FAIL;
     }
 
-    if (((fetchPeriod != 0) && (fetchPeriod < 50000))
-        || (fetchPeriod > MAX_IBS_CYCLE_COUNT))
+    if (((fetchPeriod != 0) && (fetchPeriod < 50000)) || (fetchPeriod > MAX_IBS_CYCLE_COUNT))
     {
         wchar_t buffer[65];
-        swprintf(buffer, 65, L"fetchPeriod must be between %ld and %ld",
-                 50000, MAX_IBS_CYCLE_COUNT);
+        swprintf(buffer, 65, L"IBS fetch Interval must be between %ld and %ld", 50000, MAX_IBS_CYCLE_COUNT);
         g_errorString[clientId] = buffer;
         return E_INVALIDARG;
     }
@@ -2430,12 +2426,10 @@ HRESULT CpuPerfSetIbsConfiguration(
         maxIbsOps = MAX_IBS_EXT_COUNT;
     }
 
-    if (((opPeriod != 0) && (opPeriod < 50000)) ||
-        (opPeriod > maxIbsOps))
+    if (((opPeriod != 0) && (opPeriod < 50000)) || (opPeriod > maxIbsOps))
     {
         wchar_t buffer[65];
-        swprintf(buffer, 65, L"opPeriod must be between %ld and %ld",
-                 50000, maxIbsOps);
+        swprintf(buffer, 65, L"IBS op Interval must be between %ld and %ld", 50000, maxIbsOps);
         g_errorString[clientId] = buffer;
         return E_INVALIDARG;
     }
@@ -2498,14 +2492,12 @@ HRESULT CpuPerfSetIbsConfiguration(
             PerfEvent aEvent;
             aEvent.initialize(type, pmcFlags, 0);
 
-            gSamplingEventList.push_back(
-                std::pair<PerfEvent, gtUInt64>(aEvent, opPeriod));
+            gSamplingEventList.push_back(std::pair<PerfEvent, gtUInt64>(aEvent, opPeriod));
         }
 
         if (profileAllCores)
         {
-            hr = addCoreMask((const gtUInt64*)g_pSystemCoreMask,
-                             g_SystemCoreMaskSize);
+            hr = addCoreMask((const gtUInt64*)g_pSystemCoreMask, g_SystemCoreMaskSize);
         }
         else
         {

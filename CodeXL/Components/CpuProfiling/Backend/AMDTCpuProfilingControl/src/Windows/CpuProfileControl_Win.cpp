@@ -2979,12 +2979,10 @@ HRESULT CpuPerfSetIbsConfiguration(
         return E_FAIL;
     }
 
-    if (((fetchPeriod != 0) && (fetchPeriod < 50000)) ||
-        (fetchPeriod > MAX_IBS_CYCLE_COUNT))
+    if (((fetchPeriod != 0) && (fetchPeriod < 50000)) || (fetchPeriod > MAX_IBS_CYCLE_COUNT))
     {
         wchar_t buffer[65];
-        wsprintf(buffer, L"fetchPeriod must be between %ld and %ld",
-                 50000, MAX_IBS_CYCLE_COUNT);
+        wsprintf(buffer, L"IBS fetch Interval must be between %ld and %ld", 50000, MAX_IBS_CYCLE_COUNT);
         g_errorString[clientId] = buffer;
         return E_INVALIDARG;
     }
@@ -3001,7 +2999,7 @@ HRESULT CpuPerfSetIbsConfiguration(
     if ((opPeriod != 0 && opPeriod < 50000) || (opPeriod > maxIbsOps))
     {
         wchar_t buffer[65];
-        wsprintf(buffer, L"opPeriod must be between %ld and %ld", 50000, maxIbsOps);
+        wsprintf(buffer, L"IBS op Interval must be between %ld and %ld", 50000, maxIbsOps);
         g_errorString[clientId] = buffer;
         return E_INVALIDARG;
     }
@@ -3130,12 +3128,10 @@ HRESULT CpuPerfSetIbsConfiguration(
         return E_FAIL;
     }
 
-    if (((fetchPeriod != 0) && (fetchPeriod < 50000)) ||
-        (fetchPeriod > MAX_IBS_CYCLE_COUNT))
+    if (((fetchPeriod != 0) && (fetchPeriod < 50000)) || (fetchPeriod > MAX_IBS_CYCLE_COUNT))
     {
         wchar_t buffer[65];
-        wsprintf(buffer, L"fetchPeriod must be between %ld and %ld",
-                 50000, MAX_IBS_CYCLE_COUNT);
+        wsprintf(buffer, L"IBS fetch Interval must be between %ld and %ld", 50000, MAX_IBS_CYCLE_COUNT);
         g_errorString[clientId] = buffer;
         return E_INVALIDARG;
     }
@@ -3152,7 +3148,7 @@ HRESULT CpuPerfSetIbsConfiguration(
     if ((opPeriod != 0 && opPeriod < 50000) || (opPeriod > maxIbsOps))
     {
         wchar_t buffer[65];
-        wsprintf(buffer, L"opPeriod must be between %ld and %ld", 50000, maxIbsOps);
+        wsprintf(buffer, L"IBS op Interval must be between %ld and %ld", 50000, maxIbsOps);
         g_errorString[clientId] = buffer;
         return E_INVALIDARG;
     }
