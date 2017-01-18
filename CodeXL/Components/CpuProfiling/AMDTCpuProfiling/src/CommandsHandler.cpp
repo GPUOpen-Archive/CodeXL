@@ -379,7 +379,7 @@ HRESULT CommandsHandler::setupTimerConfiguration(gtString& errorMessage)
         // this flaw. Probably at some point, we may want to think about it.
         hr = fnSetTimerConfiguration(m_profileSession.m_startAffinity, &resolution);
 
-        if (FAILED(hr))
+        if (hr != S_OK)
         {
             const unsigned int sizeErrBuffer = 512U;
             wchar_t errBuffer[sizeErrBuffer] = { 0 };
@@ -491,7 +491,7 @@ HRESULT CommandsHandler::setupEventConfiguration(gtString& errorMessage)
                                          m_profileSession.m_eventsVector.size(),
                                          &m_profileSession.m_startAffinity,
                                          1U);
-            if (FAILED(hr))
+            if (hr != S_OK)
             {
                 const unsigned int sizeErrBuffer = 512U;
                 wchar_t errBuffer[sizeErrBuffer] = { 0 };
@@ -604,7 +604,7 @@ HRESULT CommandsHandler::setupIbsConfiguration(gtString& errorMessage)
                                        !opCycleCount,
                                        &m_profileSession.m_startAffinity,
                                        1);
-            if (FAILED(hr))
+            if (hr != S_OK)
             {
                 const unsigned int sizeErrBuffer = 512U;
                 wchar_t errBuffer[sizeErrBuffer] = { 0 };
