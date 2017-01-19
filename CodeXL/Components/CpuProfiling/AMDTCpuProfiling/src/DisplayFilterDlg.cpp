@@ -291,7 +291,14 @@ bool DisplayFilterDlg::populateCoreList(int noOfCores)
         m_pLayoutForCoreList->setMargin(0);
         m_pLayoutForCoreList->setSizeConstraint(QLayout::SetMaximumSize);
 
-        //Add new items
+        // Add All core item
+        m_pCheckBoxAllCore = new QCheckBox;
+        RETURN_FALSE_IF_NULL(m_pCheckBoxAllCore);
+        m_pCheckBoxAllCore->setText(STR_All);
+        m_pLayoutForCoreList->addWidget(m_pCheckBoxAllCore, 0, 0);
+        QObject::connect(m_pCheckBoxAllCore, SIGNAL(stateChanged(int)), this, SLOT(onClickAllCoreItem(int)));
+
+        // Add individual core items
         for (auto it : m_pCheckBoxCore)
         {
             delete it;
@@ -303,49 +310,32 @@ bool DisplayFilterDlg::populateCoreList(int noOfCores)
 
         for (int i = 0; i < m_noOfCores; ++i)
         {
-            m_pCheckBoxCore.push_back(new QCheckBox);
-        }
+            QCheckBox *pCheckBox = new QCheckBox;
+            m_pCheckBoxCore.push_back(pCheckBox);
 
-        m_pCheckBoxAllCore = new QCheckBox;
-        RETURN_FALSE_IF_NULL(m_pCheckBoxAllCore);
-        //All
-        m_pCheckBoxAllCore->setText(STR_All);
-        m_pLayoutForCoreList->addWidget(m_pCheckBoxAllCore, 0, 0);
-        QObject::connect(m_pCheckBoxAllCore, SIGNAL(stateChanged(int)), this, SLOT(onClickAllCoreItem(int)));
-
-        //Individual core
-        QString strCoreName;
-
-        for (int i = 0; i < m_noOfCores; ++i)
-        {
-            strCoreName = QString("%1 %2").arg(STR_CORE).arg(i);
-            m_pCheckBoxCore[i]->setText(strCoreName);
+            QString strCoreName = QString("%1 %2").arg(STR_CORE).arg(i);
+            pCheckBox->setText(strCoreName);
 
             if ((m_noOfCores > 10) && (1 == i % 2) && (i < 10))
             {
                 strCoreName.append(" ");
             }
 
-            m_pLayoutForCoreList->addWidget(m_pCheckBoxCore[i], i / 2 + 1, i % 2, Qt::AlignLeft);
-            QObject::connect(m_pCheckBoxCore[i], SIGNAL(stateChanged(int)), this, SLOT(onClickCoreItem(int)));
+            m_pLayoutForCoreList->addWidget(pCheckBox, i / 2 + 1, i % 2, Qt::AlignLeft);
+            QObject::connect(pCheckBox, SIGNAL(stateChanged(int)), this, SLOT(onClickCoreItem(int)));
         }
 
         m_pWidgetCoreList->setLayout(m_pLayoutForCoreList);
         m_pScrollAreaCPUCore->setWidget(m_pWidgetCoreList);
     }
 
-    //unsigned long val = m_options->m_coreMask;
-    unsigned long val = m_displayFilter->GetCoreMask();
-    std::bitset<MAX_CORES_SUPPORTED> mask(val);
+    AMDTUInt64 maskVal = m_displayFilter->GetCoreMask();
+    std::bitset<MAX_CORES_SUPPORTED> mask(maskVal);
 
     for (int idx = 0; idx < m_noOfCores; ++idx)
     {
-        if (true == mask.test(idx))
-        {
-            m_pCheckBoxCore[idx]->setChecked(true);
-        }
+        m_pCheckBoxCore[idx]->setChecked(mask.test(idx));
     }
-
 
     return retVal;
 }
@@ -474,7 +464,7 @@ void DisplayFilterDlg::onClickAllCoreItem(int state)
 
 void DisplayFilterDlg::onClickCoreItem(int state)
 {
-    (void)(state); // unused
+    GT_UNREFERENCED_PARAMETER(state);
 
     bool all = true;
 
@@ -489,7 +479,6 @@ void DisplayFilterDlg::onClickCoreItem(int state)
 
     QObject::disconnect(m_pCheckBoxAllCore, SIGNAL(stateChanged(int)), this, SLOT(onClickAllCoreItem(int)));
     m_pCheckBoxAllCore->setChecked(all);
-    m_displayFilter->SetCoreMask(GT_UINT64_MAX);
     QObject::connect(m_pCheckBoxAllCore, SIGNAL(stateChanged(int)), this, SLOT(onClickAllCoreItem(int)));
 }
 
