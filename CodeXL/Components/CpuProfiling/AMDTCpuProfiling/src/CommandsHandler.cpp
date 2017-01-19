@@ -402,79 +402,95 @@ HRESULT CommandsHandler::setupEventConfiguration(gtString& errorMessage)
     {
         osCpuid cpuInfo;
 
-        if (cpuInfo.hasHypervisor())
+#if AMDT_BUILD_TARGET == AMDT_LINUX_OS
+        // EBP on Zen is supported only on Linux kernel version >= 4.9
+        int majorVersion, minorVersion, buildNumber;
+
+        if ((cpuInfo.getFamily() == FAMILY_ZN) &&
+                osGetOperatingSystemVersionNumber(majorVersion, minorVersion, buildNumber) &&
+                (4 > majorVersion || (4 == majorVersion && 9 > minorVersion)))
         {
-            if (cpuInfo.getHypervisorVendorId() == HV_VENDOR_VMWARE)
+            errorMessage = L"For this processor, Event Based Profiling is supported only with Linux kernel version 4.9 or later.\n";
+            hr = E_NOTIMPL;
+        }
+#endif
+
+        if (SUCCEEDED(hr))
+        {
+            if (cpuInfo.hasHypervisor())
             {
-                // VMware supports EBP, only if vPMC is enabled in the guest VM settings
-                // Notify user to enable vPMC to perform EBP
-                // VMware driver (guest OS) generates BSOD if events are counted in OS mode
-                // Notify user that OS events will not be counted
-                gtString helpMessage = L"Make sure \'Virtualize CPU performance Counters\' is enabled in"
-                                       L"virtual machine settings before running any event based profiling.\n\n"
-                                       L"OS mode events will not be counted within guest OS.";
-                ReportHelpMessage(helpMessage);
-            }
-            else if (cpuInfo.getHypervisorVendorId() == HV_VENDOR_MICROSOFT)
-            {
+                if (cpuInfo.getHypervisorVendorId() == HV_VENDOR_VMWARE)
+                {
+                    // VMware supports EBP, only if vPMC is enabled in the guest VM settings
+                    // Notify user to enable vPMC to perform EBP
+                    // VMware driver (guest OS) generates BSOD if events are counted in OS mode
+                    // Notify user that OS events will not be counted
+                    gtString helpMessage = L"Make sure \'Virtualize CPU performance Counters\' is enabled in"
+                        L"virtual machine settings before running any event based profiling.\n\n"
+                        L"OS mode events will not be counted within guest OS.";
+                    ReportHelpMessage(helpMessage);
+                }
+                else if (cpuInfo.getHypervisorVendorId() == HV_VENDOR_MICROSOFT)
+                {
 #if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
 
-                // EBP is supported on Hyper-V Windows 10 parent/child partition
-                // EBP is *not* supported on Hyper-V Windows 8/8.1 parent partition
-                if (cpuInfo.isHypervisorRootPartition())
-                {
-                    osWindowsVersion windowsVersion;
-
-                    if (osGetWindowsVersion(windowsVersion) && windowsVersion != OS_WIN_10)
+                    // EBP is supported on Hyper-V Windows 10 parent/child partition
+                    // EBP is *not* supported on Hyper-V Windows 8/8.1 parent partition
+                    if (cpuInfo.isHypervisorRootPartition())
                     {
-                        errorMessage.makeEmpty();
-                        errorMessage.appendFormattedString(L"Event based profiling is not supported on Windows 8, 8.1 or older with Hyper-V enabled.\n");
+                        osWindowsVersion windowsVersion;
 
-                        hr = E_NOTIMPL;
+                        if (osGetWindowsVersion(windowsVersion) && windowsVersion != OS_WIN_10)
+                        {
+                            errorMessage.makeEmpty();
+                            errorMessage.appendFormattedString(L"Event based profiling is not supported on Windows 8, 8.1 or older with Hyper-V enabled.\n");
+
+                            hr = E_NOTIMPL;
+                        }
                     }
-                }
 
 #endif
 #if AMDT_BUILD_TARGET == AMDT_LINUX_OS
-                // EBP is not supported on Hyper-V Linux child partition
-                wchar_t vendorName[32] = { 0 };
-                cpuInfo.getHypervisorVendorString(vendorName, 32);
+                    // EBP is not supported on Hyper-V Linux child partition
+                    wchar_t vendorName[32] = { 0 };
+                    cpuInfo.getHypervisorVendorString(vendorName, 32);
 
-                errorMessage.makeEmpty();
-                errorMessage.appendFormattedString(L"Hypervisor Detected: %ls\n", vendorName);
-                errorMessage.appendFormattedString(L"Event based profiling is not supported on Guest OS.\n");
+                    errorMessage.makeEmpty();
+                    errorMessage.appendFormattedString(L"Hypervisor Detected: %ls\n", vendorName);
+                    errorMessage.appendFormattedString(L"Event based profiling is not supported on Guest OS.\n");
 
-                hr = E_NOTIMPL;
+                    hr = E_NOTIMPL;
 #endif
+                }
+                else
+                {
+                    wchar_t vendorName[32] = { 0 };
+                    cpuInfo.getHypervisorVendorString(vendorName, 32);
+
+                    errorMessage.makeEmpty();
+                    errorMessage.appendFormattedString(L"Virtual Machine Detected : %ls\n", vendorName);
+                    errorMessage.appendFormattedString(L"Event based profiling is not supported on Guest OS.\n");
+
+                    hr = E_NOTIMPL;
+                }
             }
+
+#if AMDT_BUILD_TARGET == AMDT_LINUX_OS
             else
             {
-                wchar_t vendorName[32] = { 0 };
-                cpuInfo.getHypervisorVendorString(vendorName, 32);
+                // Xen Dom0 detection process is little different
+                if (access("/proc/xen/capabilities", F_OK) == 0)
+                {
+                    errorMessage.makeEmpty();
+                    errorMessage.appendFormattedString(L"Virtual Machine Detected : Xen (Dom0)\n");
+                    errorMessage.appendFormattedString(L"Event based profiling is not supported on Xen Host OS.\n");
 
-                errorMessage.makeEmpty();
-                errorMessage.appendFormattedString(L"Virtual Machine Detected : %ls\n", vendorName);
-                errorMessage.appendFormattedString(L"Event based profiling is not supported on Guest OS.\n");
-
-                hr = E_NOTIMPL;
+                    hr = E_NOTIMPL;
+                }
             }
-        }
-
-#if AMDT_BUILD_TARGET == AMDT_LINUX_OS
-        else
-        {
-            // Xen Dom0 detection process is little different
-            if (access("/proc/xen/capabilities", F_OK) == 0)
-            {
-                errorMessage.makeEmpty();
-                errorMessage.appendFormattedString(L"Virtual Machine Detected : Xen (Dom0)\n");
-                errorMessage.appendFormattedString(L"Event based profiling is not supported on Xen Host OS.\n");
-
-                hr = E_NOTIMPL;
-            }
-        }
 
 #endif
+        }
 
         EventConfiguration* pDriverEvents = nullptr;
 
@@ -488,7 +504,7 @@ HRESULT CommandsHandler::setupEventConfiguration(gtString& errorMessage)
             // Profile only on selected cores specified in the CPU Affinity Mask
             // TODO: supporting affinity mask for more than 64 cores (now profile can happen only on cores 0-64)
             hr = fnSetEventConfiguration(pDriverEvents,
-                                         m_profileSession.m_eventsVector.size(),
+                    m_profileSession.m_eventsVector.size(),
                                          &m_profileSession.m_startAffinity,
                                          1U);
             if (hr != S_OK)

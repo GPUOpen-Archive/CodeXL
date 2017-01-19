@@ -1127,87 +1127,103 @@ void CpuProfileCollect::SetEbpConfig()
     {
         osCpuid cpuInfo;
 
-        if (cpuInfo.hasHypervisor())
+#if AMDT_BUILD_TARGET == AMDT_LINUX_OS
+        // EBP on Zen is supported only on Linux kernel version >= 4.9
+        int majorVersion, minorVersion, buildNumber;
+
+        if ((cpuInfo.getFamily() == FAMILY_ZN) &&
+                osGetOperatingSystemVersionNumber(majorVersion, minorVersion, buildNumber) &&
+                (4 > majorVersion || (4 == majorVersion && 9 > minorVersion)))
         {
-            if (cpuInfo.getHypervisorVendorId() == HV_VENDOR_VMWARE)
+            reportError(false, L"For this processor, Event Based Profiling is supported only with Linux kernel version 4.9 or later.\n");
+            m_error = E_NOTIMPL;
+        }
+#endif
+
+        if (isOK())
+        {
+            if (cpuInfo.hasHypervisor())
             {
-                // VMware supports EBP, only if vPMC is enabled in the guest VM settings
-                // Notify user to enable vPMC to perform EBP
-                // VMware driver (guest OS) generates BSOD if events are counted in OS mode
-                // Notify user that OS events will not be counted
-                reportError(false, L"Make sure \'Virtualize CPU performance Counters\' is enabled in "
+                if (cpuInfo.getHypervisorVendorId() == HV_VENDOR_VMWARE)
+                {
+                    // VMware supports EBP, only if vPMC is enabled in the guest VM settings
+                    // Notify user to enable vPMC to perform EBP
+                    // VMware driver (guest OS) generates BSOD if events are counted in OS mode
+                    // Notify user that OS events will not be counted
+                    reportError(false, L"Make sure \'Virtualize CPU performance Counters\' is enabled in "
                             L"virtual machine settings before running any event based profiling.\n"
                             L"OS mode events will not be counted within guest OS.");
-            }
-            else if (cpuInfo.getHypervisorVendorId() == HV_VENDOR_MICROSOFT)
-            {
+                }
+                else if (cpuInfo.getHypervisorVendorId() == HV_VENDOR_MICROSOFT)
+                {
 
 #if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
 
-                // EBP is supported on Hyper-V Windows 10 parent/child partition
-                // EBP is *not* supported on Hyper-V Windows 8/8.1 parent partition
-                if (cpuInfo.isHypervisorRootPartition())
-                {
-                    osWindowsVersion windowsVersion;
-
-                    if (osGetWindowsVersion(windowsVersion) && windowsVersion != OS_WIN_10)
+                    // EBP is supported on Hyper-V Windows 10 parent/child partition
+                    // EBP is *not* supported on Hyper-V Windows 8/8.1 parent partition
+                    if (cpuInfo.isHypervisorRootPartition())
                     {
-                        gtString errMsg;
-                        errMsg.appendFormattedString(L"%ls profiling is not supported on Windows 8, 8.1 or older with Hyper-V enabled.\n",
-                                                     m_args.GetProfileConfig().toUpperCase().asCharArray());
+                        osWindowsVersion windowsVersion;
 
-                        reportError(false, errMsg.asCharArray());
-                        m_error = E_NOTIMPL;
+                        if (osGetWindowsVersion(windowsVersion) && windowsVersion != OS_WIN_10)
+                        {
+                            gtString errMsg;
+                            errMsg.appendFormattedString(L"%ls profiling is not supported on Windows 8, 8.1 or older with Hyper-V enabled.\n",
+                                    m_args.GetProfileConfig().toUpperCase().asCharArray());
+
+                            reportError(false, errMsg.asCharArray());
+                            m_error = E_NOTIMPL;
+                        }
                     }
-                }
 
 #endif
 #if AMDT_BUILD_TARGET == AMDT_LINUX_OS
-                // EBP is not supported on Hyper-V Linux child partition
-                wchar_t vendorName[32] = { 0 };
-                cpuInfo.getHypervisorVendorString(vendorName, 32);
+                    // EBP is not supported on Hyper-V Linux child partition
+                    wchar_t vendorName[32] = { 0 };
+                    cpuInfo.getHypervisorVendorString(vendorName, 32);
 
-                gtString errMsg;
-                errMsg.appendFormattedString(L"Hypervisor Detected: %ls\n", vendorName);
-                errMsg.appendFormattedString(L"%ls profiling is not supported on Guest OS.\n",
-                                             m_args.GetProfileConfig().toUpperCase().asCharArray());
+                    gtString errMsg;
+                    errMsg.appendFormattedString(L"Hypervisor Detected: %ls\n", vendorName);
+                    errMsg.appendFormattedString(L"%ls profiling is not supported on Guest OS.\n",
+                            m_args.GetProfileConfig().toUpperCase().asCharArray());
 
-                reportError(false, errMsg.asCharArray());
-                m_error = E_NOTIMPL;
+                    reportError(false, errMsg.asCharArray());
+                    m_error = E_NOTIMPL;
 #endif
+                }
+                else
+                {
+                    wchar_t vendorName[32] = { 0 };
+                    cpuInfo.getHypervisorVendorString(vendorName, 32);
+
+                    gtString errMsg;
+                    errMsg.appendFormattedString(L"Hypervisor Detected: %ls\n", vendorName);
+                    errMsg.appendFormattedString(L"%ls profiling is not supported on Guest OS.\n",
+                            m_args.GetProfileConfig().toUpperCase().asCharArray());
+
+                    reportError(false, errMsg.asCharArray());
+                    m_error = E_NOTIMPL;
+                }
             }
+
+#if AMDT_BUILD_TARGET == AMDT_LINUX_OS
             else
             {
-                wchar_t vendorName[32] = { 0 };
-                cpuInfo.getHypervisorVendorString(vendorName, 32);
+                // Xen Dom0 detection process is little different
+                if (access("/proc/xen/capabilities", F_OK) == 0)
+                {
+                    gtString errMsg;
+                    errMsg.appendFormattedString(L"Hypervisor Detected : Xen (Dom0)\n");
+                    errMsg.appendFormattedString(L"%ls profiling is not supported on Xen Host OS.\n",
+                            m_args.GetProfileConfig().toUpperCase().asCharArray());
 
-                gtString errMsg;
-                errMsg.appendFormattedString(L"Hypervisor Detected: %ls\n", vendorName);
-                errMsg.appendFormattedString(L"%ls profiling is not supported on Guest OS.\n",
-                                             m_args.GetProfileConfig().toUpperCase().asCharArray());
-
-                reportError(false, errMsg.asCharArray());
-                m_error = E_NOTIMPL;
+                    reportError(false, errMsg.asCharArray());
+                    m_error = E_NOTIMPL;
+                }
             }
-        }
-
-#if AMDT_BUILD_TARGET == AMDT_LINUX_OS
-        else
-        {
-            // Xen Dom0 detection process is little different
-            if (access("/proc/xen/capabilities", F_OK) == 0)
-            {
-                gtString errMsg;
-                errMsg.appendFormattedString(L"Hypervisor Detected : Xen (Dom0)\n");
-                errMsg.appendFormattedString(L"%ls profiling is not supported on Xen Host OS.\n",
-                                             m_args.GetProfileConfig().toUpperCase().asCharArray());
-
-                reportError(false, errMsg.asCharArray());
-                m_error = E_NOTIMPL;
-            }
-        }
-
 #endif
+
+        }
 
         EventConfiguration* pDriverSampleEvents = nullptr;
         EventConfiguration* pDriverCountEvents = nullptr;
@@ -1225,8 +1241,8 @@ void CpuProfileCollect::SetEbpConfig()
                 // TODO: support for more than 64 cores ?
                 gtUInt64 cpuCoreMask = m_args.GetCoreAffinityMask();
                 m_error = fnSetEventConfiguration(pDriverSampleEvents,
-                                                  static_cast<gtUInt32>(m_nbrSampleEvents),
-                                                  cpuCoreMask);
+                        static_cast<gtUInt32>(m_nbrSampleEvents),
+                        cpuCoreMask);
 
                 if (!SUCCEEDED(m_error))
                 {
@@ -1239,7 +1255,7 @@ void CpuProfileCollect::SetEbpConfig()
                 gtUInt64 cpuCoreMask = m_args.GetCoreAffinityMask();
 
                 m_error = fnSetCountingConfiguration(pDriverCountEvents,
-                                                     static_cast<gtUInt32>(m_nbrCountEvents),
+                        static_cast<gtUInt32>(m_nbrCountEvents),
                                                      cpuCoreMask);
 
                 if (!SUCCEEDED(m_error))
