@@ -81,7 +81,12 @@ if (env['CXL_build_conf'] == 'INTERNAL'):
 
 if (env['CXL_build_conf'] == 'NDA'):
     sources += ["Non-OpenSource/AMDTPowerProfileApi-Internal.cpp",]
-    
+
+if (env['CXL_build_conf'] == 'INTERNAL'):
+    sources += ["Non-OpenSource/AMDTPowerFamily17Internal.cpp",]
+
+if (env['CXL_build_conf'] == 'NDA'):
+    sources += ["Non-OpenSource/AMDTPowerFamily17Internal.cpp",]   
 # Creating object files	
 objFiles = env.SharedObject(sources)
 
