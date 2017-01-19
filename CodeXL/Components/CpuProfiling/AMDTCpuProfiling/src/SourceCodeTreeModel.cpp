@@ -1128,9 +1128,11 @@ void SourceCodeTreeModel::SetHotSpotsrcLnSamples(AMDTUInt32 counterId,
                     [&](const AMDTSampleValue& sampleInfo) {
                         return sampleCounterId == sampleInfo.m_counterId;
                     });
-                double totalSamples = iter->m_sampleCount;
 
-                SetTooltipFormat(sampleCount, sampleValuePer, totalSamples, var);
+                double totalSamples = iter->m_sampleCount;
+                auto appSamplePercent = CalculatePercent(sampleCount, totalSamples);
+
+                SetTooltipFormat(sampleCount, sampleValuePer, appSamplePercent, var);
                 pLineItem->setTooltip(SOURCE_VIEW_SAMPLES_COLUMN, var);
                 pLineItem->setTooltip(SOURCE_VIEW_SAMPLES_PERCENT_COLUMN, var);
 
