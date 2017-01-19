@@ -656,12 +656,14 @@ bool ViewConfig::parseDomTree(TiXmlElement* pRoot)
                         da.eventConfig.eventUnitMask = static_cast<uint8_t>(strtol(attrStr, nullptr, 16));
                     }
 
+                    da.eventConfig.bitOs = true;
                     attrStr = pEventElement->Attribute("Os");
                     if (attrStr)
                     {
                         da.eventConfig.bitOs = (attrStr[0] == 'T') ? true : false;
                     }
 
+                    da.eventConfig.bitUsr = true;
                     attrStr = pEventElement->Attribute("Usr");
                     if (attrStr)
                     {
@@ -745,6 +747,12 @@ bool ViewConfig::ParseColumnSpecElement(TiXmlElement* const pElement, ColumnSpec
 {
     if (pElement)
     {
+        // Set default values for os, user
+        cs.dataSelectLeft.bitOs = true;
+        cs.dataSelectLeft.bitUsr = true;
+        cs.dataSelectRight.bitOs = true;
+        cs.dataSelectRight.bitUsr = true;
+
         std::string typeStr = pElement->Value();
 
         if (typeStr == "value")
