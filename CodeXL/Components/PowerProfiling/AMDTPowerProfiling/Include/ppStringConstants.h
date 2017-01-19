@@ -63,8 +63,8 @@
 
 // Summary view:
 #define PP_STR_SummaryDurationLabel "Session Duration: <b>%02d:%02d:%02d.%03d</b>"
-#define PP_STR_SummaryCumulativeEnergyCaption "Cumulative Energy Consumption [Joules]"
-#define PP_STR_SummaryAveragePowerCaption "Average APU Power Consumption [Watts]"
+#define PP_STR_SummaryCumulativeEnergyCaption "Total Energy Consumption of all supported devices [Joules]"
+#define PP_STR_SummaryAveragePowerCaption "Average Power Consumption of all supported devices [Watts]"
 #define PP_STR_SummaryCPUFrequencyCaption "CPU Avg Frequency [MHz]"
 #define PP_STR_SummaryGPUFrequencyCaption "GPU Avg Frequency [MHz]"
 #define PP_STR_SummaryCPUFrequencyYAxisLabel "Duration [Sec]"
