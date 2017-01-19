@@ -65,6 +65,14 @@ bool ProcessesDataTable::fillSummaryTable(int counterIdx)
 
                     addRow(list, nullptr);
 
+                    // tooltip
+                    QTableWidgetItem* pNameItem = item(rowCount() - 1, CXL_PROC_SUMMARY_PROC_NAME_COL);
+
+                    if (pNameItem != nullptr)
+                    {
+                        pNameItem->setToolTip(procInfo.at(0).m_path.asASCIICharArray());
+                    }
+
                     SetPIDColumnValue(rowCount() - 1,
                         CXL_PROC_SUMMARY_PROC_ID_COL,
                         procInfo.at(0).m_pid);
@@ -172,6 +180,14 @@ bool ProcessesDataTable::AddRowToTable(const gtVector<AMDTProfileData>& allProce
             }
 
             addRow(list, nullptr);
+
+            // Tooltip
+            QTableWidgetItem* pNameItem = item(rowCount() - 1, CXL_PROC_TAB_PROC_NAME_COL);
+
+            if (pNameItem != nullptr)
+            {
+                pNameItem->setToolTip(procInfo.at(0).m_path.asASCIICharArray());
+            }
 
             SetPIDColumnValue(rowCount() - 1, CXL_PROC_TAB_PROC_ID_COL, procInfo.at(0).m_pid);
             SetTableSampleCountAndPercent(rowCount() - 1, CXL_PROC_TAB_SAMPLE_START_COL, profData);
