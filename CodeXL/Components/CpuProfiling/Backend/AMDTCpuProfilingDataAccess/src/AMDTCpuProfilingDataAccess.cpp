@@ -9,6 +9,7 @@
 
 #include <cstring>
 #include <algorithm>
+#include <unordered_map>
 
 #include <AMDTBaseTools/Include/AMDTDefinitions.h>
 #include <AMDTBaseTools/Include/gtMap.h>
@@ -1009,6 +1010,54 @@ public:
                 }
 
                 reportConfigs.push_back(reportConfig);
+            }
+        }
+
+        // In the custom profile, user can select same event with different unitmask, os, user configuration.
+        // For such cases, the event name needs to suffixed with additional details.
+        AMDTProfileSessionInfo sessionInfo;
+
+        if (GetProfileSessionInfo(sessionInfo) && sessionInfo.m_sessionType == L"Custom Profile")
+        {
+            for (auto& config : reportConfigs)
+            {
+                // Find out duplicate events
+                std::unordered_map<AMDTUInt32, AMDTUInt32> dupCountMap;
+
+                for (auto& counterDesc : config.m_counterDescs)
+                {
+                    dupCountMap[counterDesc.m_hwEventId] += 1;
+                }
+
+                // Append extra info to the duplicate event name
+                for (auto& counterDesc : config.m_counterDescs)
+                {
+                    if (dupCountMap[counterDesc.m_hwEventId] > 1)
+                    {
+                        gtUInt16 event = 0;
+                        gtUByte unitMask = 0;
+                        bool bitOs = false;
+                        bool bitUsr = false;
+
+                        DecodeEvent(counterDesc.m_id, &event, &unitMask, &bitOs, &bitUsr);
+
+                        gtString addonStr;
+                        addonStr.appendFormattedString(L" (0x%x)", unitMask);
+
+                        if (bitOs)
+                        {
+                            addonStr.append(L",Os");
+                        }
+
+                        if (bitUsr)
+                        {
+                            addonStr.append(L",Usr");
+                        }
+
+                        counterDesc.m_name.append(addonStr);
+                        counterDesc.m_abbrev.append(addonStr);
+                    }
+                }
             }
         }
 

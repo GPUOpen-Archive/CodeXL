@@ -75,13 +75,14 @@ DataTab::DataTab(QWidget* pParent, CpuSessionWindow* pParentSessionWindow, const
             m_pDisplayFilter->SetProfileType(pParentSessionWindow->GetProfileType());
         }
 
-        AMDTProfileCounterDescVec counterDesc;
-        m_pProfDataRdr->GetSampledCountersList(counterDesc);
+        CounterNameIdVec counterIds;
+        m_pDisplayFilter->GetConfigCounters(CP_strCPUProfileDisplayFilterAllData, counterIds);
         int idx = 0;
 
-        for (const auto& counter : counterDesc)
+        for (const auto& counterId : counterIds)
         {
-            m_CounterIdxMap.insert(std::make_pair(counter.m_name, idx++));
+            // Insert { counter name, index } to map
+            m_CounterIdxMap.insert({ std::get<0>(counterId), idx++ });
         }
     }
 

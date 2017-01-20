@@ -664,22 +664,19 @@ bool SessionOverviewWindow::fillHotspotIndicatorCombo()
                     QStringList hotSpotColumns;
 
                     // counters for "All Data" config type selected
-                    QString filterName = CP_strCPUProfileDisplayFilterAllData;
-                    GT_IF_WITH_ASSERT(!filterName.isEmpty())
+                    QString filterName(CP_strCPUProfileDisplayFilterAllData);
+                    CounterNameIdVec countersName;
+
+                    m_pDisplayFilter->GetConfigCounters(filterName, countersName);
+
+                    for (const auto& name : countersName)
                     {
-                        CounterNameIdVec countersName;
-                        m_pDisplayFilter->GetConfigCounters(filterName, countersName);
-
-                        for (const auto& name : countersName)
-                        {
-                            hotSpotColumns << acGTStringToQString(std::get<0>(name)); // counter name
-                        }
-
-                        retVal = true;
+                        hotSpotColumns << acGTStringToQString(std::get<0>(name));
                     }
 
                     m_pHotSpotIndicatorComboBoxAction->UpdateStringList(hotSpotColumns);
                     m_pHotSpotIndicatorComboBoxAction->UpdateEnabled(hotSpotColumns.size() > 1);
+                    retVal = true;
                 }
             }
             else
