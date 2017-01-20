@@ -693,6 +693,13 @@ public:
                                       colSpec.dataSelectRight.bitUsr,
                                       counterId);
             }
+
+            if (!ret)
+            {
+                // If one event check failed,
+                // then stop further check and return.
+                break;
+            }
         }
 
         // This ViewConfig can be supported for this profile run
