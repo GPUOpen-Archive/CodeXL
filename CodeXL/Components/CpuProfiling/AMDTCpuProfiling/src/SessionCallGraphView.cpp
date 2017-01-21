@@ -966,11 +966,7 @@ bool SessionCallGraphView::ShowParentChild(AMDTFunctionId functionId)
             m_pButterfly->clear();
 
             AMDTProfileFunctionInfo  functionInfo;
-            ret = m_pProfDataRdr->GetFunctionInfo(functionId,
-                                                  functionInfo,
-                                                  nullptr,
-                                                  nullptr,
-                                                  nullptr);
+            ret = m_pProfDataRdr->GetFunctionInfo(functionId, functionInfo, nullptr, nullptr);
 
             if (ret)
             {

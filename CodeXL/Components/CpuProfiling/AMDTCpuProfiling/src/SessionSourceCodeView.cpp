@@ -17,6 +17,9 @@
 #include <QtCore>
 #include <QtWidgets>
 
+// Infra:
+#include <AMDTBaseTools/Include/gtSet.h>
+
 // AMDTApplicationComponents
 #include <AMDTApplicationComponents/Include/acColours.h>
 #include <AMDTApplicationComponents/Include/acItemDelegate.h>
@@ -390,11 +393,7 @@ void SessionSourceCodeView::CreateFunctionsComboBox()
             AMDTProfileFunctionInfo  functionInfo;
             gtUInt64 modBaseAddress = 0;
 
-            bool ret = m_pProfDataRdr->GetFunctionInfo(func.m_id,
-                                                       functionInfo,
-                                                       &modBaseAddress,
-                                                       nullptr,
-                                                       nullptr);
+            bool ret = m_pProfDataRdr->GetFunctionInfo(func.m_id, functionInfo, &modBaseAddress, nullptr);
 
             if (ret)
             {
@@ -654,8 +653,6 @@ void SessionSourceCodeView::OnFunctionsComboChange(int functionIndex)
 
             AMDTProfileFunctionInfo  functionInfo;
             gtVAddr modBaseAddress = 0;
-            gtVector<AMDTProcessId> pidsList;
-            gtVector<AMDTThreadId> threadsList;
             QStringList pidList, tidList;
             bool isMultiPID = false;
             bool isMultiTID = false;
@@ -663,25 +660,33 @@ void SessionSourceCodeView::OnFunctionsComboChange(int functionIndex)
             m_pTreeViewModel->m_pid = AMDT_PROFILE_ALL_PROCESSES;
             m_pTreeViewModel->m_tid = AMDT_PROFILE_ALL_THREADS;
 
+            m_pidTidMap.clear();
             bool ret = m_pProfDataRdr->GetFunctionInfo(m_pTreeViewModel->m_funcId,
                                                        functionInfo,
                                                        &modBaseAddress,
-                                                       &pidsList,
-                                                       &threadsList);
+                                                       &m_pidTidMap);
 
             if (ret)
             {
                 //m_pTreeViewModel->m_newAddress = functionData.m_modBaseAddress + functionData.m_instDataList[0].m_offset;
                 m_pTreeViewModel->m_newAddress = modBaseAddress + functionInfo.m_startOffset;
 
-                isMultiPID = (pidsList.size() > 1);
-                isMultiTID = (threadsList.size() > 1);
+                isMultiPID = (m_pidTidMap.size() > 1);
+
+                gtSet<AMDTThreadId> uniqueTIDs;
+
+                for (const auto& it : m_pidTidMap)
+                {
+                    uniqueTIDs.insert(it.second.begin(), it.second.end());
+                }
+
+                isMultiTID = (uniqueTIDs.size() > 1);
 
                 if (isMultiPID)
                 {
-                    for (const auto& pid : pidsList)
+                    for (const auto& it : m_pidTidMap)
                     {
-                        pidList << (QString::number(pid));
+                        pidList << QString::number(it.first);
                     }
 
                     pidList.insert(0, CP_profileAllProcesses);
@@ -689,9 +694,9 @@ void SessionSourceCodeView::OnFunctionsComboChange(int functionIndex)
 
                 if (isMultiTID)
                 {
-                    for (const auto& tid : threadsList)
+                    for (const auto& tid : uniqueTIDs)
                     {
-                        tidList << (QString::number(tid));
+                        tidList << QString::number(tid);
                     }
 
                     tidList.insert(0, CP_profileAllThreads);
@@ -778,40 +783,53 @@ void SessionSourceCodeView::OnPIDComboChange(int index)
         GT_IF_WITH_ASSERT((pPIDComboBox != nullptr) && (m_pPIDComboBoxAction != nullptr)
                           && (pTIDComboBox != nullptr) && (m_pTIDComboBoxAction != nullptr))
         {
+            gtSet<AMDTThreadId> uniqueTIDs;
+
             if (index != SHOW_ALL_PIDS)
             {
                 m_pTreeViewModel->m_pid = pPIDComboBox->currentText().toUInt();
+                auto iter = m_pidTidMap.find(m_pTreeViewModel->m_pid);
+
+                if (iter != m_pidTidMap.end())
+                {
+                    uniqueTIDs.insert(iter->second.begin(), iter->second.end());
+                }
+            }
+            else
+            {
+                for (const auto& item : m_pidTidMap)
+                {
+                    uniqueTIDs.insert(item.second.begin(), item.second.end());
+                }
             }
 
             // set tid to ALL_TIDS
             m_pTreeViewModel->m_tid = AMDT_PROFILE_ALL_THREADS;
 
-            // TODO: CpuProfileDataAccess should provide a new API that returns the list of threads
-            // for a given functionId and processId. Alternatively enhance GetFunctionInfo()..
-            // now tidList is always empty
+            bool isMultiTID = (uniqueTIDs.size() > 1);
+
             QStringList tidList;
-            bool isMultiTID =  false;
 
-            if (pTIDComboBox->count() > 0)
-            {
-                isMultiTID = true;
-            }
-
+            // Set the list of TIDs:
             if (isMultiTID)
             {
-                // Block signals (do not update GUI while adding the new TID list to the table. This will be done
-                // later, when the TID will be selected):
-                m_pTIDComboBoxAction->blockSignals(true);
-                m_pPIDComboBoxAction->blockSignals(true);
-
-                // Set the list of TIDs:
-                tidList.insert(0, CP_profileAllThreads);
-                m_pTIDComboBoxAction->UpdateStringList(tidList);
-
-                // Unblock signals:
-                m_pTIDComboBoxAction->blockSignals(false);
-                m_pPIDComboBoxAction->blockSignals(false);
+                for (const auto& tid : uniqueTIDs)
+                {
+                    tidList << QString::number(tid);
+                }
             }
+
+            tidList.insert(0, CP_profileAllThreads);
+
+            // Block signals (do not update GUI while adding the new TID list to the table.)
+            m_pTIDComboBoxAction->blockSignals(true);
+            m_pPIDComboBoxAction->blockSignals(true);
+
+            m_pTIDComboBoxAction->UpdateStringList(tidList);
+
+            // Unblock signals:
+            m_pTIDComboBoxAction->blockSignals(false);
+            m_pPIDComboBoxAction->blockSignals(false);
 
             m_pTIDComboBoxAction->UpdateEnabled(isMultiTID);
 

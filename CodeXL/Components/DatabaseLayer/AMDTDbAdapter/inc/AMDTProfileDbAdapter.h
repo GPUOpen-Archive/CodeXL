@@ -120,8 +120,7 @@ public:
     bool GetFunctionInfo(AMDTFunctionId functionId, gtUInt32 funcStartOffset, AMDTProfileFunctionInfo& functionInfo);
     bool GetProcessAndThreadListForFunction(AMDTFunctionId              funcId,
                                             AMDTUInt32                  funcStartOffset,
-                                            gtVector<AMDTProcessId>&    processList,
-                                            gtVector<AMDTThreadId>&     threadList);
+                                            gtMap<AMDTProcessId, gtVector<AMDTThreadId>>& pidTidMap);
 
     bool GetProcessesWithCallstackSamples(gtVector<AMDTProcessId>& cssProcessVec);
 

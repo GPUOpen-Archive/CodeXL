@@ -5688,10 +5688,9 @@ public:
 
     // Retrieves the list of processes and threads for which the given function-id has samples
     bool GetProcessAndThreadListForFunction(
-        AMDTFunctionId              funcId,
-        AMDTUInt32                  funcStartOffset,
-        gtVector<AMDTProcessId>&    processList,
-        gtVector<AMDTThreadId>&     threadList)
+        AMDTFunctionId funcId,
+        AMDTUInt32 funcStartOffset,
+        gtMap<AMDTProcessId, gtVector<AMDTThreadId>>& pidTidMap)
     {
         bool ret = false;
 
@@ -5714,9 +5713,6 @@ public:
 
             if (rc == SQLITE_OK)
             {
-                gtSet<AMDTProcessId> pidUniqueSet;
-                gtSet<AMDTThreadId> tidUniqueSet;
-
                 sqlite3_bind_int(pQueryStmt, 1, funcId);
 
                 if (isUnknownFunc)
@@ -5727,22 +5723,11 @@ public:
                 // Execute the query.
                 while ((rc = sqlite3_step(pQueryStmt)) == SQLITE_ROW)
                 {
-                    pidUniqueSet.insert(sqlite3_column_int(pQueryStmt, 0));
-                    tidUniqueSet.insert(sqlite3_column_int(pQueryStmt, 1));
-                }
+                    AMDTProcessId pid = sqlite3_column_int(pQueryStmt, 0);
+                    AMDTThreadId tid = sqlite3_column_int(pQueryStmt, 1);
 
-                for (const auto& pid : pidUniqueSet)
-                {
-                    processList.push_back(pid);
+                    pidTidMap[pid].push_back(tid);
                 }
-
-                for (const auto& tid : tidUniqueSet)
-                {
-                    threadList.push_back(tid);
-                }
-
-                pidUniqueSet.clear();
-                tidUniqueSet.clear();
             }
 
             // Finalize the statement.
@@ -7448,14 +7433,13 @@ bool AmdtDatabaseAccessor::GetFunctionInfo(
 bool AmdtDatabaseAccessor::GetProcessAndThreadListForFunction(
     AMDTFunctionId              funcId,
     AMDTUInt32                  funcStartOffset,
-    gtVector<AMDTProcessId>&    processList,
-    gtVector<AMDTThreadId>&     threadList)
+    gtMap<AMDTProcessId, gtVector<AMDTThreadId>>& pidTidMap)
 {
     bool ret = false;
 
     if (m_pImpl != nullptr)
     {
-        ret = m_pImpl->GetProcessAndThreadListForFunction(funcId, funcStartOffset, processList, threadList);
+        ret = m_pImpl->GetProcessAndThreadListForFunction(funcId, funcStartOffset, pidTidMap);
     }
 
     return ret;

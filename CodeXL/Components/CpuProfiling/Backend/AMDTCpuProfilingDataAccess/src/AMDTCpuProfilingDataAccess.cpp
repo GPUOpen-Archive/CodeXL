@@ -2306,8 +2306,7 @@ public:
     bool GetFunctionInfo(AMDTFunctionId            functionId,
                          AMDTProfileFunctionInfo&  functionInfo,
                          gtUInt64*                 pModLoadAddress,
-                         gtVector<AMDTProcessId>*  pProcessList,
-                         gtVector<AMDTThreadId>*   pThreadList)
+                         gtMap<AMDTProcessId, gtVector<AMDTThreadId>>* pPidTidMap)
     {
         bool ret = false;
         gtUInt32 funcStartOffset = 0;
@@ -2337,9 +2336,9 @@ public:
                 *pModLoadAddress = modInfo.m_loadAddress;
             }
 
-            if (nullptr != pProcessList && nullptr != pThreadList)
+            if (nullptr != pPidTidMap)
             {
-                ret = m_pDbAdapter->GetProcessAndThreadListForFunction(functionId, funcStartOffset, *pProcessList, *pThreadList);
+                ret = m_pDbAdapter->GetProcessAndThreadListForFunction(functionId, funcStartOffset, *pPidTidMap);
             }
         }
 
@@ -4756,14 +4755,13 @@ bool cxlProfileDataReader::GetFunctionInfo(
     AMDTFunctionId             functionId,
     AMDTProfileFunctionInfo&   functionInfo,
     gtUInt64*                  pModLoadAddress,
-    gtVector<AMDTProcessId>*  pProcessList,
-    gtVector<AMDTThreadId>*   pThreadList)
+    gtMap<AMDTProcessId, gtVector<AMDTThreadId>>* pPidTidMap)
 {
     bool ret = false;
 
     if (nullptr != m_pImpl)
     {
-        ret = m_pImpl->GetFunctionInfo(functionId, functionInfo, pModLoadAddress, pProcessList, pThreadList);
+        ret = m_pImpl->GetFunctionInfo(functionId, functionInfo, pModLoadAddress, pPidTidMap);
     }
 
     return ret;

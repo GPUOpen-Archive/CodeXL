@@ -151,6 +151,7 @@ protected:
     std::vector<AMDTUInt32> m_functionIdVec;
     gtString m_srcFilePath;
     std::vector<gtString> m_supportedCounterList;
+    gtMap<AMDTProcessId, gtVector<AMDTThreadId>> m_pidTidMap;
 };
 
 #endif //__SESSIONSOURCECODEVIEW_H

@@ -833,14 +833,13 @@ bool amdtProfileDbAdapter::GetFunctionInfo(
 bool amdtProfileDbAdapter::GetProcessAndThreadListForFunction(
     AMDTFunctionId              funcId,
     AMDTUInt32                  funcStartOffset,
-    gtVector<AMDTProcessId>&    processList,
-    gtVector<AMDTThreadId>&     threadList)
+    gtMap<AMDTProcessId, gtVector<AMDTThreadId>>& pidTidMap)
 {
     bool ret = false;
 
     if (m_pDbAccessor != nullptr)
     {
-        ret = m_pDbAccessor->GetProcessAndThreadListForFunction(funcId, funcStartOffset, processList, threadList);
+        ret = m_pDbAccessor->GetProcessAndThreadListForFunction(funcId, funcStartOffset, pidTidMap);
     }
 
     return ret;

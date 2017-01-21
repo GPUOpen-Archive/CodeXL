@@ -103,8 +103,7 @@ public:
     bool GetFunctionInfo(AMDTFunctionId             functionId,
                          AMDTProfileFunctionInfo&   functionInfo,
                          gtUInt64*                  pModLoadAddress,
-                         gtVector<AMDTProcessId>*   pProcessList,
-                         gtVector<AMDTThreadId>*    pThreadList);
+                         gtMap<AMDTProcessId, gtVector<AMDTThreadId>>* pPidTidMap);
 
     //  Summary APIs
     bool SessionHasSamples(void);
