@@ -748,33 +748,62 @@ void SourceCodeTreeModel::PopulateFunctionSampleData(const AMDTProfileFunctionDa
     }
 }
 
-void SourceCodeTreeModel::BuildTree(const std::vector<SourceViewTreeItem*>& srcLineViewTreeMap)
+bool SourceCodeTreeModel::BuildTree(const std::vector<SourceViewTreeItem*>& srcLineViewTreeMap)
 {
-    AMDTProfileFunctionData  functionData;
-    int retVal = m_pProfDataRdr->GetFunctionDetailedProfileData(m_funcId,
-                                                                m_pid,
-                                                                m_tid,
-                                                                functionData);
+    bool retVal = false;
 
-    if (retVal != static_cast<int>(CXL_DATAACCESS_ERROR_DASM_INFO_NOTAVAILABLE))
+    AMDTProfileFunctionData functionData;
+    int ret = m_pProfDataRdr->GetFunctionDetailedProfileData(m_funcId, m_pid, m_tid, functionData);
+
+    if (ret != static_cast<int>(CXL_DATAACCESS_ERROR_DASM_INFO_NOTAVAILABLE))
     {
         gtString srcFilePath;
         AMDTSourceAndDisasmInfoVec srcInfoVec;
-        retVal = m_pProfDataRdr->GetFunctionSourceAndDisasmInfo(m_funcId, srcFilePath, srcInfoVec);
+        m_pProfDataRdr->GetFunctionSourceAndDisasmInfo(m_funcId, srcFilePath, srcInfoVec);
 
-        PopulateFunctionSampleData(functionData, srcFilePath, srcInfoVec, srcLineViewTreeMap);
+        // Line# in m_srcLinesCache should not be less than max line# in srcInfoVec.
+        if (srcInfoVec.size() > 0)
+        {
+            auto lastLine = srcInfoVec.back().m_sourceLine;
+
+            if (m_srcLinesCache.size() >= lastLine)
+            {
+                retVal = true;
+            }
+        }
+
+        if (retVal)
+        {
+            PopulateFunctionSampleData(functionData, srcFilePath, srcInfoVec, srcLineViewTreeMap);
+        }
     }
+
+    return retVal;
 }
 
 bool SourceCodeTreeModel::BuildSourceAndDASMTree()
 {
+    bool retVal = false;
+
     m_srcLineViewTreeMap.clear();
     m_sampleSrcLnViewTreeList.clear();
 
-    BuildSourceLinesTree(m_srcLineViewTreeMap);
-    BuildTree(m_srcLineViewTreeMap);
+    retVal = BuildSourceLinesTree(m_srcLineViewTreeMap);
+    retVal = retVal && BuildTree(m_srcLineViewTreeMap);
 
-    return true;
+    if (!retVal)
+    {
+        // Something gone wrong while building source tree.
+        // We shall clear cached info and try to show only disasm tree.
+        m_srcLineViewTreeMap.clear();
+        m_sampleSrcLnViewTreeList.clear();
+        m_srcLinesCache.clear();
+
+        // Clear already filled rows.
+        removeRows(0, rowCount());
+    }
+
+    return retVal;
 }
 
 bool SourceCodeTreeModel::UpdateHeaders(AMDTUInt32 hotspotCounterId)
@@ -902,8 +931,10 @@ bool SourceCodeTreeModel::SetupSourceInfo()
     return ret;
 }
 
-void SourceCodeTreeModel::BuildSourceLinesTree(std::vector<SourceViewTreeItem*>& srcLineViewTreeMap)
+bool SourceCodeTreeModel::BuildSourceLinesTree(std::vector<SourceViewTreeItem*>& srcLineViewTreeMap)
 {
+    bool ret = false;
+
     // NOTE: Cache index start from 0 but line start from 1.
     if (m_stopLine <= static_cast<gtUInt32>(m_srcLinesCache.size()))
     {
@@ -920,7 +951,11 @@ void SourceCodeTreeModel::BuildSourceLinesTree(std::vector<SourceViewTreeItem*>&
             pLineItem->setForeground(SOURCE_VIEW_LINE_COLUMN, AC_SOURCE_CODE_EDITOR_MARGIN_FORE_COLOR);
             srcLineViewTreeMap.push_back(pLineItem);
         }
+
+        ret = true;
     }
+
+    return ret;
 }
 
 bool SourceCodeTreeModel::SetSourceLines(const QString& filePath, unsigned int startLine, unsigned int stopLine)

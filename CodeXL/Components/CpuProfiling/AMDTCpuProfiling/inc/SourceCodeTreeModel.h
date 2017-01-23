@@ -108,8 +108,8 @@ private:
     void SetDisplayFormat(double val, bool appendPercent, QVariant& data, const int precision);
 
     /// Fill the current file source lines:
-    void BuildSourceLinesTree(std::vector<SourceViewTreeItem*>& srcLineViewTreeMap);
-    void BuildTree(const std::vector<SourceViewTreeItem*>& srcLineViewTreeMap);
+    bool BuildSourceLinesTree(std::vector<SourceViewTreeItem*>& srcLineViewTreeMap);
+    bool BuildTree(const std::vector<SourceViewTreeItem*>& srcLineViewTreeMap);
     void PopulateFunctionSampleData(const AMDTProfileFunctionData&  functionData,
                                     gtString srcFilePath,
                                     AMDTSourceAndDisasmInfoVec srcInfoVec,
