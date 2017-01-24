@@ -264,7 +264,7 @@ void ppCollect::ValidateProfileOptions()
     {
         m_args.SetCoreAffinityMask(m_args.GetCoreAffinityMask() & m_coreMask);
     }
-    else//devtools/main/CodeXL/Components/PowerProfiling/Backend/AMDTPowerProfileAPI/src/AMDTPowerProfileControl.cpp
+    else
     {
         return;
     }
