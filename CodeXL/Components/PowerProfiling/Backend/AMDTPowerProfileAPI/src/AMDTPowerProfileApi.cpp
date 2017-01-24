@@ -2733,5 +2733,5 @@ AMDTResult AMDTPwrGetCategoryInfo(AMDTPwrCategory category, AMDTPwrCategoryInfo*
 
     return ret;
 }
-#endif
+
 

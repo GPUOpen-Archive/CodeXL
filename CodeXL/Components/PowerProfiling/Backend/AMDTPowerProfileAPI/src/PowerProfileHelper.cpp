@@ -146,6 +146,11 @@ AMDTUInt32 GetSupportedTargetPlatformId()
             // Carrizo: 0x15 60 to 6F
             idx = PLATFORM_CARRIZO;
         }
+        else if (model >= 0x70 && model <= 0x7F)
+        {
+            // Carrizo: 0x15 70 to 7F
+            idx = PLATFORM_STONEY;
+        }
     }
     else if (0x16 == family)
     {

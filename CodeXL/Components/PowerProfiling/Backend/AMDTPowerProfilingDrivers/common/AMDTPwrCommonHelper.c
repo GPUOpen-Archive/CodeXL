@@ -53,6 +53,11 @@ uint32 HelpPwrGetTargetPlatformId(void)
             // Carrizo: 0x15 60 to 6F
             g_platformId  = PLATFORM_CARRIZO;
         }
+        else if ((0x15 == family) && (model >= 0x70 && model <= 0x7F))
+        {
+            // Carrizo: 0x15 70 to 7F
+            g_platformId  = PLATFORM_STONEY;
+        }
         else if ((0x16 == family) && (model >= 0x30 && model <= 0x3F))
         {
             // Mullins : 0x16 30 to 3F
