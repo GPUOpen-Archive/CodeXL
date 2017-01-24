@@ -14,6 +14,8 @@
 
 #define _PWR_BACKEND_TRACE_
 #define TEMP_PATH_MAX_LEN       260
+#define PP_MICROSEC_PER_SEC 1000000
+#define MILLISEC_PER_SEC 1000
 
 #define CPUID_FnIdentifiers 0x8000001E
 #define CPUID_FnThermalAndPowerManagement 6
@@ -24,6 +26,13 @@
 #define CPUID_FeatureId_EBX_LogicalProcessorCount 0xFF << 16
 #define CPUID_FnThermalAndPowerManagement_ECX_EffFreq  (1 << 0)
 
+
+// IEEE754Decode: IEEE754 float decoding.Please check the IEEE 754 decoding for details
+union IEEE754Decode
+{
+    AMDTUInt32  u32;
+    AMDTFloat32 f32;
+};
 
 // The enumeration used to retrieve data from the __cpuid intrinsic
 enum
@@ -90,6 +99,15 @@ typedef struct MemoryPool
     AMDTUInt32 m_offset;
     AMDTUInt32 m_size;
 } MemoryPool;
+
+typedef AMDTUInt32(* fpPwrCheckFamily17)(AMDTUInt32, AMDTUInt32);
+typedef void (*fpPwrGetEnergyUnit)(AMDTUInt32*);
+typedef AMDTUInt32(*fpGetCountersInternal)(AMDTPwrCounterBasicInfo**);
+typedef bool (* fpFillSmuInternal)(SmuAccess*);
+typedef AMDTUInt32(* fpDecodeSmuInternal)(PwrCounterDecodeInfo*, AMDTPwrProcessedDataRecord*, AMDTUInt8*, AMDTUInt32*, AMDTUInt64);
+typedef AMDTFloat64(* fpPwrGetZeppelinCef)(AMDTUInt64);
+
+
 
 extern AMDTPwrProfileAttributeList g_attributeList;
 
@@ -170,13 +188,19 @@ AMDTResult CreateMemoryPool(MemoryPool* pPool, AMDTUInt32 size);
 AMDTUInt8* GetMemoryPoolBuffer(MemoryPool* pPool, AMDTUInt32 size);
 // Delete the memory pool
 AMDTResult ReleaseMemoryPool(MemoryPool* pPool);
-
 // PwrGetLogicalProcessCount: Get number of logical cores
 AMDTUInt32 PwrGetLogicalProcessCount();
-
+// PwrIsSmtEnabled: Check if thread per core is more than 1
+bool PwrIsSmtEnabled();
 
 // PwrGetEnvironmentVariable: Get environment variable
-AMDTUInt32 PwrGetEnvironmentVariable(const char * pName);
+AMDTUInt32 PwrGetEnvironmentVariable(const char* pName);
+
+// PwrGetCountsPerSecs:  get the TS count per sec
+AMDTFloat32 PwrGetCountsPerSecs(void);
+
+// PwrGetPhysicalCores:
+AMDTUInt32 PwrGetPhysicalCores(void);
 
 #endif //_POWERPROFILEHELPER_H_
 

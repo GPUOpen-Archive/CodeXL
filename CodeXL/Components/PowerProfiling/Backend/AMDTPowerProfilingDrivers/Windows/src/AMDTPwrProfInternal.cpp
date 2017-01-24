@@ -360,13 +360,13 @@ VOID NTAPI SampleDataCallback(PCORE_DATA* pData)
 
             if (PROFILE_TYPE_PROCESS_PROFILING == pCoreCfg->m_profileType)
             {
-                if (pCoreCfg->m_samplingInterval < 100)
+                if (pCoreCfg->m_samplingInterval < 50)
                 {
                     signal = !(pCoreCfg->m_pCoreBuffer->m_recCnt % (pCoreCfg->m_samplingInterval));
                 }
                 else
                 {
-                    signal = !(pCoreCfg->m_pCoreBuffer->m_recCnt % 100);
+                    signal = !(pCoreCfg->m_pCoreBuffer->m_recCnt % 50);
                 }
             }
             else
@@ -414,8 +414,6 @@ void NTAPI PwrProfControlMonitoringCb(PVOID pData, bool isActivated)
     if (true == isActivated)
     {
         g_powerOn = true;
-        // Initialize non-smu counters
-        InitializeGenericCounterAccess((uint32)KeGetCurrentProcessorNumberEx(NULL));
 
         if (PROFILE_TYPE_TIMELINE != pCoreCfg->m_profileType)
         {
@@ -473,10 +471,13 @@ int32 AllocateAndInitDataBuffers(ProfileConfig* pSrcCfg,
                 break;
             }
 
+            pBuffer = pSharedBuffer + offset;
+
             if (0 == cnt)
             {
                 //Allocate for Smu config on first/master core
                 pCfg->m_smuCfg = (SmuList*) GetMemoryPoolBuffer(sizeof(SmuList), true);
+                pCfg->m_bufferSize = PWRPROF_MASTER_CORE_BUFFER_SIZE;
 
                 if (NULL == pCfg->m_smuCfg)
                 {
@@ -488,9 +489,8 @@ int32 AllocateAndInitDataBuffers(ProfileConfig* pSrcCfg,
             else
             {
                 pCfg->m_smuCfg = NULL;
+                pCfg->m_bufferSize = PWRPROF_NONMASTER_CORE_BUFFER_SIZE;
             }
-
-            pBuffer = pSharedBuffer + offset;
 
             if (NULL == pBuffer)
             {
@@ -499,7 +499,7 @@ int32 AllocateAndInitDataBuffers(ProfileConfig* pSrcCfg,
                 break;
             }
 
-            memset(pBuffer, 0, sizeof(PageBuffer) + PWRPROF_PERCORE_BUFFER_SIZE);
+            memset(pBuffer, 0, sizeof(PageBuffer) + pCfg->m_bufferSize);
             offset = offset + sizeof(PageBuffer);
 
             pCfg->m_pCoreBuffer = (PageBuffer*)pBuffer;
@@ -514,7 +514,7 @@ int32 AllocateAndInitDataBuffers(ProfileConfig* pSrcCfg,
                 break;
             }
 
-            offset = offset + PWRPROF_PERCORE_BUFFER_SIZE;
+            offset = offset + pCfg->m_bufferSize;
 
             pCfg->m_pCoreBuffer->m_pBuffer = pBuffer;
 

@@ -23,17 +23,23 @@
 //=================================================================================
 #ifndef _AMDTSHAREDBUFFERCONFIG_H
 #define _AMDTSHAREDBUFFERCONFIG_H
+#ifdef __linux__
+//Need to test 512 in Linux
+#define PWRPROF_SHARED_BUFFER_SIZE 1048576 //256 * 4096
+#else
+#define PWRPROF_SHARED_BUFFER_SIZE 2097152 //512 * 4096
 
-// Using 16 pages per core and additional 8 pages for other meta data
-// TODO: Currently the buffer is allocated for 8 cores and this needs to be modified
-// to be allocated dynamically depending on the number of available cores
-#define PWRPROF_SHARED_BUFFER_SIZE 256*4096
+#endif
 
 // 1K for all core buffer parameter other than buffers
 #define PWRPROF_SHARED_METADATA_SIZE 4096
 
-// Maximum per core buffer size
-#define PWRPROF_PERCORE_BUFFER_SIZE 16 * 4096
+// 16 pages are allocated for the master core
+#define PWRPROF_MASTER_CORE_BUFFER_SIZE (65536)
+
+// 3 pages are allocated for remaining cores
+#define PWRPROF_NONMASTER_CORE_BUFFER_SIZE (12288)
+
 
 #endif //_AMDTSHAREDBUFFERCONFIG_H
 

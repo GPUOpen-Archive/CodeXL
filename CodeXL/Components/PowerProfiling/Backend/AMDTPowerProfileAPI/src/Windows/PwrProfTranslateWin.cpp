@@ -5,19 +5,18 @@
 /// \file PwrProfTranslateWin.cpp
 ///
 //==================================================================================
-#include "PwrProfTranslateWin.h"
-
-#define MILLISEC_PER_SEC 1000
+#include <PwrProfTranslateWin.h>
+#include <PowerProfileHelper.h>
 
 // PwrGetProfileData: Provide process data based on process/module/ip profile type
 AMDTResult PwrProfTranslateWin::PwrGetProfileData(CXLContextProfileType type, void** pData, AMDTUInt32* pCnt, AMDTFloat32* pPower)
 {
-	(void)type;
-	(void)pData;
-	(void)pCnt;
-	(void)pPower;
+    (void)type;
+    (void)pData;
+    (void)pCnt;
+    (void)pPower;
 
-	AMDTResult ret = AMDT_STATUS_OK;
+    AMDTResult ret = AMDT_STATUS_OK;
 
 #ifndef _WIN64
     AMDTFloat32 totalPower = 0;
@@ -120,14 +119,6 @@ AMDTResult PwrProfTranslateWin::PwrGetProfileData(CXLContextProfileType type, vo
     return ret;
 }
 
-// PwrGetCountsPerSecs: Get os ticks per second
-AMDTFloat32 PwrProfTranslateWin::PwrGetCountsPerSecs() const
-{
-    // Win driver return TS is milli seconds
-    const AMDTFloat32 countPerSeconds = static_cast<AMDTFloat32>(MILLISEC_PER_SEC);
-    return countPerSeconds;
-}
-
 // SetElapsedTime: Elapse time from the time when first record was collected
 void PwrProfTranslateWin::SetElapsedTime(AMDTUInt64 raw, AMDTUInt64* pResult)
 {
@@ -152,8 +143,15 @@ AMDTResult PwrProfTranslateWin::AttributePowerToSample()
 
     for (coreIdx = 0; coreIdx < m_targetCoreCnt; coreIdx++)
     {
+        float energyPerSample = 0;
         AMDTUInt32 componentIdx = coreIdx / m_coresPerComponent;
-        float energyPerSample = (m_componentPower[componentIdx] * timeDiv);
+
+        if (PLATFORM_ZEPPELIN == GetSupportedTargetPlatformId())
+        {
+            timeDiv = 1;
+        }
+
+        energyPerSample = (m_componentPower[componentIdx] * timeDiv);
 
         for (auto sampleIter : m_sampleMap[coreIdx])
         {
@@ -171,9 +169,9 @@ AMDTResult PwrProfTranslateWin::AttributePowerToSample()
 // ProcessSample: Process each data sample for process/module/ip profiling
 AMDTResult PwrProfTranslateWin::ProcessSample(ContextData* pCtx, AMDTUInt32 coreId, AMDTUInt32 componentIdx)
 {
-	(void)pCtx;
-	(void)coreId;
-	(void)componentIdx;
+    (void)pCtx;
+    (void)coreId;
+    (void)componentIdx;
 
 #ifndef _WIN64
     AMDTFloat32 ipc = (AMDTFloat32)pCtx->m_pmcData[PMC_EVENT_RETIRED_MICRO_OPS]

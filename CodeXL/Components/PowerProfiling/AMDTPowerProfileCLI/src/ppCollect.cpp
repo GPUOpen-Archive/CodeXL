@@ -264,7 +264,7 @@ void ppCollect::ValidateProfileOptions()
     {
         m_args.SetCoreAffinityMask(m_args.GetCoreAffinityMask() & m_coreMask);
     }
-    else
+    else//devtools/main/CodeXL/Components/PowerProfiling/Backend/AMDTPowerProfileAPI/src/AMDTPowerProfileControl.cpp
     {
         return;
     }
@@ -356,7 +356,7 @@ void GetModifiedName(char* str, char* dest)
     counterName.replace(L" - ", L"-");
     counterName.replace(L" ", L"-");
 
-    memcpy(dest, counterName.asASCIICharArray(), OS_MAX_PATH);
+    memcpy(dest, counterName.asASCIICharArray(), AMDT_PWR_EXE_NAME_LENGTH);
 }
 AMDTResult ppCollect::EnableProfiling()
 {
@@ -928,10 +928,10 @@ bool ppCollect::AddCounterGroups()
                 m_error = AMDT_ERROR_FAIL;
             }
 
-            if(AMDT_PWR_CATEGORY_POWER == category)
+            if (AMDT_PWR_CATEGORY_POWER == category)
             {
                 category = AMDT_PWR_CATEGORY_CORRELATED_POWER;
-				AddCounters(deviceType, category);
+                AddCounters(deviceType, category);
             }
         }
         else

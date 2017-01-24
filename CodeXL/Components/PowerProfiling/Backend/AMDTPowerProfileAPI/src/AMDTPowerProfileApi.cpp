@@ -174,6 +174,8 @@ AMDTResult AllocateBuffers()
                                                                      sizeof(char) * PWR_MAX_NAME_LEN);
             (g_pDevPool + cnt)->m_pDescription = (char*)GetMemoryPoolBuffer(&g_apiMemoryPool,
                                                                             sizeof(char) * PWR_MAX_DESC_LEN);
+            memset((g_pDevPool + cnt)->m_pName, '\0', PWR_MAX_NAME_LEN);
+            memset((g_pDevPool + cnt)->m_pDescription, '\0', PWR_MAX_DESC_LEN);
             (g_pDevPool + cnt)->m_pFirstChild = nullptr;
             (g_pDevPool + cnt)->m_pNextDevice = nullptr;
         }
@@ -240,18 +242,15 @@ bool IsNodeTempSupported(const AMDTPwrTargetSystemInfo& sysInfo)
 {
     bool ret = true;
 
-    if (NULL != sysInfo.m_pNodeInfo)
+    switch (sysInfo.m_nodeInfo.m_hardwareType)
     {
-        switch (sysInfo.m_pNodeInfo->m_hardwareType)
-        {
-            case GDT_CARRIZO:
-            case GDT_STONEY:
-                ret = false;
-                break;
+        case GDT_CARRIZO:
+        case GDT_STONEY:
+            ret = false;
+            break;
 
-            default:
-                break;
-        }
+        default:
+            break;
     }
 
     return ret;
@@ -328,7 +327,7 @@ AMDTResult PrepareSystemTopologyInfo()
     bool smuAccesible = false;
     AMDTUInt32 deviceIdx = 0;
 
-    if (true == g_sysInfo.m_isAmdApu)
+    if (true == g_sysInfo.m_isPlatformWithSmu)
     {
         cuCnt = g_sysInfo.m_computeUnitCnt;
         corePerCuCnt = g_sysInfo.m_coresPerCu;
@@ -348,15 +347,13 @@ AMDTResult PrepareSystemTopologyInfo()
     system->m_pFirstChild = pkg0;
     pkg0->m_deviceID = deviceIdx++;
     pkg0->m_type = AMDT_PWR_DEVICE_PACKAGE;
-    PciDeviceInfo* pNodeInfo = nullptr;
-    GetPciDeviceInfo(APU_SMU_ID, &pNodeInfo, nullptr);
 
-    if (pNodeInfo && (strlen(pNodeInfo->m_shortName) > 0))
+    if (strlen(g_sysInfo.m_nodeInfo.m_shortName) > 0)
     {
         //TODO: GUI shouldn't check for constant string
         memset(pkg0->m_pName, 0, AMDT_PWR_EXE_NAME_LENGTH);
-        sprintf(pkg0->m_pName, "%s", pNodeInfo->m_shortName);
-        sprintf(pkg0->m_pDescription, "%s", pNodeInfo->m_shortName);
+        sprintf(pkg0->m_pName, "%s", g_sysInfo.m_nodeInfo.m_shortName);
+        sprintf(pkg0->m_pDescription, "%s", g_sysInfo.m_nodeInfo.m_shortName);
     }
     else
     {
@@ -383,7 +380,7 @@ AMDTResult PrepareSystemTopologyInfo()
     else
     {
         // APU SMU is not accessible. Throw and warning message
-        if (NULL != g_sysInfo.m_pNodeInfo && DEVICE_TYPE_APU == g_sysInfo.m_pNodeInfo->m_deviceType)
+        if (DEVICE_TYPE_APU == g_sysInfo.m_nodeInfo.m_deviceType)
         {
             // smu is not available emit warning
             ret = AMDT_WARN_SMU_DISABLED;
@@ -470,16 +467,16 @@ AMDTResult PrepareSystemTopologyInfo()
             AMDTPwrDevice* newCore = AllocateDevice(&devCnt);
             newCore->m_deviceID = deviceIdx++;
             newCore->m_type = AMDT_PWR_DEVICE_CPU_CORE;
-            //TODO: GUI shouldn't check for constant string
-            sprintf(newCore->m_pName, "Core%d", coreId);
 
-            if (g_sysInfo.m_isSmtEnabled)
+            if ((PLATFORM_ZEPPELIN == g_sysInfo.m_platformId) && (g_sysInfo.m_isSmtEnabled))
             {
-                sprintf(newCore->m_pDescription, "Logical core%d", coreId);
+                sprintf(newCore->m_pDescription, "Logical core%d", cnt);
+                sprintf(newCore->m_pName, "Core%d", cnt / 2);
             }
             else
             {
-                sprintf(newCore->m_pDescription, "Core%d", coreId);
+                sprintf(newCore->m_pDescription, "core%d", cnt);
+                sprintf(newCore->m_pName, "Core%d", cnt);
             }
 
             PwrInsertDeviceCounters(newCore, coreId, 0);
@@ -507,7 +504,7 @@ AMDTResult PrepareSystemTopologyInfo()
         cuHead = coreHead;
     }
 
-    if (true == g_sysInfo.m_isAmdApu)
+    if (true == g_sysInfo.m_isPlatformWithSmu)
     {
         // check if Igpu is present
         for (cnt = 0; cnt < g_sysInfo.m_igpuCnt; cnt++)
@@ -684,8 +681,9 @@ bool PwrEnableProcessProfileCounters()
 {
     bool ret = true;
     AMDTUInt32 pwrCounter = 0;
+    bool found = false;
 
-    if (g_sysInfo.m_isAmdApu)
+    if (g_sysInfo.m_isPlatformWithSmu)
     {
         AMDTUInt32 smuVersion = g_sysInfo.m_smuTable.m_info[0].m_smuIpVersion;
 
@@ -710,16 +708,29 @@ bool PwrEnableProcessProfileCounters()
 
         for (auto iter : *pCounters)
         {
-            if ((1 == iter.second.m_pkgId)
-                && (pwrCounter == iter.second.m_basicInfo.m_attrId)
-                && (AMDT_PWR_VALUE_SINGLE == iter.second.m_basicInfo.m_aggr))
+
+            if (PLATFORM_ZEPPELIN == g_sysInfo.m_platformId)
             {
-                if (!iter.second.m_isActive)
+                if ((CATEGORY_ENERGY == iter.second.m_basicInfo.m_category)
+                    && (INSTANCE_TYPE_PER_PHYSICAL_CORE == iter.second.m_basicInfo.m_instanceType)
+                    && (AMDT_PWR_VALUE_SINGLE == iter.second.m_desc.m_aggregation))
                 {
-                    PwrActivateCounter(iter.first, true);
-                    g_filterCounters.push_back(iter.first);
-                    ret = true;
+                    found = true;
                 }
+            }
+            else if ((1 == iter.second.m_pkgId)
+                     && (pwrCounter == iter.second.m_basicInfo.m_attrId)
+                     && (AMDT_PWR_VALUE_SINGLE == iter.second.m_basicInfo.m_aggr))
+            {
+                found = true;
+            }
+
+            if (found && !iter.second.m_isActive)
+            {
+                PwrActivateCounter(iter.first, true);
+                g_filterCounters.push_back(iter.first);
+                found = false;
+                ret = true;
             }
         }
     }
@@ -762,7 +773,7 @@ AMDTUInt32 PwrGetCoreMask()
 
     if (PROFILE_TYPE_PROCESS_PROFILING == g_profileType)
     {
-        mask = ~((AMDTUInt32)0) ^ (~((AMDTUInt32)0) << g_sysInfo.m_coreCnt);
+        mask = ~0 ^ (~0 << g_sysInfo.m_coreCnt);
     }
     else
     {
@@ -773,7 +784,9 @@ AMDTUInt32 PwrGetCoreMask()
         {
             if (iter.second.m_isActive)
             {
-                if (INSTANCE_TYPE_PER_CORE == iter.second.m_basicInfo.m_instanceType)
+                if ((INSTANCE_TYPE_PER_CORE == iter.second.m_basicInfo.m_instanceType)
+                    || ((INSTANCE_TYPE_PER_PHYSICAL_CORE == iter.second.m_basicInfo.m_instanceType)
+                        && (CATEGORY_ENERGY == iter.second.m_basicInfo.m_category)))
                 {
                     mask |= 1 << iter.second.m_instanceId;
                 }
@@ -859,7 +872,7 @@ bool PwrConfigureProfile()
         {
             AMDTUInt32 smuIdx = iter.second.m_pkgId - 1;
 
-            if (!g_sysInfo.m_isAmdApu || !g_sysInfo.m_smuTable.m_info[0].m_isAccessible)
+            if (!g_sysInfo.m_isPlatformWithSmu || !g_sysInfo.m_smuTable.m_info[0].m_isAccessible)
             {
                 smuIdx = smuIdx - 1;
                 //PwrTrace("Apu doesn't have smu smuIdx %d", smuIdx);
@@ -977,9 +990,9 @@ AMDTResult AMDTPwrProfileInitialize(AMDTPwrProfileMode profileMode)
     if (AMDT_STATUS_OK == ret)
     {
         // Get the system info
+        PwrEnableInternalCounters(true);
         ret = AMDTPwrGetTargetSystemInfo(&g_sysInfo);
         PwrTrace("AMDTPwrGetTargetSystemInfo res 0x%x", ret);
-        PwrEnableInternalCounters(true);
         g_isSVI2Supported = PwrIsSVISupported(g_sysInfo);
     }
 
@@ -1029,7 +1042,7 @@ AMDTResult AMDTPwrProfileInitialize(AMDTPwrProfileMode profileMode)
         {
             //Check if SMU is available
             if ((true == g_sysInfo.m_isPlatformSupported)
-                && (true == g_sysInfo.m_isAmdApu)
+                && (true == g_sysInfo.m_isPlatformWithSmu)
                 && !IsIGPUAvailable())
             {
                 ret = AMDT_WARN_IGPU_DISABLED;
@@ -1255,8 +1268,6 @@ AMDTResult AMDTPwrEnableCounter(AMDTUInt32 counterID)
             ret = AMDT_ERROR_PROFILE_ALREADY_STARTED;
         }
     }
-
-
 
     if (AMDT_STATUS_OK == ret)
     {
@@ -1947,9 +1958,15 @@ AMDTResult AMDTPwrReadAllEnabledCounters(AMDTUInt32* pNumOfSamples,
                 break;
             }
 
+            //sort the counters by counter-id
+            std::sort(data.m_counters.begin(),
+                      data.m_counters.end(),
+                      [](const AMDTPwrAttributeInfo & left, const AMDTPwrAttributeInfo & right)
+            {return (left.m_counterId < right.m_counterId); });
+
             for (auto iter : data.m_counters)
             {
-                PwrSupportedCounterMap:: iterator supIter = pCounters->find(iter.second.m_counterId);
+                PwrSupportedCounterMap:: iterator supIter = pCounters->find(iter.m_counterId);
 
                 if (!supIter->second.m_isActive)
                 {
@@ -1963,14 +1980,14 @@ AMDTResult AMDTPwrReadAllEnabledCounters(AMDTUInt32* pNumOfSamples,
                     //Prepare the output data now
                     if (PWR_UNIT_TYPE_COUNT == supIter->second.m_basicInfo.m_unitType)
                     {
-                        *value = (AMDTFloat32)iter.second.m_value64;
+                        *value = (AMDTFloat32)iter.m_value64;
                     }
                     else
                     {
-                        *value = (AMDTFloat32)iter.second.m_float32;
+                        *value = (AMDTFloat32)iter.m_float32;
                     }
 
-                    result.m_counterValues[cnt].m_counterID = iter.second.m_counterId;
+                    result.m_counterValues[cnt].m_counterID = iter.m_counterId;
                     counterPoolCnt++;
                     cnt++;
                 }
@@ -2191,7 +2208,6 @@ AMDTResult AMDTPwrReadCumulativeCounter(AMDTUInt32 counterId,
                 {
                     ret = AMDT_ERROR_NODATA;
                 }
-
             }
             else
             {
@@ -2481,7 +2497,7 @@ AMDTResult AMDTEnableProcessProfiling()
 
     if (AMDT_STATUS_OK == ret)
     {
-        if ((false == g_sysInfo.m_isAmdApu) || (false == g_sysInfo.m_smuTable.m_info[0].m_isAccessible))
+        if ((false == g_sysInfo.m_isPlatformWithSmu) || (false == g_sysInfo.m_smuTable.m_info[0].m_isAccessible))
         {
             ret = AMDT_WARN_PROCESS_PROFILE_NOT_SUPPORTED;
         }
@@ -2583,13 +2599,6 @@ AMDTResult AMDTPwrGetNodeTemperature(AMDTFloat32* pNodeTemp)
 // point of time from start of the profile to the stop of the profile.
 AMDTResult AMDTPwrGetModuleProfileData(AMDTPwrModuleData** ppData, AMDTUInt32* pModuleCount, AMDTFloat32* pPower)
 {
-
-#if (defined(_WIN64) || defined(LINUX))
-    (void)ppData;
-    (void)pModuleCount;
-    (void)pPower;
-    return AMDT_ERROR_NOTSUPPORTED;
-#else
     AMDTPwrProfileState state = AMDT_PWR_PROFILE_STATE_UNINITIALIZED;
     AMDTResult ret = AMDT_STATUS_OK;
 
@@ -2620,8 +2629,6 @@ AMDTResult AMDTPwrGetModuleProfileData(AMDTPwrModuleData** ppData, AMDTUInt32* p
     }
 
     return ret;
-
-#endif
 }
 
 // This API will provide the category details for a given category id.

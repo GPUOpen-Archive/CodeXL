@@ -28,8 +28,6 @@ public:
                                  AMDTFloat32* pPower);
 
 private:
-    // PwrGetCountsPerSecs:  get the TS count per sec
-    AMDTFloat32 PwrGetCountsPerSecs() const;
 
     // SetElapsedTime: Get the Elapsed time
     void SetElapsedTime(AMDTUInt64 raw, AMDTUInt64* pResult);

@@ -3,37 +3,51 @@
 Import('*')
 import subprocess
 import os
+import SCons.Script
+import time
 from CXL_init import *
 
 cxl_env = CXL_env.Clone()
 
 env = Environment() 
 
-print "Copying Driver Installation Files"
-
-PwrProfInstaller = "CodeXLPwrProfDriver.sh"
+PwrProfInstaller    = "CodeXLPwrProfDriver.sh"
 PwrProSourceInstall = "CodeXLPwrProfDriverSource.tar.gz"
-PwrProfVersion = "CodeXLPwrProfVersion"
+PwrProfVersion      = "CodeXLPwrProfVersion"
+baseDir     = Dir("#./Components/PowerProfiling/Backend/AMDTPowerProfilingDrivers/Linux/src").abspath
 
-def runMake(source,target):
-	print "src " + src
-	print "target " + target
+def run(cmd):
+    res = subprocess.call(cmd, shell=True)
+    if res != 0:
+      print "Error: Failed in building Power Profile Drv: " + str(res)
+      sys.exit(1)
 
-	make_cmd = 'make'
-	make_path = 'src'
-	real_stdout = subprocess.PIPE
-	# Make!
-	make = subprocess.Popen(make_cmd,
-			cwd = make_path,
-			stdout = real_stdout,
-			)
-	# Some subprocesses don't terminate unless we communicate with them
-	output = make.communicate()[0]
-	return make.returncode
+def buildDrv(target, source, env):
+    # do a clean 
+    cmd = "make clean -C %s" %baseDir
+    run(cmd)
 
-#module = env.Command(moduleName , Dir('src'), 'cd $SOURCE ; make ')
+    # do a make 
+    cmd = "make -C %s" %baseDir
+    print cmd
+    run(cmd)
 
-# Installing modules
+    # create CodeXLPwrProfDriverSource.tar.gz file
+    # cmd = "%s/AMDTPwrProfCreateSrcPkg.sh" %scriptDir
+    # run(cmd)
+
+    return 0
+
+def drvMessage(target = None, source = None, env = None):
+    return "Building Power Profile driver from '%s'\n at: %s" % (source[0], 
+      time.asctime(time.localtime(time.time())))
+
+drvMake = env.Command(
+    target      = 'PwrProfDriver', 
+    source      = Dir("#./Components/PowerProfiling/Backend/AMDTPowerProfilingDrivers/Linux/src"),
+    action      = Action(buildDrv, strfunction = drvMessage),
+)
+
 moduleSource = cxl_env.Install( 
 	dir = cxl_env['CXL_lib_dir'], 
 	source = PwrProSourceInstall)
@@ -46,6 +60,6 @@ moduleInstallScript = cxl_env.Install(
 	dir = cxl_env['CXL_lib_dir'], 
 	source = PwrProfInstaller)
 
-ResultsAction = moduleSource + moduleVersion + moduleInstallScript
+ResultsAction = drvMake + moduleSource + moduleVersion + moduleInstallScript
 
 Return('ResultsAction')

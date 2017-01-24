@@ -554,3 +554,18 @@ bool PwrApiCleanUp(void)
     return PwrEnableSmu(false);
 }
 
+// PwrGetEnvironmentVariable: Get environment variable
+AMDTUInt32 PwrGetEnvironmentVariable(const char* pName)
+{
+    const DWORD buffSize = 65535;
+    static char buffer[buffSize];
+
+    if (GetEnvironmentVariableA(pName, buffer, buffSize))
+    {
+        return (AMDTUInt32)atoi(buffer);
+    }
+    else
+    {
+        return 0;
+    }
+}

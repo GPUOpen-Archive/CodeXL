@@ -59,7 +59,11 @@ int IntializeCoreData(CoreData* pCoreClientData,
                       uint32 coreId,
                       ProfileConfig* config)
 {
+    uint64 phyCoreMask = 0;
     uint64 coreSpecficMask = 0;
+    uint32 masterCoreBufferSize = sizeof(PageBuffer) + PWRPROF_MASTER_CORE_BUFFER_SIZE;
+
+
     uint32 offset = PWRPROF_SHARED_METADATA_SIZE; // initial 4096 bytes for future use
 
     if (NULL == g_pSharedBuffer)
@@ -77,8 +81,16 @@ int IntializeCoreData(CoreData* pCoreClientData,
     pCoreClientData->m_recLen               = 0;
     pCoreClientData->m_coreId               = coreId;
 
-    // point to the shared buffer
-    offset += (index * (sizeof(PageBuffer) + PWRPROF_PERCORE_BUFFER_SIZE));
+    if(0 == index)
+    {
+        pCoreClientData->m_bufferSize = PWRPROF_MASTER_CORE_BUFFER_SIZE;
+    }
+    else
+    {
+        pCoreClientData->m_bufferSize = PWRPROF_NONMASTER_CORE_BUFFER_SIZE;
+        offset += masterCoreBufferSize + ((index-1) * (sizeof(PageBuffer) + pCoreClientData->m_bufferSize));
+    }
+
     pCoreClientData->m_pCoreBuffer = (PageBuffer*)(g_pSharedBuffer + offset);
 
     if (NULL == pCoreClientData->m_pCoreBuffer)
@@ -98,7 +110,7 @@ int IntializeCoreData(CoreData* pCoreClientData,
     pCoreClientData->m_pCoreBuffer->m_pBuffer = g_pSharedBuffer + offset + sizeof(PageBuffer);
 
     // TODO: Is it OK to do memset for many pages?
-    memset(pCoreClientData->m_pCoreBuffer->m_pBuffer, 0, PWRPROF_PERCORE_BUFFER_SIZE);
+    memset(pCoreClientData->m_pCoreBuffer->m_pBuffer, 0, pCoreClientData->m_bufferSize);
 
     pCoreClientData->m_pOsData = kmalloc(sizeof(OsCoreCfgData), GFP_KERNEL);
 
@@ -118,6 +130,15 @@ int IntializeCoreData(CoreData* pCoreClientData,
 
     // smu configure
     pCoreClientData->m_smuCfg = NULL;
+
+    // Check for core energy counters which are physical core specific
+    if(config->m_apuCounterMask & (1ULL << COUNTERID_CORE_ENERGY))
+    {
+        if(!HelpPwrIsSmtEnabled() || (0 == (coreId % 2)))
+        {
+            phyCoreMask = (1ULL << COUNTERID_CORE_ENERGY);
+        }
+    }
 
     if (true == *isFirstConfig)
     {
@@ -150,7 +171,7 @@ int IntializeCoreData(CoreData* pCoreClientData,
     else
     {
         coreSpecficMask = config->m_apuCounterMask & PWR_PERCORE_COUNTER_MASK;
-        pCoreClientData->m_counterMask = coreSpecficMask;
+        pCoreClientData->m_counterMask = coreSpecficMask | phyCoreMask;
     }
 
     return 0;

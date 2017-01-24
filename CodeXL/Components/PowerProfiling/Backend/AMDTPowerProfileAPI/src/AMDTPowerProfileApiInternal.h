@@ -18,7 +18,8 @@
 #endif
 
 #define MAX_OUTPUT_FILE_PATH    255
-#define MAX_DEVICE_CNT          50
+//TODO: Need to be calculated dynamically
+#define MAX_DEVICE_CNT          150
 
 typedef enum
 {

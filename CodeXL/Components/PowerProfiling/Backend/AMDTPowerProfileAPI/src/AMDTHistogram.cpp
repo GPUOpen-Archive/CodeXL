@@ -71,6 +71,11 @@ AMDTResult AddToHistogram(AMDTUInt32 counterId, AMDTFloat32 value)
 
     bucket = (AMDTUInt32)((value + step - 1) / step - 1);
 
+    if (FREQ_BIN_CNT < bucket)
+    {
+        bucket = FREQ_BIN_CNT - 1;
+    }
+
     if (iter != g_histogramCounter.end())
     {
         iter->second.m_bins[bucket]++;

@@ -17,8 +17,6 @@
 // std includes
 #include <vector>
 
-// Enable SMU9
-#define ENABLE_SMU9
 #define MAX_CORE_CNT (64)
 #define MAX_PHYSICAL_CORE_CNT (64)
 #define MAX_COUNTER_CNT (250)
@@ -135,7 +133,6 @@ struct PlatformInfo
 struct AMDTPwrTargetSystemInfo
 {
     bool           m_isAmd;
-    bool           m_isAmdApu;
     bool           m_isPlatformWithSmu;
     bool           m_isPlatformSupported;
     bool           m_isSmtEnabled;
@@ -148,7 +145,7 @@ struct AMDTPwrTargetSystemInfo
     AMDTUInt32     m_coresPerCu;
     AMDTUInt32     m_svi2Cnt;
     AMDTUInt32     m_igpuCnt;
-    PciDeviceInfo* m_pNodeInfo;
+    PlatformInfo   m_nodeInfo;
     SmuList        m_smuTable;
 };
 
@@ -157,16 +154,17 @@ struct AMDTPwrTargetSystemInfo
 */
 enum PwrCategory
 {
-    CATEGORY_POWER,        // Instantaneous power
-    CATEGORY_FREQUENCY,    // Frequency
-    CATEGORY_TEMPERATURE,  // Temperature in centegrade
-    CATEGORY_VOLTAGE,      // Volatage
-    CATEGORY_CURRENT,      // Current
-    CATEGORY_DVFS,         // P-State, C-State
-    CATEGORY_PROCESS,      // PID, TID
-    CATEGORY_TIME,         // Time
-    CATEGORY_NUMBER,       // generic count value
-    //CATEGORY_ENERGY,       // Energy in joules
+    CATEGORY_POWER,            // Instantaneous power
+    CATEGORY_FREQUENCY,        // Frequency
+    CATEGORY_TEMPERATURE,      // Temperature in centegrade
+    CATEGORY_VOLTAGE,          // Volatage
+    CATEGORY_CURRENT,          // Current
+    CATEGORY_DVFS,             // P-State, C-State
+    CATEGORY_PROCESS,          // PID, TID
+    CATEGORY_TIME,             // Time
+    CATEGORY_NUMBER,           // generic count value
+    CATEGORY_ENERGY,           // Energy in joules
+    CATEGORY_CORRELATED_POWER  // Power correlation
 };
 
 
@@ -190,8 +188,10 @@ enum AMDTPwrAttributeInstanceType
     INSTANCE_TYPE_NONCORE_SINGLE,
     INSTANCE_TYPE_PER_CU,
     INSTANCE_TYPE_PER_CORE,
+    INSTANCE_TYPE_PER_PHYSICAL_CORE,
     INSTANCE_TYPE_PER_CORE_MULTIVALUE,
-    INSTANCE_TYPE_NONCORE_MULTIVALUE
+    INSTANCE_TYPE_NONCORE_MULTIVALUE,
+    INSTANCE_TYPE_SMU_PER_CORE
 };
 
 //Following structure are used in Data access APIs
@@ -258,7 +258,7 @@ typedef struct PwrCounterDecodeInfo
     AMDTUInt32 m_smuIpVersion;
 } PwrCounterDecodeInfo;
 
-typedef gtMap<AMDTUInt32, AMDTPwrAttributeInfo>     PwrDecodedCounterMap;
+using PwrDecodeCounterVec = std::vector<AMDTPwrAttributeInfo>;
 
 //AMDTPwrProcessedDataRecord: Processed profile data
 //A processed record is represent by AMDTPwrProcessedDataRecord.
@@ -270,11 +270,15 @@ typedef gtMap<AMDTUInt32, AMDTPwrAttributeInfo>     PwrDecodedCounterMap;
 //    AttributeInfo* nth_attr = &(rec.m_pAttr+n);
 struct AMDTPwrProcessedDataRecord
 {
-    AMDTUInt64                m_recId;                   //Record-id
-    AMDTUInt64                m_ts;
-    AMDTPwrProcessedDataType  m_recordType;
-    AMDTUInt32                m_attrCnt;                //Number of attributes in the record
-    PwrDecodedCounterMap      m_counters;
+    AMDTUInt64                m_recId   = 0;                   //Record-id
+    AMDTUInt64                m_ts      = 0;
+    AMDTPwrProcessedDataType  m_recordType = PROFILE_DATA_TYPE_INVALID;
+    AMDTUInt32                m_attrCnt = 0;                //Number of attributes in the record
+    PwrDecodeCounterVec       m_counters;
+    AMDTPwrProcessedDataRecord()
+    {
+        m_counters.reserve(MAX_COUNTER_CNT);
+    }
 };
 
 // Process name structure

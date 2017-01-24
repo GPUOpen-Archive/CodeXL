@@ -44,5 +44,9 @@ void SetSmuAccessState(bool state);
 
 // GetSmuAccessState: If all configured SMU are accisible this will send true.
 bool GetSmuAccessState(void);
+
+// PwrGetIpcData: collect IPC load parameters
+void PwrGetIpcData(PmcCounters* pSrc, uint32* pData);
+
 #endif //_RAWDATAFILEHEADER_H
 

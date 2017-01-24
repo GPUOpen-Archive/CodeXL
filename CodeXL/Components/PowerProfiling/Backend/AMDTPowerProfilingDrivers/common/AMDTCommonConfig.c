@@ -28,7 +28,9 @@
 #include <AMDTSmu8Interface.h>
 #include <AMDTSmu7Interface.h>
 #include <AMDTAccessPmcData.h>
-
+#ifdef AMDT_INTERNAL_COUNTERS
+#include <AMDTSmu9Interface.h>
+#endif
 static bool g_smuAccessOk = true;
 
 // FillSmuAccessData: Fill the smu structure based on SMU type
@@ -69,9 +71,11 @@ bool FillSmuAccessData(SmuList* srcList, SmuList* destList)
                 {
                     case SMU_IPVERSION_9_0:
                     {
+#ifdef AMDT_INTERNAL_COUNTERS
                         pSmuFn->fnSmuInit = PwrSmu9SessionInitialize;
                         pSmuFn->fnSmuClose = PwrSmu9SessionClose;
                         pSmuFn->fnSmuReadCb = PwrSmu9CollectRegisterValues;
+#endif
                         ret = true;
                         break;
                     }
@@ -132,13 +136,19 @@ bool GetSmuAccessState(void)
 // ConfigureSourceProfiling: Configuration for source code profiling
 void ConfigureSourceProfiling(CoreData* pCoreCfg)
 {
-    InitializePMCCounters(pCoreCfg->m_pmc);
+    if (PLATFORM_ZEPPELIN != HelpPwrGetTargetPlatformId())
+    {
+        InitializePMCCounters(pCoreCfg->m_pmc);
+    }
 }
 
 // CloseSourceProfiling: Close the configuration for source code profiling
 void CloseSourceProfiling(CoreData* pCoreCfg)
 {
-    ResetPMCControl(pCoreCfg->m_pmc);
+    if (PLATFORM_ZEPPELIN != HelpPwrGetTargetPlatformId())
+    {
+        ResetPMCControl(pCoreCfg->m_pmc);
+    }
 }
 
 // ConfigureSmu: This should be called before profiling start/stop/pause/ resume
@@ -175,3 +185,18 @@ void ConfigureSmu(SmuList* pList, bool isOn)
 
 }
 
+void PwrGetIpcData(PmcCounters* pSrc, uint32* pData)
+{
+#ifdef AMDT_INTERNAL_COUNTERS
+
+    if (PLATFORM_ZEPPELIN == HelpPwrGetTargetPlatformId())
+    {
+        PwrReadZpIpcData(pData);
+    }
+    else
+#endif
+    {
+        ReadPmcCounterData(pSrc, pData);
+        ResetPMCCounters(pSrc);
+    }
+}

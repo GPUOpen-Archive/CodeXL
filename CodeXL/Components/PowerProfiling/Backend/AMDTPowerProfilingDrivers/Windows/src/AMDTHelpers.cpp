@@ -16,11 +16,13 @@
 #include <AMDTPwrProfDriver.h>
 #include <AMDTDriverInternal.h>
 #include <AMDTHelpers.h>
+#include <AMDTCounterAccessInterface.h>
 #include <WinDriverUtils\Include\Cpuid.h>
 #include <WinDriverUtils\Include\Pci.hpp>
 #include <WinDriverUtils\Include\Msr.h>
 #define ALIGN_16_BYTES 16
-// Memort pool for the profile session
+
+// Memory pool for the profile session
 // Pool is created before every configuration for the session
 // and deleted once session is ended
 MemoryPool* g_pSessionPool = NULL;
@@ -45,7 +47,6 @@ extern CoreData* g_pCoreCfg;
 extern PPWRPROF_DEV_EXTENSION gpPwrDevExt;
 static uint32 g_computeUnitCnt = INVALID_UINT32_VALUE;
 
-static uint32 g_platformId = PLATFORM_INVALID;
 //SMU NB Spec
 #define SMU_INDEX_ADDR        0x800000B8
 #define SMU_INDEX_DATA        0x800000BC
@@ -402,7 +403,7 @@ uint32 GetComputeUnitCntPerNode()
 
         ReadPci32Reg(bus, device, function, reg, cuStatus);
 
-        if (PLATFORM_MULLINS == HelpGetTargetPlatformId())
+        if (PLATFORM_MULLINS == HelpPwrGetTargetPlatformId())
         {
             g_computeUnitCnt = 1;
         }
@@ -544,40 +545,6 @@ uint64 HelpReadMsr64(uint32 reg)
 {
     return ReadMsrReg(reg);
 
-}
-
-// HelpGetTargetPlatformId: Get platform id
-uint32 HelpGetTargetPlatformId(void)
-{
-    uint32 family = 0;
-    uint32 model = 0;
-
-    if (PLATFORM_INVALID == g_platformId)
-    {
-        GetCpuModelFamily(&family, &model);
-
-        if ((0x15 == family) && (model >= 0x30 && model <= 0x3F))
-        {
-            // Kaveri : 0x15 30 to 3F
-            g_platformId = PLATFORM_KAVERI;
-        }
-        else if ((0x15 == family) && (model >= 0x60 && model <= 0x6F))
-        {
-            // Carrizo: 0x15 60 to 6F
-            g_platformId  = PLATFORM_CARRIZO;
-        }
-        else if ((0x16 == family) && (model >= 0x30 && model <= 0x3F))
-        {
-            // Mullins : 0x16 30 to 3F
-            g_platformId = PLATFORM_MULLINS;
-        }
-        else
-        {
-            g_platformId = PLATFORM_INVALID;
-        }
-    }
-
-    return g_platformId;
 }
 
 // HelpGetBitsCount: Get the set bit count
@@ -853,5 +820,30 @@ bool ReleasePCMCountersLock()
     }
 
     return res;
+}
+
+// PwrGetLogicalProcessCount:  Get the number of logical cores
+uint32 PwrGetLogicalProcessCount(void)
+{
+    int aCPUInfo[NUM_CPUID_OFFSETS] = { -1 };
+    __cpuid(aCPUInfo, CPUID_FnFeatureId);
+
+    uint32 numOfThreads = (aCPUInfo[EBX_OFFSET] & CPUID_FeatureId_EBX_LogicalProcessorCount) >> 16;
+    return numOfThreads;
+}
+
+// HelpPwrIsSmtEnabled: Check if thread per core is more than 1
+bool HelpPwrIsSmtEnabled()
+{
+    uint32 numOfThreads = 0;
+
+    bool result = false;
+    int aCPUInfo[NUM_CPUID_OFFSETS] = { -1 };
+    __cpuid(aCPUInfo, CPUID_FnIdentifiers);
+
+    numOfThreads = (aCPUInfo[EBX_OFFSET] & CPUID_NodeIdentifiers_EBX_ThreadsPerCore) + 1;
+
+    result = (numOfThreads > 1) ? true : false;
+    return result;
 }
 

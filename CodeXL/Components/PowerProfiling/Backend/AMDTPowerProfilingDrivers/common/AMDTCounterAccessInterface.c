@@ -29,21 +29,14 @@ static uint32 g_boostedPstateCnt = INVALID_UINT32_VALUE;
 static bool g_cefSupported = false;
 static bool g_cefROSupported = false;
 
-#define MPERF_MSR_ADDRESS      0x000000E7
-#define APERF_MSR_ADDRESS      0x000000E8
-#define P0STATE_MSR_ADDRESS    0xC0010064
-#define MPERF_RO_MSR_ADDRESS   0xC00000E7
-#define APERF_RO_MSR_ADDRESS   0xC00000E8
-#define CEF_BUFFER_SIZE        (4)
+#define MAX_PREV_VALUES 128
+// PreviousData: Holds previous counter data
+uint32 prevCoreEnergy[MAX_PREV_VALUES];
+uint32 prevPkgEnergy = 0;
+static CefInfo g_prevROCefData[MAX_PREV_VALUES];
 
-typedef struct
-{
-    uint64 m_aperf;
-    uint64 m_mperf;
-} CefInfo;
-
-// Per core CEF data to calculate the overflow
-static CefInfo g_prevROCefData[CEF_BUFFER_SIZE];
+#define CORE_ENERGY_STAT_ADDR 0xC001029A
+#define PKG_ENERGY_STAT_ADDR 0xC001029B
 
 // ReadBoostedPstate:
 static uint32 ReadBoostedPstate(void)
@@ -76,14 +69,52 @@ static void ResetCoreEffectiveFreqCounters(void)
     }
 }
 
-// ReadCoreEffectiveFreqROCounters:
-static void ReadCoreEffectiveFreqROCounters(uint32 core, uint64* pAperf, uint64* pMperf, uint64* pP0State)
+// ReadCoreEffectiveFreqCounters:
+static void ReadCoreEffectiveFreqCounters(uint64* pAperf, uint64* pMperf, uint64* pP0State)
+{
+    ACCESS_MSR msr;
+
+    if (true == g_cefSupported)
+    {
+        msr.isReadAccess = true;
+        msr.regId = MPERF_MSR_ADDRESS;
+        HelpAccessMSRAddress(&msr);
+        *pMperf = msr.data;
+
+        msr.regId = APERF_MSR_ADDRESS;
+        HelpAccessMSRAddress(&msr);
+        *pAperf = msr.data;
+
+        // Read P-State-0 Frequency
+        msr.regId = P0STATE_MSR_ADDRESS + g_boostedPstateCnt;
+        HelpAccessMSRAddress(&msr);
+        *pP0State = msr.data;
+        // Reset the counter value adter reading the registers
+        ResetCoreEffectiveFreqCounters();
+    }
+    else
+    {
+        *pAperf = 0;
+        *pMperf = 0;
+        *pP0State = 0;
+    }
+}
+
+// InitailizePrevROCefData: Init DS to store prev data for CEF
+void PwrInitailizePrevROCefData(int core)
+{
+    g_prevROCefData[core].m_mperf = HelpReadMsr64(MPERF_RO_MSR_ADDRESS);
+    g_prevROCefData[core].m_aperf = HelpReadMsr64(APERF_RO_MSR_ADDRESS);
+}
+
+// ReadCefROCounters : Read CEF data
+void PwrReadCefROCounters(uint32 core, uint64* pAperf, uint64* pMperf, uint64* pP0State, bool isCefROSupported, uint32 boostedPstateCnt)
 {
     ACCESS_MSR msr;
     uint64 mperf = 0;
     uint64 aperf = 0;
 
-    if (g_cefROSupported)
+    if (isCefROSupported)
     {
         msr.isReadAccess = true;
         mperf = HelpReadMsr64(MPERF_RO_MSR_ADDRESS);
@@ -113,42 +144,9 @@ static void ReadCoreEffectiveFreqROCounters(uint32 core, uint64* pAperf, uint64*
         g_prevROCefData[core].m_aperf = aperf;
 
         // Read P-State-0 Frequency
-        msr.regId = P0STATE_MSR_ADDRESS + g_boostedPstateCnt;
+        msr.regId = P0STATE_MSR_ADDRESS + boostedPstateCnt;
         HelpAccessMSRAddress(&msr);
         *pP0State = msr.data;
-    }
-    else
-    {
-        *pAperf = 0;
-        *pMperf = 0;
-        *pP0State = 0;
-    }
-}
-
-
-// ReadCoreEffectiveFreqCounters:
-static void ReadCoreEffectiveFreqCounters(uint64* pAperf, uint64* pMperf, uint64* pP0State)
-{
-    ACCESS_MSR msr;
-
-    if (true == g_cefSupported)
-    {
-        msr.isReadAccess = true;
-        msr.regId = MPERF_MSR_ADDRESS;
-        HelpAccessMSRAddress(&msr);
-        *pMperf = msr.data;
-
-        msr.regId = APERF_MSR_ADDRESS;
-        HelpAccessMSRAddress(&msr);
-        *pAperf = msr.data;
-
-        // Read P-State-0 Frequency
-        msr.regId = P0STATE_MSR_ADDRESS + g_boostedPstateCnt;
-        HelpAccessMSRAddress(&msr);
-        *pP0State = msr.data;
-
-        // Reset the counter value adter reading the registers
-        ResetCoreEffectiveFreqCounters();
     }
     else
     {
@@ -212,10 +210,12 @@ bool CollectNodeCounters(CoreData* pCoreCfg, uint32* pLength)
                 {
                     if (g_cefROSupported)
                     {
-                        ReadCoreEffectiveFreqROCounters(pCoreCfg->m_coreId,
-                                                        (uint64*)&pData[offset],
-                                                        (uint64*)&pData[offset + sizeof(uint64)],
-                                                        (uint64*)&pData[offset + (2 * sizeof(uint64))]);
+                        PwrReadCefROCounters(pCoreCfg->m_coreId,
+                                             (uint64*)&pData[offset],
+                                             (uint64*)&pData[offset + sizeof(uint64)],
+                                             (uint64*)&pData[offset + (2 * sizeof(uint64))],
+                                             g_cefROSupported,
+                                             g_boostedPstateCnt);
                     }
                     else
                     {
@@ -243,9 +243,23 @@ bool CollectNodeCounters(CoreData* pCoreCfg, uint32* pLength)
                     break;
                 }
 
+                case COUNTERID_SOFTWARE_PSTATE:
+                {
+#define SOFTWARE_PSTATE_MSR_ADDR 0xC0010063
+                    ACCESS_MSR msr;
+                    msr.isReadAccess = true;
+                    msr.regId = SOFTWARE_PSTATE_MSR_ADDR;
+                    HelpAccessMSRAddress(&msr);
+                    value = (uint32*)&pData[offset];
+                    *value = msr.data;
+                    offset += sizeof(uint32);
+                    break;
+                }
+
+
                 case COUNTERID_PSTATE:
                 {
-#define PSTATE_MSR_ADDR 0xC0010071
+                    #define PSTATE_MSR_ADDR 0xC0010071
                     ACCESS_MSR msr;
                     msr.isReadAccess = true;
                     msr.regId = PSTATE_MSR_ADDR;
@@ -293,26 +307,36 @@ bool CollectNodeCounters(CoreData* pCoreCfg, uint32* pLength)
                     offset += sizeof(uint32);
                     break;
                 }
+#ifdef AMDT_INTERNAL_COUNTERS
 
-                case COUNTERID_FAMILY17_CORE_ENERGY:
+                case COUNTERID_CORE_ENERGY:
                 {
-                    uint64 energy = HelpReadMsr64(pCoreCfg->m_internalCounter.m_coreEnergyMsr);
+                    ACCESS_MSR msr;
                     value = (uint32*)&pData[offset];
-                    *value = (uint32)energy;
+                    msr.isReadAccess = true;
+                    msr.regId = CORE_ENERGY_STAT_ADDR;
+                    HelpAccessMSRAddress(&msr);
+                    *value = msr.data - prevCoreEnergy[pCoreCfg->m_coreId];
+                    prevCoreEnergy[pCoreCfg->m_coreId] = msr.data;
                     offset += sizeof(uint32);
                     break;
                 }
 
-                case COUNTERID_FAMILY17_PKG_ENERGY:
+                case COUNTERID_PKG_ENERGY:
                 {
-                    uint64 energy = HelpReadMsr64(pCoreCfg->m_internalCounter.m_packageEnergyMsr);
+                    ACCESS_MSR msr;
                     value = (uint32*)&pData[offset];
-                    *value = (uint32)energy;
+
+                    msr.isReadAccess = true;
+                    msr.regId = PKG_ENERGY_STAT_ADDR;
+                    HelpAccessMSRAddress(&msr);
+                    *value = msr.data - prevPkgEnergy;
+                    prevPkgEnergy = msr.data;
                     offset += sizeof(uint32);
                     break;
                 }
 
-
+#endif
                 default:
                     break;
             }
@@ -385,30 +409,69 @@ bool CollectBasicCounters(CoreData* pCoreCfg, uint32* pLength)
 
     return result;
 }
-
-// InitializeGenericCounterAccess:
-void InitializeGenericCounterAccess(uint32 core)
+void PwrReadInitialValues(uint32 coreId)
 {
+    if (PLATFORM_ZEPPELIN == HelpPwrGetTargetPlatformId())
+    {
+        ACCESS_MSR msr;
 
+        if (HelpPwrIsSmtEnabled() && (0 != (coreId % 2)))
+        {
+            return;
+        }
+
+        msr.isReadAccess = true;
+#ifdef AMDT_INTERNAL_COUNTERS
+        msr.regId = CORE_ENERGY_STAT_ADDR;
+        HelpAccessMSRAddress(&msr);
+        prevCoreEnergy[coreId] = msr.data;
+
+        if (!prevPkgEnergy)
+        {
+            msr.isReadAccess = true;
+
+            msr.regId = PKG_ENERGY_STAT_ADDR;
+
+            HelpAccessMSRAddress(&msr);
+            prevPkgEnergy = msr.data;
+        }
+#endif
+    }
+}
+
+// PwrInitializeBoostedPstate: Read and store boosted pstate
+void PwrInitializeBoostedPstate(void)
+{
     // Read boosted p-state
     if (INVALID_UINT32_VALUE == g_boostedPstateCnt)
     {
         g_boostedPstateCnt = ReadBoostedPstate();
     }
+}
 
+// PwrInitializeEffectiveFrequency: Initialize effective frequency data
+void PwrInitializeEffectiveFrequency(uint32 core)
+{
     g_cefSupported = HelpIsCefSupported();
     g_cefROSupported = HelpIsROCefAvailable();
 
     if (g_cefROSupported)
     {
-        memset(&g_prevROCefData[0], 0, CEF_BUFFER_SIZE * sizeof(CefInfo));
-        g_prevROCefData[core].m_mperf = HelpReadMsr64(MPERF_RO_MSR_ADDRESS);
-        g_prevROCefData[core].m_aperf = HelpReadMsr64(APERF_RO_MSR_ADDRESS);
+        PwrInitailizePrevROCefData(core);
     }
     else if (g_cefSupported)
     {
         ResetCoreEffectiveFreqCounters();
     }
+}
+// InitializeGenericCounterAccess:
+void InitializeGenericCounterAccess(uint32 core)
+{
+    DRVPRINT("DPC core id %d", core);
+    PwrInitializeBoostedPstate();
+    PwrInitializeEffectiveFrequency(core);
+    PwrReadInitialValues(core);
+    HelpPwrEnablePerf(true);
 }
 
 // CloseGenericCounterAccess:
@@ -416,6 +479,9 @@ void CloseGenericCounterAccess(void)
 {
     g_boostedPstateCnt = INVALID_UINT32_VALUE;
     ResetCoreEffectiveFreqCounters();
+    prevPkgEnergy = 0;
+    memset(prevCoreEnergy, 0, sizeof(uint32) * MAX_PREV_VALUES);
+    HelpPwrEnablePerf(false);
 }
 
 // GetBasicCounterSize
@@ -449,9 +515,12 @@ uint32 GetNodeCounterSize(uint32 counterId)
         // 4 byte counters
         case COUNTERID_CSTATE_RES:
         case COUNTERID_PSTATE:
+        case COUNTERID_SOFTWARE_PSTATE:
         case COUNTERID_NODE_TCTL_TEPERATURE:
         case COUNTERID_SVI2_CORE_TELEMETRY:
         case COUNTERID_SVI2_NB_TELEMETRY:
+        case COUNTERID_PKG_ENERGY:
+        case COUNTERID_CORE_ENERGY:
         {
             bufferLen += sizeof(uint32);
             break;

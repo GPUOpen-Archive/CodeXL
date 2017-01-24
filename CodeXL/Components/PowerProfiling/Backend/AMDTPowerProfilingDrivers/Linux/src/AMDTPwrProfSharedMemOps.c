@@ -219,14 +219,16 @@ static int pp_anon_inode_mmap(struct file* file, struct vm_area_struct* vma)
 static unsigned int pp_anon_inode_poll(struct file* filp, poll_table* wait)
 {
     unsigned int mask = 0;
-    int signal = 0;
+    unsigned int signal = 0;
 
     poll_wait(filp, &work_queue, wait);
+
     ATOMIC_GET(&signal, g_signal);
 
-    if (0 != signal)
+    if (signal)
     {
-        mask |= POLLIN;
+        mask = POLLIN;
+        ATOMIC_SET(&g_signal, 0);
     }
 
     return mask;

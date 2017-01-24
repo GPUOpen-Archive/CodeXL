@@ -23,17 +23,20 @@
 //=================================================================================
 
 // LOCAL INCLUDES
+#include <AMDTCounterAccessInterface.h>
+#include <AMDTHelpers.h>
 #include <AMDTPwrProfDriver.h>
 #include <AMDTPwrProfInternal.h>
-#include <AMDTHelpers.h>
 #include <AMDTPwrProfHwaccess.h>
 #include <AMDTPwrProfCpuid.h>
 #include <AMDTPwrProfCoreUtils.h>
 
-// Memort pool for the profile session
+// Memory pool for the profile session
 // Pool is created before every configuration for the session
 // and deleted once session is ended
 MemoryPool g_sessionPool;
+
+DEFINE_PER_CPU(CefInfo, g_prevROCefData);
 
 //SMU NB Spec
 #define SMU_INDEX_ADDR          0x800000B8
@@ -43,7 +46,6 @@ MemoryPool g_sessionPool;
 
 // STATIC VARIABLES
 static uint32 g_computeUnitCnt = INVALID_UINT32_VALUE;
-static uint32 g_platformId = PLATFORM_INVALID;
 static bool IsCpuSigRead = false;
 
 // struct for cpu signature
@@ -152,7 +154,7 @@ uint32 GetComputeUnitCntPerNode()
 
         ReadPCI32(bus, device, function, reg, &cuStatus);
 
-        if (PLATFORM_MULLINS == HelpGetTargetPlatformId())
+        if (PLATFORM_MULLINS == HelpPwrGetTargetPlatformId())
         {
             g_computeUnitCnt = 1;
         }
@@ -297,40 +299,6 @@ bool HelpWriteSmuNBSpecRegister(uint32 reg, uint32* pData)
     pciData.data = *pData;
     HelpAccessPciAddress(&pciData);
     return result;
-}
-
-// Get the platform id.
-uint32 HelpGetTargetPlatformId(void)
-{
-    uint32 family = 0;
-    uint32 model = 0;
-
-    if (PLATFORM_INVALID == g_platformId)
-    {
-        GetCpuModelFamily(&family, &model);
-
-        if ((0x15 == family) && (model >= 0x30 && model <= 0x3F))
-        {
-            // Kaveri : 0x15 30 to 3F
-            g_platformId = PLATFORM_KAVERI;
-        }
-        else if ((0x15 == family) && (model >= 0x60 && model <= 0x6F))
-        {
-            // Carrizo: 0x15 60 to 6F
-            g_platformId  = PLATFORM_CARRIZO;
-        }
-        else if ((0x16 == family) && (model >= 0x30 && model <= 0x3F))
-        {
-            // Mullins : 0x16 30 to 3F
-            g_platformId = PLATFORM_MULLINS;
-        }
-        else
-        {
-            g_platformId = PLATFORM_INVALID;
-        }
-    }
-
-    return g_platformId;
 }
 
 // Return the number of bits set.
@@ -585,5 +553,39 @@ bool AcquirePCMCountersLock()
 bool ReleasePCMCountersLock()
 {
     return false;
+}
+
+// PwrGetLogicalProcessCount:  Get the number of logical cores
+uint32 PwrGetLogicalProcessCount(void)
+{
+    uint32 numOfThreads = 0;
+    uint32 dwEax, dwEbx, dwEcx, dwEdx;
+    dwEax = dwEbx = dwEcx = dwEdx = 0;
+
+    ReadCPUID(CPUID_FnFeatureId, 0, &dwEax, &dwEbx, &dwEcx, &dwEdx);
+    numOfThreads = (dwEbx & CPUID_FeatureId_EBX_LogicalProcessorCount) >> 16;
+    return numOfThreads;
+}
+
+// HelpPwrIsSmtEnabled: Check if thread per core is more than 1
+bool HelpPwrIsSmtEnabled()
+{
+    uint32 numOfThreads = 0;
+
+    bool result = false;
+
+    uint32 dwEax = 0;
+    uint32 dwEbx = 0;
+    uint32 dwEcx = 0;
+    uint32 dwEdx = 0;
+
+
+    ReadCPUID(CPUID_FnIdentifiers, 0, &dwEax, &dwEbx, &dwEcx, &dwEdx);
+
+    numOfThreads = (dwEbx & CPUID_NodeIdentifiers_EBX_ThreadsPerCore) + 1;
+
+    result = (numOfThreads > 1) ? true : false;
+
+    return result;
 }
 

@@ -64,6 +64,8 @@ typedef struct CoreData
     uint32           m_samplingInterval;
     uint32           m_recLen;
     uint32           m_coreId;
+    uint32           m_bufferSize;
+    uint32           m_fill;
     ContextData      m_contextData;
     PageBuffer*      m_pCoreBuffer;
     uint64           m_counterMask;

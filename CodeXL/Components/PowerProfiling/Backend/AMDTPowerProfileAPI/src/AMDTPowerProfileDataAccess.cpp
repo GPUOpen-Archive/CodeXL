@@ -26,13 +26,17 @@ static PowerProfileTranslate* g_pTranslate = nullptr;
 static AMDTPwrProfileConfig g_currentCfg;
 static AMDTPwrProcessInfo g_pidInfo[MAX_PID_CNT];
 
+#ifdef LINUX
+    #include <Linux/PwrProfTranslateLinux.h>
+#else
+    #include <Windows/PwrProfTranslateWin.h>
+#endif
+
 osCriticalSection driverCriticalSection;
 
 static AMDTPwrProcessedDataRecord* pProcData = nullptr;
 static AMDTPwrProcessedDataRecord* pprevProcData = nullptr;
 std::unordered_map<AMDTUInt32, AMDTPwrProcessInfo> g_lastAggrPidPwrMap;
-
-extern PowerData   g_aggrPidPowerList;
 
 // DriverDataMonitor: Function to monitor the driver events and process the raw data
 void DriverDataMonitor(DriverSignalInfo* pInfo)
@@ -55,7 +59,12 @@ AMDTResult AMDTPwrOpenOnlineDataAccess(void* pParam)
     AMDTUInt64 flag = 0x01; //To indicate online
 
     g_isOnline = true;
-    g_pTranslate = new PowerProfileTranslate();
+
+#ifndef LINUX
+    g_pTranslate = new PwrProfTranslateWin();
+#else
+    g_pTranslate = new PwrProfTranslateLinux();
+#endif
 
     memset(&g_currentCfg, 0, sizeof(AMDTPwrProfileConfig));
 
@@ -160,21 +169,12 @@ AMDTResult GetCummulativePidProfDataFromStart(AMDTUInt32* pPIDCount,
     AMDTPwrProcessInfo* pInfo = nullptr;
     AMDTUInt32 entries = 0;
 
-#ifdef _WIN32
-
     if (nullptr != g_pTranslate)
     {
         AMDTFloat32 power = 0;
         g_pTranslate->PwrGetProfileData(PROCESS_PROFILE, (void**)&pInfo, &entries, &power);
         (void)power;
     }
-
-#else
-
-    entries = g_aggrPidPowerList.m_numberOfPids;
-    pInfo = &g_aggrPidPowerList.m_process[0];
-
-#endif
 
     if (entries > 0)
     {
@@ -210,21 +210,12 @@ AMDTResult GetCummulativePidProfDataInstatant(AMDTUInt32* pPIDCount,
     AMDTPwrProcessInfo* pInfo = nullptr;
     AMDTUInt32 entries = 0;
 
-#ifdef _WIN32
-
     if (nullptr != g_pTranslate)
     {
         AMDTFloat32 power = 0;
         g_pTranslate->PwrGetProfileData(PROCESS_PROFILE, (void**)&pInfo, &entries, &power);
         (void)power;
     }
-
-#else
-
-    entries = g_aggrPidPowerList.m_numberOfPids;
-    pInfo = &g_aggrPidPowerList.m_process[0];
-
-#endif
 
     // first call to this function
     if (g_lastAggrPidPwrMap.empty())
@@ -316,11 +307,6 @@ AMDTResult GetCummulativePidProfDataInstatant(AMDTUInt32* pPIDCount,
         {
             g_lastAggrPidPwrMap.clear();
 
-            // Copy g_aggrPidPowerData
-            for (AMDTUInt32 idx = 0; idx < entries; ++idx)
-            {
-                g_lastAggrPidPwrMap.insert({ g_aggrPidPowerList.m_process[idx].m_pid, g_aggrPidPowerList.m_process[idx] });
-            }
         }
     }
 

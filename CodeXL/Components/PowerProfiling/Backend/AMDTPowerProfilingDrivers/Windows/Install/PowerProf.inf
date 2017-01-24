@@ -1,65 +1,57 @@
 ;Copyright (c) 2012 Advanced Micro Devices, Inc.
 [Version]
-Signature="$Windows NT$"
-Provider=%INF_Provider%
-DriverVer=05/01/2012,1.0
+signature   = "$Windows NT$"
+Class       = "ActivityMonitor"
+ClassGuid   = {b86dff51-a31e-4bac-b3cf-e8cfe75c9fc2}
+Provider    = %AMD%
+DriverVer   = 05/01/2012,1.0.0.0
+CatalogFile = pwrprof.cat
+
+
+[DefaultInstall.ntx86]
+OptionDesc = %DESC%
+CopyFiles  = CopyDriver32
+
+[DefaultInstall.ntamd64]
+OptionDesc = %DESC%
+CopyFiles  = CopyDriver64
+
+[DefaultInstall.ntx86.Services]
+AddService = %SERVICE_NAME%,2,DriverServiceRegister
+
+[DefaultInstall.ntamd64.Services]
+AddService = %SERVICE_NAME%,2,DriverServiceRegister
 
 [DestinationDirs]
-; Driver to be installed in the drivers subdirectory.
-DefaultDestDir = 12	; DIRID_DRIVERS
-ServiceDestDir = 11; DIRID_SYSTEM
+DefaultDestDir  = 12
+
+[CopyDriver32]
+AMDTPwrProf.sys,AMDTPwrProf32.sys,,2
+
+[CopyDriver64]
+AMDTPwrProf.sys,AMDTPwrProf64.sys,,2
+
 
 [SourceDisksNames]
-1 = %PowerProf.MediaDesc%
+1 = Distribution Media,,,
 
-[SourceDisksFiles.x86]
-pcore.sys = 1,\x86
-AMDTPowerProf.sys = 1,\x86
-PowerLoadService.exe = 1
+[SourceDisksFiles]
+AMDTPwrProf32.sys	= 1
+AMDTPwrProf64.sys	= 1
 
-[SourceDisksFiles.amd64]
-pcore.sys = 1,\x64
-AMDTPowerProf.sys = 1,\x64
-PowerLoadService.exe = 1
+[DriverServiceRegister]
+DisplayName		= %DESC%
+ServiceType		= %SERVICE_KERNEL_DRIVER%
+StartType		= %SERVICE_DEMAND_START%
+ErrorControl	= %SERVICE_ERROR_NORMAL%
+ServiceBinary	= %12%\AMDTPwrProf.sys
 
-[DefaultInstall.NT]
-CopyFiles=DriverCopyFiles
-CopyFiles=ServiceDestDir
-
-[DriverCopyFiles]
-pcore.sys
-AMDTPowerProf.sys
-
-[ServiceDestDir]
-PowerLoadService.exe
-
-[DefaultInstall.NT.Services]
-AddService = pcore,0x00000800,pcore_Service_Inst
-AddService = PowerProf,0x00000800,PowerProf_Service_Inst
-AddService = PowerLoadService,0x00000800,PowerLoadService_Service_Inst
-
-[pcore_Service_Inst]
-DisplayName = "AMD Profiling Core"
-ServiceType = 1 ;SERVICE_KERNEL_DRIVER
-StartType = 3 ; SERVICE_DEMAND_START 
-ErrorControl = 1 ; SERVICE_ERROR_NORMAL
-ServiceBinary = %12%\pcore.sys
-
-[PowerProf_Service_Inst]
-DisplayName = "AMD Power Profiling"
-ServiceType = 1 ;SERVICE_KERNEL_DRIVER
-StartType = 3 ; SERVICE_DEMAND_START 
-ErrorControl = 1 ; SERVICE_ERROR_NORMAL
-ServiceBinary = %12%\AMDTPowerProfProf.sys
-
-[PowerLoadService_Service_Inst]
-DisplayName = "AMD Power Profiling Load Service"
-Description="Loads and persists the AMD Power Profiling drivers"
-ServiceType = 0x00000010 ;SERVICE_WIN32_OWN_PROCESS
-StartType = 2 ; SERVICE_SYSTEM_START 
-ErrorControl = 1 ; SERVICE_ERROR_NORMAL
-ServiceBinary = %11%\PowerLoadService.exe
-
+; User readable strings
+;----------------------------------------------------------
 [Strings]
-INF_Provider="AMD"
-PowerProf.MediaDesc="Install Directory"
+AMD  = "Advanced Micro Devices"
+DESC = "AMD Power Profiling"
+SERVICE_KERNEL_DRIVER   = 1
+SERVICE_DEMAND_START	= 3
+SERVICE_ERROR_NORMAL	= 1
+SERVICE_NAME = "AMDTPwrProf"

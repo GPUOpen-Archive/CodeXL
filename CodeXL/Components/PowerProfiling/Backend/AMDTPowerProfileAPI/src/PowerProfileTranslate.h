@@ -25,11 +25,12 @@
 
 #ifndef _LINUX
     #include <CXLTaskInfo/inc/TaskInfoInterface.h>
+#else
+    #include <Linux/PwrProfLinuxDatatypes.h>
+    using namespace PwrProfLinuxDatatypes;
 #endif
 
-#if (defined (AMDT_INTERNAL) || defined(AMDT_NDA))
-    #include <AMDTPowerProfileSmu9Api-Internal.h>
-#endif
+#define MAX_MODULE_PER_PROCESS 256
 
 #define TRANSLATION_POOL_SIZE 2*1048576 // 2MB
 // Maximum value to check the validity
@@ -69,33 +70,11 @@
     case CATEGORY_NUMBER:out = (AMDTFloat32)in;break;\
     }\
 
-    // IEEE754Decode: IEEE754 float decoding.Please check the IEEE 754 decoding for details
-    union IEEE754Decode
-    {
-        AMDTUInt32  u32;
-        AMDTFloat32 f32;
-    };
 #define SMU8_PROCESS_RAWDATA(out, raw) {union IEEE754Decode pack; pack.u32 = raw; out = pack.f32;}
 
-#ifndef PWR_CONFIGURE_SMU9
-    #define PWR_CONFIGURE_SMU9
-#endif
+#define SMU9_PROCESS_RAWDATA(out, raw) {union IEEE754Decode pack; pack.u32 = raw; out = pack.f32;}
+#define PWR_FAMILY17_DECODE_MSR_COUNTER
 
-#ifndef PWR_SMU9_GET_DECODED_ENERGY
-    #define PWR_SMU9_GET_DECODED_ENERGY(raw, out) out = (AMDTFloat32)raw;
-#endif
-
-#ifndef PWR_FILL_SMU9_REGISTER_DETAILS
-    #define PWR_FILL_SMU9_REGISTER_DETAILS(psmu)
-#endif
-
-#ifndef PWR_SMU9_DECODE_COUNTER
-    #define PWR_SMU9_DECODE_COUNTER(decodeInfo, out, raw, idx, sys, time) 0
-#endif
-
-#ifndef PWR_FAMILY17_DECODE_MSR_COUNTER
-    #define PWR_FAMILY17_DECODE_MSR_COUNTER(decodeInfo, rawData, out) *out = (AMDTFloat32)rawData
-#endif
     /****************************************************************************/
     typedef struct SampleConfig
     {
@@ -118,70 +97,23 @@
         SampleConfig* m_pCfg;
     } SampleConfigList;
 
-    //IpAddressInfo:
-    typedef struct IpAddressInfo
-    {
-        AMDTUInt32   m_sampleCnt;
-        AMDTFloat32  m_power;
-    } IpAddressInfo;
-
-    //Ip map: (ip, ip info)
-    typedef gtMap<AMDTUInt64, IpAddressInfo> IpAddressMap;
-
-    // ModuleIntanceInfo:
-    typedef struct  ModuleIntanceInfo
-    {
-        AMDTFloat32  m_power;
-        AMDTUInt32   m_sampleCnt;
-        IpAddressMap m_ipMap;
-    } ModuleIntanceInfo;
-
-    // instance map: (module instance id, instance info)
-    typedef gtMap<AMDTUInt32, ModuleIntanceInfo> ModuleInstanceMap;
-
-    // ProcessInfo:
-    typedef struct  ProcessInfo
-    {
-        AMDTFloat32       m_power;
-        AMDTUInt32        m_sampleCnt;
-        ModuleInstanceMap m_modInstMap;
-    } ProcessInfo;
-
-    // SampleData:
-    typedef struct SampleData
-    {
-        AMDTUInt64     m_ip;
-        AMDTUInt32     m_processId;
-        AMDTUInt32     m_threadId;
-        AMDTUInt64     m_timeStamp;
-        AMDTUInt32     m_modInstance;
-        AMDTFloat32    m_ipc;
-        AMDTUInt32     m_sampleCnt;
-    } SampleData;
-
-    // process map: (process id, process info)
-    typedef gtMap<AMDTUInt32, ProcessInfo> ProcessTreeMap;
-
-#ifndef LINUX
-    // Interesting module instance list(instance id, module info)
-    typedef gtMap<AMDTUInt32, LoadModuleInfo> ModuleInfoMap;
-#endif
-
-    // sample key(ip+instance, sample info)
-    typedef gtMap<AMDTUInt64, SampleData> SampleMap;
-
     class PowerProfileTranslate
     {
     public:
         PowerProfileTranslate();
         virtual ~PowerProfileTranslate();
 
+        //InitializeModuleMap : init process profiling structures
+        virtual void InitializeModuleMap() {}
+
+        // CleanupModuleMap: cleanup process profiling structures
+        virtual void CleanupModuleMap() {}
+
         //InitPowerProfiler - Initialize power profiler
         AMDTResult InitPowerTranslate(const wchar_t* pFileName, AMDTUInt64 flag);
 
         // Cleanup all memory allocations done in Init function
         void ClosePowerProfileTranslate();
-
 
         //GetProfileType - profile type
         AMDTResult GetProfileType();
@@ -192,9 +124,6 @@
         AMDTResult TranslateRawData();
 
         AMDTResult GetProcessedList(AMDTPwrProcessedDataRecord* pData);
-
-        // InsertSampleToSystemTree: Insert each sample to system tree with corresponding power
-        AMDTResult InsertSampleToSystemTree(SampleData* pCtx, AMDTFloat32 power, AMDTUInt32 sampleCnt);
 
         // Get the profile start/end absolute time stamps
         AMDTResult GetSessionTimeStamps(AMDTUInt64& startTs, AMDTUInt64& endTs)
@@ -228,17 +157,31 @@
         AMDTUInt32  GetSamplingPeriod() const { return m_samplingPeriod; }
 
         // PwrGetModuleProfileData: Provide process data based on process/module/ip profile type
-        AMDTResult PwrGetProfileData(CXLContextProfileType type, void** pData, AMDTUInt32* pCnt, AMDTFloat32* pPower);
+        virtual AMDTResult PwrGetProfileData(CXLContextProfileType type, void** pData, AMDTUInt32* pCnt, AMDTFloat32* pPower) = 0;
 
     protected:
         RawDataReader* m_rawFileHld;
+        AMDTUInt64 m_perfCounter;
+        AMDTUInt32 m_phyCoreCnt;
+        AMDTUInt64 m_prevTs;
+        AMDTUInt64 m_currentTs;
+        AMDTFloat32 m_componentPower[MAX_PHYSICAL_CORE_CNT];
+        AMDTFloat32 m_sampleIpcLoad[MAX_CORE_CNT];
+        // Platform id
+        AMDTUInt32 m_platformId;
+        std::vector <AMDTPwrModuleData> m_moduleList;
+        std::vector <AMDTPwrProcessInfo> m_processList;
+        AMDTUInt32  m_samplingPeriod;
+        AMDTUInt32 m_targetCoreCnt;
+        AMDTUInt32 m_targetCuCnt;
+        AMDTUInt32 m_coresPerComponent;
+
     private:
+        virtual void SetElapsedTime(AMDTUInt64 raw, AMDTUInt64* pResult) = 0;
+        virtual AMDTResult AttributePowerToSample() = 0;
+        virtual AMDTResult ProcessSample(ContextData* pCtx, AMDTUInt32 coreId, AMDTUInt32 componentIdx) = 0;
+        virtual void ExtractNameAndPath(char* pFullPath, char* pName, char* pPath) = 0;
 
-        void SetElapsedTime(AMDTUInt64 raw, AMDTUInt64* pResult);
-
-        void CalculatePidPower(AMDTFloat32* cuPower, AMDTUInt32 cuCnt);
-
-        void GetProcessName(AMDTPwrProcessInfo* pInfo);
 
         // ReadSharedBuffer: Populate the shared buffer to the core specific buffers
         AMDTResult ReadSharedBuffer(SharedBuffer* pBuffer, AMDTUInt64 coreMask);
@@ -256,74 +199,48 @@
         // there is junk value in the next sample
         bool SaveCurrentSampleData(AMDTPwrAttributeInfo* pData);
 
-        // ExtractNameAndPath: Helper function to extract name and path from full path
-        void ExtractNameAndPath(char* pFullPath, char* pName, char* pPath);
-
-        //AttributePowerToSample: Calculate the power for each sample and insert in the system tree
-        AMDTResult AttributePowerToSample(AMDTFloat32* cuPower);
-
-        // ProcessSample: Process each data sample for process/module/ip profiling
-        AMDTResult ProcessSample(ContextData* pCtx, AMDTFloat32 ipc, AMDTUInt32 coreId);
-
         AMDTResult PwrSetCoreConfigs(void);
-
-
         PwrCoreConfig* PwrGetCoreConfig(AMDTUInt16 sampleId);
 
-
+        AMDTUInt32 DecodeSmuCounter(PwrCounterDecodeInfo* pDecodeInfo, AMDTUInt8* pRaw, AMDTUInt32* pIdx);
+        AMDTUInt32 DecodeDgpuCounter(PwrCounterDecodeInfo* pDecodeInfo, AMDTUInt8* pRaw);
         AMDTUInt32 DecodeNodeCounters(PwrCounterDecodeInfo* pDecodeInfo, AMDTPwrProcessedDataRecord* pOut, AMDTUInt8* pRaw);
         AMDTUInt32 DecodeSmu7Counters(PwrCounterDecodeInfo* pDecodeInfo, AMDTPwrProcessedDataRecord* pOut, AMDTUInt8* pRaw, AMDTUInt32* pIdx);
         AMDTUInt32 DecodeSmu8Counters(PwrCounterDecodeInfo* pDecodeInfo, AMDTPwrProcessedDataRecord* pOut, AMDTUInt8* pRaw, AMDTUInt32* pIdx);
         AMDTUInt32 DecodeSmu7DgpuCounters(PwrCounterDecodeInfo* pDecodeInfo, AMDTPwrProcessedDataRecord* pOut, AMDTUInt8* pRaw);
+        AMDTResult SetConfigMaskAndCoreCnt();
 
         //Attribute list in the raw record
         SampleConfigList m_configList;
 
         AMDTUInt32 m_hostCoreCnt;
-        AMDTUInt32 m_targetCoreCnt;
-        AMDTUInt32 m_targetCuCnt;
-        AMDTUInt32 m_coresPerCu;
+
         AMDTUInt64 m_sampleOffset;
         AMDTUInt32 m_consumedRecId;
-
         //Online specific parameters
         AMDTUInt32 m_recordIdx;
-
-        // Platform id
-        AMDTUInt32 m_platformId;
 
         SharedBuffer* m_pSahredBuffer;
         AMDTPwrTargetSystemInfo m_sysInfo;
         bool m_isRunning;
 
         //Ring buffer
-        PowerData   m_samplePower[MAX_CU_CNT];
-        AMDTUInt32  m_samplingPeriod;
         AMDTUInt32  m_recIdFactor;
         ProfileType m_profileType;
         AMDTPwrProcessedDataRecord m_data;
         std::queue <AMDTPwrProcessedDataRecord> m_processedData;
         mutable std::mutex m_lock;
         std::condition_variable m_condition;
-        AMDTUInt64 m_prevTs;
-        AMDTUInt64 m_currentTs;
         AMDTPwrAttributeInfo m_prevSmuSampleData[MAX_PREV_COUNTERS];
 
-        std::vector <AMDTPwrProcessInfo> m_processList;
         std::vector <ContextPowerData> m_contextList;
-        std::vector <AMDTPwrModuleData> m_moduleList;
 
-        AMDTFloat32 m_sampleIpcLoad[MAX_CORE_CNT];
-#ifndef LINUX
-        ModuleInfoMap m_moduleTable;
-#endif
-        SampleMap m_sampleMap[MAX_CORE_CNT];
-        ProcessTreeMap m_systemTreeMap;
-        AMDTUInt64 m_prevTs1;
-        AMDTUInt64 m_perfCounter;
-        AMDTUInt64 m_perfFreq;
+        AMDTUInt64 m_configCoreMask = 0;
+        AMDTUInt32 m_configCoreCnt = 0;
 
         std::vector <PwrCoreConfig> m_coreConfigs;
+        AMDTUInt32 m_expectedCoutners;
+        AMDTUInt32 m_energyUnit = 0;
     };
 
 #endif //_POWER_PROFILE_TRANSLATE_H_

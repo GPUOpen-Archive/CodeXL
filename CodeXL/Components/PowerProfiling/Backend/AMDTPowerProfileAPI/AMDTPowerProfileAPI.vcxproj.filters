@@ -48,6 +48,9 @@
     <ClCompile Include="src\AMDTHistogram.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Window\PwrProfTranslateWin.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\AMDTPowerProfileControl.h">
@@ -102,6 +105,9 @@
       <Filter>Platforms and Counter Attributes</Filter>
     </ClInclude>
     <ClInclude Include="src\SupportedDeviceList.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Window\PwrProfTranslateWin.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

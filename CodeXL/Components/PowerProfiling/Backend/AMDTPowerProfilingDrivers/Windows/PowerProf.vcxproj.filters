@@ -17,9 +17,6 @@
       <UniqueIdentifier>{8E41214B-6785-4CFE-B992-037D68949A14}</UniqueIdentifier>
       <Extensions>inf;inv;inx;mof;mc;</Extensions>
     </Filter>
-    <Filter Include="Header Files\UserAccess">
-      <UniqueIdentifier>{d6918250-8751-4ec1-be9f-cef99cca5dba}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\resource.h">
@@ -113,10 +110,16 @@
     <ClCompile Include="..\common\AMDTAccessPmcData.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\common\AMDTPwrCommonHelper.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Non-OpenSource\AMDTSmu9Interface.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Inf Include="install\PowerProf.inf">
-      <Filter>Header Files</Filter>
+      <Filter>Driver Files</Filter>
     </Inf>
   </ItemGroup>
 </Project>

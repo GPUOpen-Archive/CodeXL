@@ -379,9 +379,46 @@ install() {
     add_module_entry
 }
 
+verify_kernel_header() {
+ 
+    if [ -f /etc/redhat-release ]
+    then
+        HEADER_SRC="/usr/src/kernels/`uname -r`"
+        if [ ! -d ${HEADER_SRC} ]
+        then
+            echo "ERROR: Linux headers is required for installing CodeXL Power Profiler driver."
+            echo "       Please install the sources using"
+            tput bold    # put the text in bold
+            echo "       sudo yum install kernel-devel"
+            tput sgr0    #Reset text attributes to normal without clear.
+            echo "       and then start the installation again."
+            exit 1
+        fi
+    elif [ -f /etc/SuSE-release ]
+    then
+        # TODO:
+        echo  1 > /dev/null
+    else
+        HEADER_SRC="/usr/src/linux-headers-`uname -r`"
+
+        if [ ! -d ${HEADER_SRC} ]
+        then
+            echo "ERROR: Linux headers is required for installing CodeXL Power Profiler driver."
+            echo "       Please install the sources using"
+            tput bold    # put the text in bold
+            echo "       sudo apt-get install linux-headers-$(uname -r)"
+            tput sgr0    #Reset text attributes to normal without clear.
+            echo "       and then start the installation again."
+            exit 1
+        fi
+    fi
+}
 
 installer() {
-    
+ 
+    # verify if the linux-header source exists
+    verify_kernel_header 
+ 
     # uninstall all the previous version installed
     uninstall
 

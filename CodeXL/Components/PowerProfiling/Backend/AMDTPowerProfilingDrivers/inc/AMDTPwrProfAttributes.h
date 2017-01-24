@@ -33,20 +33,21 @@
 #define PCORE_MAJOR_VERSION  4
 #define PCORE_MINOR_VERSION  11
 #define PCORE_BUILD_VERSION  0
-#define PWRPROF_MAJOR_VERSION  3
-#define PWRPROF_MINOR_VERSION  9
-#define PWRPROF_BUILD_VERSION  2
+#define PWRPROF_MAJOR_VERSION  4
+#define PWRPROF_MINOR_VERSION  0
+#define PWRPROF_BUILD_VERSION  3
 
 // Linux version
 // Once version is changed backend and driver needs to be updated
 // Major version should be changed after every release
 // Minor version should be changed for any change in driver code
 // Please update the version number in file located at ../Linux/CodeXLPwrProfVersion
-#define LINUX_PWR_DRV_MAJOR 5
-#define LINUX_PWR_DRV_MINOR 10
+#define LINUX_PWR_DRV_MAJOR 6
+#define LINUX_PWR_DRV_MINOR 01
 
 #define POWER_PROFILE_DRIVER_VERSION \
-    DRIVER_VERSION | ((uint64)PCORE_MAJOR_VERSION << 56) | ((uint64)PCORE_MINOR_VERSION << 48) | ((uint64)PCORE_BUILD_VERSION << 32)
+    DRIVER_VERSION | ((uint64)PCORE_MAJOR_VERSION << 56) | ((uint64)PCORE_MINOR_VERSION << 48) | ((uint64)PCORE_BUILD_VERSION << 32) \
+                   | ((uint64)PWRPROF_MAJOR_VERSION << 28) | ((uint64)PWRPROF_MINOR_VERSION << 24) | ((uint64)PWRPROF_BUILD_VERSION << 20)
 
 // Supported platform
 #define PLATFORM_INVALID    0xFFFFFFUL
@@ -82,12 +83,13 @@ typedef enum PwrNodeCounterIds
     COUNTERID_CEF,
     COUNTERID_CSTATE_RES,
     COUNTERID_PSTATE,
-    COUNTERID_FAMILY17_CORE_ENERGY,
-    COUNTERID_PERCORE_END = COUNTERID_FAMILY17_CORE_ENERGY,
+    COUNTERID_SOFTWARE_PSTATE,
+    COUNTERID_PERCORE_END = COUNTERID_SOFTWARE_PSTATE,
+    COUNTERID_CORE_ENERGY,
     COUNTERID_NODE_TCTL_TEPERATURE,
     COUNTERID_SVI2_CORE_TELEMETRY,
     COUNTERID_SVI2_NB_TELEMETRY,
-    COUNTERID_FAMILY17_PKG_ENERGY,
+    COUNTERID_PKG_ENERGY,
     COUNTERID_NODE_MAX_CNT
 } PwrNodeCounterIds;
 
@@ -310,17 +312,6 @@ typedef struct
     /// The return status
     uint32 ulStatus;
 } FILE_HEADER, *PFILE_HEADER;
-
-/// \struct TARGET_SYSTEM_INFO
-/// Target HW information
-typedef struct
-{
-    uint32 m_physicalCores;
-    uint32 m_logicalCores;
-    uint32 m_socketCount;
-    uint32 m_isSmtEnabled;
-    uint32 m_status;
-} TARGET_SYSTEM_INFO, *PTARGET_SYSTEM_INFO;
 
 /// \struct DATA_BUFFERS
 /// Mainly used for online profiling mode

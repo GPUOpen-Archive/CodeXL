@@ -7,7 +7,6 @@
 
 extern std::list <ProcessName> g_processNames;
 
-#define PP_MICROSEC_PER_SEC 1000000
 #define PP_UNKNOWN_MODULE "Unknown Module"
 #define PP_UNKNOWN_NAME "unknown name"
 #define PP_UNKNOWN_PATH "unknown path"
@@ -67,14 +66,6 @@ void PwrProfTranslateLinux::InitializeModuleMap()
     {
         m_modSampleDataTable.push_back(ModuleSampleDataMap());
     }
-}
-
-// PwrGetCountsPerSecs:  get the TS count per sec
-AMDTFloat32 PwrProfTranslateLinux::PwrGetCountsPerSecs() const
-{
-    // Linux driver return TS is micro seconds
-    const AMDTFloat32 countPerSeconds = static_cast<AMDTFloat32>(PP_MICROSEC_PER_SEC);
-    return countPerSeconds;
 }
 
 // SetElapsedTime: Elapse time from the time when first record was collected
@@ -201,8 +192,15 @@ AMDTResult PwrProfTranslateLinux::AttributePowerToSample()
         {
             auto& moduleMapItr = m_modSampleDataTable.at(compIdx);
 
-            timeSpan = (m_currentTs - m_prevTs);
-            energyPerCuSample = (m_componentPower[compIdx] > 0) ? (m_componentPower[compIdx] * timeSpan / PwrGetCountsPerSecs()) : static_cast<AMDTFloat32>(0.0);
+            if (PLATFORM_ZEPPELIN == GetSupportedTargetPlatformId())
+            {
+                energyPerCuSample = m_componentPower[compIdx];
+            }
+            else
+            {
+                timeSpan = (m_currentTs - m_prevTs);
+                energyPerCuSample = (m_componentPower[compIdx] > 0) ? (m_componentPower[compIdx] * timeSpan / PwrGetCountsPerSecs()) : static_cast<AMDTFloat32>(0.0);
+            }
 
             for (auto& modItr : moduleMapItr)
             {
@@ -399,8 +397,8 @@ AMDTResult PwrProfTranslateLinux::ReadProcPidMap(ContextData* pCtx, ProcPidModIn
                     execName[size - 1] = '\0'; /* Remove \n*/
 
                     auto found = std::find_if(std::begin(info.m_modInfoTable),
-                            std::end(info.m_modInfoTable),
-                            [ = ](const ModInfo & args) {return ((modStartAddress == args.m_startAddress) && (modEndAddress == args.m_endAddress));});
+                                              std::end(info.m_modInfoTable),
+                    [ = ](const ModInfo & args) {return ((modStartAddress == args.m_startAddress) && (modEndAddress == args.m_endAddress));});
 
                     if (found == info.m_modInfoTable.end())
                     {

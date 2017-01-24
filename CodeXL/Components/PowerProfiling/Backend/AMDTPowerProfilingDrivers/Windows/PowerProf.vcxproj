@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Win8.1 Debug|Win32">
       <Configuration>Win8.1 Debug</Configuration>
@@ -53,7 +53,7 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{69F29D65-9259-4E82-A7BE-0BB17C3C581C}</ProjectGuid>
     <TemplateGuid>{dd38f7fc-d7bd-488b-9242-7d8754cde80d}</TemplateGuid>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <MinimumVisualStudioVersion>11.0</MinimumVisualStudioVersion>
     <Configuration>Win8 Debug</Configuration>
     <Platform Condition="'$(Platform)' == ''">Win32</Platform>
@@ -70,67 +70,67 @@
   <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Win8.1 Debug|Win32'">
     <TargetVersion>WindowsV6.3</TargetVersion>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>WindowsKernelModeDriver8.1</PlatformToolset>
+    <PlatformToolset>WindowsKernelModeDriver10.0</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Win8 Debug|Win32'" Label="Configuration">
     <TargetVersion>Windows8</TargetVersion>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>WindowsKernelModeDriver8.1</PlatformToolset>
+    <PlatformToolset>WindowsKernelModeDriver10.0</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Win8.1 Release|Win32'">
     <TargetVersion>WindowsV6.3</TargetVersion>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>WindowsKernelModeDriver8.1</PlatformToolset>
+    <PlatformToolset>WindowsKernelModeDriver10.0</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Win8 Release|Win32'" Label="Configuration">
     <TargetVersion>Windows8</TargetVersion>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>WindowsKernelModeDriver8.1</PlatformToolset>
+    <PlatformToolset>WindowsKernelModeDriver10.0</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Win7 Debug|Win32'" Label="Configuration">
     <TargetVersion>Windows7</TargetVersion>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>WindowsKernelModeDriver8.1</PlatformToolset>
+    <PlatformToolset>WindowsKernelModeDriver10.0</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Win7 Release|Win32'" Label="Configuration">
     <TargetVersion>Windows7</TargetVersion>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>WindowsKernelModeDriver8.1</PlatformToolset>
+    <PlatformToolset>WindowsKernelModeDriver10.0</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
   </PropertyGroup>
   <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Win8.1 Debug|x64'">
     <TargetVersion>WindowsV6.3</TargetVersion>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>WindowsKernelModeDriver8.1</PlatformToolset>
+    <PlatformToolset>WindowsKernelModeDriver10.0</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Win8 Debug|x64'" Label="Configuration">
     <TargetVersion>Windows8</TargetVersion>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>WindowsKernelModeDriver8.1</PlatformToolset>
+    <PlatformToolset>WindowsKernelModeDriver10.0</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Win8.1 Release|x64'">
     <TargetVersion>WindowsV6.3</TargetVersion>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>WindowsKernelModeDriver8.1</PlatformToolset>
+    <PlatformToolset>WindowsKernelModeDriver10.0</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Win8 Release|x64'" Label="Configuration">
     <TargetVersion>Windows8</TargetVersion>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>WindowsKernelModeDriver8.1</PlatformToolset>
+    <PlatformToolset>WindowsKernelModeDriver10.0</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Win7 Debug|x64'" Label="Configuration">
     <TargetVersion>Windows7</TargetVersion>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>WindowsKernelModeDriver8.1</PlatformToolset>
+    <PlatformToolset>WindowsKernelModeDriver10.0</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Win7 Release|x64'" Label="Configuration">
     <TargetVersion>Windows7</TargetVersion>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>WindowsKernelModeDriver8.1</PlatformToolset>
+    <PlatformToolset>WindowsKernelModeDriver10.0</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
@@ -149,40 +149,52 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Win7 Debug|Win32'">
     <TargetName>AMDTPwrProf</TargetName>
+    <Inf2CatUseLocalTime>true</Inf2CatUseLocalTime>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Win8 Debug|Win32'">
     <TargetName>AMDTPwrProf</TargetName>
+    <Inf2CatUseLocalTime>true</Inf2CatUseLocalTime>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Win7 Release|Win32'">
     <TargetName>AMDTPwrProf</TargetName>
+    <Inf2CatUseLocalTime>true</Inf2CatUseLocalTime>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Win8.1 Debug|Win32'">
     <TargetName>AMDTPwrProf</TargetName>
+    <Inf2CatUseLocalTime>true</Inf2CatUseLocalTime>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Win8 Release|Win32'">
     <TargetName>AMDTPwrProf</TargetName>
+    <Inf2CatUseLocalTime>true</Inf2CatUseLocalTime>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Win8.1 Release|Win32'">
     <TargetName>AMDTPwrProf</TargetName>
+    <Inf2CatUseLocalTime>true</Inf2CatUseLocalTime>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Win8 Debug|x64'">
     <TargetName>AMDTPwrProf</TargetName>
+    <Inf2CatUseLocalTime>true</Inf2CatUseLocalTime>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Win7 Debug|x64'">
     <TargetName>AMDTPwrProf</TargetName>
     <DisableProductionSignDebugWarnings>true</DisableProductionSignDebugWarnings>
+    <Inf2CatUseLocalTime>true</Inf2CatUseLocalTime>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Win7 Release|x64'">
     <TargetName>AMDTPwrProf</TargetName>
+    <Inf2CatUseLocalTime>true</Inf2CatUseLocalTime>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Win8.1 Debug|x64'">
     <TargetName>AMDTPwrProf</TargetName>
+    <Inf2CatUseLocalTime>true</Inf2CatUseLocalTime>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Win8 Release|x64'">
     <TargetName>AMDTPwrProf</TargetName>
+    <Inf2CatUseLocalTime>true</Inf2CatUseLocalTime>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Win8.1 Release|x64'">
     <TargetName>AMDTPwrProf</TargetName>
+    <Inf2CatUseLocalTime>true</Inf2CatUseLocalTime>
   </PropertyGroup>
   <ItemDefinitionGroup>
     <Link>
@@ -204,7 +216,7 @@
       <PreprocessorDefinitions>_WIN64;_AMD64_;AMD64;_AMD_WIN64_;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <TreatWarningAsError>false</TreatWarningAsError>
       <BufferSecurityCheck>false</BufferSecurityCheck>
-      <AdditionalIncludeDirectories>..\..\..\..\..\..\Common\Src;.\inc;..\inc;..\..\..\..\..\..\amdpcore\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)inc;$(ProjectDir)..\inc;$(SolutionDir)..;$(ProjectDir)..\Non-OpenSource</AdditionalIncludeDirectories>
       <CompileAs>CompileAsCpp</CompileAs>
       <DisableSpecificWarnings>4201;4603;4627;4986;4987;4996;%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
@@ -217,7 +229,7 @@
       <PreprocessorDefinitions>_WIN64;_AMD64_;AMD64;_AMD_WIN64_;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <TreatWarningAsError>false</TreatWarningAsError>
       <BufferSecurityCheck>false</BufferSecurityCheck>
-      <AdditionalIncludeDirectories>..\..\..\..\..\..\Common\Src;.\inc;..\inc;..\..\..\..\..\..\amdpcore\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)inc;$(ProjectDir)..\inc;$(SolutionDir)..;$(ProjectDir)..\Non-OpenSource</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4201;4603;4627;4986;4987;4996;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <CompileAs>CompileAsCpp</CompileAs>
     </ClCompile>
@@ -242,7 +254,7 @@
       <PreprocessorDefinitions>_WIN64;_AMD64_;AMD64;_AMD_WIN64_;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <TreatWarningAsError>false</TreatWarningAsError>
       <BufferSecurityCheck>false</BufferSecurityCheck>
-      <AdditionalIncludeDirectories>..\..\..\..\..\..\Common\Src;.\inc;..\inc;..\..\..\..\..\..\amdpcore\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)inc;$(ProjectDir)..\inc;$(SolutionDir)..;$(ProjectDir)..\Non-OpenSource</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4201;4603;4627;4986;4987;4996;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <CompileAs>CompileAsCpp</CompileAs>
     </ClCompile>
@@ -258,7 +270,7 @@
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <WholeProgramOptimization>true</WholeProgramOptimization>
       <BufferSecurityCheck>false</BufferSecurityCheck>
-      <AdditionalIncludeDirectories>..\..\..\..\..\..\Common\Src;.\inc;..\inc;..\..\..\..\..\..\amdpcore\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)inc;$(ProjectDir)..\inc;$(SolutionDir)..;$(ProjectDir)..\Non-OpenSource</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4201;4603;4627;4986;4987;4996;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <WarningLevel>Level4</WarningLevel>
       <CompileAs>CompileAsCpp</CompileAs>
@@ -275,7 +287,7 @@
       <TreatWarningAsError>false</TreatWarningAsError>
       <BufferSecurityCheck>false</BufferSecurityCheck>
       <WholeProgramOptimization>true</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>..\..\..\..\..\..\Common\Src;.\inc;..\inc;..\..\..\..\..\..\amdpcore\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)inc;$(ProjectDir)..\inc;$(SolutionDir)..;$(ProjectDir)..\Non-OpenSource</AdditionalIncludeDirectories>
       <CompileAs>CompileAsCpp</CompileAs>
       <DisableSpecificWarnings>4201;4603;4627;4986;4987;4996;%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
@@ -291,7 +303,7 @@
       <TreatWarningAsError>false</TreatWarningAsError>
       <BufferSecurityCheck>false</BufferSecurityCheck>
       <WholeProgramOptimization>true</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>..\..\..\..\..\..\Common\Src;.\inc;..\inc;..\..\..\..\..\..\amdpcore\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)inc;$(ProjectDir)..\inc;$(SolutionDir)..;$(ProjectDir)..\Non-OpenSource</AdditionalIncludeDirectories>
       <CompileAs>CompileAsCpp</CompileAs>
       <DisableSpecificWarnings>4201;4603;4627;4986;4987;4996;%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
@@ -325,7 +337,7 @@
       <TreatWarningAsError>false</TreatWarningAsError>
       <WholeProgramOptimization>true</WholeProgramOptimization>
       <BufferSecurityCheck>false</BufferSecurityCheck>
-      <AdditionalIncludeDirectories>..\..\..\..\..\..\Common\Src;.\inc;..\inc;..\..\..\..\..\..\amdpcore\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)inc;$(ProjectDir)..\inc;$(SolutionDir)..;$(ProjectDir)..\Non-OpenSource</AdditionalIncludeDirectories>
       <CompileAs>CompileAsCpp</CompileAs>
       <DisableSpecificWarnings>4201;4603;4627;4986;4987;4996;%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
@@ -349,7 +361,7 @@
       <TreatWarningAsError>false</TreatWarningAsError>
       <BufferSecurityCheck>false</BufferSecurityCheck>
       <WholeProgramOptimization>true</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>..\..\..\..\..\..\Common\Src;.\inc;..\inc;..\..\..\..\..\..\amdpcore\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)inc;$(ProjectDir)..\inc;$(SolutionDir)..;$(ProjectDir)..\Non-OpenSource</AdditionalIncludeDirectories>
       <CompileAs>CompileAsCpp</CompileAs>
       <DisableSpecificWarnings>4201;4603;4627;4986;4987;4996;%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
@@ -363,7 +375,7 @@
       <TreatWarningAsError>false</TreatWarningAsError>
       <BufferSecurityCheck>false</BufferSecurityCheck>
       <WholeProgramOptimization>true</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>..\..\..\..\..\..\Common\Src;.\inc;..\inc;..\..\..\..\..\..\amdpcore\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)inc;$(ProjectDir)..\inc;$(SolutionDir)..;$(ProjectDir)..\Non-OpenSource</AdditionalIncludeDirectories>
       <CompileAs>CompileAsCpp</CompileAs>
       <DisableSpecificWarnings>4201;4603;4627;4986;4987;4996;%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
@@ -387,7 +399,7 @@
     <ClCompile>
       <TreatWarningAsError>false</TreatWarningAsError>
       <BufferSecurityCheck>false</BufferSecurityCheck>
-      <AdditionalIncludeDirectories>..\..\..\..\..\..\Common\Src;.\inc;..\inc;..\..\..\..\..\..\amdpcore\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)inc;$(ProjectDir)..\inc;$(SolutionDir)..;$(ProjectDir)..\Non-OpenSource</AdditionalIncludeDirectories>
       <CompileAs>CompileAsCpp</CompileAs>
       <DisableSpecificWarnings>4201;4603;4627;4986;4987;4996;%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
@@ -399,7 +411,7 @@
     <ClCompile>
       <TreatWarningAsError>false</TreatWarningAsError>
       <BufferSecurityCheck>false</BufferSecurityCheck>
-      <AdditionalIncludeDirectories>..\..\..\..\..\..\Common\Src;.\inc;..\inc;..\..\..\..\..\..\amdpcore\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)inc;$(ProjectDir)..\inc;$(SolutionDir)..;$(ProjectDir)..\Non-OpenSource</AdditionalIncludeDirectories>
       <CompileAs>CompileAsCpp</CompileAs>
       <DisableSpecificWarnings>4201;4603;4627;4986;4987;4996;%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
@@ -411,7 +423,7 @@
     </Link>
     <ClCompile>
       <TreatWarningAsError>false</TreatWarningAsError>
-      <AdditionalIncludeDirectories>..\..\..\..\..\..\Common\Src;.\inc;..\inc;..\..\..\..\..\..\amdpcore\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)inc;$(ProjectDir)..\inc;$(SolutionDir)..;$(ProjectDir)..\Non-OpenSource</AdditionalIncludeDirectories>
       <ShowIncludes>true</ShowIncludes>
       <StringPooling />
       <ExceptionHandling>Sync</ExceptionHandling>
@@ -429,6 +441,12 @@
       <DisableSpecificWarnings>4201;4603;4627;4986;4987;4996;%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
   </ItemDefinitionGroup>
+  <ItemDefinitionGroup>
+      <ClCompile>
+        <PreprocessorDefinitions Condition="'$(AMDT_BUILD)'=='AMDT_INTERNAL'">AMDT_INTERNAL_COUNTERS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      </ClCompile>
+  </ItemDefinitionGroup>
+
   <ItemGroup>
     <Inf Include="install\PowerProf.inf" />
   </ItemGroup>
@@ -460,14 +478,8 @@
     <ResourceCompile Include="src\PwrProf.rc" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\..\..\amdpcore\AMDPcore.vcxproj">
+    <ProjectReference Include="$(SolutionDir)..\amdpcore\AMDPcore.vcxproj">
       <Project>{615ee04f-3558-4699-98cf-a526c0ffd1ce}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\..\..\Common\Src\WinDriverStackWalker\WinDriverStackWalker.vcxproj">
-      <Project>{b3607101-2642-420c-b70e-0c753d50710f}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\..\..\Common\Src\WinDriverUtils\WinDriverUtils.vcxproj">
-      <Project>{95c7b950-f97c-4490-8d3d-afa0f1e64a8d}</Project>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
@@ -493,6 +505,7 @@
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Win8.1 Debug|x64'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Win8 Debug|x64'">CompileAsCpp</CompileAs>
     </ClCompile>
+    <ClCompile Include="..\common\AMDTPwrCommonHelper.c" />
     <ClCompile Include="..\common\AMDTRawDataFile.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Win8 Release|x64'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Win8.1 Release|x64'">CompileAsCpp</CompileAs>
@@ -514,6 +527,7 @@
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Win8.1 Debug|x64'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Win8 Debug|x64'">CompileAsCpp</CompileAs>
     </ClCompile>
+    <ClCompile Condition="'$(AMDT_BUILD)'=='AMDT_INTERNAL'" Include="..\Non-OpenSource\AMDTSmu9Interface.c" />
     <ClCompile Include="src\AMDTHelpers.cpp">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Win8 Release|x64'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Win8.1 Release|x64'">CompileAsCpp</CompileAs>

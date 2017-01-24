@@ -83,7 +83,8 @@ AMDTResult RawDataReader::ReleaseBufferList()
         for (cnt = 0; cnt < m_bufferCnt; cnt++)
         {
             RawBufferInfo* list = m_pBufferList + cnt;
-			if (nullptr != list)
+
+            if (nullptr != list)
             {
                 list->ulvalidLength = 0;
                 AMDTUInt8* pMem = (AMDTUInt8*)(list->uliBuffer.QuadPart);
@@ -620,8 +621,18 @@ AMDTResult RawDataReader::ReadSections()
                             // Set only core specific counters for other cores
                             if (0 != cnt1)
                             {
-                                pTempCfg->m_apuCounterMask = coreSpecificMask;
-                                pTempCfg->m_attrCnt = (AMDTUInt16)GetMaskCount(coreSpecificMask);
+                                AMDTUInt64 phyCoreMask = 0;
+
+                                if (pTempCfg->m_apuCounterMask & (1ULL << COUNTERID_CORE_ENERGY))
+                                {
+                                    if (!PwrIsSmtEnabled() || (PwrIsSmtEnabled() && (0 == (coreIdx % 2))))
+                                    {
+                                        phyCoreMask = (1ULL << COUNTERID_CORE_ENERGY);
+                                    }
+                                }
+
+                                pTempCfg->m_apuCounterMask = coreSpecificMask | phyCoreMask;
+                                pTempCfg->m_attrCnt = (AMDTUInt16)GetMaskCount(pTempCfg->m_apuCounterMask);
                             }
                         }
                     }

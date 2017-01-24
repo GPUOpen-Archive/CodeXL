@@ -23,6 +23,8 @@
 #include <AMDTCommonConfig.h>
 #include <AMDTHwAccessInterface.h>
 #include <AMDTSharedObjPath.h>
+#include <AMDTCounterAccessInterface.h>
+#include <WinDriverUtils\Include\Atomic.hpp>
 
 extern PPWRPROF_DEV_EXTENSION gpPwrDevExt;
 CoreData* g_pCoreCfg = NULL;
@@ -66,12 +68,12 @@ NTSTATUS DeleteSharedMap()
 }
 
 // CreateSharedBuffer: Open a shared memory area between application and driver mode for sharing pause state
-NTSTATUS CreateSharedBuffer()
+NTSTATUS CreateSharedBuffer(uint32 envVariable)
 {
     // Convert the constant string to the UNICODE_STRING.
     UNICODE_STRING usSharedMemoryObjName;
 
-    DRVPRINT("calling");
+    DRVPRINT("calling env 0x%x", envVariable);
     RtlInitUnicodeString(&usSharedMemoryObjName, PWRPROF_SHARED_OBJ_BASE);
 
     OBJECT_ATTRIBUTES objAttrs;
@@ -105,7 +107,7 @@ NTSTATUS CreateSharedBuffer()
 
         if (STATUS_SUCCESS == status)
         {
-            DRVPRINT("ZwMapViewOfSection success");
+            DRVPRINT("ZwMapViewOfSection success commit size 0x%x", viewSize);
             //save the base address to free it later
             sharedBaseAddr = pBaseAddress;
             //Allocate the length of ViewSize in bytes
@@ -117,7 +119,7 @@ NTSTATUS CreateSharedBuffer()
 
                 __try
                 {
-                    MmProbeAndLockPages(pMdl, KernelMode, IoReadAccess);
+                    MmProbeAndLockPages(pMdl, KernelMode, IoModifyAccess);
                 }
                 __except (EXCEPTION_EXECUTE_HANDLER)
                 {
@@ -131,8 +133,12 @@ NTSTATUS CreateSharedBuffer()
 
                     if (NULL != pSharedBuffer)
                     {
-                        DRVPRINT("pSharedBuffer success");
-                        DRVPRINT("%s", pSharedBuffer);
+                        if (0x0 == envVariable)
+                        {
+                            DRVPRINT("pSharedBuffer success RtlSecureZeroMemory...");
+                            RtlSecureZeroMemory(pSharedBuffer, PWRPROF_SHARED_BUFFER_SIZE);
+                        }
+
                         mdlPtr = pMdl;
                     }
                     else
@@ -207,8 +213,14 @@ NTSTATUS IoctlGetVersionHandler(IN PPWRPROF_DEV_EXTENSION pDevExt,
 
     if (STATUS_SUCCESS == ret)
     {
-        *pulVersion = DRIVER_VERSION | ((ULONG64)pcoreMajor << 56)
-                      | ((ULONG64)pcoreMinor << 48) | ((ULONG64)pcoreBuild << 32);
+        *pulVersion = DRIVER_VERSION
+                      | ((ULONG64)pcoreMajor << 56)
+                      | ((ULONG64)pcoreMinor << 48)
+                      | ((ULONG64)pcoreBuild << 32)
+                      | ((ULONG64)PWRPROF_MAJOR_VERSION << 28)
+                      | ((ULONG64)PWRPROF_MINOR_VERSION << 24)
+                      | ((ULONG64)PWRPROF_BUILD_VERSION << 20);
+
         pIrp->IoStatus.Information = sizeof(ULONG64);
     }
 
@@ -285,6 +297,61 @@ bool SetOutputFile(ClientData* pClient, const wchar_t* pRawFilePath, ULONG prdLe
 
     bool ret = false;
     return ret;
+}
+
+// PwrCoreInitialize: DPC per core to initialize profile config
+static VOID PwrCoreInitialize(PKDPC pDpc, PVOID context, PVOID synchEvent, PVOID arg2)
+{
+    (void)pDpc;
+    (void)context;
+    (void) arg2;
+    InitializeGenericCounterAccess((uint32)KeGetCurrentProcessorNumberEx(NULL));
+    static_cast<EventNotifier*>(synchEvent)->Notify();
+}
+
+// PwrSetTargetCoreDpc: Set DPC
+bool PwrSetTargetCoreDpc(KDPC& dpc, uint32 core)
+{
+    PROCESSOR_NUMBER procNumber;
+
+    bool succeeded = (STATUS_SUCCESS == KeGetProcessorNumberFromIndex(static_cast<ULONG>(core), &procNumber) &&
+                      STATUS_SUCCESS == KeSetTargetProcessorDpcEx(&dpc, &procNumber));
+
+    if (!succeeded)
+    {
+        DRVPRINT("Invalid target core number!");
+    }
+
+    return succeeded;
+}
+
+// PwrExecuteDpc: Execute DPC
+bool PwrExecuteDpc(uint core, PKDEFERRED_ROUTINE routine, void* context)
+{
+    bool succeeded = false;
+    KDPC dpc;
+
+    KeInitializeDpc(&dpc, routine, context);
+
+    if (PwrSetTargetCoreDpc(dpc, core))
+    {
+        KeSetImportanceDpc(&dpc, HighImportance);
+
+        EventNotifier synchEvent;
+
+        if (TRUE == KeInsertQueueDpc(&dpc, &synchEvent, NULL))
+        {
+            synchEvent.Wait();
+
+            succeeded = true;
+        }
+        else
+        {
+            DRVPRINT("Failed to enqueue DPC!");
+        }
+    }
+
+    return succeeded;
 }
 
 //IoctlAddProfConfigsHandler: Set profile configurations
@@ -365,7 +432,7 @@ NTSTATUS IoctlAddProfConfigsHandler(IN PPWRPROF_DEV_EXTENSION pDevExt,
     // Create shared buffer
     if (STATUS_SUCCESS == ret)
     {
-        ret = CreateSharedBuffer();
+        ret = CreateSharedBuffer(pSrcCfg->m_fill);
 
         if (STATUS_SUCCESS != ret)
         {
@@ -422,11 +489,12 @@ NTSTATUS IoctlAddProfConfigsHandler(IN PPWRPROF_DEV_EXTENSION pDevExt,
         for (confCount = 0; confCount < gpPwrDevExt->coreCount; confCount++)
         {
             CoreData* pCoreCfg = NULL;
+            uint64 phyCoreMask = 0;
 
             // Get next core id
             if (coreMask & 0x01)
             {
-                coreMask =  coreMask >> 1;
+                coreMask = coreMask >> 1;
                 pCoreCfg = g_pCoreCfg + cfgIdx;
 
                 if (NULL == pCoreCfg)
@@ -444,6 +512,14 @@ NTSTATUS IoctlAddProfConfigsHandler(IN PPWRPROF_DEV_EXTENSION pDevExt,
                 coreId++;
                 coreMask =  coreMask >> 1;
                 continue;
+            }
+
+            if (pSrcCfg->m_apuCounterMask & (1ULL << COUNTERID_CORE_ENERGY))
+            {
+                if (!HelpPwrIsSmtEnabled() || (0 == (confCount % 2)))
+                {
+                    phyCoreMask = (1ULL << COUNTERID_CORE_ENERGY);
+                }
             }
 
             // Fill per core configuration
@@ -520,9 +596,11 @@ NTSTATUS IoctlAddProfConfigsHandler(IN PPWRPROF_DEV_EXTENSION pDevExt,
             {
                 // Set only core specific attributes to other core config
                 // Also add first 3 MUST attributes to the mask
-                pCoreCfg->m_counterMask = coreCounterMask;
+                pCoreCfg->m_counterMask = coreCounterMask | phyCoreMask;
                 pCoreCfg->m_smuCfg = NULL;
             }
+
+            PwrExecuteDpc(static_cast<uint32>(confCount), (PKDEFERRED_ROUTINE)PwrCoreInitialize, false);
 
             DRVPRINT("confCount %d mask 0x%x", confCount, pCoreCfg->m_counterMask);
             // Fill internal counters if any

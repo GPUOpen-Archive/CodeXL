@@ -22,9 +22,9 @@
 #endif
 #include <string.h>
 #include <stdio.h>
-
-//static AMDTInt32 g_isSmtEnable = -1;
+static AMDTInt32 g_isSmtEnable = -1;
 AMDTPwrProfileAttributeList g_attributeList;
+fpPwrCheckFamily17 g_fpPwrCheckFamily17 = nullptr;
 
 // ReadPciAddress : PCIe Device address read
 bool ReadPciAddress(AMDTUInt32 bus,
@@ -155,7 +155,14 @@ AMDTUInt32 GetSupportedTargetPlatformId()
             idx = PLATFORM_MULLINS;
         }
     }
-
+    else
+    {
+        if( nullptr != g_fpPwrCheckFamily17)
+        {
+            idx = g_fpPwrCheckFamily17(family, model);
+        }
+    }
+#if 0
     else if (0x17 == family)
     {
         if (model <= 0x0F)
@@ -164,7 +171,7 @@ AMDTUInt32 GetSupportedTargetPlatformId()
             idx = PLATFORM_ZEPPELIN;
         }
     }
-
+#endif
     return idx;
 }
 
@@ -221,6 +228,7 @@ AMDTUInt32 PwrGetLogicalProcessCount()
     PwrTrace("Logical processors %d", numOfThreads);
     return numOfThreads;
 }
+
 // IsCefSupported: Check if Core Effectiver Frequency is supported by the CPU
 bool IsCefSupported()
 {
@@ -519,3 +527,49 @@ AMDTResult ReleaseMemoryPool(MemoryPool* pPool)
     return AMDT_STATUS_OK;
 }
 
+// PwrIsSmtEnabled: Check if thread per core is more than 1
+bool PwrIsSmtEnabled()
+{
+    bool result = false;
+
+    if (-1 != g_isSmtEnable)
+    {
+        result = (1 == g_isSmtEnable) ? true : false;
+    }
+    else if (PLATFORM_ZEPPELIN == GetSupportedTargetPlatformId())
+    {
+        AMDTUInt32 numOfThreads = 0;
+        AMDTInt32 cpuInfo[4] = { -1 };
+
+        getCpuid(CPUID_FnIdentifiers, cpuInfo);
+        numOfThreads = (cpuInfo[EBX_OFFSET] & CPUID_NodeIdentifiers_EBX_ThreadsPerCore) + 1;
+
+        g_isSmtEnable = (numOfThreads > 1) ? 1 : 0;
+        result = (1 == g_isSmtEnable) ? true : false;
+    }
+    else
+    {
+        g_isSmtEnable = 0;
+    }
+
+    return result;
+}
+
+// PwrGetCountsPerSecs:  get the TS count per sec
+AMDTFloat32 PwrGetCountsPerSecs(void)
+{
+    AMDTFloat32 countPerSeconds = 0;
+
+#ifdef LINUX
+    countPerSeconds = static_cast<AMDTFloat32>(PP_MICROSEC_PER_SEC);
+#else
+    countPerSeconds = static_cast<AMDTFloat32>(MILLISEC_PER_SEC);
+#endif
+    return countPerSeconds;
+}
+
+// PwrGetPhysicalCores:
+AMDTUInt32 PwrGetPhysicalCores(void)
+{
+    return (PwrIsSmtEnabled()) ? (GetActiveCoreCount() / 2) : GetActiveCoreCount();
+}

@@ -38,7 +38,7 @@
   </ImportGroup>
   <ItemDefinitionGroup>
     <ClCompile>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\CommonProfileLibs\CXLTaskInfo;$(ProjectDir)..\..\..\CommonProfileLibs;..\AMDTPowerProfilingDrivers\Windows\inc\;..\AMDTPowerProfilingDrivers\inc\;..\..\..\..\..\Common\Src\AMDTCommonHeaders\;.\inc;.\Non-OpenSource;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\CommonProfileLibs\CXLTaskInfo;$(ProjectDir)..\..\..\CommonProfileLibs;..\AMDTPowerProfilingDrivers\Windows\inc\;..\AMDTPowerProfilingDrivers\inc\;..\..\..\..\..\Common\Src\AMDTCommonHeaders\;.\inc;.\Non-OpenSource;.\src\Windows;..\AMDTPowerProfilingDrivers\Non-OpenSource;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
@@ -51,10 +51,10 @@
     <ResourceCompile Include="$(CommonProjectsDir)\VersionInfo\VersionResource.rc" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Condition="'$(AMDT_BUILD)'=='AMDT_INTERNAL'" Include="Non-OpenSource\AMDTPowerProfileSmu9Api-Internal.cpp" />
-    <ClCompile Condition="'$(AMDT_BUILD)'=='AMDT_NDA'" Include="Non-OpenSource\AMDTPowerProfileSmu9Api-Internal.cpp" />
     <ClCompile Condition="'$(AMDT_BUILD)'=='AMDT_INTERNAL'" Include="Non-OpenSource\AMDTPowerProfileApi-Internal.cpp" />
     <ClCompile Condition="'$(AMDT_BUILD)'=='AMDT_NDA'" Include="Non-OpenSource\AMDTPowerProfileApi-Internal.cpp" />
+    <ClCompile Condition="'$(AMDT_BUILD)'=='AMDT_INTERNAL'" Include="Non-OpenSource\AMDTPowerFamily17Internal.cpp" />
+    <ClCompile Condition="'$(AMDT_BUILD)'=='AMDT_NDA'" Include="Non-OpenSource\AMDTPowerFamily17Internal.cpp" />
     <ClCompile Include="src\AMDTHistogram.cpp" />
     <ClCompile Include="src\AMDTPowerProfileApi.cpp" />
     <ClCompile Include="src\AMDTPowerProfileControl.cpp" />
@@ -65,6 +65,7 @@
     <ClCompile Include="src\PowerProfileHelper.cpp" />
     <ClCompile Include="src\PowerProfileTranslate.cpp" />
     <ClCompile Include="src\RawDataReader.cpp" />
+    <ClCompile Include="src\Windows\PwrProfTranslateWin.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="inc\AMDTPowerProfileApi.h" />
@@ -85,6 +86,7 @@
     <ClInclude Include="src\Smu7DgpuCounterList.h" />
     <ClInclude Include="src\Smu8CounterList.h" />
     <ClInclude Include="src\SupportedDeviceList.h" />
+    <ClInclude Include="src\Windows\PwrProfTranslateWin.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="AMDTPowerProfileAPI.def" />

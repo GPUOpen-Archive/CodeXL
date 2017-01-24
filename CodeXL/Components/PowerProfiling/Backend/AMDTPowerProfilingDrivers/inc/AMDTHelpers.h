@@ -46,6 +46,10 @@
 #define CPUID_FnAdvancePowerManagementInformation 0x80000007
 #define CPUID_FnAdvancePowerManagementInformation_EDX_EffFreqRO (1 << 10)
 #define POOL_BASE_SIZE  16
+#define CPUID_FnFeatureId 1
+#define CPUID_NodeIdentifiers_EBX_ThreadsPerCore (0xFF << 8)
+#define CPUID_FeatureId_EBX_LogicalProcessorCount 0xFF << 16
+#define CPUID_FnThermalAndPowerManagement_ECX_EffFreq  (1 << 0)
 
 union CpuInfo
 {
@@ -130,8 +134,8 @@ uint32 HelpEncodeExtendedConfigSpaceAddress(uint32 bus,
                                             uint32  func,
                                             uint32 reg);
 
-// HelpGetTargetPlatform: Return the current target platform id
-uint32 HelpGetTargetPlatformId(void);
+// HelpPwrGetTargetPlatform: Return the current target platform id
+uint32 HelpPwrGetTargetPlatformId(void);
 
 // HelpGetBitsCount: Count number of bits set
 void HelpGetBitsCount(uint64 mask, uint32* pCount);
@@ -187,5 +191,14 @@ void GetPerformanceCounter(uint64* pPerfCounter, uint64* pFrequency);
 bool AcquirePCMCountersLock(void);
 
 bool ReleasePCMCountersLock(void);
+
+uint32 PwrGetLogicalProcessCount(void);
+
+bool HelpPwrIsSmtEnabled(void);
+
+// HelpPwrEnablePerf: Enable perf bit
+void HelpPwrEnablePerf(bool enable);
+
+uint32 HelpPwrGetPhysicalCoreCount(void);
 
 #endif //_HELPERS_H

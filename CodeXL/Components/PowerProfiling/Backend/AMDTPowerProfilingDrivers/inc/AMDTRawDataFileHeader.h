@@ -294,6 +294,21 @@ typedef bool (*CLOSE_SMU_CB)(void* pSmu);
 typedef bool (*COLLECT_SMU_CB)(void* pSmu, uint8* pData, uint32* pLength);
 /// Function pointers to read SMU values
 
+// Smu9Interface: Access interface for Smu9
+typedef struct Smu9Interface
+{
+    uint32 m_nbSmnIndex;
+    uint32 m_nbSmnData;
+    uint32 m_testMsgId;
+    uint32 m_testMsgArg;
+    uint32 m_testMsgResp;
+    uint32 m_testMsgPmLogStartId;
+    uint32 m_testMsgPmLogReadId;
+    uint32 m_testMsgAgmTableVersionId;
+    uint32 m_testMsgDramHigh;
+    uint32 m_testMsgDramLow;
+} Smu9Interface;
+
 typedef struct SmuAccessCb
 {
     INIT_SMU_CB    fnSmuInit;
@@ -305,6 +320,7 @@ typedef struct SmuAccess
 {
     union
     {
+        Smu9Interface m_smu9;
         Smu8Interface m_smu8;
         Smu7Interface m_smu7;
     };
@@ -381,6 +397,8 @@ typedef struct ContextData
     uint32     m_threadId;
     uint64     m_timeStamp;
     uint64     m_ip;
+    uint32     m_isKernel;
+    uint32     m_fill;
     uint32     m_pmcData[PMC_EVENT_MAX_CNT];
 } ContextData;
 

@@ -28,6 +28,18 @@
 #include <AMDTDriverTypedefs.h>
 #include <AMDTDriverInternal.h>
 
+#define MPERF_MSR_ADDRESS      0x000000E7
+#define APERF_MSR_ADDRESS      0x000000E8
+#define P0STATE_MSR_ADDRESS    0xC0010064
+#define MPERF_RO_MSR_ADDRESS   0xC00000E7
+#define APERF_RO_MSR_ADDRESS   0xC00000E8
+
+typedef struct
+{
+    uint64 m_aperf;
+    uint64 m_mperf;
+} CefInfo;
+
 // CollectBasicCounters: Read basic counters such as sample id, sample spec, timestamp
 bool CollectBasicCounters(CoreData* pCoreCfg,
                           uint32* pLength);

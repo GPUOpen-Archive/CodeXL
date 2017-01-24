@@ -19,6 +19,12 @@ env.Append(PWRPROFDRIVERLINUXINCLUDES = [
 	   ]
 )
 
+if (env['CXL_build_conf'] == 'INTERNAL' or env['CXL_build_conf'] == 'NDA'):
+    env.Append(PWRPROFDRIVERINCLUDES = [
+		env['CXL_commonproj_dir']+"/../../CodeXL/Components/PowerProfiling/Backend/AMDTPowerProfilingDrivers/Non-OpenSource",
+	   ]
+    )
+
 compiler_base_flags = env['CPPFLAGS']
 compiler_base_flags += '-pthread -D_LINUX -DLINUX'
 
@@ -43,17 +49,18 @@ includes = \
 [
     "inc/AMDTPowerProfileApi.h",
     "inc/AMDTPowerProfileDataTypes.h",
-    "src/AMDTPowerProfileApiInternal.h"
-    "src/AMDTPowerProfileControl.h"
-    "src/AMDTPowerProfileDataAccess.h"
-    "src/AMDTPowerProfileInternal.h"
+    "src/AMDTPowerProfileApiInternal.h",
+    "src/AMDTPowerProfileControl.h",
+    "src/AMDTPowerProfileDataAccess.h",
+    "src/AMDTPowerProfileInternal.h",
     "src/AMDTHistogram.h",
-    "src/OsFileWrapper.h"
-    "src/PowerEvents.h"
-    "src/PowerProfileDriverInterface.h"
+    "src/OsFileWrapper.h",
+    "src/PowerEvents.h",
+    "src/PowerProfileDriverInterface.h",
     "src/PowerProfileHelper.h",
     "src/PowerProfileTranslate.h",
-    "src/RawDataReader.h"
+    "src/RawDataReader.h",
+    "src/Linux/PwrProfTranslateLinux.h",
 ]
 
 sources = \
@@ -62,6 +69,7 @@ sources = \
     "src/RawDataReader.cpp",
     "src/PowerProfileHelper.cpp",
     "src/Linux/PowerProfileDriverInterface.cpp",
+    "src/Linux/PwrProfTranslateLinux.cpp",
     "src/AMDTPowerProfileControl.cpp",
     "src/AMDTPowerProfileDataAccess.cpp",
     "src/PowerProfileTranslate.cpp",
@@ -69,24 +77,12 @@ sources = \
     "src/AMDTHistogram.cpp",
 ]
 
-if (env['CXL_build_conf'] == 'INTERNAL'):
-    sources += ["Non-OpenSource/AMDTPowerProfileSmu9Api-Internal.cpp",]
+if (env['CXL_build_conf'] == 'INTERNAL' or env['CXL_build_conf'] == 'NDA'):
+    sources += [
+                "Non-OpenSource/AMDTPowerProfileApi-Internal.cpp",
+                "Non-OpenSource/AMDTPowerFamily17Internal.cpp",
+                ]
 
-if (env['CXL_build_conf'] == 'NDA'):
-    sources += ["Non-OpenSource/AMDTPowerProfileSmu9Api-Internal.cpp",]
-
-
-if (env['CXL_build_conf'] == 'INTERNAL'):
-    sources += ["Non-OpenSource/AMDTPowerProfileApi-Internal.cpp",]
-
-if (env['CXL_build_conf'] == 'NDA'):
-    sources += ["Non-OpenSource/AMDTPowerProfileApi-Internal.cpp",]
-
-if (env['CXL_build_conf'] == 'INTERNAL'):
-    sources += ["Non-OpenSource/AMDTPowerFamily17Internal.cpp",]
-
-if (env['CXL_build_conf'] == 'NDA'):
-    sources += ["Non-OpenSource/AMDTPowerFamily17Internal.cpp",]   
 # Creating object files	
 objFiles = env.SharedObject(sources)
 

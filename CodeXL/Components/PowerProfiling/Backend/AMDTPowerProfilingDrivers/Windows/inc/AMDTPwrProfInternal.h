@@ -15,7 +15,7 @@
 #define _PWRPROFINTERNAL_H
 #include <ntifs.h>
 #include <stdlib.h>
-#include "..\..\..\..\..\..\..\amdpcore\include\pcoreinterface.h"
+#include <amdpcore/Include/PcoreInterface.h>
 #include <AMDTAccessPmcData.h>
 #include <AMDTPwrProfDriver.h>
 #include <AMDTRawDataFileHeader.h>

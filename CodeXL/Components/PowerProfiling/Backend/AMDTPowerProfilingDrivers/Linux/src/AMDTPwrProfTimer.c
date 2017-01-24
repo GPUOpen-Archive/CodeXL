@@ -48,6 +48,7 @@
 
 // Global core config list
 CoreData* g_pCoreCfg = NULL;
+#define PWR_ESCAPE_CODE  ~0UL
 
 // Define per-cpu client-data
 DEFINE_PER_CPU(CoreData, g_coreClientData);
@@ -59,6 +60,7 @@ extern int moduleState;
 // Extern functions
 extern void MarkClientForCleanup(unsigned long);
 extern void InitializeGenericCounterAccess(uint32 core);
+extern void CloseGenericCounterAccess(void);
 extern wait_queue_head_t work_queue;
 
 // Global signal handler
@@ -77,11 +79,6 @@ static ClientList tlist =
     .list = LIST_HEAD_INIT(tlist.list),
 };
 
-// CallInitCef: Core effective frequency initialization
-void CallInitCef(void* data)
-{
-    InitializeGenericCounterAccess(*(uint32*)data);
-}
 
 // CheckParentPid
 //
@@ -143,6 +140,24 @@ bool CheckParentPid(pid_t parentPid)
     return ret;
 }
 
+void SetInstructionPointer(uint32* isKernel, uint64* ip)
+{
+    struct pt_regs* regs = 0;
+
+    regs = get_irq_regs();
+
+    if (likely(regs))
+    {
+        *isKernel = !user_mode(regs);
+        *ip = instruction_pointer(regs);
+    }
+    else
+    {
+        *isKernel = 0;
+        *ip = PWR_ESCAPE_CODE;
+    }
+}
+
 // SampleDataCallback
 //
 // Timer Callback function invoked when the HR timer expires
@@ -153,11 +168,6 @@ int SampleDataCallback(ClientData* pClientData)
     int cpu = 0;
     struct task_struct* currentTask = NULL;
     CoreData* pCoreClientData = NULL;
-    uint32 interval;
-    bool flag = false;
-    int counter = 0;
-
-    ATOMIC_SET(&g_signal, 0);
 
     if (NULL != pClientData)
     {
@@ -177,58 +187,16 @@ int SampleDataCallback(ClientData* pClientData)
                 pCoreClientData->m_contextData.m_threadId   = currentTask->pid;
                 pCoreClientData->m_contextData.m_timeStamp  = ktime_to_ns(ktime_get());
                 pCoreClientData->m_coreId                   = cpu;
+                SetInstructionPointer(&pCoreClientData->m_contextData.m_isKernel, &pCoreClientData->m_contextData.m_ip);
 
                 WriteSampleData(pCoreClientData);
 
                 // Trigger event to client to inform the data availability
                 if (1 == pCoreClientData->m_sampleId)
                 {
-                    if (PROFILE_TYPE_PROCESS_PROFILING == pCoreClientData->m_profileType)
-                    {
-                        if (pCoreClientData->m_samplingInterval < 100)
-                        {
-                            counter = pCoreClientData->m_pCoreBuffer->m_recCnt % (pCoreClientData->m_samplingInterval);
-
-                            if (counter == 0)
-                            {
-                                flag = true;
-                            }
-                        }
-                        else
-                        {
-                            counter = pCoreClientData->m_pCoreBuffer->m_recCnt % 100;
-
-                            if (counter == 0)
-                            {
-                                flag = true;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        if (pCoreClientData->m_samplingInterval < 100)
-                        {
-                            interval = 100 / pCoreClientData->m_samplingInterval;
-                            counter = (pCoreClientData->m_pCoreBuffer->m_recCnt % interval);
-
-                            if (0 == counter)
-                            {
-                                flag = true;
-                            }
-                        }
-                        else
-                        {
-                            flag = true;
-                        }
-                    }
-
-                    if (true == flag)
-                    {
-                        ATOMIC_SET(&g_signal, 1);
-                        wake_up_interruptible(&work_queue);
-                    }
+                    ATOMIC_SET(&g_signal, 1);
+                    wake_up_interruptible(&work_queue);
                 }
-
             }
             else
             {
@@ -671,14 +639,9 @@ enum hrtimer_restart HrTimerCallback(struct hrtimer* timer_for_restart)
 //
 // Initiailize HR timer
 //
-void InitHrTimer(void)
+void InitHrTimer(uint32 cpu)
 {
-    int cpu;
     CoreData* pCoreClientData = NULL;
-
-    // get current core id
-    cpu = get_cpu();
-    put_cpu();
 
     // get the CORE_CLIENT_OBJECT
     pCoreClientData = &per_cpu(g_coreClientData, cpu);
@@ -690,6 +653,16 @@ void InitHrTimer(void)
     return;
 } // InitHrTimer
 
+
+// Initialize : Init HrTimer and counter data
+void Initialize(void)
+{
+    uint32 cpu = get_cpu();
+    put_cpu();
+
+    InitHrTimer(cpu);
+    InitializeGenericCounterAccess(cpu);
+}
 
 // ConfigureTimer
 //
@@ -710,10 +683,11 @@ int ConfigureTimer(ProfileConfig* config, uint32 clientId)
     bool isFirstConfig          = true;
     int configIdx               = 0;
     int ret                     = -1;
+
     PwrInternalAddr internalCounter;
+    memset(&internalCounter, 0, sizeof(internalCounter));
 
     DRVPRINT("Configuring Timer for client %d\n", clientId);
-    memset(&internalCounter, 0, sizeof(internalCounter));
 
     // Prepare cpu m_affinity mask structure for the configured core mask
     cpumask_clear(&cpuAffinity);
@@ -758,11 +732,15 @@ int ConfigureTimer(ProfileConfig* config, uint32 clientId)
     {
         DRVPRINT("Configuring for Core: %d ", coreId);
 
+#ifdef PP_LINUX_INTERNAL_COUNTER_SUPPORTED
+
         if (NULL != pSharedBuffer)
         {
             memcpy(&internalCounter, &pSharedBuffer[PWR_INTERNAL_COUNTER_BASE], sizeof(PwrInternalAddr));
             DRVPRINT("CSTATE 0x%x SVI2 0x%x SVI2NB 0x%x", internalCounter.m_cstateRes, internalCounter.m_sviTelemetry, internalCounter.m_sviNBTelemetry);
         }
+
+#endif // PP_LINUX_INTERNAL_COUNTER_SUPPORTED
 
         // Get the core specific CORE_CLIENT_DATA for this configured coreId
         pCoreClientData = &per_cpu(g_coreClientData, coreId);
@@ -792,12 +770,12 @@ int ConfigureTimer(ProfileConfig* config, uint32 clientId)
 
     if (cpumask_test_cpu(cpu, &pClientData->m_osClientCfg.m_affinity))
     {
-        InitHrTimer();
+        Initialize();
     }
 
     preempt_disable();
     smp_call_function_many(&pClientData->m_osClientCfg.m_affinity,
-                           (void*)InitHrTimer,
+                           (void*)Initialize,
                            (void*)NULL,
                            false); // non blocking call
     preempt_enable();
@@ -813,22 +791,6 @@ int ConfigureTimer(ProfileConfig* config, uint32 clientId)
 
     // Write header data buffer for the file
     errRet = WriteHeader(pClientData, config);
-    DRVPRINT("Return value from WriteHeader = %d\n", errRet);
-
-    cpu = get_cpu();
-    put_cpu();
-
-    // Reset The CEF counters to 0 before we start sampling
-    // For the current cpu
-    CallInitCef((void*)&cpu);
-
-    // for the remaining all cpus
-    preempt_disable();
-    smp_call_function_many(&pClientData->m_osClientCfg.m_affinity,
-                           (void*)CallInitCef,
-                           (void*)&cpu,
-                           true);
-    preempt_enable();
 
     DRVPRINT("Exiting Configure Timer with success ");
     return 0;
@@ -875,6 +837,8 @@ int UnconfigureTimer(uint32 clientId)
 
             // Release smu configuration
             ConfigureSmu(pCoreClientData->m_smuCfg, false);
+
+            CloseGenericCounterAccess();
 
             FreeClientData(pClientData);
 

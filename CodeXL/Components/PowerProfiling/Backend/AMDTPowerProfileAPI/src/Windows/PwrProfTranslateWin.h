@@ -69,7 +69,6 @@ public:
     AMDTResult PwrGetProfileData(CXLContextProfileType type, void** pData, AMDTUInt32* pCnt, AMDTFloat32* pPower);
 
 private:
-    AMDTFloat32 PwrGetCountsPerSecs() const;
     void SetElapsedTime(AMDTUInt64 raw, AMDTUInt64* pResult);
     AMDTResult AttributePowerToSample();
     AMDTResult ProcessSample(ContextData* pCtx, AMDTUInt32 coreId, AMDTUInt32 componentIdx);

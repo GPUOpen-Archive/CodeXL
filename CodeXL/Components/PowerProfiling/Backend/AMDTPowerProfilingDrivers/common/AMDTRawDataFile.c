@@ -30,6 +30,10 @@
 #include <AMDTSharedBufferConfig.h>
 #include <AMDTSmu8Interface.h>
 #include <AMDTSmu7Interface.h>
+#include <AMDTCommonConfig.h>
+#ifdef AMDT_INTERNAL_COUNTERS
+#include <AMDTSmu9Interface.h>
+#endif
 
 #define ONLINE_SECTION_HEADER_CNT (2)
 #define MAX_SMU_VALUE_CNT 64
@@ -395,10 +399,11 @@ bool GetRequiredBufferLength(CoreData* pCfg, uint32* pLength)
             switch (apuIpVersion)
             {
                 case SMU_IPVERSION_9_0:
-                    break;
-
+                case SMU_IPVERSION_8_0:
+                case SMU_IPVERSION_8_1:
+                case SMU_IPVERSION_7_0:
                 default:
-
+                {
                     for (attrCnt = 0; attrCnt < COUNTERID_NODE_MAX_CNT; attrCnt++)
                     {
                         if ((mask >> attrCnt) & 0x01)
@@ -406,8 +411,8 @@ bool GetRequiredBufferLength(CoreData* pCfg, uint32* pLength)
                             bufferLen += GetNodeCounterSize(attrCnt);
                         }
                     }
-
-                    break;
+                }
+                break;
             }
         }
 
@@ -428,6 +433,16 @@ bool GetRequiredBufferLength(CoreData* pCfg, uint32* pLength)
                         {
                             case SMU_IPVERSION_9_0:
                             {
+#ifdef AMDT_INTERNAL_COUNTERS
+                                for (attrCnt = 0; attrCnt < COUNTERID_SMU9_CNT; attrCnt++)
+                                {
+                                    if ((mask >> attrCnt) & 0x01)
+                                    {
+                                        bufferLen += PwrGetSmu9CounterSize(attrCnt);
+                                    }
+                                }
+
+#endif
                                 break;
                             }
 
@@ -488,7 +503,7 @@ uint32 GetMarkerKey(uint8* str)
     uint32 c;
     uint32 len = 0;
 
-    while ((c = *str++) && (len++ < PWR_MARKER_BUFFER_SIZE))
+    while (((c = *str++) != 0) && (len++ < PWR_MARKER_BUFFER_SIZE))
     {
         hash = ((hash << 5) + hash) + c;
     }
@@ -600,7 +615,7 @@ int32 WriteSampleData(CoreData* pCoreCfg)
 
         // Check if remaining buffer area is not sufficient to accomodated one more record.
         // If so, start writing from begining
-        if (PWRPROF_PERCORE_BUFFER_SIZE <= (offset + len))
+        if (pCoreCfg->m_bufferSize < (offset + len))
         {
             ATOMIC_SET(&pCoreBuffer->m_currentOffset, 0);
             prevOffset = offset;
@@ -638,20 +653,21 @@ int32 WriteSampleData(CoreData* pCoreCfg)
         // Collect context data @ 1ms
         uint64* pRecId = NULL;
         ContextData* pContextData = NULL;
+
         pRecHdr = (RawRecordHdr*) &pBuffer[offset];
+
         pRecHdr->m_recordType = REC_TYPE_CONTEXT_DATA;
         pRecHdr->m_recordLen = (uint16)CONTEXT_RECORD_LEN;
         pRecHdr->m_fill = 0;
         offset += sizeof(RawRecordHdr);
 
         pRecId = (uint64*)&pBuffer[offset];
-        *pRecId =  pCoreCfg->m_pCoreBuffer->m_recCnt;
+        *pRecId = pCoreCfg->m_pCoreBuffer->m_recCnt;
         offset += sizeof(uint64);
 
         // Fill the context data
         pContextData = (ContextData*)&pBuffer[offset];
-        ReadPmcCounterData(pCoreCfg->m_pmc, pContextData->m_pmcData);
-        ResetPMCCounters(pCoreCfg->m_pmc);
+        PwrGetIpcData(pCoreCfg->m_pmc, pContextData->m_pmcData);
 
         pContextData->m_processId = pCoreCfg->m_contextData.m_processId;
         pContextData->m_threadId = pCoreCfg->m_contextData.m_threadId;
@@ -696,6 +712,7 @@ int32 WriteSampleData(CoreData* pCoreCfg)
 
                 if (NULL != pAccess->fnSmuReadCb)
                 {
+                    DRVPRINT("FnSumRead 0x%x", pSmu->m_counterMask);
                     pAccess->fnSmuReadCb(pSmu,
                                          &pCoreCfg->m_pCoreBuffer->m_pBuffer[offset],
                                          &offset);
