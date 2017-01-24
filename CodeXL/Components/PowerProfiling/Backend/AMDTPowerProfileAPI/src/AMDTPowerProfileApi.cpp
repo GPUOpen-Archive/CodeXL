@@ -150,10 +150,6 @@ static AMDTUInt32 g_ChildCounterList[COUNTERID_MAX_CNT];
 #define PP_INVALID_COUNTER_ID    0xFFFF
 
 typedef std::pair<AMDTUInt8, bool> DgpuCountPair;
-//#define PWR_API_STUB_ENABLED
-#ifdef PWR_API_STUB_ENABLED
-#include <AMDTPowerProfileApiStub.cpp>
-#else
 
 // AllocateBuffers: Allocate required memory for power profiling
 AMDTResult AllocateBuffers()
