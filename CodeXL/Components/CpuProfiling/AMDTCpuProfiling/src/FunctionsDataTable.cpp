@@ -92,85 +92,80 @@ void FunctionsDataTable::onAboutToShowContextMenu()
     // Call the base class implementation:
     CPUProfileDataTable::onAboutToShowContextMenu();
 
-    GT_IF_WITH_ASSERT((m_pContextMenu != nullptr) &&
-                      (m_pTableDisplaySettings != nullptr) &&
-                      (m_pParentSessionWindow != nullptr) &&
-                      (m_pProfDataRdr != nullptr))
+    GT_IF_WITH_ASSERT((m_pContextMenu != nullptr) && (m_pProfDataRdr != nullptr))
     {
-        foreach (QAction* pAction, m_pContextMenu->actions())
+        if (selectedItems().count() > 0)
         {
-            if (pAction != nullptr)
+            // get the selected item (only one item)
+            QTableWidgetItem* pItem = selectedItems().first();
+
+            if (nullptr != pItem)
             {
-                bool isActionEnabled = false;
+                int rowIndex = pItem->row();
 
-                if (pAction->data().isValid())
+                gtString funcName = acQStringToGTString(getFunctionName(rowIndex));
+                bool isUnknownModule = funcName.startsWith(L"Unknown Module");
+
+                AMDTFunctionId funcId = getFunctionId(rowIndex).toInt();
+
+                int selectedCount = selectedItems().count();
+                int colCount = columnCount();
+
+                // if its empty or is the "empty row" string item
+                bool isBadSelection = (rowIndex == -1) || ((colCount > 0 && (selectedCount / colCount) > 1)) || isUnknownModule;
+
+                foreach(QAction* pAction, m_pContextMenu->actions())
                 {
-                    TableContextMenuActionType actionType = (TableContextMenuActionType)pAction->data().toInt();
-
-                    if (selectedItems().count() > 0)
+                    if (pAction != nullptr && pAction->data().isValid())
                     {
-                        AMDTFunctionId funcId = INVALID_FUNCTION_ID;
+                        TableContextMenuActionType actionType = (TableContextMenuActionType)pAction->data().toInt();
+                        bool isActionEnabled = false;
 
-                        // get the selected item (only one item)
-                        QTableWidgetItem* pItem = selectedItems().first();
-
-                        if (nullptr != pItem)
+                        if (isBadSelection)
                         {
-                            int rowIndex = pItem->row();
-                            gtString funcName = acQStringToGTString(getFunctionName(rowIndex));
-                            QString funcIdStr = getFunctionId(rowIndex);
-                            funcId = funcIdStr.toInt();
+                            isActionEnabled = false;
+                        }
+                        else if (DISPLAY_FUNCTION_IN_CALLGRAPH_VIEW == actionType)
+                        {
+                            //get supported call graph process
+                            gtVector<AMDTProcessId> cssProcesses;
+                            bool rc = m_pProfDataRdr->GetCallGraphProcesses(cssProcesses);
 
-                            // if its empty or is the "empty row" string item
-                            if ((pItem->row() == -1) ||
-                                (funcName.startsWith(L"Unknown Module")) ||
-                                ((columnCount() != 0 &&
-                                  (selectedItems().count() / columnCount()) > 1)))
+                            if ((INVALID_FUNCTION_ID != funcId) && (true == rc))
                             {
-                                isActionEnabled = false;
-                            }
-                            else if (DISPLAY_FUNCTION_IN_CALLGRAPH_VIEW == actionType)
-                            {
-                                //get supported call graph process
-                                gtVector<AMDTProcessId> cssProcesses;
-                                bool rc = m_pProfDataRdr->GetCallGraphProcesses(cssProcesses);
-
-                                if ((INVALID_FUNCTION_ID != funcId) && (true == rc))
+                                for (auto const& process : cssProcesses)
                                 {
-                                    for (auto const& process : cssProcesses)
-                                    {
-                                        AMDTProfileFunctionData  functionData;
-                                        bool retVal = m_pProfDataRdr->GetFunctionData(funcId,
-                                                                                      process,
-                                                                                      AMDT_PROFILE_ALL_THREADS,
-                                                                                      functionData);
+                                    AMDTProfileFunctionData  functionData;
+                                    bool retVal = m_pProfDataRdr->GetFunctionData(funcId,
+                                        process,
+                                        AMDT_PROFILE_ALL_THREADS,
+                                        functionData);
 
-                                        if (retVal)
+                                    if (retVal)
+                                    {
+                                        if (!functionData.m_pidsList.empty())
                                         {
-                                            if (!functionData.m_pidsList.empty())
+                                            if (process == functionData.m_pidsList.at(0))
                                             {
-                                                if (process == functionData.m_pidsList.at(0))
-                                                {
-                                                    isActionEnabled = true;
-                                                    break;
-                                                }
+                                                isActionEnabled = true;
+                                                break;
                                             }
                                         }
                                     }
                                 }
                             }
-                            else if (DISPLAY_FUNCTION_IN_SOURCE_CODE_VIEW == actionType)
+                        }
+                        else if (DISPLAY_FUNCTION_IN_SOURCE_CODE_VIEW == actionType || DISPLAY_FUNCTION_IN_FUNCTIONS_VIEW == actionType)
+                        {
+                            if (INVALID_FUNCTION_ID != funcId)
                             {
-                                if (INVALID_FUNCTION_ID != funcId)
-                                {
-                                    isActionEnabled = true;
-                                }
+                                isActionEnabled = true;
                             }
                         }
-                    }
 
-                    // Enable / disable the action:
-                    pAction->setEnabled(isActionEnabled);
+                        // Enable / disable the action:
+                        pAction->setEnabled(isActionEnabled);
+                    }
                 }
             }
         }
