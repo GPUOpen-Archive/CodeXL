@@ -137,7 +137,7 @@ bool ModulesDataTable::fillSummaryTable(int counterIdx)
 {
     bool retVal = false;
 
-    GT_IF_WITH_ASSERT((m_pProfDataRdr != nullptr) && (m_pTableDisplaySettings != nullptr))
+    GT_IF_WITH_ASSERT((m_pProfDataRdr != nullptr) && (m_pDisplayFilter != nullptr) && (m_pTableDisplaySettings != nullptr))
     {
         AMDTProfileCounterDescVec counterDesc;
         bool rc = m_pProfDataRdr->GetSampledCountersList(counterDesc);
@@ -192,13 +192,22 @@ bool ModulesDataTable::fillSummaryTable(int counterIdx)
                     pModuleNameItem->setToolTip(moduleData.m_name.asASCIICharArray());
                 }
 
-                SetSampleColumnValue(rowCount() - 1,
-                    CXL_MOD_SUMMARY_SAMPLE_COL,
-                    moduleData.m_sampleValue.at(0).m_sampleCount);
+                if (m_isCLU)
+                {
+                    SetSamplePercentColumnValue(rowCount() - 1,
+                        CXL_MOD_SUMMARY_SAMPLE_COL,
+                        moduleData.m_sampleValue.at(0).m_sampleCount);
+                }
+                else
+                {
+                    SetSampleColumnValue(rowCount() - 1,
+                        CXL_MOD_SUMMARY_SAMPLE_COL,
+                        moduleData.m_sampleValue.at(0).m_sampleCount);
 
-                SetSamplePercentColumnValue(rowCount() - 1,
-                    CXL_MOD_SUMMARY_SAMPLE_PER_COL,
-                    moduleData.m_sampleValue.at(0).m_sampleCountPercentage);
+                    SetSamplePercentColumnValue(rowCount() - 1,
+                        CXL_MOD_SUMMARY_SAMPLE_PER_COL,
+                        moduleData.m_sampleValue.at(0).m_sampleCountPercentage);
+                }
             }
             else
             {
@@ -232,11 +241,35 @@ bool ModulesDataTable::fillSummaryTable(int counterIdx)
             }
         }
 
-        setItemDelegateForColumn(CXL_MOD_SUMMARY_SAMPLE_COL, &acNumberDelegateItem::Instance());
         delegateSamplePercent(CXL_MOD_SUMMARY_SAMPLE_PER_COL);
 
-        setSortingEnabled(true);
+        if (m_isCLU)
+        {
+            if (m_pDisplayFilter->IsCLUPercentCaptionSet())
+            {
+                delegateSamplePercent(CXL_MOD_SUMMARY_SAMPLE_COL);
+            }
+            else
+            {
+                setItemDelegateForColumn(CXL_MOD_SUMMARY_SAMPLE_COL, &acNumberDelegateItem::Instance());
+            }
+
+            hideColumn(CXL_MOD_SUMMARY_SAMPLE_PER_COL);
+        }
+        else
+        {
+            setItemDelegateForColumn(CXL_MOD_SUMMARY_SAMPLE_COL, &acNumberDelegateItem::Instance());
+        }
+
         setColumnWidth(CXL_MOD_SUMMARY_MOD_NAME_COL, MAX_MODULE_NAME_LEN);
+
+        if (m_pTableDisplaySettings->m_lastSortColumnCaption.isEmpty())
+        {
+            m_pTableDisplaySettings->m_lastSortColumnCaption = horizontalHeaderItem(CXL_MOD_SUMMARY_SAMPLE_COL)->text();
+        }
+
+        setSortingEnabled(true);
+
         retVal = true;
     }
 
@@ -321,6 +354,11 @@ bool ModulesDataTable::fillTableData(AMDTProcessId procId, AMDTModuleId modId, s
         hideColumn(CXL_MOD_TAB_MOD_ID_COL);
 
         setColumnWidth(CXL_MOD_TAB_MOD_NAME_COL, MAX_MODULE_NAME_LEN);
+
+        if (m_pTableDisplaySettings->m_lastSortColumnCaption.isEmpty())
+        {
+            m_pTableDisplaySettings->m_lastSortColumnCaption = horizontalHeaderItem(CXL_MOD_TAB_SAMPLE_START_COL)->text();
+        }
 
         retVal = true;
     }

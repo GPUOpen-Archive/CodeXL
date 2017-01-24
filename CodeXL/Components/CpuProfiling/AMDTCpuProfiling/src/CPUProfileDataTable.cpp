@@ -850,6 +850,8 @@ displayTableData(std::shared_ptr<cxlProfileDataReader> pProfDataRdr,
         bool rcData = fillTableData(procId, modId, moduleIdVec);
         GT_ASSERT(rcData);
 
+        sortTable();
+
         retVal = true;
     }
 
@@ -890,7 +892,7 @@ bool CPUProfileDataTable::initializeTableHeaders(std::shared_ptr<DisplayFilter> 
                                                                colStr, colTooltip);
             GT_ASSERT(rc);
 
-            if (m_isCLU && (colStr == "Samples"))
+            if (m_isCLU && (colStr == CP_colCaptionSamples))
             {
                 colStr = diplayFilter->GetCLUOVHdrName();
                 colTooltip = colStr;
@@ -1030,7 +1032,16 @@ void CPUProfileDataTable::SetTableSampleCountAndPercent(int row, int delegateCol
             else // CLU
             {
                 SetSampleColumnValue(row, delegateColumn + i, sampleCount);
-                setItemDelegateForColumn(delegateColumn + i, &acNumberDelegateItem::Instance());
+
+                // First CLU sample column shows the data in percentage.
+                if (i == 0)
+                {
+                    delegateSamplePercent(delegateColumn + i);
+                }
+                else
+                {
+                    setItemDelegateForColumn(delegateColumn + i, &acNumberDelegateItem::Instance());
+                }
             }
 
             ++i;

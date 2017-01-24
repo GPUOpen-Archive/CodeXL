@@ -751,22 +751,14 @@ void SessionOverviewWindow::initDisplayFilters()
         m_processesTablesFilter.m_displayedColumns.push_back(TableDisplaySettings::PROCESS_NAME_COL);
         m_processesTablesFilter.m_displayedColumns.push_back(TableDisplaySettings::PID_COL);
         m_processesTablesFilter.m_displayedColumns.push_back(TableDisplaySettings::SAMPLES_COUNT_COL);
-
-        if (!m_isCLU)
-        {
-            m_processesTablesFilter.m_displayedColumns.push_back(TableDisplaySettings::SAMPLES_PERCENT_COL);
-        }
+        m_processesTablesFilter.m_displayedColumns.push_back(TableDisplaySettings::SAMPLES_PERCENT_COL);
 
         // Set the display filter for the modules table:
         m_modulesTablesFilter.m_amountOfItemsInDisplay = 5;
         m_modulesTablesFilter.m_hotSpotIndicatorColumnCaption.clear();
         m_modulesTablesFilter.m_displayedColumns.push_back(TableDisplaySettings::MODULE_NAME_COL);
         m_modulesTablesFilter.m_displayedColumns.push_back(TableDisplaySettings::SAMPLES_COUNT_COL);
-
-        if (!m_isCLU)
-        {
-            m_modulesTablesFilter.m_displayedColumns.push_back(TableDisplaySettings::SAMPLES_PERCENT_COL);
-        }
+        m_modulesTablesFilter.m_displayedColumns.push_back(TableDisplaySettings::SAMPLES_PERCENT_COL);
 
         // Set the display filter for the functions table:
         m_functionsTablesFilter.m_amountOfItemsInDisplay = 5;
@@ -774,12 +766,8 @@ void SessionOverviewWindow::initDisplayFilters()
         m_functionsTablesFilter.m_displayedColumns.push_back(TableDisplaySettings::FUNCTION_ID);
         m_functionsTablesFilter.m_displayedColumns.push_back(TableDisplaySettings::FUNCTION_NAME_COL);
         m_functionsTablesFilter.m_displayedColumns.push_back(TableDisplaySettings::SAMPLES_COUNT_COL);
+        m_functionsTablesFilter.m_displayedColumns.push_back(TableDisplaySettings::SAMPLES_PERCENT_COL);
         m_functionsTablesFilter.m_displayedColumns.push_back(TableDisplaySettings::MODULE_NAME_COL);
-
-        if (!m_isCLU)
-        {
-            m_functionsTablesFilter.m_displayedColumns.push_back(TableDisplaySettings::SAMPLES_PERCENT_COL);
-        }
 
         if (m_isCLU)
         {
