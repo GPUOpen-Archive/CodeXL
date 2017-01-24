@@ -1393,7 +1393,7 @@ AMDTUInt32 PowerProfileTranslate::DecodeNodeCounters(PwrCounterDecodeInfo* pDeco
                 unit = std::pow(2, m_energyUnit);
                 energy = static_cast<AMDTFloat32>(data) / static_cast<AMDTFloat32>(unit);
 
-                counter.m_float32 = (PLATFORM_ZEPPELIN == GetSupportedTargetPlatformId()) ? energy : energy * 1000;
+                counter.m_float32 = energy * 1000;
                 counter.m_counterId = pDecodeInfo->m_clientId;
                 counter.m_instanceId  = pDecodeInfo->m_instanceId;
                 pOut->m_counters.push_back(counter);
