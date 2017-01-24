@@ -155,9 +155,18 @@ void FunctionsDataTable::onAboutToShowContextMenu()
                                 }
                             }
                         }
-                        else if (DISPLAY_FUNCTION_IN_SOURCE_CODE_VIEW == actionType || DISPLAY_FUNCTION_IN_FUNCTIONS_VIEW == actionType)
+                        else if (DISPLAY_FUNCTION_IN_SOURCE_CODE_VIEW == actionType)
                         {
                             if (INVALID_FUNCTION_ID != funcId)
+                            {
+                                isActionEnabled = true;
+                            }
+                        }
+                        else if (DISPLAY_FUNCTION_IN_FUNCTIONS_VIEW == actionType)
+                        {
+                            bool isOther = funcName.isEqual("other") && (INVALID_FUNCTION_ID == funcId);
+
+                            if (isOther || (INVALID_FUNCTION_ID != funcId))
                             {
                                 isActionEnabled = true;
                             }

@@ -321,16 +321,24 @@ void SessionFunctionView::selectFunction(const QString& funcId)
     {
         int itemRowIndex = -1;
 
-        for (int i = 0; i < m_pFunctionTable->rowCount(); i++)
+        if (funcId.isEmpty())
         {
-            QTableWidgetItem* pItem = m_pFunctionTable->item(i, 0);
-
-            if (pItem != nullptr)
+            // If it is empty function id, select the first function.
+            itemRowIndex = 0;
+        }
+        else
+        {
+            for (int i = 0; i < m_pFunctionTable->rowCount(); i++)
             {
-                if (pItem->text() == funcId)
+                QTableWidgetItem* pItem = m_pFunctionTable->item(i, 0);
+
+                if (pItem != nullptr)
                 {
-                    itemRowIndex = i;
-                    break;
+                    if (pItem->text() == funcId)
+                    {
+                        itemRowIndex = i;
+                        break;
+                    }
                 }
             }
         }

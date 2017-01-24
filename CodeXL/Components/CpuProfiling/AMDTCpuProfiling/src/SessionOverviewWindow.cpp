@@ -1111,7 +1111,7 @@ void SessionOverviewWindow::openFunctionViewForFunction(QTableWidgetItem* pTable
             // Find the matching session window:
             CpuSessionWindow* pSessionWindow = pSessionViewCreator->findSessionWindow(pActivatedItemMacthingItemData);
 
-            GT_IF_WITH_ASSERT((pSessionWindow != nullptr) && (!funcId.isEmpty()))
+            GT_IF_WITH_ASSERT(pSessionWindow != nullptr)
             {
                 SessionFunctionView* pFunctionsView = pSessionWindow->sessionFunctionsView();
 
