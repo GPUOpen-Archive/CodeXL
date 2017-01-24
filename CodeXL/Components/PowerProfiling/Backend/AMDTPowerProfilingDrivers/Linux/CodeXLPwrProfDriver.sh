@@ -380,10 +380,12 @@ install() {
 }
 
 verify_kernel_header() {
+
+    # kernel headers is linked to build directory
+    HEADER_SRC="/lib/modules/`uname -r`/build"
  
     if [ -f /etc/redhat-release ]
     then
-        HEADER_SRC="/usr/src/kernels/`uname -r`"
         if [ ! -d ${HEADER_SRC} ]
         then
             echo "ERROR: Linux headers is required for installing CodeXL Power Profiler driver."
@@ -399,7 +401,6 @@ verify_kernel_header() {
         # TODO:
         echo  1 > /dev/null
     else
-        HEADER_SRC="/usr/src/linux-headers-`uname -r`"
 
         if [ ! -d ${HEADER_SRC} ]
         then
