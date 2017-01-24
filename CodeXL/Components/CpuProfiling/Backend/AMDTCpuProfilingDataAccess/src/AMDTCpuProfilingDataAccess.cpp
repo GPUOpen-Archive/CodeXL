@@ -1048,21 +1048,29 @@ public:
 
                         DecodeEvent(counterDesc.m_id, &event, &unitMask, &bitOs, &bitUsr);
 
-                        gtString addonStr;
-                        addonStr.appendFormattedString(L" (0x%x)", unitMask);
+                        gtString addonNameStr;
+                        gtString addonAbbrevStr;
+
+                        addonNameStr.appendFormattedString(L" (umask:0x%x", unitMask);
+                        addonAbbrevStr.appendFormattedString(L" (0x%x", unitMask);
 
                         if (bitOs)
                         {
-                            addonStr.append(L",Os");
+                            addonNameStr.append(L",Os");
+                            addonAbbrevStr.append(L",Os");
                         }
 
                         if (bitUsr)
                         {
-                            addonStr.append(L",Usr");
+                            addonNameStr.append(L",Usr");
+                            addonAbbrevStr.append(L",Usr");
                         }
 
-                        counterDesc.m_name.append(addonStr);
-                        counterDesc.m_abbrev.append(addonStr);
+                        addonNameStr.append(L")");
+                        addonAbbrevStr.append(L")");
+
+                        counterDesc.m_name.append(addonNameStr);
+                        counterDesc.m_abbrev.append(addonAbbrevStr);
                     }
                 }
             }
