@@ -16,6 +16,9 @@ PwrProSourceInstall = "CodeXLPwrProfDriverSource.tar.gz"
 PwrProfVersion      = "CodeXLPwrProfVersion"
 baseDir     = Dir("#./Components/PowerProfiling/Backend/AMDTPowerProfilingDrivers/Linux/src").abspath
 
+if (cxl_env['CXL_build_conf'] == 'INTERNAL' or cxl_env['CXL_build_conf'] == 'NDA'):
+     cxl_env.Append(CPPDEFINES={'AMDT_INTERNAL_COUNTERS' : 1})
+
 def run(cmd):
     res = subprocess.call(cmd, shell=True)
     if res != 0:

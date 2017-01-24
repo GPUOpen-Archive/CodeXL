@@ -8,7 +8,11 @@ endif
 
 obj-m += $(TARGET).o
 
+ifneq ($(AMDT_INTERNAL_COUNTERS), 1)
+${TARGET}-objs :=  AMDTPwrProfHwaccess.o AMDTPwrProfHelper.o ../../common/AMDTSmu7Interface.o ../../common/AMDTSmu8Interface.o ../../common/AMDTAccessPmcData.o ../../common/AMDTCounterAccessInterface.o ../../common/AMDTRawDataFile.o ../../common/AMDTCommonConfig.o ../../common/AMDTHwAccessInterface.o ../../common/AMDTPwrCommonHelper.o AMDTPwrProfTimer.o AMDTPwrProfEntry.o AMDTPwrProfCoreUtils.o AMDTPwrProfModule.o AMDTPwrProfTimerHelper.o AMDTPwrProfSharedMemOps.o
+else
 ${TARGET}-objs :=  AMDTPwrProfHwaccess.o AMDTPwrProfHelper.o ../../common/AMDTSmu7Interface.o ../../common/AMDTSmu8Interface.o ../../common/AMDTAccessPmcData.o ../../common/AMDTCounterAccessInterface.o ../../common/AMDTRawDataFile.o ../../common/AMDTCommonConfig.o ../../common/AMDTHwAccessInterface.o ../../common/AMDTPwrCommonHelper.o AMDTPwrProfTimer.o AMDTPwrProfEntry.o AMDTPwrProfCoreUtils.o AMDTPwrProfModule.o AMDTPwrProfTimerHelper.o AMDTPwrProfSharedMemOps.o ../../Non-OpenSource/AMDTSmu9Interface.o
+endif
 
 all:
 	make -C /lib/modules/$(shell uname -r)/build M=$(CURDIR) $(MAKE_OPTS) EXTRA_CFLAGS="$(EXTRA_CFLAGS)" modules
