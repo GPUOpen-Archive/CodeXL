@@ -764,7 +764,7 @@ JavaJncReader::_getSrcInfoFromBcAndMethodID(
     // Get Source line
     size_t num = it->second.lineNumberVec.size();
 
-    for (size_t i = num - 1; i >= 0; i--)
+    for (int i = static_cast<int>(num - 1); i >= 0; i--)
     {
         srcLine = it->second.lineNumberVec[i].line_number;
 
