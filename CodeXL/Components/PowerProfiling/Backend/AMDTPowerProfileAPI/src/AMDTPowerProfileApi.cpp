@@ -691,6 +691,10 @@ bool PwrEnableProcessProfileCounters()
         {
             pwrCounter = COUNTERID_SMU7_APU_PWR_CU;
         }
+        else if (SMU_IPVERSION_9_0 == smuVersion)
+        {
+            //do nothing
+        }
         else
         {
             ret = false;
