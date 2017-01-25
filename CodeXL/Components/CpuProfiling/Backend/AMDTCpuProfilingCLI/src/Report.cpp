@@ -823,64 +823,20 @@ void CpuProfileReport::ValidateOptions()
     }
 
     // Validate the core affinity mask
-    // TODO: Currently this supports only upto 64 cores
-    if (GT_UINT64_MAX != m_args.GetCoreAffinityMask())
+    if (!m_args.IsReportAllCores())
     {
         int nbrCores = 0;
-        gtUInt64 maxAffinity = 0;
 
-        // TODO: this should be read from DB
+        // TODO: Currently this API supports only upto 64 cores?
         osGetAmountOfLocalMachineCPUs(nbrCores);
+        gtVector<gtUInt32> coresList = m_args.GetCoresList();
 
-        if (nbrCores < 64)
+        for (auto& coreId : coresList)
         {
-            maxAffinity = (1ULL << nbrCores) - 1;
-        }
-        else
-        {
-            maxAffinity = GT_UINT64_MAX;
-        }
-
-        if (maxAffinity < m_args.GetCoreAffinityMask())
-        {
-            reportError(false, L"Invalid core affinity mask (0x%lx) specified with option(-c).\n", m_args.GetCoreAffinityMask());
-            return;
-        }
-    }
-
-    // Fill-in the m_coresList from the coreAffinity mask
-    // If separate-by-core and core-affinity-mask not used, then report for all the cores
-    if (m_args.IsReportByCore())
-    {
-        gtUInt64 coreMask = m_args.GetCoreAffinityMask();
-
-        if (GT_UINT64_MAX == coreMask)
-        {
-            int nbrCores = 0;
-
-            // TODO: this should be read from profile reader
-            osGetAmountOfLocalMachineCPUs(nbrCores);
-
-            if (nbrCores < 64)
+            if (static_cast<gtInt32>(coreId) < 0 || static_cast<gtInt32>(coreId) >= nbrCores)
             {
-                coreMask = (1ULL << nbrCores) - 1;
-            }
-            else
-            {
-                coreMask = GT_UINT64_MAX;
-            }
-        }
-
-        gtUInt32 coreId = 0;
-
-        while (coreMask)
-        {
-            if (coreMask & 0x1)
-            {
-                m_coresList.push_back(coreId);
-
-                coreMask >>= 1;
-                coreId++;
+                reportError(false, L"Invalid core id (%d) specified with option(-c).\n", coreId);
+                return;
             }
         }
     }
@@ -926,6 +882,7 @@ osFilePath& CpuProfileReport::GetOutputFilePath()
         }
 
         m_outputFilePath = osFilePath(outputFile);
+        m_outputFilePath.resolveToAbsolutePath();
         m_outputFilePath.reinterpretAsDirectory();
 
         // Get the basename from the input file and create a output dir
@@ -1636,45 +1593,6 @@ bool CpuProfileReport::ReportCSSData(AMDTProcessId pid)
     }
 
     return retVal;
-}
-
-bool CpuProfileReport::InitCoresList()
-{
-    // Fill-in the m_coresList from the coreAffinity mask
-    // If separate-by-core and core-affinity-mask not used, then report for all the cores
-    if (m_args.IsReportByCore())
-    {
-        AMDTProfileSessionInfo sessionInfo;
-        m_profileDbReader.GetProfileSessionInfo(sessionInfo);
-
-        gtUInt64 coreMask = m_args.GetCoreAffinityMask();
-
-        if (static_cast<gtUInt64>(-1) == coreMask)
-        {
-            gtUInt32 nbrCores = sessionInfo.m_coreCount;
-
-            for (gtUInt32 core = 0; core < nbrCores; core++)
-            {
-                coreMask <<= 1;
-                coreMask |= 1;
-            }
-        }
-
-        gtUInt32 coreId = 0;
-
-        while (coreMask)
-        {
-            if (coreMask & 0x1)
-            {
-                m_coresList.push_back(coreId);
-
-                coreMask >>= 1;
-                coreId++;
-            }
-        }
-    }
-
-    return true;
 }
 
 #if AMDT_CPCLI_ENABLE_IMIX

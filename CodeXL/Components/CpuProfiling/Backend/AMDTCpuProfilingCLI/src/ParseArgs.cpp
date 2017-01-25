@@ -13,6 +13,7 @@
 
 // Project:
 #include <AMDTBaseTools/Include/AMDTDefinitions.h>
+#include <AMDTOSWrappers/Include/osMachine.h>
 #include <ParseArgs.h>
 #include <CommonUtils.h>
 
@@ -266,7 +267,8 @@ bool ParseArgs::InitializeArgs(int nbrArgs, wchar_t* args[])
     int opt;
     int tmpNbr;
     gtString tmp;
-    unsigned long long tmpULL;
+    //unsigned long long tmpULL;
+    int nbrCores = 0;
 
     if (nbrArgs == 1)
     {
@@ -451,6 +453,51 @@ bool ParseArgs::InitializeArgs(int nbrArgs, wchar_t* args[])
                 break;
 
             case 'c':
+                tmp = gtString(optArg);
+                startPosition = 0;
+                osGetAmountOfLocalMachineCPUs(nbrCores);
+
+                do
+                {
+                    pos = tmp.find(L",", startPosition);
+
+                    gtString tmpStr;
+                    int endPosition = (-1 != pos) ? (pos - 1) : tmp.length();
+                    tmp.getSubString(startPosition, endPosition, tmpStr);
+
+                    if (tmpStr.isIntegerNumber())
+                    {
+                        tmpStr.toIntNumber(tmpNbr);
+
+                        if ((tmpNbr < 0) || (tmpNbr >= nbrCores))
+                        {
+                            fprintf(stderr, "Invalid Core Id(%d) is specified with option(-c). Valid core-ids are 0 to %d.\n",
+                                tmpNbr, (nbrCores-1));
+                            retVal = false;
+                            break;
+                        }
+
+                        m_coreMaskInfo.AddCoreId(tmpNbr);
+                    }
+                    else
+                    {
+                        fprintf(stderr, "Invalid argument(%s) is passed with option(-c).\n", tmpStr.asASCIICharArray());
+                        retVal = false;
+                        break;
+                    }
+
+                    startPosition = pos + 1;
+                } while (-1 != pos);
+
+                if (retVal && m_coreMaskInfo.GetCoresList().empty())
+                {
+                    fprintf(stderr, "Invalid Core Ids(%s) are passed with option(-c).\n", tmp.asASCIICharArray());
+                }
+
+                break;
+
+#if 0
+            case 'c':
                 // Core Affinity Mask
                 // in SWP, only these cores will be profiled
                 // in Per Process mode, the processor affinity will be set for the launch app
@@ -477,6 +524,7 @@ bool ParseArgs::InitializeArgs(int nbrArgs, wchar_t* args[])
                 }
 
                 break;
+#endif //0
 
             case 'd':
                 // Profile Duration
@@ -693,6 +741,7 @@ bool ParseArgs::InitializeArgs(int nbrArgs, wchar_t* args[])
             case 'p':
                 // Attach case
                 tmp = gtString(optArg);
+                startPosition = 0;
 
                 do
                 {
@@ -806,6 +855,17 @@ bool ParseArgs::InitializeArgs(int nbrArgs, wchar_t* args[])
     }
 
     return retVal;
+}
+
+void ParseArgs::GetCoreMask(gtUInt64*& pCoreMask, gtUInt32& coreMaskSize)
+{
+    pCoreMask = nullptr;
+    coreMaskSize = 0;
+
+    if (!IsProfileAllCores())
+    {
+        m_coreMaskInfo.GetCoreMask(pCoreMask, coreMaskSize);
+    }
 }
 
 gtString ParseArgs::GetInputFile()

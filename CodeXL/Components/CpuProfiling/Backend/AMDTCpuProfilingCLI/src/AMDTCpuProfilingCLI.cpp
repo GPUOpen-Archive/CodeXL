@@ -21,6 +21,7 @@
 
 // Infra:
 #include <AMDTOSWrappers/Include/osProductVersion.h>
+#include <AMDTOSWrappers/Include/osMachine.h>
 #include <AMDTOSWrappers/Include/osApplication.h>
 #include <AMDTOSWrappers/Include/osProcess.h>
 #include <AMDTOSWrappers/Include/osFilePath.h>
@@ -152,8 +153,9 @@ int PrintCollectOptions()
     fprintf(stderr, "                               Specify the Unwind Interval and Unwind Depth values.\n");
 #endif
 
-    fprintf(stderr, "\n    -c                         Core Affinity Mask.\n");
-    fprintf(stderr, "                               Default affinity is all the available cores.\n");
+    fprintf(stderr, "\n    -c <core-id,..>            Core Affinity.\n");
+    fprintf(stderr, "                               Comma seperated list of CPUs. Ranges of CPUs also can be \n");
+    fprintf(stderr, "                               specified with -: 0-3. Default affinity is all the available cores.) \n");
     fprintf(stderr, "                               In System-wide profiling, samples are collected only\n");
     fprintf(stderr, "                               from these cores. In Per-Process profile, processor\n");
     fprintf(stderr, "                               affinity is set for the launched application.\n");
@@ -415,6 +417,7 @@ HRESULT LaunchTargetApp(
     {
         // Launch the target application, if any
         osFilePath exePath(args.GetLaunchApp());
+        exePath.resolveToAbsolutePath();
 
         ExecutableFile* pExec = ExecutableFile::Open(args.GetLaunchApp().asCharArray());
         bool is64Bit = false;
@@ -441,9 +444,10 @@ HRESULT LaunchTargetApp(
 
         if (workDir.isEmpty())
         {
-            if (! exePath.fileDirectoryAsString().startsWith(L"."))
+            if (! exePath.isRelativePath())
             {
-                workDir = exePath.fileDirectoryAsString();
+                osFilePath tmpWorkDir = exePath.fileDirectoryAsString();
+                workDir = tmpWorkDir.reinterpretAsDirectory().asString(true);
             }
             else
             {
@@ -469,7 +473,23 @@ HRESULT LaunchTargetApp(
         if (appLaunched)
         {
             // Set processor affinity
-            osSetProcessAffinityMask(processId, processHandle, args.GetCoreAffinityMask());
+            AMDTProfileCoreMaskInfo coreMaskInfo = args.GetCoreMaskInfo();
+
+            if (args.IsProfileAllCores())
+            {
+                int nbrCores = 0;
+                osGetAmountOfLocalMachineCPUs(nbrCores);
+                coreMaskInfo.AddCores(nbrCores);
+            }
+
+            gtUInt64* pCpuCoreMask = nullptr;
+            gtUInt32 cpuCoreMaskSize = 0;
+            coreMaskInfo.GetCoreMask(pCpuCoreMask, cpuCoreMaskSize);
+
+            // TODO: Support for >64 cores windows processor gropus
+            gtUInt64 cpuAffinityMask = (cpuCoreMaskSize > 0) ? pCpuCoreMask[0] : static_cast<gtUInt64>(-1);
+
+            osSetProcessAffinityMask(processId, processHandle, cpuAffinityMask);
 
             // Restore the environment vars...
             RestoreEnvironment(clrEnvVars);
@@ -746,10 +766,10 @@ bool reportError(bool appendDriverError, const wchar_t* pFormatString, ...)
     osDebugLog::instance().initialize(debugLogFile, NULL, NULL);
 
     ParseArgs args;
-    retVal = args.Initialize(argc, argv);
+    bool ret = args.Initialize(argc, argv);
 
     // if there are no args..
-    if (! retVal)
+    if (! ret)
     {
         exit(-1);
     }

@@ -24,6 +24,7 @@
 #include <AMDTOSWrappers/Include/osProcess.h>
 #include <AMDTCpuProfilingBackendUtils/Include/CpuProfileDefinitions.h>
 #include <AMDTOSWrappers/Include/osDebugLog.h>
+#include <AMDTCommonHeaders/AMDTProfileCoreMaskInfo.h>
 
 //
 // codexl-cli  // print usage & exit
@@ -79,7 +80,11 @@ public:
     int GetStartDelay() const { return m_startDelay; }
     gtVector<gtString> GetRawEventString() const { return m_rawEventsStringVec; }
 
-    gtUInt64 GetCoreAffinityMask() const { return m_coreAffinityMask; }
+    bool IsProfileAllCores() const { return (m_coreMaskInfo.GetCoresList().size() == 0); }
+    bool IsReportAllCores() const { return IsProfileAllCores(); }
+    AMDTProfileCoreMaskInfo& GetCoreMaskInfo() { return m_coreMaskInfo; }
+    void GetCoreMask(gtUInt64*& pCoreMask, gtUInt32& coreMaskSize);
+    gtVector<gtUInt32> GetCoresList() const { return m_coreMaskInfo.GetCoresList();  }
 
     gtString& GetLaunchApp() { return m_launchApp; }
     gtString GetLaunchAppArgs() { return m_launchAppArgs; }
@@ -123,7 +128,7 @@ private:
 
     gtVector<int>       m_pidsList;
 
-    gtUInt64  m_coreAffinityMask = static_cast<gtUInt64>(-1);
+    AMDTProfileCoreMaskInfo m_coreMaskInfo;
 
     bool      m_printSampleCount = false;
     int       m_debugLogLevel = 0;

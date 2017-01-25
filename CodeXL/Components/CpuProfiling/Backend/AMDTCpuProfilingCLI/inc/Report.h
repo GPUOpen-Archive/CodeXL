@@ -170,7 +170,7 @@ private:
     gtUInt32            m_sortCounterId;
     gtVector<gtString>  m_profileEventsNameVec;   // this is used for column headers
 
-    gtList<gtUInt32>    m_coresList; // List of cores for which samples need to be aggregated
+    gtVector<gtUInt32>  m_coresList; // List of cores for which samples need to be aggregated
 
     // report sections
     bool                m_isRawInputFile = false;
@@ -192,7 +192,6 @@ private:
     osFilePath& GetOutputFilePath();
 
     bool InitializeReportFile();
-    bool InitCoresList();
 
     bool IsReportOverview() const { return m_isReportOverview; }
     bool IsReportAggregateByProcess() const { return m_isReportAggregateByProcess; }

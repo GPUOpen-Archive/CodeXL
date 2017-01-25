@@ -183,65 +183,63 @@ HRESULT CpuProfileCollect::StopProfiling()
 
             if (m_nbrCountEvents > 0)
             {
-                // TODO: Support for more than 64 cores
-                int nbrCores = 0;
-                gtUInt64 coreAffinityMask = m_args.GetCoreAffinityMask();
+                gtVector<gtUInt32> coresList;
 
-                if ((coreAffinityMask + 1) == 0)
+                // TODO: Support for more than 64 cores; osGetAmountOfLocalMachineCPUs does not detect more than 1 socket
+                if (m_args.IsProfileAllCores())
                 {
-                    coreAffinityMask = 0;
+                    int nbrCores = 0;
                     osGetAmountOfLocalMachineCPUs(nbrCores);
 
-                    if (nbrCores < 64)
-                    {
-                        coreAffinityMask = (1ULL << nbrCores) - 1;
-                    }
+                    AMDTProfileCoreMaskInfo allCoresMask;
+                    allCoresMask.AddCores(nbrCores);
+                    coresList = allCoresMask.GetCoresList();
+                }
+                else
+                {
+                    coresList = m_args.GetCoresList();
                 }
 
-                gtUInt32 coreId = 0;
                 CpuProfilePmcEventCount eventCountTotals;
-                while (coreAffinityMask)
+
+                for (auto& coreId : coresList)
                 {
-                    if (coreAffinityMask & 0x1)
+                    CpuProfilePmcEventCount eventCountData;
+                    eventCountData.m_coreId = coreId;
+                    eventCountData.m_nbrEvents = static_cast<gtUInt32>(m_nbrCountEvents);
+
+                    m_error = fnGetAllEventCounts(coreId,
+                                                    static_cast<gtUInt32>(this->m_nbrCountEvents),
+                                                    &eventCountData.m_eventCountValue[0]);
+
+                    int idx = 0;
+
+                    for (const auto& aEvent : m_countEventVec)
                     {
-                        CpuProfilePmcEventCount eventCountData;
-                        eventCountData.m_coreId = coreId;
-                        eventCountData.m_nbrEvents = static_cast<gtUInt32>(m_nbrCountEvents);
+                        eventCountData.m_eventConfig[idx] = aEvent;
+                        idx++;
+                    }
 
-                        m_error = fnGetAllEventCounts(coreId, static_cast<gtUInt32>(this->m_nbrCountEvents), &eventCountData.m_eventCountValue[0]);
-
-                        int idx = 0;
-
-                        for (const auto& aEvent : m_countEventVec)
+                    if (m_args.IsReportByCore())
+                    {
+                        m_eventCountValuesVec.push_back(eventCountData);
+                    }
+                    else
+                    {
+                        if (!eventCountTotals.m_nbrEvents)
                         {
-                            eventCountData.m_eventConfig[idx] = aEvent;
-                            idx++;
-                        }
-
-                        if (m_args.IsReportByCore())
-                        {
-                            m_eventCountValuesVec.push_back(eventCountData);
+                            eventCountTotals = eventCountData;
                         }
                         else
                         {
-                            if (!eventCountTotals.m_nbrEvents)
-                            {
-                                eventCountTotals = eventCountData;
-                            }
-                            else
-                            {
-                                eventCountTotals.m_coreId = static_cast<gtUInt32>(-1);
+                            eventCountTotals.m_coreId = static_cast<gtUInt32>(-1);
 
-                                for (gtUInt32 id = 0; id < eventCountData.m_nbrEvents; id++)
-                                {
-                                    eventCountTotals.m_eventCountValue[id] += eventCountData.m_eventCountValue[id];
-                                }
+                            for (gtUInt32 id = 0; id < eventCountData.m_nbrEvents; id++)
+                            {
+                                eventCountTotals.m_eventCountValue[id] += eventCountData.m_eventCountValue[id];
                             }
                         }
                     }
-
-                    coreAffinityMask >>= 1;
-                    coreId++;
                 }
 
                 if (!m_args.IsReportByCore())
@@ -392,28 +390,22 @@ void CpuProfileCollect::ValidateProfile()
         }
     }
 
-    // Validate the core affinity mask
-    // TODO: Currently this supports only upto 64 cores
-    if (static_cast<gtUInt64>(-1) != m_args.GetCoreAffinityMask())
+    // Validate the cores list
+    if (!m_args.IsProfileAllCores())
     {
         int nbrCores = 0;
-        gtUInt64 maxAffinity = 0;
 
+        // TODO: Currently this API supports only upto 64 cores
         osGetAmountOfLocalMachineCPUs(nbrCores);
+        gtVector<gtUInt32> coresList = m_args.GetCoresList();
 
-        if (nbrCores < 64)
+        for (auto& coreId : coresList)
         {
-            maxAffinity = (1ULL << nbrCores) - 1;
-        }
-        else
-        {
-            maxAffinity = GT_UINT64_MAX;
-        }
-
-        if (maxAffinity < m_args.GetCoreAffinityMask())
-        {
-            reportError(false, L"Invalid core affinity mask (0x%lx) specified with option(-c).\n", m_args.GetCoreAffinityMask());
-            return;
+            if (static_cast<gtInt32>(coreId) < 0 || static_cast<gtInt32>(coreId) >= nbrCores)
+            {
+                reportError(false, L"Invalid core id (%d) specified with option(-c).\n", coreId);
+                return;
+            }
         }
     }
 
@@ -694,7 +686,7 @@ void CpuProfileCollect::ValidateProfile()
                     m_profileDcConfig.SetConfigType(type);
                 }
 
-                m_profileDcConfig.SetConfigName("Custom");
+                m_profileDcConfig.SetConfigName("Custom Profile");
             }
         }
         else if (!IsTP())
@@ -1101,16 +1093,17 @@ void CpuProfileCollect::SetTbpConfig()
 
         if (msInterval >= 1.0)
         {
-            gtUInt64 cpuCoreMask = m_args.GetCoreAffinityMask();
+            gtUInt64* pCpuCoreMask = nullptr;
+            gtUInt32 cpuCoreMaskSize = 0;
 
-            //set up timer options
-            if (0.0f < msInterval)
-            {
-                // Convert the resolution to micro seconds
-                unsigned int resolution = static_cast<unsigned int>(msInterval * 1000.0f);
+            m_args.GetCoreMask(pCpuCoreMask, cpuCoreMaskSize);
 
-                m_error = fnSetTimerConfiguration(cpuCoreMask, &resolution);
-            }
+            // Convert the resolution to micro seconds
+            unsigned int resolution = static_cast<unsigned int>(msInterval * 1000.0f);
+
+            // Set up timer options
+            //m_error = fnSetTimerConfiguration(cpuCoreMask, &resolution);
+            m_error = fnSetTimerConfiguration(&resolution, pCpuCoreMask, cpuCoreMaskSize);
 
             if (!SUCCEEDED(m_error))
             {
@@ -1119,7 +1112,6 @@ void CpuProfileCollect::SetTbpConfig()
         }
     }
 }
-
 
 void CpuProfileCollect::SetEbpConfig()
 {
@@ -1238,12 +1230,18 @@ void CpuProfileCollect::SetEbpConfig()
             if (m_nbrSampleEvents > 0)
             {
                 // Profile only on selected cores specified in the CPU Affinity Mask
-                // TODO: support for more than 64 cores ?
-                gtUInt64 cpuCoreMask = m_args.GetCoreAffinityMask();
-                m_error = fnSetEventConfiguration(pDriverSampleEvents,
-                        static_cast<gtUInt32>(m_nbrSampleEvents),
-                        cpuCoreMask);
+                gtUInt64* pCpuCoreMask = nullptr;
+                gtUInt32 cpuCoreMaskSize = 0;
 
+                m_args.GetCoreMask(pCpuCoreMask, cpuCoreMaskSize);
+
+                //m_error = fnSetEventConfiguration(pDriverSampleEvents,
+                //                                  static_cast<gtUInt32>(m_nbrSampleEvents),
+                //                                  cpuCoreMask);
+                m_error = fnSetEventConfiguration(pDriverSampleEvents,
+                                                  static_cast<gtUInt32>(m_nbrSampleEvents),
+                                                  pCpuCoreMask,
+                                                  cpuCoreMaskSize);
                 if (!SUCCEEDED(m_error))
                 {
                     reportError(true, L"There was a problem configuring the event profile. (error code 0x%lx)\n\n", m_error);
@@ -1252,11 +1250,18 @@ void CpuProfileCollect::SetEbpConfig()
 
             if (m_nbrCountEvents > 0)
             {
-                gtUInt64 cpuCoreMask = m_args.GetCoreAffinityMask();
+                gtUInt64* pCpuCoreMask = nullptr;
+                gtUInt32 cpuCoreMaskSize = 0;
 
+                m_args.GetCoreMask(pCpuCoreMask, cpuCoreMaskSize);
+
+                //m_error = fnSetCountingConfiguration(pDriverCountEvents,
+                //                                     static_cast<gtUInt32>(m_nbrCountEvents),
+                //                                     cpuCoreMask);
                 m_error = fnSetCountingConfiguration(pDriverCountEvents,
-                        static_cast<gtUInt32>(m_nbrCountEvents),
-                                                     cpuCoreMask);
+                                                     static_cast<gtUInt32>(m_nbrCountEvents),
+                                                     pCpuCoreMask,
+                                                     cpuCoreMaskSize);
 
                 if (!SUCCEEDED(m_error))
                 {
@@ -1393,15 +1398,24 @@ void CpuProfileCollect::SetIbsConfig()
             }
 
             // Profile only on selected cores specified in the CPU Affinity Mask
-            // TODO: support for more than 64 cores ?
-            gtUInt64 cpuCoreMask = m_args.GetCoreAffinityMask();
+            gtUInt64* pCpuCoreMask = nullptr;
+            gtUInt32 cpuCoreMaskSize = 0;
+
+            m_args.GetCoreMask(pCpuCoreMask, cpuCoreMaskSize);
+
             gtUInt64 fetchPeriod = ibsConfig.fetchSampling ? ibsConfig.fetchMaxCount : 0;
             gtUInt64 opPeriod = opSample ? opInterval : 0;
-            m_error = fnSetIbsConfiguration(cpuCoreMask,
-                                            static_cast<gtUInt32>(fetchPeriod),
+            //m_error = fnSetIbsConfiguration(cpuCoreMask,
+            //                                static_cast<gtUInt32>(fetchPeriod),
+            //                                static_cast<gtUInt32>(opPeriod),
+            //                                true,
+            //                                !opCycleCount);
+            m_error = fnSetIbsConfiguration(static_cast<gtUInt32>(fetchPeriod),
                                             static_cast<gtUInt32>(opPeriod),
                                             true,
-                                            !opCycleCount);
+                                            !opCycleCount,
+                                            pCpuCoreMask,
+                                            cpuCoreMaskSize);
 
             if (!isOK())
             {
@@ -1591,18 +1605,18 @@ void CpuProfileCollect::WriteRunInfo()
             }
 
             // If affinity is not passed as argument, then the default value is 0xFF...FF
-            gtUInt64 coreAffinityMask = m_args.GetCoreAffinityMask();
+            AMDTProfileCoreMaskInfo coreMaskInfo = m_args.GetCoreMaskInfo();
 
-            // If default value is 0xFF..FF, then compute the affinity using number of cores
-            if (coreAffinityMask + 1 == 0)
+            if (m_args.IsProfileAllCores())
             {
-                if (nbrCores < 64)
-                {
-                    coreAffinityMask = (1ULL << nbrCores) - 1;
-                }
+                coreMaskInfo.AddCores(nbrCores);
             }
 
-            rInfo.m_cpuAffinity = coreAffinityMask;
+            gtUInt64* pCpuCoreMask = nullptr;
+            gtUInt32 cpuCoreMaskSize = 0;
+            coreMaskInfo.GetCoreMask(pCpuCoreMask, cpuCoreMaskSize);
+            // TODO: support for > 64 cores
+            rInfo.m_cpuAffinity = (cpuCoreMaskSize > 0) ? pCpuCoreMask[0] : static_cast<gtUInt64>(-1);
 
             // set OS name
             osGetOSShortDescriptionString(rInfo.m_osName);
