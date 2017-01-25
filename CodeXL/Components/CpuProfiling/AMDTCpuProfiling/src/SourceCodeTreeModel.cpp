@@ -444,6 +444,11 @@ bool SourceCodeTreeModel::BuildDisassemblyTree()
                     return counterId == sampleInfo.m_counterId;
                 });
 
+                if (iter == aggrSampleValueVec.cend())
+                {
+                    continue;
+                }
+
                 double totalSamples = iter->m_sampleCount;
                 auto appSamplePercent = CalculatePercent(sampleCount, totalSamples);
 
@@ -616,6 +621,11 @@ void SourceCodeTreeModel::PopulateFunctionSampleData(const AMDTProfileFunctionDa
                 return sample.m_counterId == sampleInfo.m_counterId;
             });
 
+            if (iter == aggrSampleValueVec.cend())
+            {
+                continue;
+            }
+
             double totalSamples = iter->m_sampleCount;
 
             auto sampleValue = sample.m_sampleCount;
@@ -690,6 +700,11 @@ void SourceCodeTreeModel::PopulateFunctionSampleData(const AMDTProfileFunctionDa
                         [&](const AMDTSampleValue& sampleInfo) {
                         return aSampleValue.m_counterId == sampleInfo.m_counterId;
                     });
+
+                    if (iter == aggrSampleValueVec.cend())
+                    {
+                        continue;
+                    }
 
                     auto totalSamples = iter->m_sampleCount;
                     auto appSamplePercent = CalculatePercent(sampleCount, totalSamples);
@@ -1164,6 +1179,11 @@ void SourceCodeTreeModel::SetHotSpotsrcLnSamples(AMDTUInt32 counterId,
                         return sampleCounterId == sampleInfo.m_counterId;
                     });
 
+                if (iter == aggrSampleValueVec.cend())
+                {
+                    continue;
+                }
+
                 double totalSamples = iter->m_sampleCount;
                 auto appSamplePercent = CalculatePercent(sampleCount, totalSamples);
 
@@ -1199,6 +1219,12 @@ void SourceCodeTreeModel::SetHotSpotsrcLnSamples(AMDTUInt32 counterId,
                                     [&](const AMDTSampleValue& sampleInfo) {
                                         return sample.m_counterId == sampleInfo.m_counterId;
                                     });
+
+                                if (iter == aggrSampleValueVec.cend())
+                                {
+                                    continue;
+                                }
+
                                 double totalSamples = iter->m_sampleCount;
                                 double appSamplePercent = CalculatePercent(sampleCount, totalSamples);
 
@@ -1253,6 +1279,12 @@ void SourceCodeTreeModel::SetHotSpotDisamOnlySamples(AMDTUInt32 counterId,
                         [&](const AMDTSampleValue& sampleInfo) {
                             return counterId == sampleInfo.m_counterId;
                         });
+
+                    if (iter == aggrSampleValueVec.cend())
+                    {
+                        continue;
+                    }
+
                     double totalSamples = iter->m_sampleCount;
                     double appSamplesPercent = CalculatePercent(sampleCount, totalSamples);
 
