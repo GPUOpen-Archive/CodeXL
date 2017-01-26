@@ -106,7 +106,6 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CXLCpuProfilingRawData", "..\Components\CpuProfiling\Backend\AMDTCpuProfilingRawData\AMDTCpuProfilingRawData.vcxproj", "{83C7662A-4D27-403A-8072-FDE0AFA83CFB}"
 	ProjectSection(ProjectDependencies) = postProject
 		{03D9DA41-E510-4205-BCDA-F988D507EF50} = {03D9DA41-E510-4205-BCDA-F988D507EF50}
-		{033BB047-F8A8-4946-9FA4-0D2E25ABD473} = {033BB047-F8A8-4946-9FA4-0D2E25ABD473}
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CXLCpuPerfEventUtils", "..\Components\CpuProfiling\AMDTCpuPerfEventUtils\AMDTCpuPerfEventUtils.vcxproj", "{FB5DE7C5-1997-4BC0-B854-5A3D82E8D28E}"

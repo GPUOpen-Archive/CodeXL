@@ -183,7 +183,7 @@ HRESULT CpuProfileReport::Report()
 
         if (!m_args.GetSectionsToReport().isEmpty()
             && IsReportCallGraph()
-            && sessionInfo.m_cssEnabled)
+            && (!sessionInfo.m_cssEnabled))
         {
             reportError(false, L"Callgraph details are not available in the profile data file - " STR_FORMAT L".\n",
                         dbFilePath.asString().asCharArray());
