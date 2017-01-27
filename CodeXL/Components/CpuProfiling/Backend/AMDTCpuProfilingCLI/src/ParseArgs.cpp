@@ -13,6 +13,7 @@
 
 // Project:
 #include <AMDTBaseTools/Include/AMDTDefinitions.h>
+#include <AMDTBaseTools/Include/gtSet.h>
 #include <AMDTOSWrappers/Include/osMachine.h>
 #include <ParseArgs.h>
 #include <CommonUtils.h>
@@ -305,6 +306,7 @@ bool ParseArgs::InitializeArgs(int nbrArgs, wchar_t* args[])
     int pos;
     int startPosition = 0;
     bool printCSSWarning = true;
+    gtSet<gtUInt32> coreIdUniqueSet;
 
     while ((opt = getOption(nbrArgs, args, "C:D:E:F:GIL:NOPR:S:T:V:X:abc:d:e:fg:hi:m:o:p:s:vw:")) != -1)
     {
@@ -464,8 +466,36 @@ bool ParseArgs::InitializeArgs(int nbrArgs, wchar_t* args[])
                     gtString tmpStr;
                     int endPosition = (-1 != pos) ? (pos - 1) : tmp.length();
                     tmp.getSubString(startPosition, endPosition, tmpStr);
+                    int range = tmpStr.find(L"-");
 
-                    if (tmpStr.isIntegerNumber())
+                    if (range > 0)
+                    {
+                        gtStringTokenizer tokens(tmpStr, L"-");
+                        gtString value;
+                        gtInt32 start = 0;
+                        gtInt32 end = 0;
+                        bool firstTolken = true;
+
+                        while (tokens.getNextToken(value))
+                        {
+                            firstTolken ? value.toIntNumber(start) : value.toIntNumber(end);
+                            firstTolken = false;
+                        }
+
+                        if ((start >= end) || (start < 0) || (end < 0))
+                        {
+                            fprintf(stderr, "Invalid core ids range (%d-%d) is specified with option(-c). Valid core-ids are 0 to %d.\n",
+                                start, end, (nbrCores - 1));
+                            retVal = false;
+                            break;
+                        }
+
+                        for (gtInt32 i = start; i <= end; i++)
+                        {
+                            coreIdUniqueSet.insert(i);
+                        }
+                    }
+                    else if (tmpStr.isIntegerNumber())
                     {
                         tmpStr.toIntNumber(tmpNbr);
 
@@ -477,7 +507,7 @@ bool ParseArgs::InitializeArgs(int nbrArgs, wchar_t* args[])
                             break;
                         }
 
-                        m_coreMaskInfo.AddCoreId(tmpNbr);
+                        coreIdUniqueSet.insert(tmpNbr);
                     }
                     else
                     {
@@ -488,6 +518,16 @@ bool ParseArgs::InitializeArgs(int nbrArgs, wchar_t* args[])
 
                     startPosition = pos + 1;
                 } while (-1 != pos);
+
+                if (retVal)
+                {
+                    for (const auto& coreId : coreIdUniqueSet)
+                    {
+                        m_coreMaskInfo.AddCoreId(coreId);
+                    }
+
+                    coreIdUniqueSet.clear();
+                }
 
                 if (retVal && m_coreMaskInfo.GetCoresList().empty())
                 {
