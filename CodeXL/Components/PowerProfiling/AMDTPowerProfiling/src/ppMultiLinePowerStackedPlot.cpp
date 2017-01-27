@@ -89,8 +89,7 @@ void ppMultiLnePowerStackedPlot::PrepareTimelineDataFromDB(const gtVector<int>& 
             int apuCounterId = m_pSessionController->GetAPUCounterID();
             gtMap<int, gtVector<SampledValue> >::iterator it = sampledDataPerCounter.begin();
 
-            // APU counter should always exist
-            GT_IF_WITH_ASSERT(apuCounterId != -1 && it != sampledDataPerCounter.end())
+            GT_IF_WITH_ASSERT(it != sampledDataPerCounter.end())
             {
                 // all values vector of all counters should be in the same size
                 valuesCount = ((*it).second).size();
