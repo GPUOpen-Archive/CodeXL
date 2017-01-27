@@ -3122,6 +3122,8 @@ public:
                             }
                         }
                     }
+
+                    jncReader.Close();
                 }
             }
             else

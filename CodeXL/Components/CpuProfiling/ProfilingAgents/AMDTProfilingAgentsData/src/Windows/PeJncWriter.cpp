@@ -892,9 +892,12 @@ void PeJncWriter::WriteAlignmentPadding()
     {
         unsigned padBytes = ADDRESSALIGNMENT - (writtenBytes % ADDRESSALIGNMENT);
 
-        for (unsigned cnt = 0; cnt < padBytes; cnt++)
+        if (padBytes < ADDRESSALIGNMENT)
         {
-            m_fileStream.write(padByte);
+            for (unsigned cnt = 0; cnt < padBytes; cnt++)
+            {
+                m_fileStream.write(padByte);
+            }
         }
     }
 }

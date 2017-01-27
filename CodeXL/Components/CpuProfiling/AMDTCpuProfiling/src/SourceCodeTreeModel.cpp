@@ -598,6 +598,12 @@ void SourceCodeTreeModel::PopulateFunctionSampleData(const AMDTProfileFunctionDa
             pLineItem = srcLineViewTreeMap.at(srcData.m_sourceLineNumber - 1);
         }
 
+        GT_ASSERT(pLineItem != nullptr);
+        if (pLineItem == nullptr)
+        {
+            continue;
+        }
+
         if (m_funcFirstSrcLine == 0)
         {
             // set the address for first line with samples of the function
