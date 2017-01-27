@@ -973,6 +973,14 @@ gtString ParseArgs::GetOutputFile()
 
 #endif
 
+    if (!m_outputFile.isEmpty())
+    {
+        osFilePath outputPath(m_outputFile);
+        outputPath.resolveToAbsolutePath();
+
+        m_outputFile = outputPath.asString(true);
+    }
+
     return m_outputFile;
 } // GetOutputFile
 

@@ -882,7 +882,6 @@ osFilePath& CpuProfileReport::GetOutputFilePath()
         }
 
         m_outputFilePath = osFilePath(outputFile);
-        m_outputFilePath.resolveToAbsolutePath();
         m_outputFilePath.reinterpretAsDirectory();
 
         // Get the basename from the input file and create a output dir
