@@ -1,5 +1,5 @@
 //=============================================================
-// (c) 2015 Advanced Micro Devices, Inc.
+// (c) 2017 Advanced Micro Devices, Inc.
 //
 /// \author CodeXL Developer Tools
 /// \brief  Example program using the AMDTPowerProfile APIs.
@@ -22,7 +22,7 @@
 
 void GetTimeStampString(AMDTPwrSystemTime& sampleTime, AMDTUInt64 elapsedMs, char* pTimeStr)
 {
-#define WINDOWS_TICK_PER_SECOND  10000000
+#define WINDOWS_TICK_PER_SEC     10000000
 #define MICROSEC_IN_SECOND       1000000
 
 #if defined ( WIN32 )
@@ -121,47 +121,52 @@ void CollectAllCounters()
 #endif
 
         // read all the counter values
-        AMDTPwrSample* pSampleData;
+        AMDTPwrSample* pSampleData = nullptr;
+
         hResult = AMDTPwrReadAllEnabledCounters(&nbrSamples, &pSampleData);
 
-        // iterate over all the samples and report the sampled counter values
-        for (AMDTUInt32 idx = 0; idx < nbrSamples; idx++)
+        if (AMDT_STATUS_OK != hResult)
         {
-            pSampleData += idx;
-
-            // Timestamp
-            char timeStamp[64] = { "\0" };
-            //GetTimeStampString(pSampleData->m_systemTime, pSampleData->m_elapsedTimeMs, timeStamp);
-            fprintf(stdout, "Timestamp : %lu ", (pSampleData->m_systemTime.m_second * 1000000 + pSampleData->m_systemTime.m_microSecond) / 1000);
-
-            // Iterate over the sampled counter values and print
-            for (unsigned int i = 0; i < pSampleData->m_numOfValues; i++)
-            {
-                // Get the counter descriptor to print the counter name
-                AMDTPwrCounterDesc counterDesc;
-                AMDTPwrGetCounterDesc(pSampleData->m_counterValues->m_counterID, &counterDesc);
-
-                fprintf(stdout, "%s : %f ", counterDesc.m_name, pSampleData->m_counterValues->m_counterValue);
-
-                pSampleData->m_counterValues++;
-            } // iterate over the sampled counters
-
-            fprintf(stdout, "\n");
-        } // iterate over all the samples collected
-
-        // check if we exceeded the profile duration
-        if ((profilingDuration > 0)
-            && (pSampleData->m_elapsedTimeMs >= (profilingDuration * 1000)))
-        {
-            stopProfiling = true;
+            continue;
         }
 
-        if (stopProfiling)
+        if (nullptr != pSampleData)
         {
-            // stop the profiling
-            hResult = AMDTPwrStopProfiling();
-            assert(AMDT_STATUS_OK == hResult);
-            isProfiling = false;
+            // iterate over all the samples and report the sampled counter values
+            for (AMDTUInt32 idx = 0; idx < nbrSamples; idx++)
+            {
+                // Iterate over the sampled counter values and print
+                for (unsigned int i = 0; i < pSampleData[idx].m_numOfValues; i++)
+                {
+                    if (nullptr != pSampleData[idx].m_counterValues)
+                    {
+                        // Get the counter descriptor to print the counter name
+                        AMDTPwrCounterDesc counterDesc;
+                        AMDTPwrGetCounterDesc(pSampleData[idx].m_counterValues->m_counterID, &counterDesc);
+
+                        fprintf(stdout, "%s : %f ", counterDesc.m_name, pSampleData[idx].m_counterValues->m_counterValue);
+
+                        pSampleData[idx].m_counterValues++;
+                    }
+                } // iterate over the sampled counters
+
+                fprintf(stdout, "\n");
+            } // iterate over all the samples collected
+
+            // check if we exceeded the profile duration
+            if ((profilingDuration > 0)
+                && (pSampleData->m_elapsedTimeMs >= (profilingDuration * 1000)))
+            {
+                stopProfiling = true;
+            }
+
+            if (stopProfiling)
+            {
+                // stop the profiling
+                hResult = AMDTPwrStopProfiling();
+                assert(AMDT_STATUS_OK == hResult);
+                isProfiling = false;
+            }
         }
     }
 
@@ -170,9 +175,9 @@ void CollectAllCounters()
     assert(AMDT_STATUS_OK == hResult);
 }
 
-int main(int argc, char* argv[])
+int main()
 {
+    AMDTResult hResult = AMDT_STATUS_OK;
     CollectAllCounters();
-
-    exit(0);
+    return hResult;
 }
