@@ -3021,11 +3021,11 @@ public:
                 samplingConfig.m_unitMask         = static_cast<AMDTInt8>(unitMask);
                 samplingConfig.m_userMode         = (userMode != 0) ? true : false;
                 samplingConfig.m_osMode           = (osMode != 0) ? true : false;
+                ret = true;
             }
 
             // Finalize the statement.
             sqlite3_finalize(pQueryStmt);
-            ret = true;
         }
 
         return ret;

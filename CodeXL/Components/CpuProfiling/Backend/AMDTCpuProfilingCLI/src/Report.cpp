@@ -1202,8 +1202,11 @@ void CpuProfileReport::ReportMonitoredEventDetails()
     for (const auto& counter : counterDesc)
     {
         AMDTProfileSamplingConfig sampleConfig;
-        m_profileDbReader.GetSamplingConfiguration(counter.m_id, sampleConfig);
-        samplingConfigVec.push_back(sampleConfig);
+
+        if (m_profileDbReader.GetSamplingConfiguration(counter.m_id, sampleConfig))
+        {
+            samplingConfigVec.push_back(sampleConfig);
+        }
     }
 
     m_pReporter->ReportSamplingSpec(sectionHdrs, counterDesc, samplingConfigVec);
@@ -1225,15 +1228,6 @@ void CpuProfileReport::ReportMonitoredEventDetails()
     m_sortCounterId = (-1 == sortEventIndex) ? -1 : samplingConfigVec[sortEventIndex].m_id;
     m_sortEventIdx = (-1 == sortEventIndex) ? 0 : sortEventIndex;
 
-    if (m_sortEventId == 0xFFFFFFFF)
-    {
-        m_sortEventName = L"All Events";
-    }
-    else
-    {
-        m_sortEventName = L"???";
-    }
-
     for (const auto& counter : counterDesc)
     {
         if (counter.m_hwEventId == m_sortEventId)
@@ -1241,6 +1235,11 @@ void CpuProfileReport::ReportMonitoredEventDetails()
             m_sortEventName = counter.m_name;
             break;
         }
+    }
+
+    if (m_sortEventName.isEmpty())
+    {
+        m_sortEventName = L"Unknown Event";
     }
 
     m_profileEventsNameVec.clear();

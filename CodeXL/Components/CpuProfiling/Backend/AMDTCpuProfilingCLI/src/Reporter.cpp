@@ -412,8 +412,8 @@ bool CSVReporter::WriteCallGraphFunctionSummary(
             tmpStr += L"\"";
             tmpStr += cgFunc.m_functionInfo.m_name;
             tmpStr += L"\"";
-            tmpStr.appendFormattedString(L",%ld", cgFunc.m_totalSelfSamples);
-            tmpStr.appendFormattedString(L",%ld", cgFunc.m_totalDeepSamples);
+            tmpStr.appendFormattedString(L",%u", static_cast<unsigned>(cgFunc.m_totalSelfSamples));
+            tmpStr.appendFormattedString(L",%u", static_cast<unsigned>(cgFunc.m_totalDeepSamples));
 
             if (showPerc)
             {
@@ -463,7 +463,7 @@ bool CSVReporter::WriteCallGraph(const AMDTCallGraphFunction&     self,
         {
             gtString tmpStr(L"\n");
             tmpStr += L",,";
-            tmpStr.appendFormattedString(L"                %ld", cgFunc.m_totalDeepSamples);
+            tmpStr.appendFormattedString(L"                %u", static_cast<unsigned>(cgFunc.m_totalDeepSamples));
             tmpStr.appendFormattedString(L" (%3.02f%%)", cgFunc.m_deepSamplesPerc);
             tmpStr += L",";
             tmpStr += L"\"                ";
@@ -490,10 +490,10 @@ bool CSVReporter::WriteCallGraph(const AMDTCallGraphFunction&     self,
         }
 
         tmpStr += L",";
-        tmpStr.appendFormattedString(L"%ld", self.m_totalDeepSamples);
+        tmpStr.appendFormattedString(L"%u", static_cast<unsigned>(self.m_totalDeepSamples));
         tmpStr.appendFormattedString(L" (%3.02f%%)", self.m_deepSamplesPerc);
         tmpStr += L",";
-        tmpStr.appendFormattedString(L"%ld", self.m_totalSelfSamples);
+        tmpStr.appendFormattedString(L"%u", static_cast<unsigned>(self.m_totalSelfSamples));
         tmpStr.appendFormattedString(L" (%3.02f%%)", selfSamplePerc);
 
         tmpStr += L",";
@@ -517,7 +517,7 @@ bool CSVReporter::WriteCallGraph(const AMDTCallGraphFunction&     self,
         {
             gtString tmpStr(L"\n");
             tmpStr += L",,";
-            tmpStr.appendFormattedString(L"                %ld", cgFunc.m_totalDeepSamples);
+            tmpStr.appendFormattedString(L"                %u", static_cast<unsigned>(cgFunc.m_totalDeepSamples));
             tmpStr.appendFormattedString(L" (%3.02f%%)", cgFunc.m_deepSamplesPerc);
 
             tmpStr += L",";
