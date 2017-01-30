@@ -1412,7 +1412,10 @@ void CpuProfileReport::ReportProcessData()
     gtString tmpStr;
 
     AMDTProfileDataVec processProfileData;
-    m_profileDbReader.GetProcessSummary(m_sortCounterId, processProfileData);
+    gtUInt32 idx = m_sortEventIdx;
+    m_profileDbReader.GetProcessProfileData(AMDT_PROFILE_ALL_PROCESSES, AMDT_PROFILE_ALL_MODULES, processProfileData);
+    std::sort(processProfileData.begin(), processProfileData.end(),
+        [idx](AMDTProfileData const& a, AMDTProfileData const& b) { return a.m_sampleValue.at(idx).m_sampleCount > b.m_sampleValue.at(idx).m_sampleCount; });
 
     // TBD - just print the top 5 processes
     for (const auto& proc : processProfileData)
