@@ -225,7 +225,7 @@ bool CSVReporter::WriteOverviewProcess(
     for (const auto& proc : processProfileData)
     {
         gtString rowStr;
-        rowStr.appendFormattedString(L"%ls,%u", proc.m_name.asCharArray(), proc.m_id);
+        rowStr.appendFormattedString(L"%ls (PID - %u)", proc.m_name.asCharArray(), proc.m_id);
 
         for (const auto& sample : proc.m_sampleValue)
         {

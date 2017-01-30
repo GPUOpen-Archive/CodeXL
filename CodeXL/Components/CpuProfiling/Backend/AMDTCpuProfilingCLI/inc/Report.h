@@ -168,6 +168,7 @@ private:
     gtString            m_sortEventName;
     gtUInt32            m_sortEventId;
     gtUInt32            m_sortCounterId;
+    gtUInt32            m_sortEventIdx = 0;
     gtVector<gtString>  m_profileEventsNameVec;   // this is used for column headers
 
     gtVector<gtUInt32>  m_coresList; // List of cores for which samples need to be aggregated

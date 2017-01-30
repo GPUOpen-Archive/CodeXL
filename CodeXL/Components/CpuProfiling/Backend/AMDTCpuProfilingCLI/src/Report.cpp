@@ -1223,6 +1223,7 @@ void CpuProfileReport::ReportMonitoredEventDetails()
 
     m_sortEventId = (-1 == sortEventIndex) ? -1 : samplingConfigVec[sortEventIndex].m_hwEventId;
     m_sortCounterId = (-1 == sortEventIndex) ? -1 : samplingConfigVec[sortEventIndex].m_id;
+    m_sortEventIdx = (-1 == sortEventIndex) ? 0 : sortEventIndex;
 
     if (m_sortEventId == 0xFFFFFFFF)
     {
@@ -1318,11 +1319,17 @@ void CpuProfileReport::ReportOverviewData(AMDTProfileSessionInfo& sessionInfo)
             tmpStr.appendFormattedString(L"," STR_FORMAT, m_profileEventsNameVec[i].asCharArray());
         }
 
-        tmpStr.appendFormattedString(L"," STR_FORMAT, OVERVIEW_SECTION_MODULE);
         sectionHdrs.push_back(tmpStr);
 
         AMDTProfileDataVec funcProfileData;
-        m_profileDbReader.GetFunctionSummary(m_sortCounterId, funcProfileData);
+        gtUInt32 idx = m_sortEventIdx;
+
+        // Here m_profileDbReader.GetFunctionSummary is not used as the CLI 
+        // reports all the counters data in the Overview section
+        m_profileDbReader.GetFunctionProfileData(AMDT_PROFILE_ALL_PROCESSES, AMDT_PROFILE_ALL_MODULES, funcProfileData);
+        std::sort(funcProfileData.begin(), funcProfileData.end(),
+            [idx](AMDTProfileData const& a, AMDTProfileData const& b) { return a.m_sampleValue.at(idx).m_sampleCount > b.m_sampleValue.at(idx).m_sampleCount; });
+
         m_pReporter->WriteOverviewFunction(sectionHdrs, funcProfileData, m_args.IsShowPercentage());
         funcProfileData.clear();
 
@@ -1337,7 +1344,7 @@ void CpuProfileReport::ReportOverviewData(AMDTProfileSessionInfo& sessionInfo)
         sectionHdrs.push_back(tmpStr);
 
         tmpStr.makeEmpty();
-        tmpStr.appendFormattedString(STR_FORMAT L"," STR_FORMAT, OVERVIEW_SECTION_PROCESS, OVERVIEW_SECTION_PID);
+        tmpStr.appendFormattedString(STR_FORMAT, OVERVIEW_SECTION_PROCESS);
 
         // Add the profiled event's names
         for (gtUInt32 i = 0; i < m_profileEventsNameVec.size(); i++)
@@ -1348,12 +1355,15 @@ void CpuProfileReport::ReportOverviewData(AMDTProfileSessionInfo& sessionInfo)
         sectionHdrs.push_back(tmpStr);
 
         AMDTProfileDataVec processProfileData;
-        m_profileDbReader.GetProcessSummary(m_sortCounterId, processProfileData);
+
+        // Here m_profileDbReader.GetProcessSummary is not used as the CLI 
+        // reports all the counters data in the Overview section
+        m_profileDbReader.GetProcessProfileData(AMDT_PROFILE_ALL_PROCESSES, AMDT_PROFILE_ALL_MODULES, processProfileData);
+        std::sort(processProfileData.begin(), processProfileData.end(),
+            [idx](AMDTProfileData const& a, AMDTProfileData const& b) { return a.m_sampleValue.at(idx).m_sampleCount > b.m_sampleValue.at(idx).m_sampleCount; });
+
         // Don't print process overview if there is only 1 process.
-        if (processProfileData.size() > 1)
-        {
-            m_pReporter->WriteOverviewProcess(sectionHdrs, processProfileData, m_args.IsShowPercentage());
-        }
+        m_pReporter->WriteOverviewProcess(sectionHdrs, processProfileData, m_args.IsShowPercentage());
         processProfileData.clear();
 
         // Overview - MODULE
@@ -1379,7 +1389,13 @@ void CpuProfileReport::ReportOverviewData(AMDTProfileSessionInfo& sessionInfo)
         sectionHdrs.push_back(tmpStr);
 
         AMDTProfileDataVec moduleProfileData;
-        m_profileDbReader.GetModuleSummary(m_sortCounterId, moduleProfileData);
+
+        // Here m_profileDbReader.GetModuleSummary is not used as the CLI 
+        // reports all the counters data in the Overview section
+        m_profileDbReader.GetModuleProfileData(AMDT_PROFILE_ALL_PROCESSES, AMDT_PROFILE_ALL_MODULES, moduleProfileData);
+        std::sort(processProfileData.begin(), processProfileData.end(),
+            [idx](AMDTProfileData const& a, AMDTProfileData const& b) { return a.m_sampleValue.at(idx).m_sampleCount > b.m_sampleValue.at(idx).m_sampleCount; });
+
         m_pReporter->WriteOverviewModule(sectionHdrs, moduleProfileData, m_args.IsShowPercentage());
         moduleProfileData.clear();
     }
@@ -1465,8 +1481,6 @@ void CpuProfileReport::ReportProcessData()
             {
                 tmpStr.appendFormattedString(L"," STR_FORMAT, evName.asCharArray());
             }
-
-            tmpStr.appendFormattedString(L"," STR_FORMAT, OVERVIEW_SECTION_MODULE);
 
             sectionHdrs.push_back(tmpStr);
 
