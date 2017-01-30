@@ -30,37 +30,35 @@ ModulesDataTable::~ModulesDataTable()
 {
 }
 
-bool ModulesDataTable::findModuleFilePath(int moduleRowIndex, QString& moduleFileName)
+bool ModulesDataTable::findModuleFilePath(int rowIndex, QString& moduleFileName)
 {
     bool retVal = false;
 
-    GT_IF_WITH_ASSERT(m_pTableDisplaySettings != nullptr)
+    GT_IF_WITH_ASSERT((rowIndex >= 0) && (rowIndex < rowCount()))
     {
-        for (int i = 0; i < (int)m_pTableDisplaySettings->m_displayedColumns.size(); i++)
+        QTableWidgetItem* pItem = item(rowIndex, m_moduleNameColumn);
+
+        GT_IF_WITH_ASSERT(pItem != nullptr)
         {
-            if (m_pTableDisplaySettings->m_displayedColumns[i] == TableDisplaySettings::MODULE_NAME_COL)
+            // Get the module file path (the full path is stored in the tooltip):
+            moduleFileName = pItem->toolTip();
+
+            // For system modules - remove the "System" postfix from the tooltip:
+            if (moduleFileName.endsWith(" (System)"))
             {
-                QTableWidgetItem* pItem = item(moduleRowIndex, i);
-
-                GT_IF_WITH_ASSERT(pItem != nullptr)
-                {
-                    // Get the module file path (the full path is stored in the tooltip):
-                    moduleFileName = pItem->toolTip();
-
-                    // For system modules - remove the "System" postfix from the tooltip:
-                    if (moduleFileName.endsWith(" (System)"))
-                    {
-                        moduleFileName = moduleFileName.replace(" (System)", "");
-                    }
-
-                    retVal = true;
-                    break;
-                }
+                moduleFileName = moduleFileName.replace(" (System)", "");
             }
+
+            retVal = true;
         }
     }
 
     return retVal;
+}
+
+int ModulesDataTable::getEmptyMsgItemColIndex() const
+{
+    return m_moduleNameColumn;
 }
 
 void ModulesDataTable::onAboutToShowContextMenu()
@@ -93,13 +91,10 @@ void ModulesDataTable::onAboutToShowContextMenu()
                         {
                             isActionEnabled = false;
                         }
-
-                        else if (columnCount() != 0 &&
-                                 (selectedItems().count() / columnCount()) > 1)
+                        else if (columnCount() != 0 && (selectedItems().count() / columnCount()) > 1)
                         {
                             isActionEnabled = false;
                         }
-
                         else if (actionType == DISPLAY_MODULE_IN_FUNCTIONS_VIEW)
                         {
                             // Get the list of selected rows:
@@ -137,6 +132,8 @@ bool ModulesDataTable::fillSummaryTable(int counterIdx)
 {
     bool retVal = false;
 
+    m_moduleNameColumn = CXL_MOD_SUMMARY_MOD_NAME_COL;
+
     GT_IF_WITH_ASSERT((m_pProfDataRdr != nullptr) && (m_pDisplayFilter != nullptr) && (m_pTableDisplaySettings != nullptr))
     {
         AMDTProfileCounterDescVec counterDesc;
@@ -151,7 +148,12 @@ bool ModulesDataTable::fillSummaryTable(int counterIdx)
 
         for (const auto& moduleData : moduleProfileData)
         {
-            bool isOther = (moduleData.m_name.compare(L"other") == 0);
+            if (moduleData.m_sampleValue.empty() || moduleData.m_sampleValue.at(0).m_sampleCount <= 0.0)
+            {
+                continue;
+            }
+
+            bool isOther = (0 == moduleData.m_name.compare(L"other") && AMDT_PROFILE_ALL_MODULES == moduleData.m_moduleId);
 
             if (!isOther)
             {
@@ -279,7 +281,9 @@ bool ModulesDataTable::fillSummaryTable(int counterIdx)
 bool ModulesDataTable::fillTableData(AMDTProcessId procId, AMDTModuleId modId, std::vector<AMDTUInt64> processIdVec)
 {
     bool retVal = false;
-    GT_UNREFERENCED_PARAMETER(modId);
+
+    m_moduleIdColumn = CXL_MOD_TAB_MOD_ID_COL;
+    m_moduleNameColumn = CXL_MOD_TAB_MOD_NAME_COL;
 
     GT_IF_WITH_ASSERT((m_pProfDataRdr.get() != nullptr) &&
                       (m_pDisplayFilter != nullptr) &&
@@ -366,11 +370,22 @@ bool ModulesDataTable::fillTableData(AMDTProcessId procId, AMDTModuleId modId, s
     return retVal;
 }
 
-bool ModulesDataTable::findModueId(int rowIndex, AMDTModuleId& modId)
+bool ModulesDataTable::findModuleId(int rowIndex, AMDTModuleId& modId)
 {
-    QTableWidgetItem* pidWidget = item(rowIndex, CXL_MOD_TAB_MOD_ID_COL);
-    modId = pidWidget->text().toUInt();
-    return true;
+    bool retVal = false;
+
+    GT_IF_WITH_ASSERT((rowIndex >= 0) && (rowIndex < rowCount()))
+    {
+        QTableWidgetItem* pidWidget = item(rowIndex, m_moduleIdColumn);
+
+        GT_IF_WITH_ASSERT(pidWidget != nullptr)
+        {
+            modId = pidWidget->text().toUInt();
+            retVal = true;
+        }
+    }
+
+    return retVal;
 }
 
 bool ModulesDataTable::AddRowToTable(const gtVector<AMDTProfileData>& allModulesData)
@@ -383,6 +398,18 @@ bool ModulesDataTable::AddRowToTable(const gtVector<AMDTProfileData>& allModules
 
         for (const auto& profData : allModulesData)
         {
+            double totalSamples = 0.0;
+
+            for (const auto& sampleVal : profData.m_sampleValue)
+            {
+                totalSamples += sampleVal.m_sampleCount;
+            }
+
+            if (totalSamples <= 0.0)
+            {
+                continue;
+            }
+
             QStringList list;
 
             // insert module id

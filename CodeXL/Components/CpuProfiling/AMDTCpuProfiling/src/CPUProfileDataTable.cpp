@@ -62,18 +62,15 @@ CPUProfileDataTable::~CPUProfileDataTable()
 
 bool CPUProfileDataTable::AddEmptyAndOtherRow()
 {
-    // Get the item for the empty table message:
-    int newRowIndex = rowCount();
-
-    // set row with empty row message
     QStringList list;
-    list << CP_emptyTableMessage;
 
-    for (int i = 1; i < columnCount(); ++i)
+    for (int i = 0; i < columnCount(); ++i)
     {
         list << "";
     }
 
+    // add "empty-message" row
+    int newRowIndex = rowCount();
     addRow(list, nullptr);
 
     // save item of this row
@@ -86,19 +83,13 @@ bool CPUProfileDataTable::AddEmptyAndOtherRow()
     }
 
     // add "other" row
-    QStringList samplesList;
-
-    for (int i = 0; i < columnCount(); ++i)
-    {
-        samplesList << "";
-    }
-
     newRowIndex = rowCount();
-    addRow(samplesList, nullptr);
+    addRow(list, nullptr);
 
-    // set all row items with "other" row data role
+    // save item of this row
     m_pOtherSamplesRowItem = item(newRowIndex, 0);
 
+    // set all row items with "other" row data role
     GT_IF_WITH_ASSERT(m_pOtherSamplesRowItem != nullptr)
     {
         m_pOtherSamplesRowItem->setData(AC_USER_ROLE_OTHER_ROW, CPUProfileDataTableItem::ASCENDING_ORDER);
@@ -185,7 +176,7 @@ void CPUProfileDataTable::sortTable()
 
                 if (pHeaderItem != nullptr)
                 {
-                    if (m_pTableDisplaySettings->m_lastSortColumnCaption == horizontalHeaderItem(i)->text())
+                    if (m_pTableDisplaySettings->m_lastSortColumnCaption == pHeaderItem->text())
                     {
                         sortByColIndex = i;
                         break;
@@ -200,7 +191,7 @@ void CPUProfileDataTable::sortTable()
             if (!m_pTableDisplaySettings->m_hotSpotIndicatorColumnCaption.isEmpty())
             {
                 // When displaying a hot spot indicator - sort by samples count:
-                for (int i = 0 ; i < (int)m_pTableDisplaySettings->m_displayedColumns[i]; i++)
+                for (int i = 0 ; i < (int)m_pTableDisplaySettings->m_displayedColumns.size(); i++)
                 {
                     if (m_pTableDisplaySettings->m_displayedColumns[i] == TableDisplaySettings::SAMPLES_COUNT_COL)
                     {
@@ -731,15 +722,25 @@ bool CPUProfileDataTable::HandleEmptyTable()
 {
     // if at least one row shown: hide "empty table" row
     // if no: unhide "empty table" row
-    bool isTableEmpty = false;
-
     GT_IF_WITH_ASSERT(m_pEmptyRowTableItem != nullptr)
     {
-        isTableEmpty = IsTableEmpty();
-        setRowHidden(m_pEmptyRowTableItem->row(), !isTableEmpty);
+        if (IsTableEmpty())
+        {
+            int rowIdx = m_pEmptyRowTableItem->row();
+            int colIdx = getEmptyMsgItemColIndex();
+
+            QTableWidgetItem* msgItem = item(rowIdx, colIdx);
+
+            if (msgItem != nullptr)
+            {
+                msgItem->setText(CP_emptyTableMessage);
+            }
+
+            setRowHidden(rowIdx, false);
+        }
     }
 
-    return isTableEmpty;
+    return true;
 }
 
 void CPUProfileDataTable::UpdateLastRowItemsSortOrder()
@@ -816,12 +817,12 @@ bool CPUProfileDataTable::delegateSamplePercent(int colNum)
     return retVal;
 }
 
-bool CPUProfileDataTable::
-displayTableData(std::shared_ptr<cxlProfileDataReader> pProfDataRdr,
-                 std::shared_ptr<DisplayFilter> diplayFilter,
-                 AMDTProcessId procId,
-                 AMDTModuleId modId,
-                 std::vector<AMDTUInt64> moduleIdVec)
+bool CPUProfileDataTable::displayTableData(
+    std::shared_ptr<cxlProfileDataReader> pProfDataRdr,
+    std::shared_ptr<DisplayFilter> diplayFilter,
+    AMDTProcessId procId,
+    AMDTModuleId modId,
+    std::vector<AMDTUInt64> moduleIdVec)
 {
     bool retVal = false;
 
@@ -846,10 +847,13 @@ displayTableData(std::shared_ptr<cxlProfileDataReader> pProfDataRdr,
             GT_ASSERT(rcHeaders);
         }
 
+        AddEmptyAndOtherRow();
+
         // Fill the list data:
         bool rcData = fillTableData(procId, modId, moduleIdVec);
         GT_ASSERT(rcData);
 
+        HandleEmptyTable();
         sortTable();
 
         retVal = true;

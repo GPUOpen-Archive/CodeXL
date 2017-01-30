@@ -156,6 +156,7 @@ DisplayFilterDlg::displayDialog(const QString& sessionPath, bool enableOnlySyste
 
             initializeConfiguration();
             addFinalLayout();
+
             GT_IF_WITH_ASSERT(nullptr != m_pScrollAreaCPUCore)
             {
                 QScrollBar* pVscrollbar = m_pScrollAreaCPUCore->verticalScrollBar();
@@ -265,17 +266,13 @@ bool DisplayFilterDlg::initializeConfiguration()
 {
     bool retVal = true;
 
-    if (m_noOfCores > 0)
-    {
-        retVal = populateCoreList(m_noOfCores);
-    }
-
+    retVal = populateCoreList(m_noOfCores);
     retVal = retVal && populateColumnList();
-    return retVal;
 
+    return retVal;
 }
 
-bool DisplayFilterDlg::populateCoreList(int noOfCores)
+bool DisplayFilterDlg::populateCoreList(gtUInt32 noOfCores)
 {
     bool retVal = true;
 
@@ -305,10 +302,9 @@ bool DisplayFilterDlg::populateCoreList(int noOfCores)
         }
 
         m_pCheckBoxCore.clear();
-
         m_pCheckBoxCore.reserve(m_noOfCores);
 
-        for (int i = 0; i < m_noOfCores; ++i)
+        for (unsigned int i = 0; i < m_noOfCores; ++i)
         {
             QCheckBox *pCheckBox = new QCheckBox;
             m_pCheckBoxCore.push_back(pCheckBox);
@@ -332,7 +328,7 @@ bool DisplayFilterDlg::populateCoreList(int noOfCores)
     AMDTUInt64 maskVal = m_displayFilter->GetCoreMask();
     std::bitset<MAX_CORES_SUPPORTED> mask(maskVal);
 
-    for (int idx = 0; idx < m_noOfCores; ++idx)
+    for (unsigned int idx = 0; idx < m_noOfCores; ++idx)
     {
         m_pCheckBoxCore[idx]->setChecked(mask.test(idx));
     }
@@ -381,9 +377,7 @@ void DisplayFilterDlg::onChangeView(const QString& newlySelectedView)
     {
         m_noOfColumn = counterDetails.size();
 
-        const int noOfColumn = m_noOfColumn;
-
-        if (noOfColumn != 0)
+        if (m_noOfColumn != 0)
         {
             // Remove old items:
             if (nullptr != m_pVBLayoutForColumn)
@@ -405,9 +399,9 @@ void DisplayFilterDlg::onChangeView(const QString& newlySelectedView)
             m_pVBLayoutForColumn->setMargin(0);
 
             // Add new items:
-            m_pCheckBoxColumns.reserve(noOfColumn);
+            m_pCheckBoxColumns.reserve(m_noOfColumn);
 
-            for (int i = 0; i < noOfColumn; ++i)
+            for (unsigned int i = 0; i < m_noOfColumn; ++i)
             {
                 m_pCheckBoxColumns.push_back(new QCheckBox);
             }
@@ -423,24 +417,19 @@ void DisplayFilterDlg::onChangeView(const QString& newlySelectedView)
 
             m_pVBLayoutForColumn->addStretch();
 
-            for (int idx = 0; idx < m_noOfColumn; ++idx)
+            for (auto& checkBox : m_pCheckBoxColumns)
             {
-                QString checkboxName = m_pCheckBoxColumns[idx]->text();
+                QString checkboxName = checkBox->text();
 
-                std::wstring wstr = checkboxName.toStdWString();
-                gtString counterName(wstr.c_str());
+                auto iter = std::find(m_unSelectedCounters.begin(), m_unSelectedCounters.end(), checkboxName);
 
-                auto beginItr = m_notChecked.begin();
-                auto endItr = m_notChecked.end();
-                auto found = std::find(beginItr, endItr, counterName);
-
-                if (m_notChecked.end() != found)
+                if (m_unSelectedCounters.end() == iter)
                 {
-                    m_pCheckBoxColumns[idx]->setChecked(false);
+                    checkBox->setChecked(true);
                 }
                 else
                 {
-                    m_pCheckBoxColumns[idx]->setChecked(true);
+                    checkBox->setChecked(false);
                 }
             }
 
@@ -448,17 +437,15 @@ void DisplayFilterDlg::onChangeView(const QString& newlySelectedView)
             m_pScrollAreaColumns->setWidget(m_pWidgetColumnList);
         }
     }
-
-
 }
 
 void DisplayFilterDlg::onClickAllCoreItem(int state)
 {
-    for (int i = 0; i < m_noOfCores; ++i)
+    for (auto& checkBox : m_pCheckBoxCore)
     {
-        QObject::disconnect(m_pCheckBoxCore[i], SIGNAL(stateChanged(int)), this, SLOT(onClickCoreItem(int)));
-        m_pCheckBoxCore[i]->setChecked(state);
-        QObject::connect(m_pCheckBoxCore[i], SIGNAL(stateChanged(int)), this, SLOT(onClickCoreItem(int)));
+        QObject::disconnect(checkBox, SIGNAL(stateChanged(int)), this, SLOT(onClickCoreItem(int)));
+        checkBox->setChecked(state);
+        QObject::connect(checkBox, SIGNAL(stateChanged(int)), this, SLOT(onClickCoreItem(int)));
     }
 }
 
@@ -468,9 +455,9 @@ void DisplayFilterDlg::onClickCoreItem(int state)
 
     bool all = true;
 
-    for (int i = 0; i < m_noOfCores; ++i)
+    for (auto& checkBox : m_pCheckBoxCore)
     {
-        if (!m_pCheckBoxCore[i]->isChecked())
+        if (!checkBox->isChecked())
         {
             all = false;
             break;
@@ -489,53 +476,59 @@ void DisplayFilterDlg::onClickOk()
                       (nullptr != m_pSessionTreeItemData) &&
                       (nullptr != m_displayFilter))
     {
-        bool atLeastOneCore = false;
+        bool atLeastOneCoreSelected = false;
+        bool atLeastOneColumnSelected = false;
 
-        QString viewName = m_pComboBoxViewes->currentText();
-        m_cofigName = viewName;
-        m_displayFilter->SetViewName(viewName);
+        m_cofigName = m_pComboBoxViewes->currentText();
+        m_displayFilter->SetViewName(m_cofigName);
 
-        std::bitset<MAX_CORES_SUPPORTED> coreMask;
+        std::bitset<MAX_CORES_SUPPORTED> selectedCoreMask;
 
-        for (int i = 0; i < m_noOfCores; ++i)
+        for (unsigned int i = 0; i < m_noOfCores; ++i)
         {
             if (m_pCheckBoxCore[i]->isChecked())
             {
-                coreMask.set(i, true);
-                atLeastOneCore = true;
+                selectedCoreMask.set(i, true);
             }
         }
 
-        m_displayFilter->SetCoreMask(coreMask.to_ulong());
-
-        if ((0 < m_noOfCores) && ((static_cast<int>(coreMask.count())) == m_noOfCores))
+        if (selectedCoreMask.any())
         {
+            atLeastOneCoreSelected = true;
+        }
+
+        m_displayFilter->SetCoreMask(selectedCoreMask.to_ullong());
+
+        if ((0 < m_noOfCores) && ((static_cast<int>(selectedCoreMask.count())) == 0))
+        {
+            // If nothing is selected, then select the first item.
             m_pCheckBoxCore[0]->setChecked(true);
-            coreMask.reset();
         }
 
         // Update the hidden column list:
-        bool atLeastOneColumn = true;
         updateHiddenColumnList();
 
-        if ((0 < m_noOfColumn) &&
-            (static_cast<int>(m_selectedCounters.size()) == m_noOfColumn))
+        if ((0 < m_noOfColumn) && (m_unSelectedCounters.size() < m_noOfColumn))
         {
+            atLeastOneColumnSelected = true;
+        }
+
+        if ((0 < m_noOfColumn) && (m_unSelectedCounters.size() == m_noOfColumn))
+        {
+            // If nothing is selected, then select the first item.
             m_pCheckBoxColumns[0]->setChecked(true);
-            m_selectedCounters.clear();
-            atLeastOneColumn = false;
         }
 
         QString strErrorMessage;
 
-        if (!atLeastOneColumn)
+        if (!atLeastOneColumnSelected)
         {
-            strErrorMessage += "At least one column must be selected to view...";
+            strErrorMessage = "At least one column must be selected to view...";
         }
 
-        if (!atLeastOneCore)
+        if (!atLeastOneCoreSelected)
         {
-            if (0 != strErrorMessage.size())
+            if (!strErrorMessage.isEmpty())
             {
                 strErrorMessage += QString("\n");
             }
@@ -543,7 +536,7 @@ void DisplayFilterDlg::onClickOk()
             strErrorMessage += "At least one core must be selected to view...";
         }
 
-        if ((!atLeastOneCore) || (!atLeastOneColumn))
+        if ((!atLeastOneCoreSelected) || (!atLeastOneColumnSelected))
         {
             acMessageBox::instance().critical("CodeXL Error", strErrorMessage);
             return;
@@ -611,14 +604,14 @@ void DisplayFilterDlg::disableAllControlsExceptSystemModule(bool disable)
     {
         m_pCheckBoxAllCore->setEnabled(!disable);
 
-        for (int i = 0; i < m_noOfCores; ++i)
+        for (auto& checkBox : m_pCheckBoxCore)
         {
-            m_pCheckBoxCore[i]->setEnabled(!disable);
+            checkBox->setEnabled(!disable);
         }
 
-        for (int i = 0; i < m_noOfColumn; ++i)
+        for (auto& checkBox : m_pCheckBoxColumns)
         {
-            m_pCheckBoxColumns[i]->setEnabled(!disable);
+            checkBox->setEnabled(!disable);
         }
 
         m_pComboBoxViewes->setEnabled(!disable);
@@ -743,24 +736,12 @@ void DisplayFilterDlg::addFinalLayout()
 
 void DisplayFilterDlg::updateHiddenColumnList()
 {
-    // Sanity check:
+    m_unSelectedCounters.clear();
+
     GT_IF_WITH_ASSERT((m_pCheckBoxSeparateColumnsBy != nullptr) &&
                       (m_pRadioButtonSeparateByNUMA != nullptr) &&
                       (m_pRadioButtonSeparateByCore != nullptr))
     {
-        std::vector<gtString> checkCounterName;
-        m_notChecked.clear();
-
-        // get Config name
-        QString configName = m_displayFilter->GetCurrentConfigName();
-        CounterNameIdVec counterDetails;
-
-        //get supported counter list
-        if (!configName.isEmpty())
-        {
-            m_displayFilter->GetConfigCounters(configName, counterDetails);
-        }
-
         if (nullptr != m_displayFilter)
         {
             QString configName = m_displayFilter->GetCurrentConfigName();
@@ -774,28 +755,29 @@ void DisplayFilterDlg::updateHiddenColumnList()
 
             CounterNameIdVec selectedCounters;
 
-            for (int i = 0; i < m_noOfColumn; ++i)
+            for (auto& checkBox : m_pCheckBoxColumns)
             {
-                QString counterName = m_pCheckBoxColumns[i]->text();
-                gtString gStr(acQStringToGTString(counterName));
+                QString counterName = checkBox->text();
+                bool isChecked = checkBox->isChecked();
 
-                bool isChecked = m_pCheckBoxColumns[i]->isChecked();
+                gtString gStrCounterName(acQStringToGTString(counterName));
 
-                for (const auto& sel : counterDetails)
+                for (const auto& counter : counterDetails)
                 {
-                    if (isChecked)
+                    if (std::get<1>(counter) == gStrCounterName)
                     {
-                        if (std::get<1>(sel) == gStr)
+                        if (isChecked)
                         {
-                            selectedCounters.push_back(sel);
+                            selectedCounters.push_back(counter);
                         }
-                    }
-                    else
-                    {
-                        m_notChecked.push_back(gStr);
+                        else
+                        {
+                            m_unSelectedCounters.push_back(counterName);
+                        }
+
+                        break;
                     }
                 }
-
             }
 
             m_displayFilter->SetSelectedCounterList(selectedCounters);

@@ -473,7 +473,7 @@ void SessionModulesView::onModulesTableCellChanged()
         foreach (QTableWidgetItem* pSelectedItem, m_pTopModulesTable->selectedItems())
         {
             QString processFileName;
-            bool rc = m_pTopModulesTable->findModueId(pSelectedItem->row(), modId);
+            bool rc = m_pTopModulesTable->findModuleId(pSelectedItem->row(), modId);
             GT_ASSERT(rc);
 
             //insert unique elements

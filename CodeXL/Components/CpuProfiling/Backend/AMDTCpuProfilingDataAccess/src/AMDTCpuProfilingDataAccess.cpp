@@ -1334,9 +1334,9 @@ public:
         {
             double currentTotal = 0.0;
 
-            for (auto& aSummaryData : summaryDataVec)
+            for (const auto& aSummaryData : summaryDataVec)
             {
-                for (auto& aSampleValue : aSummaryData.m_sampleValue)
+                for (const auto& aSampleValue : aSummaryData.m_sampleValue)
                 {
                     if (aSampleValue.m_counterId == counterId)
                     {

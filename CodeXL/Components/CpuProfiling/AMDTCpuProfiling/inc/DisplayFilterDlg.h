@@ -53,7 +53,7 @@ private:
     DisplayFilterDlg(QWidget* pParent);
 
     bool initializeConfiguration();
-    bool populateCoreList(int noOfCores);
+    bool populateCoreList(gtUInt32 noOfCores);
     bool populateColumnList();
     bool initializeLayout();
     void disableAllControlsExceptSystemModule(bool disable);
@@ -80,8 +80,8 @@ private:
     QCheckBox* m_pCheckBoxAllCore = nullptr;
     QGridLayout*  m_pLayoutForCoreList = nullptr;
     QWidget* m_pWidgetCoreList = nullptr;
-    int m_noOfCores = 0;
-    int m_noOfColumn = 0;
+    gtUInt32 m_noOfCores = 0;
+    gtUInt32 m_noOfColumn = 0;
     QWidget* m_pWidgetColumnList = nullptr;
     QVBoxLayout* m_pVBLayoutForColumn = nullptr;
     std::vector<QCheckBox*> m_pCheckBoxColumns;
@@ -113,9 +113,8 @@ private:
     std::shared_ptr<DisplayFilter> m_displayFilter;
     std::shared_ptr<cxlProfileDataReader>   m_pProfDataReader;
     QString                                 m_cofigName;
-    gtVector<gtUInt32>                      m_selectedCounters;
     std::map<int, int>                      m_colIdxCounterIdMap;
-    std::vector<gtString>                   m_notChecked;
+    std::vector<QString>                    m_unSelectedCounters;
 };
 
 

@@ -87,6 +87,11 @@ QString FunctionsDataTable::getFunctionId(int rowIndex) const
     return name;
 }
 
+int FunctionsDataTable::getEmptyMsgItemColIndex() const
+{
+    return m_functionNameColumn;
+}
+
 void FunctionsDataTable::onAboutToShowContextMenu()
 {
     // Call the base class implementation:
@@ -208,7 +213,12 @@ bool FunctionsDataTable::fillSummaryTable(int counterIdx)
 
         for (auto profData : funcProfileData)
         {
-            bool isOther = (profData.m_name.compare(L"other") == 0);
+            if (profData.m_sampleValue.empty() || profData.m_sampleValue.at(0).m_sampleCount <= 0.0)
+            {
+                continue;
+            }
+
+            bool isOther = (0 == profData.m_name.compare(L"other") && AMDT_PROFILE_ALL_MODULES == profData.m_moduleId);
 
             if (!isOther)
             {
@@ -349,6 +359,18 @@ bool FunctionsDataTable::AddRowToTable(const gtVector<AMDTProfileData>& function
 
     for (const auto& profData : functionProfileData)
     {
+        double totalSamples = 0.0;
+
+        for (const auto& sampleVal : profData.m_sampleValue)
+        {
+            totalSamples += sampleVal.m_sampleCount;
+        }
+
+        if (totalSamples <= 0.0)
+        {
+            continue;
+        }
+
         QStringList list;
         CounterNameIdVec selectedCounterList;
 

@@ -44,7 +44,12 @@ bool ProcessesDataTable::fillSummaryTable(int counterIdx)
 
             for (const auto& profData : processProfileData)
             {
-                bool isOther = (profData.m_name.compare(L"other") == 0);
+                if (profData.m_sampleValue.empty() || profData.m_sampleValue.at(0).m_sampleCount <= 0.0)
+                {
+                    continue;
+                }
+
+                bool isOther = (0 == profData.m_name.compare(L"other") && AMDT_PROFILE_ALL_MODULES == profData.m_moduleId);
 
                 if (!isOther)
                 {
@@ -159,13 +164,33 @@ bool ProcessesDataTable::fillSummaryTable(int counterIdx)
 
 bool ProcessesDataTable::findProcessDetails(int rowIndex, AMDTProcessId& pid, QString& processFileName)
 {
-    QTableWidgetItem* pidWidget = item(rowIndex, m_processIdColumn);
-    pid = pidWidget->text().toUInt();
+    bool retVal = false;
 
-    QTableWidgetItem* procNameWidget = item(rowIndex, m_processNameColumn);
-    processFileName = procNameWidget->text();
+    GT_IF_WITH_ASSERT((rowIndex >= 0) && (rowIndex < rowCount()))
+    {
+        QTableWidgetItem* pidWidget = item(rowIndex, m_processIdColumn);
 
-    return true;
+        GT_IF_WITH_ASSERT(pidWidget != nullptr)
+        {
+            pid = pidWidget->text().toUInt();
+        }
+
+        QTableWidgetItem* procNameWidget = item(rowIndex, m_processNameColumn);
+
+        GT_IF_WITH_ASSERT(procNameWidget != nullptr)
+        {
+            processFileName = procNameWidget->text();
+        }
+
+        retVal = true;
+    }
+
+    return retVal;
+}
+
+int ProcessesDataTable::getEmptyMsgItemColIndex() const
+{
+    return m_processNameColumn;
 }
 
 CPUProfileDataTable::TableType ProcessesDataTable::GetTableType() const
@@ -183,6 +208,18 @@ bool ProcessesDataTable::AddRowToTable(const gtVector<AMDTProfileData>& allProce
     {
         for (const auto& profData : allProcessData)
         {
+            double totalSamples = 0.0;
+
+            for (const auto& sampleVal : profData.m_sampleValue)
+            {
+                totalSamples += sampleVal.m_sampleCount;
+            }
+
+            if (totalSamples <= 0.0)
+            {
+                continue;
+            }
+
             QStringList list;
 
             AMDTProfileProcessInfoVec procInfo;

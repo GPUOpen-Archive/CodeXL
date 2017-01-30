@@ -53,6 +53,7 @@ public:
     QString getFunctionName(int rowIndex) const;
     QString getModuleName(int rowIndex) const;
     QString getFunctionId(int rowIndex) const;
+    int getEmptyMsgItemColIndex() const;
 
     /// Set the popup for missing files attribute:
     void setPopupToBrowseMissingFiles(bool popup) {m_popupToBrowseMissingFiles = popup;}

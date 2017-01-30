@@ -124,6 +124,8 @@ public:
     // returns "other" message row number.
     int GetOtherSamplesItemRowNum() const;
 
+    virtual int getEmptyMsgItemColIndex() const = 0;
+
 signals:
 
     void contextMenuActionTriggered(CPUProfileDataTable::TableContextMenuActionType actionType, QTableWidgetItem* pTableItem);

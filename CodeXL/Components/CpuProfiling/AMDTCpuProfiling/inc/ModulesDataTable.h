@@ -57,10 +57,12 @@ public:
     /// \return true on success false on failure
     bool findModuleFilePath(int moduleRowIndex, QString& moduleFilePath);
 
+    int getEmptyMsgItemColIndex() const;
+
     // returns modules table type
     TableType GetTableType() const;
 
-    bool findModueId(int rowIndex, AMDTModuleId& modId);
+    bool findModuleId(int rowIndex, AMDTModuleId& modId);
 
 public slots:
 
@@ -75,6 +77,9 @@ private:
 
     bool AddRowToTable(const gtVector<AMDTProfileData>& allProcessData);
     void mergeProfileModuleData(gtVector<AMDTProfileData>& data) const;
+
+    int m_moduleIdColumn = -1;
+    int m_moduleNameColumn = -1;
 
     CpuSessionWindow* m_pParentSessionWindow = nullptr;
 };
