@@ -2358,7 +2358,7 @@ public:
                                        AMDTThreadId              threadId,
                                        AMDTProfileFunctionData&  functionData)
     {
-        int retVal = 0;
+        int retVal = CXL_DATAACCESS_ERROR_INTERNAL;
         bool ret = false;
 
         ret = GetFunctionData(funcId, processId, threadId, functionData);
@@ -2370,60 +2370,63 @@ public:
             AMDTProfileFunctionData* pCurrFunctionData = &functionData;
             retVal = GetFunctionSourceAndDisasmInfo__(funcId, srcFilePath, srcInfoVec, pCurrFunctionData);
 
-            AMDTProfileSourceLineDataVec& srcLineDataVec = functionData.m_srcLineDataList;
-            AMDTProfileInstructionDataVec& instDataVec = functionData.m_instDataList;
-
-            for (auto& instData : instDataVec)
+            if (CXL_DATAACCESS_SUCCESS == retVal)
             {
-                gtUInt32 srcLine = 0;
+                AMDTProfileSourceLineDataVec& srcLineDataVec = functionData.m_srcLineDataList;
+                AMDTProfileInstructionDataVec& instDataVec = functionData.m_instDataList;
 
-                if (CXL_DATAACCESS_WARN_SRC_INFO_NOTAVAILABLE != static_cast<unsigned int>(retVal))
+                for (auto& instData : instDataVec)
                 {
-                    // check whether this offset has samples (in functionData.m_instDataList)
-                    auto srcData = std::find_if(srcInfoVec.begin(), srcInfoVec.end(),
-                        [&instData](AMDTSourceAndDisasmInfo const& sData)
-                    { return ((instData.m_offset >= sData.m_offset) && (instData.m_offset < (sData.m_offset + sData.m_size))); });
+                    gtUInt32 srcLine = 0;
 
-                    if (srcData != srcInfoVec.end())
+                    if (CXL_DATAACCESS_WARN_SRC_INFO_NOTAVAILABLE != static_cast<unsigned int>(retVal))
                     {
-                        srcLine = (*srcData).m_sourceLine;
+                        // check whether this offset has samples (in functionData.m_instDataList)
+                        auto srcData = std::find_if(srcInfoVec.begin(), srcInfoVec.end(),
+                            [&instData](AMDTSourceAndDisasmInfo const& sData)
+                        { return ((instData.m_offset >= sData.m_offset) && (instData.m_offset < (sData.m_offset + sData.m_size))); });
+
+                        if (srcData != srcInfoVec.end())
+                        {
+                            srcLine = (*srcData).m_sourceLine;
+                        }
+                    }
+
+                    // Check wether we have see this srcline in srcLineDataVec
+                    // if so, update the profile data otherwise add a new line
+                    auto slData = std::find_if(srcLineDataVec.begin(), srcLineDataVec.end(),
+                        [&srcLine](AMDTProfileSourceLineData const& sData) { return sData.m_sourceLineNumber == srcLine; });
+
+                    if (slData == srcLineDataVec.end())
+                    {
+                        AMDTProfileSourceLineData srcLineData;
+                        srcLineData.m_sourceLineNumber = srcLine;
+                        srcLineData.m_sampleValues = instData.m_sampleValues;
+
+                        srcLineDataVec.push_back(srcLineData);
+                    }
+                    else
+                    {
+                        for (gtUInt32 i = 0; i < instData.m_sampleValues.size(); i++)
+                        {
+                            slData->m_sampleValues[i].m_sampleCount += instData.m_sampleValues[i].m_sampleCount;
+                            slData->m_sampleValues[i].m_sampleCountPercentage += instData.m_sampleValues[i].m_sampleCountPercentage;
+                        }
                     }
                 }
 
-                // Check wether we have see this srcline in srcLineDataVec
-                // if so, update the profile data otherwise add a new line
-                auto slData = std::find_if(srcLineDataVec.begin(), srcLineDataVec.end(),
-                    [&srcLine](AMDTProfileSourceLineData const& sData) { return sData.m_sourceLineNumber == srcLine; });
+                AMDTCounterIdVec countersList;
+                ret = GetCountersList(countersList);
 
-                if (slData == srcLineDataVec.end())
-                {
-                    AMDTProfileSourceLineData srcLineData;
-                    srcLineData.m_sourceLineNumber = srcLine;
-                    srcLineData.m_sampleValues = instData.m_sampleValues;
+                // Now calculate the percentage
+                ret = ret && CalculateRawCounterPercentage(funcId, processId, threadId, countersList, functionData);
 
-                    srcLineDataVec.push_back(srcLineData);
-                }
-                else
-                {
-                    for (gtUInt32 i = 0; i < instData.m_sampleValues.size(); i++)
-                    {
-                        slData->m_sampleValues[i].m_sampleCount += instData.m_sampleValues[i].m_sampleCount;
-                        slData->m_sampleValues[i].m_sampleCountPercentage += instData.m_sampleValues[i].m_sampleCountPercentage;
-                    }
-                }
+                // Now calculate the computed counter values
+                // Iterate over the profileDataVec and calculate the computed counter values
+                ret = ret && CalculateComputedCounters(functionData.m_srcLineDataList);
+
+                ret = ret && CalculateComputedCounters(functionData.m_instDataList);
             }
-
-            AMDTCounterIdVec countersList;
-            ret = GetCountersList(countersList);
-
-            // Now calculate the percentage
-            ret = ret && CalculateRawCounterPercentage(funcId, processId, threadId, countersList, functionData);
-
-            // Now calculate the computed counter values
-            // Iterate over the profileDataVec and calculate the computed counter values
-            ret = ret && CalculateComputedCounters(functionData.m_srcLineDataList);
-
-            ret = ret && CalculateComputedCounters(functionData.m_instDataList);
         }
 
         return retVal;
@@ -2618,7 +2621,6 @@ public:
     {
         int rv = CXL_DATAACCESS_WARN_SRC_INFO_NOTAVAILABLE;
         bool foundSrcInfo = false;
-        bool foundSrcFilePath = false;
 
         auto funcSrcInfoIt = m_funcIdSrcInfoMap.find(funcId);
 
@@ -2632,15 +2634,10 @@ public:
         {
             rv = GetDisassembly(funcId, srcInfoVec, pFuncData);
 
-            if (rv)
+            if (CXL_DATAACCESS_SUCCESS == rv)
             {
                 m_funcIdSrcInfoMap.insert({ funcId, srcInfoVec });
-            }
-
-            if (!foundSrcFilePath)
-            {
-                // Find the srcFilePath
-                foundSrcFilePath = GetSrcFilePathForFuncId(funcId, srcFilePath);
+                GetSrcFilePathForFuncId(funcId, srcFilePath);
             }
         }
 
@@ -2960,10 +2957,10 @@ public:
                     }
                 }
             }
-        }
-        else
-        {
-            retVal = CXL_DATAACCESS_ERROR_DASM_INFO_NOTAVAILABLE;
+            else
+            {
+                retVal = CXL_DATAACCESS_ERROR_DASM_INFO_NOTAVAILABLE;
+            }
         }
 
         return retVal;

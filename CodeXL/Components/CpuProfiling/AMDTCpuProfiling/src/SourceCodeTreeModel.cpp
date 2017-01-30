@@ -385,6 +385,8 @@ bool SourceCodeTreeModel::setHeaderData(int section, Qt::Orientation orientation
 
 bool SourceCodeTreeModel::BuildDisassemblyTree()
 {
+    bool ret = false;
+
     m_srcLineViewTreeMap.clear();
     m_sampleSrcLnViewTreeList.clear();
     m_srcLineDataVec.clear();
@@ -404,102 +406,107 @@ bool SourceCodeTreeModel::BuildDisassemblyTree()
         retVal = m_pProfDataRdr->GetFunctionSourceAndDisasmInfo(m_funcId, srcFilePath, srcInfoVec);
     }
 
-    // Fetch aggregated samples for each counter id
-    AMDTSampleValueVec aggrSampleValueVec;
-    m_pProfDataRdr->GetSampleCount(false, aggrSampleValueVec);
-
-    AMDTUInt64 moduleBaseAddr = functionData.m_modBaseAddress;
-
-    for (const auto& srcData : functionData.m_srcLineDataList)
+    if (retVal == CXL_DATAACCESS_SUCCESS)
     {
-        bool isSamplePercentSet = m_pDisplayFilter->IsDisplaySamplePercent();
+        // Fetch aggregated samples for each counter id
+        AMDTSampleValueVec aggrSampleValueVec;
+        m_pProfDataRdr->GetSampleCount(false, aggrSampleValueVec);
 
-        gtVector<InstOffsetSize> instOffsetVec;
-        GetInstOffsets(srcData.m_sourceLineNumber, srcInfoVec, instOffsetVec);
+        AMDTUInt64 moduleBaseAddr = functionData.m_modBaseAddress;
 
-        int column = SOURCE_VIEW_SAMPLES_PERCENT_COLUMN + 1;
-
-        for (const auto& instOffset : instOffsetVec)
+        for (const auto& srcData : functionData.m_srcLineDataList)
         {
-            SourceViewTreeItem* pAsmItem = new SourceViewTreeItem(SOURCE_VIEW_ASM_DEPTH, m_pRootItem);
+            bool isSamplePercentSet = m_pDisplayFilter->IsDisplaySamplePercent();
 
-            gtString disasm;
-            gtString codeByte;
-            GetDisasmString(instOffset.m_offset, srcInfoVec, disasm, codeByte);
+            gtVector<InstOffsetSize> instOffsetVec;
+            GetInstOffsets(srcData.m_sourceLineNumber, srcInfoVec, instOffsetVec);
 
-            AMDTSampleValueVec sampleValue;
-            GetDisasmSampleValue(instOffset, functionData.m_instDataList, sampleValue);
+            int column = SOURCE_VIEW_SAMPLES_PERCENT_COLUMN + 1;
 
-            column = SOURCE_VIEW_SAMPLES_PERCENT_COLUMN + 1;
-            bool isFirst = true;
-
-            for (const auto& aSampleValue : sampleValue)
+            for (const auto& instOffset : instOffsetVec)
             {
-                auto counterId = aSampleValue.m_counterId;
-                auto sampleCount = aSampleValue.m_sampleCount;
-                auto funcSamplePercent = aSampleValue.m_sampleCountPercentage;
+                SourceViewTreeItem* pAsmItem = new SourceViewTreeItem(SOURCE_VIEW_ASM_DEPTH, m_pRootItem);
 
-                auto iter = std::find_if(aggrSampleValueVec.cbegin(), aggrSampleValueVec.cend(),
-                    [&](const AMDTSampleValue& sampleInfo) {
-                    return counterId == sampleInfo.m_counterId;
-                });
+                gtString disasm;
+                gtString codeByte;
+                GetDisasmString(instOffset.m_offset, srcInfoVec, disasm, codeByte);
 
-                if (iter == aggrSampleValueVec.cend())
+                AMDTSampleValueVec sampleValue;
+                GetDisasmSampleValue(instOffset, functionData.m_instDataList, sampleValue);
+
+                column = SOURCE_VIEW_SAMPLES_PERCENT_COLUMN + 1;
+                bool isFirst = true;
+
+                for (const auto& aSampleValue : sampleValue)
                 {
-                    continue;
+                    auto counterId = aSampleValue.m_counterId;
+                    auto sampleCount = aSampleValue.m_sampleCount;
+                    auto funcSamplePercent = aSampleValue.m_sampleCountPercentage;
+
+                    auto iter = std::find_if(aggrSampleValueVec.cbegin(), aggrSampleValueVec.cend(),
+                        [&](const AMDTSampleValue& sampleInfo) {
+                        return counterId == sampleInfo.m_counterId;
+                    });
+
+                    if (iter == aggrSampleValueVec.cend())
+                    {
+                        continue;
+                    }
+
+                    double totalSamples = iter->m_sampleCount;
+                    auto appSamplePercent = CalculatePercent(sampleCount, totalSamples);
+
+                    if (isFirst)
+                    {
+                        QVariant var;
+
+                        SetDisplayFormat(sampleCount, false, var, SAMPLE_PRECISION);
+                        pAsmItem->setData(SOURCE_VIEW_SAMPLES_COLUMN, var);
+                        pAsmItem->setData(SOURCE_VIEW_SAMPLES_PERCENT_COLUMN, funcSamplePercent);
+                        pAsmItem->setForeground(SOURCE_VIEW_SAMPLES_PERCENT_COLUMN, acRED_NUMBER_COLOUR);
+
+                        SetTooltipFormat(sampleCount, funcSamplePercent, appSamplePercent, var);
+                        pAsmItem->setTooltip(SOURCE_VIEW_SAMPLES_COLUMN, var);
+                        pAsmItem->setTooltip(SOURCE_VIEW_SAMPLES_PERCENT_COLUMN, var);
+
+                        isFirst = false;
+                    }
+
+                    if (!isSamplePercentSet)
+                    {
+                        QVariant var;
+                        SetDisplayFormat(sampleCount, false, var, SAMPLE_PRECISION);
+                        pAsmItem->setData(column, var);
+                    }
+                    else
+                    {
+                        QVariant var;
+                        SetDisplayFormat(sampleCount, true, var, SAMPLE_PERCENT_PRECISION);
+                        pAsmItem->setData(column, var);
+                    }
+
+                    QVariant tooltip;
+                    SetTooltipFormat(sampleCount, funcSamplePercent, appSamplePercent, tooltip);
+                    pAsmItem->setTooltip(column, tooltip);
+
+                    column++;
                 }
 
-                double totalSamples = iter->m_sampleCount;
-                auto appSamplePercent = CalculatePercent(sampleCount, totalSamples);
+                pAsmItem->setData(SOURCE_VIEW_ADDRESS_COLUMN, "0x" + QString::number(instOffset.m_offset + moduleBaseAddr, 16));
+                pAsmItem->setForeground(SOURCE_VIEW_ADDRESS_COLUMN, acQGREY_TEXT_COLOUR);
 
-                if (isFirst)
-                {
-                    QVariant var;
+                pAsmItem->setData(SOURCE_VIEW_SOURCE_COLUMN, acGTStringToQString(disasm));
+                pAsmItem->setForeground(SOURCE_VIEW_SOURCE_COLUMN, acDARK_PURPLE);
 
-                    SetDisplayFormat(sampleCount, false, var, SAMPLE_PRECISION);
-                    pAsmItem->setData(SOURCE_VIEW_SAMPLES_COLUMN, var);
-                    pAsmItem->setData(SOURCE_VIEW_SAMPLES_PERCENT_COLUMN, funcSamplePercent);
-                    pAsmItem->setForeground(SOURCE_VIEW_SAMPLES_PERCENT_COLUMN, acRED_NUMBER_COLOUR);
-
-                    SetTooltipFormat(sampleCount, funcSamplePercent, appSamplePercent, var);
-                    pAsmItem->setTooltip(SOURCE_VIEW_SAMPLES_COLUMN, var);
-                    pAsmItem->setTooltip(SOURCE_VIEW_SAMPLES_PERCENT_COLUMN, var);
-
-                    isFirst = false;
-                }
-
-                if (!isSamplePercentSet)
-                {
-                    QVariant var;
-                    SetDisplayFormat(sampleCount, false, var, SAMPLE_PRECISION);
-                    pAsmItem->setData(column, var);
-                }
-                else
-                {
-                    QVariant var;
-                    SetDisplayFormat(sampleCount, true, var, SAMPLE_PERCENT_PRECISION);
-                    pAsmItem->setData(column, var);
-                }
-
-                QVariant tooltip;
-                SetTooltipFormat(sampleCount, funcSamplePercent, appSamplePercent, tooltip);
-                pAsmItem->setTooltip(column, tooltip);
-
-                column++;
+                pAsmItem->setData(SOURCE_VIEW_CODE_BYTES_COLUMN, acGTStringToQString(codeByte));
+                pAsmItem->setForeground(SOURCE_VIEW_CODE_BYTES_COLUMN, acDARK_GREEN);
             }
-
-            pAsmItem->setData(SOURCE_VIEW_ADDRESS_COLUMN, "0x" + QString::number(instOffset.m_offset + moduleBaseAddr, 16));
-            pAsmItem->setForeground(SOURCE_VIEW_ADDRESS_COLUMN, acQGREY_TEXT_COLOUR);
-
-            pAsmItem->setData(SOURCE_VIEW_SOURCE_COLUMN, acGTStringToQString(disasm));
-            pAsmItem->setForeground(SOURCE_VIEW_SOURCE_COLUMN, acDARK_PURPLE);
-
-            pAsmItem->setData(SOURCE_VIEW_CODE_BYTES_COLUMN, acGTStringToQString(codeByte));
-            pAsmItem->setForeground(SOURCE_VIEW_CODE_BYTES_COLUMN, acDARK_GREEN);
         }
+
+        ret = true;
     }
 
-    return true;
+    return ret;
 }
 
 void SourceCodeTreeModel::GetInstOffsets(gtUInt16 srcLine,

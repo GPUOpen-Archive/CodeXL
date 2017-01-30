@@ -56,6 +56,8 @@ SessionSourceCodeView::SessionSourceCodeView(QWidget* pParent,
 {
     m_exportString = CP_sourceCodeViewExportString;
 
+    afGlobalVariablesManager::instance().SetShouldAlertMissingSourceFile(true);
+
     // Create the tree model object:
     m_pTreeViewModel = new SourceCodeTreeModel(m_sessionDir, m_pProfDataRdr, m_pDisplayFilter);
 }
@@ -759,14 +761,17 @@ bool SessionSourceCodeView::UpdateDisplay()
         // Create the model data:
         retVal = CreateModelData();
 
-        // Update the column widths:
-        UpdateColumnWidths();
+        if (retVal)
+        {
+            // Update the column widths:
+            UpdateColumnWidths();
 
-        // Update the percent columns to display in the delegate item:
-        UpdatePercentDelegate();
+            // Update the percent columns to display in the delegate item:
+            UpdatePercentDelegate();
 
-        // Refresh the view:
-        RefreshView();
+            // Refresh the view:
+            RefreshView();
+        }
     }
 
     return retVal;
@@ -1313,16 +1318,17 @@ void SessionSourceCodeView::SetTreeSelection(SourceViewTreeItem* pItemToSelect)
 bool SessionSourceCodeView::CreateModelData()
 {
     bool retVal = false;
-    QString tryFile;
 
-    // Sanity check:
     GT_IF_WITH_ASSERT(m_pTreeViewModel != nullptr)
     {
         bool alertMissingSourceFile = false;
         bool failedToAnnotateSource = false;
+        bool alertMissingBinaryFile = false;
 
         if (!m_pTreeViewModel->m_isDisplayingOnlyDasm)
         {
+            QString tryFile;
+
             // Get the source file and store it in the cache
             if (GetActualSourceFile(m_pTreeViewModel->m_srcFile, tryFile))
             {
@@ -1348,19 +1354,6 @@ bool SessionSourceCodeView::CreateModelData()
 
             if (failedToAnnotateSource || alertMissingSourceFile)
             {
-                qApp->restoreOverrideCursor();
-
-                if ((alertMissingSourceFile)
-                    && (afGlobalVariablesManager::instance().ShouldAlertMissingSourceFile()))
-                {
-                    acMessageBox::instance().warning(AF_STR_WarningA, CP_sourceCodeErrorSourceNotFound);
-                }
-                else if (failedToAnnotateSource)
-                {
-                    acMessageBox::instance().warning(AF_STR_WarningA, CP_sourceCodeErrorFailedToAnnotateSource);
-                }
-
-                qApp->setOverrideCursor(QCursor(Qt::WaitCursor));
                 m_pTreeViewModel->m_isDisplayingOnlyDasm = true;
             }
         }
@@ -1371,6 +1364,29 @@ bool SessionSourceCodeView::CreateModelData()
             m_pTreeViewModel->SetSourceLines(QString(), 0, 0);
             m_pTreeViewModel->m_isDisplayingOnlyDasm = false;
             retVal = m_pTreeViewModel->BuildDisassemblyTree();
+            alertMissingBinaryFile = !retVal;
+        }
+
+        if (failedToAnnotateSource || alertMissingSourceFile || alertMissingBinaryFile)
+        {
+            qApp->restoreOverrideCursor();
+
+            if (alertMissingBinaryFile)
+            {
+                acMessageBox::instance().warning(
+                    AF_STR_WarningA,
+                    QString(CP_sourceCodeErrorCouldNotOpenFile).arg(m_pTreeViewModel->m_moduleName));
+            }
+            else if ((alertMissingSourceFile) && (afGlobalVariablesManager::instance().ShouldAlertMissingSourceFile()))
+            {
+                acMessageBox::instance().warning(AF_STR_WarningA, CP_sourceCodeErrorSourceNotFound);
+            }
+            else if (failedToAnnotateSource)
+            {
+                acMessageBox::instance().warning(AF_STR_WarningA, CP_sourceCodeErrorFailedToAnnotateSource);
+            }
+
+            qApp->setOverrideCursor(QCursor(Qt::WaitCursor));
         }
     }
 
