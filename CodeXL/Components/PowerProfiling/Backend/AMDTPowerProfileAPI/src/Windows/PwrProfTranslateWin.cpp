@@ -19,6 +19,7 @@ AMDTResult PwrProfTranslateWin::PwrGetProfileData(CXLContextProfileType type, vo
     AMDTResult ret = AMDT_STATUS_OK;
 
 #ifndef _WIN64
+    char path[OS_MAX_PATH];
     AMDTFloat32 totalPower = 0;
     wchar_t str[OS_MAX_PATH];
 
@@ -35,12 +36,13 @@ AMDTResult PwrProfTranslateWin::PwrGetProfileData(CXLContextProfileType type, vo
             memset(&process, 0, sizeof(AMDTPwrProcessInfo));
             process.m_pid = processIter.first;
 
+            memset(path, '\0', OS_MAX_PATH);
             if (S_OK == fnFindProcessName(process.m_pid, str, AMDT_PWR_EXE_PATH_LENGTH))
             {
-                char path[OS_MAX_PATH];
                 wcstombs(path, str, OS_MAX_PATH);
-                ExtractNameAndPath(path, process.m_name, process.m_path);
             }
+
+            ExtractNameAndPath(path, process.m_name, process.m_path);
 
             process.m_sampleCnt = processIter.second.m_sampleCnt;
             process.m_power = processIter.second.m_power;
@@ -87,14 +89,14 @@ AMDTResult PwrProfTranslateWin::PwrGetProfileData(CXLContextProfileType type, vo
                 }
 
                 module.m_sampleCnt = moduleIter.second.m_sampleCnt;
+                memset(path, '\0', OS_MAX_PATH);
 
                 // Get process name and path
                 if (S_OK == fnFindProcessName(module.m_processId, str, AMDT_PWR_EXE_PATH_LENGTH))
                 {
-                    char path[OS_MAX_PATH];
                     wcstombs(path, str, OS_MAX_PATH);
-                    ExtractNameAndPath(path, module.m_processName, module.m_processPath);
                 }
+                ExtractNameAndPath(path, module.m_processName, module.m_processPath);
 
                 m_moduleList.push_back(module);
             }

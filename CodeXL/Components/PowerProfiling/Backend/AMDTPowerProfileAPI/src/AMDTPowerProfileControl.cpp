@@ -1070,27 +1070,34 @@ bool IsSmuLogAccessible(SmuInfo* pSmu, DeviceType devType)
 
         default:
         {
-            AMDTUInt32 retry = SMU_LOG_MSG_RETRY_MAX;
-
-            do
+            if (DEVICE_TYPE_DGPU == devType)
             {
-                // Initiate smu logging and stop loggin to check if smu is accessible
-                ret = Smu7DriverMsg(pSmu, SMU_PM_STATUS_LOG_START);
-
-                if (true == ret)
-                {
-                    break;
-                }
-
-                SLEEP_IN_MS(50);
+                ret = true;
             }
-            while (--retry);
-
-            PwrTrace("Smu7DriverMsg: rety cnt %d", SMU_LOG_MSG_RETRY_MAX - retry);
-
-            if (false == ret)
+            else
             {
-                PwrTrace("IsSmuLogAccessible: SMU_PM_STATUS_LOG_START failed");
+                AMDTUInt32 retry = SMU_LOG_MSG_RETRY_MAX;
+
+                do
+                {
+                    // Initiate smu logging and stop loggin to check if smu is accessible
+                    ret = Smu7DriverMsg(pSmu, SMU_PM_STATUS_LOG_START);
+
+                    if (true == ret)
+                    {
+                        break;
+                    }
+
+                    SLEEP_IN_MS(50);
+                }
+                while (--retry);
+
+                PwrTrace("Smu7DriverMsg: rety cnt %d", SMU_LOG_MSG_RETRY_MAX - retry);
+
+                if (false == ret)
+                {
+                    PwrTrace("IsSmuLogAccessible: SMU_PM_STATUS_LOG_START failed");
+                }
             }
 
             break;
