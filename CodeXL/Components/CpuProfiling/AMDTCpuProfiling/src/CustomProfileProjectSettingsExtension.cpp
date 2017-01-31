@@ -1516,7 +1516,7 @@ void CustomProfileProjectSettingsExtension::OnSettingsTreeSelectionAboutToChange
 
         fnGetPredefinedProfilesAvailable(isPredefinedProfilesSupported);
 
-        if (!isPredefinedProfilesSupported)
+        if (!isPredefinedProfilesSupported && GetEbpIbsEventCount() > 1)
         {
             noteStr = CP_STR_cpuProfileProjectSettingsCustomTypeWarning;
         }
@@ -1928,4 +1928,27 @@ QWidget* CustomEventItemDelegate::createEditor(QWidget* pParent, const QStyleOpt
         }
     }
     return retVal;
+}
+
+gtUInt32 CustomProfileProjectSettingsExtension::GetEbpIbsEventCount() const
+{
+    gtUInt32 evCount = 0;
+
+    for (int i = 0, count = m_pMonitoredEventsTreeWidget->topLevelItemCount(); i < count; ++i)
+    {
+        QTreeWidgetItem* pItem = m_pMonitoredEventsTreeWidget->topLevelItem(i);
+
+        if (pItem != nullptr)
+        {
+            gtUInt16 eventSelect = (pItem->type() - QTreeWidgetItem::UserType);
+
+            // Count EBP, IBS Op, IBS Fetch, CLU events
+            if (!IsTimerEvent(eventSelect))
+            {
+                evCount++;
+            }
+        }
+    }
+
+    return evCount;
 }

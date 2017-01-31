@@ -110,6 +110,7 @@ protected:
     QTreeWidgetItem* FindAvailableEventItem(QTreeWidgetItem& availableParent, const QTreeWidgetItem& monitoredItem) const;
     bool IsDuplicatableEvent(const QTreeWidgetItem& item) const;
     bool IsValidEvent(const QTreeWidgetItem& item) const;
+    gtUInt32 GetEbpIbsEventCount() const;
 
 private:
 
