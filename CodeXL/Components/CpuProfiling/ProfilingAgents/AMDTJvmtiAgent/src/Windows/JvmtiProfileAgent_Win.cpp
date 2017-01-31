@@ -24,7 +24,7 @@ void JNICALL writeInlineInfo(jvmtiEnv*      pJvmtiEnv,
 
 static void BuildInlineAddressRanges(
     jvmtiCompiledMethodLoadInlineRecord*  record,
-    vector<void*>&                        globalAddressRanges,
+    std::vector<void*>&                   globalAddressRanges,
     jint&                                 bytecodeToSourceTableSize,
     const void*                           jittedCodeAddr,
     jint                                  jittedCodeSize);
@@ -100,13 +100,13 @@ void JNICALL WriteJncFile(jvmtiEnv*                    pJvmtiEnv,
                           const void*                  codeAddr,
                           jint                         mapLength,
                           const jvmtiAddrLocationMap*  map,
-                          wstring*                     jncFileName,
+                          std::wstring*                jncFileName,
                           methodInfo*                  mInfo,
                           const void*                  compileInfo)
 {
     JncWriter  jncWriter;
     char*     pCodeAddr = (char*)codeAddr;
-    wstring   className;
+    std::wstring className;
 
     if (nullptr == mInfo)
     {
@@ -249,11 +249,11 @@ void JNICALL WriteJncFile(jvmtiEnv*                    pJvmtiEnv,
 int WriteNativeToJncFile(const char*   name,
                          const void*   codeAddr,
                          jint          codeSize,
-                         wstring*      jncFileName)
+                         std::wstring* jncFileName)
 {
     JncWriter jncWriter;
     char* pCodeAddr = (char*)codeAddr;
-    wstring class_name = L"Native Code::";
+    std::wstring class_name = L"Native Code::";
 
     if (gJvmtiVerbose)
     {
@@ -309,7 +309,7 @@ void JNICALL writeInlineInfo(jvmtiEnv*      pJvmtiEnv,
     }
 
     // Build Sections
-    vector<void*>  globalAddressRanges;
+    std::vector<void*>  globalAddressRanges;
     jint           bytecodeToSourceTableSize = 0;
 
     // Build the table to map the inlined method id's to PC address ranges
@@ -321,9 +321,9 @@ void JNICALL writeInlineInfo(jvmtiEnv*      pJvmtiEnv,
                              codeAddr,
                              codeSize);
 
-    vector<void*>  stringTable;
-    vector<void*>  lineNumberTables;
-    vector<jint>   lineNumberTableEntryCounts;
+    std::vector<void*>  stringTable;
+    std::vector<void*>  lineNumberTables;
+    std::vector<jint>   lineNumberTableEntryCounts;
     jint           stringTableSize = 0;
     jint           lineNumberTableSize = 0;
 
@@ -426,7 +426,7 @@ static jint computeInlineInfoSize(jvmtiCompiledMethodLoadInlineRecord* record)
 //
 static void BuildInlineAddressRanges(
     jvmtiCompiledMethodLoadInlineRecord*  record,
-    vector<void*>&                        globalAddressRanges,
+    std::vector<void*>&                   globalAddressRanges,
     jint&                                 bytecodeToSourceTableSize,
     const void*                           jittedCodeAddr,
     jint                                  jittedCodeSize)
@@ -436,7 +436,7 @@ static void BuildInlineAddressRanges(
         return;
     }
 
-    vector<AddressRange> localStackFrames;
+    std::vector<AddressRange> localStackFrames;
 
     for (int i = 0; i < record->numpcs; i++)
     {

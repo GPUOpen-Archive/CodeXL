@@ -25,15 +25,15 @@ char UNKNOWN_SOURCE_FILE[] = "unknown source file";
 // string table. This function also populates the string table and a list
 // of line number tables.
 //
-void buildBytecodeToSourceTable(jvmtiEnv*        pJvmtiEnv,
-                                vector<void*>&   globalAddressRanges,
-                                vector<void*>&   stringTable,
-                                jint&            stringTableSize,
-                                vector<void*>&   lineNumberTables,
-                                jint&            lineNumberTableSize,
-                                vector<jint>&    lineNumberTableEntryCounts)
+void buildBytecodeToSourceTable(jvmtiEnv*             pJvmtiEnv,
+                                std::vector<void*>&   globalAddressRanges,
+                                std::vector<void*>&   stringTable,
+                                jint&                 stringTableSize,
+                                std::vector<void*>&   lineNumberTables,
+                                jint&                 lineNumberTableSize,
+                                std::vector<jint>&    lineNumberTableEntryCounts)
 {
-    map<jmethodID, TableOffsets> id2tableOffsets;
+    std::map<jmethodID, TableOffsets> id2tableOffsets;
     stringTableSize = 0;
     lineNumberTableSize = 0;
 
@@ -173,14 +173,14 @@ void buildBytecodeToSourceTable(jvmtiEnv*        pJvmtiEnv,
 //           .
 //         linenumberentry-kn
 //
-void createMethodTableBlob(jvmtiEnv*        pJvmtiEnv,
-                           vector<void*>&   methodTable,
-                           jint             methodTableSize,
-                           vector<void*>&   lineNumberTables,
-                           jint             lineNumberTableSize,
-                           vector<jint>&    lineNumberTableEntryCounts,
-                           void*&           methodTableBlob,
-                           jint&            methodTableBlobSize)
+void createMethodTableBlob(jvmtiEnv*             pJvmtiEnv,
+                           std::vector<void*>&   methodTable,
+                           jint                  methodTableSize,
+                           std::vector<void*>&   lineNumberTables,
+                           jint                  lineNumberTableSize,
+                           std::vector<jint>&    lineNumberTableEntryCounts,
+                           void*&                methodTableBlob,
+                           jint&                 methodTableBlobSize)
 {
     GT_UNREFERENCED_PARAMETER(pJvmtiEnv);
     int offset = 0;
@@ -228,9 +228,9 @@ void createMethodTableBlob(jvmtiEnv*        pJvmtiEnv,
 // preceded by its size in bytes. This information is needed for postprocessing
 // tools.
 //
-void createStringTableBlob(vector<void*>&  stringTable,
-                           jint&           stringTableSize,
-                           void*&          stringTableBlob)
+void createStringTableBlob(std::vector<void*>&  stringTable,
+                           jint&                stringTableSize,
+                           void*&               stringTableBlob)
 {
     stringTableBlob = malloc(sizeof(char) * stringTableSize + sizeof(jint));
     int offset = 0;
@@ -249,11 +249,11 @@ void createStringTableBlob(vector<void*>&  stringTable,
 }
 
 
-void insertAddressRange(jmethodID        methodId,
-                        const void*      jittedCodeAddr,
-                        jint             jittedCodeSize,
-                        vector<void*>&   globalAddressRanges,
-                        jint&            bytecodeToSourceTableSize)
+void insertAddressRange(jmethodID             methodId,
+                        const void*           jittedCodeAddr,
+                        jint                  jittedCodeSize,
+                        std::vector<void*>&   globalAddressRanges,
+                        jint&                 bytecodeToSourceTableSize)
 {
     AddressRange* range = new AddressRange();
 
@@ -354,7 +354,7 @@ int createJNCMethodLoadLineInfoBlob(jvmtiEnv*                    pJvmtiEnv,
     return 0;
 }
 
-void freeMethodTables(jvmtiEnv* pJvmtiEnv, vector<void*>& methodTable, vector<void*>& lineNumberTables)
+void freeMethodTables(jvmtiEnv* pJvmtiEnv, std::vector<void*>& methodTable, std::vector<void*>& lineNumberTables)
 {
     for (int i = 0; i < (int)methodTable.size(); i++)
     {

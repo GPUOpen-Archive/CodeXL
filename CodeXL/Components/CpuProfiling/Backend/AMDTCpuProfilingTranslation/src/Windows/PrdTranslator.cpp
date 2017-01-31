@@ -123,8 +123,6 @@ enum HardcodedEventType
 
 #define CXL_3GB_VM  3221225472
 
-using namespace std;
-
 __declspec(thread) static wchar_t smoduleName[OS_MAX_PATH + 1];
 __declspec(thread) static wchar_t sfunctionName [OS_MAX_PATH + 1];
 __declspec(thread) static wchar_t sjncName [OS_MAX_PATH + 1];
@@ -764,7 +762,7 @@ void PrdTranslator::AggregateKnownModuleSampleData(
             nullptr != pModInfo->pFunctionName && L'\0' != pModInfo->pFunctionName[0])
         {
             funcName = pModInfo->pFunctionName;
-            wostringstream ss;
+            std::wostringstream ss;
 
             if (pModInfo->moduleType != evOCLModule)
             {

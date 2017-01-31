@@ -439,7 +439,7 @@ JNIEXPORT jint JNICALL Agent_OnLoad(JavaVM* vm, char* options, void* reserved)
 #else
     // Linux
     struct stat buf;
-    string tmpStr(profileDataDir.begin(), profileDataDir.end());
+    std::string tmpStr(profileDataDir.begin(), profileDataDir.end());
 
     if (stat(tmpStr.c_str(), &buf) != 0)
     {

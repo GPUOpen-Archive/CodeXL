@@ -36,21 +36,21 @@ void GetCmdline()
 {
     char tmp[100] = { 0 };
     pid_t pid = gJvmPID;
-    stringstream tstream;
+    std::stringstream tstream;
 
-    string jvmCmd = "";
+    std::string jvmCmd = "";
 
     tstream << "/proc/" << pid << "/cmdline";
-    string pidDir = tstream.rdbuf()->str();
+    std::string pidDir = tstream.rdbuf()->str();
 
-    filebuf fb;
+    std::filebuf fb;
 
-    if (NULL == fb.open(pidDir.c_str(), ios::in))
+    if (NULL == fb.open(pidDir.c_str(), std::ios::in))
     {
-        cout << "filebuf failed to open" << endl;
+        std::cout << "filebuf failed to open" << std::endl;
     }
 
-    istream is(&fb);
+    std::istream is(&fb);
 
     while (!is.eof())
     {
@@ -58,7 +58,7 @@ void GetCmdline()
 
         if (gJvmtiVerbose)
         {
-            cout << "getCmdline " << jvmCmd << endl;
+            std::cout << "getCmdline " << jvmCmd << std::endl;
         }
     }
 
@@ -315,7 +315,7 @@ static int hasInlinedMethods(jvmtiCompiledMethodLoadInlineRecord* record)
 //
 static void BuildInlineAddressRanges(
     jvmtiCompiledMethodLoadInlineRecord*  record,
-    vector<void*>&                        globalAddressRanges,
+    std::vector<void*>&                   globalAddressRanges,
     jint&                                 bytecodeToSourceTableSize,
     const void*                           jittedCodeAddr,
     jint                                  jittedCodeSize)
@@ -325,7 +325,7 @@ static void BuildInlineAddressRanges(
         return;
     }
 
-    vector<AddressRange> localStackFrames;
+    std::vector<AddressRange> localStackFrames;
 
     for (int i = 0; i < record->numpcs; i++)
     {
@@ -499,7 +499,7 @@ static unsigned int CreateInlineDataBlob(
 
 // WriteJNC
 //
-static int WriteJNC(wstring*      jncFileName,
+static int WriteJNC(std::wstring* jncFileName,
                     char const*   symbolName,
                     const void*   jittedCodeAddr,
                     unsigned int  jittedCodeSize,
@@ -593,11 +593,11 @@ void JNICALL WriteJncFile(jvmtiEnv*                    pJvmtiEnv,
                           const void*                  codeAddr,
                           jint                         mapLength,
                           const jvmtiAddrLocationMap*  map,
-                          wstring*                     jncFileName,
+                          std::wstring*                jncFileName,
                           methodInfo*                  mInfo,
                           const void*                  compileInfo)
 {
-    string strName;
+    std::string strName;
 
     if ((NULL == jncFileName) || (NULL == mInfo))
     {
@@ -685,7 +685,7 @@ void JNICALL WriteJncFile(jvmtiEnv*                    pJvmtiEnv,
     //     - .pc2bc
 
     // Build Sections
-    vector<void*>  globalAddressRanges;
+    std::vector<void*>  globalAddressRanges;
     jint           bytecodeToSourceTableSize = 0;
 
     if (! hasInlineInfo)
@@ -708,9 +708,9 @@ void JNICALL WriteJncFile(jvmtiEnv*                    pJvmtiEnv,
                                  codeSize);
     }
 
-    vector<void*>  stringTable;
-    vector<void*>  lineNumberTables;
-    vector<jint>   lineNumberTableEntryCounts;
+    std::vector<void*>  stringTable;
+    std::vector<void*>  lineNumberTables;
+    std::vector<jint>   lineNumberTableEntryCounts;
     jint           stringTableSize = 0;
     jint           lineNumberTableSize = 0;
 
@@ -800,7 +800,7 @@ void JNICALL WriteJncFile(jvmtiEnv*                    pJvmtiEnv,
 int WriteNativeToJncFile(char const*   symbolName,
                          const void*   jittedCodeAddr,
                          jint          jittedCodeSize,
-                         wstring*      jncFileName)
+                         std::wstring* jncFileName)
 {
     JncWriter jncWriter;
 

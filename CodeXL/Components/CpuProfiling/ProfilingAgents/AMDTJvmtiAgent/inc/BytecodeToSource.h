@@ -13,8 +13,6 @@
 #include <jvmti.h>
 #include <AMDTBaseTools/Include/AMDTDefinitions.h>
 
-using namespace std;
-
 struct AddressRange
 {
     gtVAddr   methodId;
@@ -35,30 +33,30 @@ struct TableOffsets
 };
 
 extern void buildBytecodeToSourceTable(jvmtiEnv* pJvmtiEnv,
-                                       vector<void*>& globalAddressRanges,
-                                       vector<void*>& stringTable,
+                                       std::vector<void*>& globalAddressRanges,
+                                       std::vector<void*>& stringTable,
                                        jint& stringTableSize,
-                                       vector<void*>& lineNumberTables,
+                                       std::vector<void*>& lineNumberTables,
                                        jint& lineNumberTableSize,
-                                       vector<jint>& lineNumberTableEntryCounts);
+                                       std::vector<jint>& lineNumberTableEntryCounts);
 
 extern void createMethodTableBlob(jvmtiEnv* pJvmtiEnv,
-                                  vector<void*>& methodTable,
+                                  std::vector<void*>& methodTable,
                                   jint methodTableSize,
-                                  vector<void*>& lineNumberTables,
+                                  std::vector<void*>& lineNumberTables,
                                   jint lineNumberTableSize,
-                                  vector<jint>& lineNumberTableEntryCounts,
+                                  std::vector<jint>& lineNumberTableEntryCounts,
                                   void*& methodTableBlob,
                                   jint& methodTableBlobSize);
 
-extern void createStringTableBlob(vector<void*>& stringTable,
+extern void createStringTableBlob(std::vector<void*>& stringTable,
                                   jint& stringTableSize,
                                   void*& stringTableBlob);
 
 extern void insertAddressRange(jmethodID methodId,
                                const void* jittedCodeAddr,
                                jint jittedCodeSize,
-                               vector<void*>& globalAddressRanges,
+                               std::vector<void*>& globalAddressRanges,
                                jint& bytecodeToSourceTableSize);
 
 extern int createJNCMethodLoadLineInfoBlob(jvmtiEnv* pJvmtiEnv,
@@ -69,7 +67,7 @@ extern int createJNCMethodLoadLineInfoBlob(jvmtiEnv* pJvmtiEnv,
                                            jint& lineinfoBlobSize);
 
 extern void freeMethodTables(jvmtiEnv* pJvmtiEnv,
-                             vector<void*>& methodTables,
-                             vector<void*>& lineNumberTables);
+                             std::vector<void*>& methodTables,
+                             std::vector<void*>& lineNumberTables);
 
 #endif // _BYTECODETOSOURCE_H
