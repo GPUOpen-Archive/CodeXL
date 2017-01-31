@@ -27,16 +27,20 @@
 
 // Infra:
 #include <AMDTApplicationComponents/Include/acFunctions.h>
+#include <AMDTApplicationComponents/Include/acMessageBox.h>
 
 // AMDTApplicationFramework:
 #include <AMDTApplicationFramework/Include/afGlobalVariablesManager.h>
 #include <AMDTApplicationFramework/Include/afMessageBox.h>
+#include <AMDTApplicationFramework/Include/afProjectManager.h>
+#include <AMDTApplicationFramework/Include/afProgressBarWrapper.h>
+#include <AMDTApplicationFramework/Include/afApplicationCommands.h>
 
-// Shared profiling:
-#include <SharedProfileManager.h>
-
-//CpuPerfEvent
-#include <AMDTCpuPerfEventUtils/inc/EventEngine.h>
+// AMDTSharedProfiling:
+#include <AMDTSharedProfiling/inc/SharedProfileManager.h>
+#include <AMDTSharedProfiling/inc/ProfileApplicationTreeHandler.h>
+#include <AMDTSharedProfiling/inc/SharedProfileSettingPage.h>
+#include <AMDTSharedProfiling/inc/StringConstants.h>
 
 //Infra:
 #include <AMDTBaseTools/Include/gtAssert.h>
@@ -51,24 +55,15 @@
 #include <AMDTOSWrappers/Include/osUser.h>
 #include <AMDTOSWrappers/Include/osProductVersion.h>
 #include <AMDTAPIClasses/Include/Events/apExecutionModeChangedEvent.h>
-
-#include <AMDTApplicationComponents/Include/acMessageBox.h>
-
-// AMDTApplicationFramework:
-#include <AMDTApplicationFramework/Include/afProjectManager.h>
-#include <AMDTApplicationFramework/Include/afProgressBarWrapper.h>
-#include <AMDTApplicationFramework/Include/afApplicationCommands.h>
-
 #include <AMDTAPIClasses/Include/Events/apEventsHandler.h>
 #include <AMDTAPIClasses/Include/Events/apProfileProgressEvent.h>
 #include <AMDTAPIClasses/Include/Events/apProfileProcessTerminatedEvent.h>
 
-// AMDTSharedProfiling:
-#include <AMDTSharedProfiling/inc/ProfileApplicationTreeHandler.h>
-#include <AMDTSharedProfiling/inc/SharedProfileSettingPage.h>
-#include <AMDTSharedProfiling/inc/StringConstants.h>
+// Backend:
+#include <AMDTCpuPerfEventUtils/inc/EventEngine.h>
+#include <AMDTExecutableFormat/inc/ExecutableFile.h>
 
-//Local:
+// Local:
 #include <inc/CommandsHandler.h>
 #include <inc/AmdtCpuProfiling.h>
 #include <inc/SessionViewCreator.h>
@@ -81,7 +76,9 @@
 #include <inc/StdAfx.h>
 #include <inc/CpuRetryDialog.h>
 
-#include <AMDTExecutableFormat/inc/ExecutableFile.h>
+#if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
+#include <ProfilingAgents/AMDTClrProfAgent/inc/ClrProfAgent.h>
+#endif // AMDT_WINDOWS_OS
 
 
 #ifdef PROTO_ONLY
@@ -95,9 +92,6 @@ static bool osResumeSuspendedProcess(const osProcessId& processId, const osProce
                                      const osThreadHandle& processThreadHandle, bool closeHandles) { return false; }
 
 #endif
-
-static bool IsUserAcceptingProfiling();
-static bool IsUserAcceptingPerfCssWarning();
 
 // JVMTI Agent library name
 #if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
@@ -113,11 +107,9 @@ static bool IsUserAcceptingPerfCssWarning();
     #endif
 #endif
 
-#define JAVA_PROFILE_ENABLED    1
 
-#if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
-    #include <ProfilingAgents/AMDTClrProfAgent/inc/ClrProfAgent.h>
-#endif // AMDT_WINDOWS_OS
+static bool IsUserAcceptingProfiling();
+static bool IsUserAcceptingPerfCssWarning();
 
 //static member initialization:
 CommandsHandler* CommandsHandler::m_pMySingleInstance = nullptr;
@@ -191,7 +183,6 @@ bool CommandsHandler::initialize()
 
         ProfileApplicationTreeHandler::instance()->registerSessionTypeTreeHandler(acGTStringToQString(profileName), &CpuProfileTreeHandler::instance());
     }
-
 
     // Make sure that the time based profiling is the current session type in the framework:
     gtString selectedProfile = SharedProfileManager::instance().selectedSessionTypeName();
@@ -717,7 +708,6 @@ bool CommandsHandler::trySetupClrProfilingEnvironment(gtList<osEnvironmentVariab
 bool CommandsHandler::trySetupJavaProfilingEnvironment(gtString& javaAgentArg, bool is64BitApp) const
 {
     bool retVal = false;
-#ifdef JAVA_PROFILE_ENABLED
 
     // Check if the launched application is java
     if (m_profileSession.m_exeFullPath.endsWith("java.exe") || m_profileSession.m_exeFullPath.endsWith("java"))
@@ -749,7 +739,6 @@ bool CommandsHandler::trySetupJavaProfilingEnvironment(gtString& javaAgentArg, b
         }
     }
 
-#endif // JAVA_PROFILE_ENABLED
     return retVal;
 }
 

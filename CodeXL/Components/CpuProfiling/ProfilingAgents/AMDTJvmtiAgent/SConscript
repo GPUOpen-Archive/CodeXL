@@ -3,9 +3,19 @@
 Import('*')
 from CXL_init import *
 
-libName = "libCXLJvmtiAgent-x64"
 
 env = CXL_env.Clone()
+
+if (env['CXL_build'] == 'debug'):
+    dbgSuffix = '-d'
+else:
+    dbgSuffix = ''
+
+if (env['CXL_arch'] == 'x86_64'):
+    libName = "libCXLJvmtiAgent-x64" + dbgSuffix + ".so"
+else:
+    libName = "libCXLJvmtiAgent-x64" + dbgSuffix + ".so"
+
 
 env.VariantDir('build/AMDTProfilingAgentsData', '../AMDTProfilingAgentsData/src')
 
