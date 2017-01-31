@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<!DOCTYPE view_configuration SYSTEM "..\viewconfig.dtd">
+
+<!--
+    Show instruction cache (IC) measurements
+    View configuration
+    Copyright (c) 2017 Advanced Micro Devices, Inc. All rights reserved.
+
+    The ic_focus view should be available when instruction cache fetches,
+    instruction cache misses, and retired instructions are available.
+
+    Related data collection configurations: inst_access.xml
+ -->
+
+<view_configuration>
+
+</view_configuration>

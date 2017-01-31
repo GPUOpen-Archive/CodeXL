@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<!DOCTYPE view_configuration SYSTEM "..\viewconfig.dtd">
+
+<!--
+    Show instructions per cycle
+    View configuration
+    Copyright (c) 2017 Advanced Micro Devices, Inc. All rights reserved.
+
+    The IPC view should always be available when retired instruction
+    and CPU clocks (cycles) are available.
+
+    Related DC configuration: assess.xml
+ -->
+
+<view_configuration>
+
+</view_configuration>

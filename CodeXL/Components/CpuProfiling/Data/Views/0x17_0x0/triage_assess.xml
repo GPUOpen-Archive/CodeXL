@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<!DOCTYPE view_configuration SYSTEM "..\viewconfig.dtd">
+
+<!--
+    Overall assessment of performance
+    View configuration
+    Copyright (c) 2017 Advanced Micro Devices, Inc. All rights reserved.
+
+    The triage view displays an overall assessment of performance. It
+    displays select computed measurements to quickly indicate possible
+    performance culprits for investigation.
+
+    Related DC configuration: assess.xml
+ -->
+
+<view_configuration>
+
+</view_configuration>

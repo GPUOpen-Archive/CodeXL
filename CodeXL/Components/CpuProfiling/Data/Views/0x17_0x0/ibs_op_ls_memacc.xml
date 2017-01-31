@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<!DOCTYPE view_configuration SYSTEM "..\viewconfig.dtd">
+
+<!--
+    IBS load/store op "expert" information: Bank conflicts, forwarding, MAB hits
+    View configuration
+    Copyright (c) 2017 Advanced Micro Devices, Inc. All rights reserved.
+
+        Related data collection configurations: ibs.xml
+ -->
+
+<view_configuration>
+
+</view_configuration>

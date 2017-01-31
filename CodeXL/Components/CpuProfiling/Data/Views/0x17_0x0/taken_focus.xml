@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<!DOCTYPE view_configuration SYSTEM "..\viewconfig.dtd">
+
+<!--
+    Show taken branch measurements
+    View configuration
+    Copyright (c) 2017 Advanced Micro Devices, Inc. All rights reserved.
+
+    The taken branch view should be available when retire instructions,
+    branches and taken branches are available.
+
+    Related DC configurations: branch.xml
+ -->
+
+<view_configuration>
+
+</view_configuration>

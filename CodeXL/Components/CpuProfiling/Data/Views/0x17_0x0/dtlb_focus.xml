@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<!DOCTYPE view_configuration SYSTEM "..\viewconfig.dtd">
+
+<!--
+    Show data translation lookaside buffer (DTLB) measurements
+    View configuration
+    Copyright (c) 2017 Advanced Micro Devices, Inc. All rights reserved.
+
+    The dtlb_focus view should be available when data cache accesses,
+    DTLB_L1M_L2H, DTLB_L1M_L2M, and retired instructions are available.
+
+    Related data collection configurations: data_access.xml
+ -->
+
+<view_configuration>
+
+</view_configuration>
