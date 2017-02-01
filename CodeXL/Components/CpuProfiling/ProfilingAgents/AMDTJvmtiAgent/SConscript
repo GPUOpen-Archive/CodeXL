@@ -14,7 +14,7 @@ else:
 if (env['CXL_arch'] == 'x86_64'):
     libName = "libCXLJvmtiAgent-x64" + dbgSuffix + ".so"
 else:
-    libName = "libCXLJvmtiAgent-x64" + dbgSuffix + ".so"
+    libName = "libCXLJvmtiAgent" + dbgSuffix + ".so"
 
 
 env.VariantDir('build/AMDTProfilingAgentsData', '../AMDTProfilingAgentsData/src')
