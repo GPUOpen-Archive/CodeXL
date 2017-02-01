@@ -924,17 +924,21 @@ void PrdTranslator::InitNewModule(CpuProfileModule& mod,
 
         case evJavaModule:
             mod.m_modType = CpuProfileModule::JAVAMODULE;
+            // Debug info is stored in .jnc files
+            mod.m_isDebugInfoAvailable = true;
             break;
 
         case evManaged:
             mod.m_modType = CpuProfileModule::MANAGEDPE;
+            // Debug info is stored in .jnc files
+            mod.m_isDebugInfoAvailable = true;
             break;
 
         case evOCLModule:
-
-        //mod.m_modType = CpuProfileModule::OCLMODULE;
-        //break;
+            // fall through
         case evInvalidType:
+            // fall through
+        default:
             break;
     }
 

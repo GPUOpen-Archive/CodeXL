@@ -1813,18 +1813,17 @@ void CaPerfTranslator::_addSampleToProcessAndModule(CpuProfileProcess* pProc,
     }
     else if (pMod->m_modType == CpuProfileModule::JAVAMODULE)
     {
+        // Debug info is stored in .jnc files
+        pMod->m_isDebugInfoAvailable = true;
+
         gtString javaFuncName(gJavaJclModInfo.pFunctionName);
         gtString javaSrcFileName(gJavaJclModInfo.pJavaSrcFileName);
 
-        wchar_t jncName[OS_MAX_PATH] = { L'\0' };
-        swprintf(jncName, OS_MAX_PATH, L"%d/%S", pid,
-                 gJavaJclModInfo.pJncName);
-        gtString jncNameStr(jncName);
+        gtString jncNameStr;
+        jncNameStr.appendFormattedString(L"%u/%S", pid, gJavaJclModInfo.pJncName);
 
-        // fwprintf(stderr, L"recordSample: java mod name : %S\n",
-        //       pMod->getPath().c_str());
-        // fwprintf(stderr, L"insert java function  : %S\n",
-        //       javaFuncName.c_str());
+        // fwprintf(stderr, L"recordSample: java mod name : %S\n", pMod->getPath().c_str());
+        // fwprintf(stderr, L"insert java function  : %S\n", javaFuncName.c_str());
 
         gtUInt32 functionId = (pFuncInfo != nullptr) ? pFuncInfo->m_funcId : 0;
 
