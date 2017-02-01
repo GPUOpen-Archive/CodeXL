@@ -102,8 +102,8 @@ int PrintVersion()
 
 int PrintCollectOptions()
 {
-    fprintf(stderr, "\nCollect Options:\n");
-    fprintf(stderr, "    -m <profile type>      Predefined profile type to be used to collect samples\n");
+    fprintf(stderr, "\nCollect Options:");
+    fprintf(stderr, "\n    -m <profile type>      Predefined profile type to collect samples.\n");
     fprintf(stderr, "                           Supported profile types are:-\n");
     fprintf(stderr, "                               tbp         - Time-based Sampling\n");
     fprintf(stderr, "                               assess      - Assess Performance\n");
@@ -116,22 +116,29 @@ int PrintCollectOptions()
     fprintf(stderr, "                               inst_access - Investigate Instruction Access\n");
     fprintf(stderr, "                               l2_access   - Investigate L2 Cache Access\n");
 
+    fprintf(stderr, "\n    -e                     Specify PMU or IBS event in the form of comma\n");
+    fprintf(stderr, "                           seperated key=value pair. Supported keys are\n");
+    fprintf(stderr, "                               event=<PMU-event-select>\n");
+    fprintf(stderr, "                               event=<ibs-fetch | ibs-op>\n");
+    fprintf(stderr, "                               umask=<unit-mask>\n");
+    fprintf(stderr, "                               user=<0 | 1>\n");
+    fprintf(stderr, "                               os=<0 | 1>\n");
+    fprintf(stderr, "                               interval=<sampling-interval>\n");
+    fprintf(stderr, "                               ibsop-count-control=<0 | 1>\n");
+    fprintf(stderr, "                           The PMU-event-select and unit-mask values can be in\n");
+    fprintf(stderr, "                           decimal or hex. Default values are umask=0, user=1\n");
+    fprintf(stderr, "                           os=1, interval=0, ibsop-count-control=0.\n");
+    fprintf(stderr, "                           For a PMC event, if the interval is not set or 0,\n");
+    fprintf(stderr, "                           then the event will be monitored in count mode.\n");
+    fprintf(stderr, "                           For IBS events valid sampling interval is required.\n");
+    fprintf(stderr, "                           If ibsop-count-control is 0, then count clock cycles\n");
+    fprintf(stderr, "                           otherwise count dispatched micro ops.\n");
+    fprintf(stderr, "                           Multiple occurrences of -e is allowed.\n");
+
     fprintf(stderr, "\n    -T <n>                 Custom Time based profiling.\n");
     fprintf(stderr, "                           (sampling interval 'n' in milli-seconds).\n");
+
     fprintf(stderr, "\n    -C <Custom profile>    Path to the custom profile XML file.\n");
-    fprintf(stderr, "\n    -E                     Specify raw PMU or IBS counter in the form of\n");
-    fprintf(stderr, "                           comma seperated key=value pair. Supported keys are\n");
-    fprintf(stderr, "                               event=<PMU-event-select> \n");
-    fprintf(stderr, "                               event=ibs-fetch | ibs-op \n");
-    fprintf(stderr, "                               umask=<unit-mask> \n");
-    fprintf(stderr, "                               user=<0 | 1> \n");
-    fprintf(stderr, "                               os=<0 | 1> \n");
-    fprintf(stderr, "                               ibsop-count-control=<0 | 1> \n");
-    fprintf(stderr, "                               interval=<sampling-interval>\n");
-    fprintf(stderr, "                           The PMU-event-select and unit-mask values can be \n");
-    fprintf(stderr, "                           in decimal or hex. if ibsop-count-control is 0,\n");
-    fprintf(stderr, "                           then count clock cycles otherwise, count dispatched\n");
-    fprintf(stderr, "                           dispatched micro ops.\n");
 
     fprintf(stderr, "\n    -o <file name>         Base name of the output file.\n");
     fprintf(stderr, "                           Default path will be %sCodeXL-CpuProfile-<TS>.\n", DEFAULT_TEMP_PATH);
@@ -140,7 +147,7 @@ int PrintCollectOptions()
     fprintf(stderr, "                           Process IDs are separated by comma.\n");
 
     fprintf(stderr, "\n    -a                     System Wide Profile (SWP).\n");
-    fprintf(stderr, "                           Otherwise, profile only the launched application \n");
+    fprintf(stderr, "                           Otherwise profile only the launched application \n");
     fprintf(stderr, "                           or the PIDs attached.\n");
 
     fprintf(stderr, "\n    -G                     Enable Callstack sampling with default Unwind \n");
@@ -223,7 +230,7 @@ int PrintReportOptions()
     fprintf(stderr, "                           process and module together are not allowed.\n");
     fprintf(stderr, "                           module and callgraph together are not allowed.\n");
 
-    fprintf(stderr, "\n    -e                     Specify the event index for which callgraph will be\n");
+    fprintf(stderr, "\n    -E                     Specify the event index for which callgraph will be\n");
     fprintf(stderr, "                           generated. This event is also used to find the hot\n");
     fprintf(stderr, "                           functions in the Overview section.\n");
 
@@ -276,15 +283,21 @@ int PrintExamples()
     fprintf(stderr, "  7. Launch Classic.exe and collect 'TBP' with Callstack sampling:\n");
     fprintf(stderr, "     %s collect -m tbp -G -o %scpuprof-tbp %s\n\n", CODEXL_CPUPROFILER_CLI, TEMP_PATH, CLASSIC_EXAMPLE);
 
-    fprintf(stderr, "  8. Generate report from the raw datafile:\n");
+    fprintf(stderr, "  8. Launch Classic.exe and collect samples for PMC events 0x76 and 0xc0:\n");
+    fprintf(stderr, "     %s collect -e event=0x76,interval=250000 -e event=0xc0,user=1,os=0,interval=250000 -o %scpuprof-tbp %s\n\n", CODEXL_CPUPROFILER_CLI, TEMP_PATH, CLASSIC_EXAMPLE);
+
+    fprintf(stderr, "  9. Launch Classic.exe and collect samples for IBS OP with interval 50000:\n");
+    fprintf(stderr, "     %s collect -e event=ibs-fetch,interval=50000 -o %scpuprof-tbp %s\n\n", CODEXL_CPUPROFILER_CLI, TEMP_PATH, CLASSIC_EXAMPLE);
+
+    fprintf(stderr, "  10. Generate report from the raw datafile:\n");
     fprintf(stderr, "     %s report -i %scpuprof-tbp.%s -o %scpuprof-tbp-out\n\n", CODEXL_CPUPROFILER_CLI,
             TEMP_PATH, CPUPROFILE_RAWFILE_EXT_STR, TEMP_PATH);
 
-    fprintf(stderr, "  9. Generate IMIX report from the raw datafile:\n");
+    fprintf(stderr, "  11. Generate IMIX report from the raw datafile:\n");
     fprintf(stderr, "     %s report -R imix -i %scpuprof-tbp.%s -o %scpuprof-tbp-out\n\n", CODEXL_CPUPROFILER_CLI, TEMP_PATH, CPUPROFILE_RAWFILE_EXT_STR, TEMP_PATH);
 
 #if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
-    fprintf(stderr, "  10. Generate report with Symbol Server paths:\n");
+    fprintf(stderr, "  12. Generate report with Symbol Server paths:\n");
     fprintf(stderr, "      %s report -D C:\\AppSymbols;C:\\DriverSymbols -S http://msdl.microsoft.com/download/symbols -X C:\\symbols -i %scpuprof-tbp.%s -o %scpuprof-tbp-out\n\n",
             CODEXL_CPUPROFILER_CLI, TEMP_PATH, CPUPROFILE_RAWFILE_EXT_STR, TEMP_PATH);
 #endif

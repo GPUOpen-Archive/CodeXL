@@ -323,11 +323,28 @@ bool ParseArgs::InitializeArgs(int nbrArgs, wchar_t* args[])
                 m_debugSymbolPaths = gtString(optArg);
                 break;
 
-            // Not supported yet
             case 'E':
-                // Raw Event support
-                // multiple -E's are supported
-                m_rawEventsStringVec.push_back(optArg);
+                // REPORT Option - Sort Event Index
+                tmp = gtString(optArg);
+
+                if (tmp.isIntegerNumber())
+                {
+                    tmp.toIntNumber(m_sortEventIndex);
+
+                    if (m_sortEventIndex < -1)
+                    {
+                        fprintf(stderr, "Negative Sort Event Index(%d) is specified with option(-e).\n",
+                            m_sortEventIndex);
+                        retVal = false;
+                    }
+                }
+                else
+                {
+                    fprintf(stderr, "Invalid Sort Event Index(%s) is specified with option(-e).\n",
+                        tmp.asASCIICharArray());
+                    retVal = false;
+                }
+
                 break;
 
             case 'F':
@@ -591,27 +608,9 @@ bool ParseArgs::InitializeArgs(int nbrArgs, wchar_t* args[])
                 break;
 
             case 'e':
-                // REPORT Option - Sort Event Index
-                tmp = gtString(optArg);
-
-                if (tmp.isIntegerNumber())
-                {
-                    tmp.toIntNumber(m_sortEventIndex);
-
-                    if (m_sortEventIndex < -1)
-                    {
-                        fprintf(stderr, "Negative Sort Event Index(%d) is specified with option(-e).\n",
-                                m_sortEventIndex);
-                        retVal = false;
-                    }
-                }
-                else
-                {
-                    fprintf(stderr, "Invalid Sort Event Index(%s) is specified with option(-e).\n",
-                            tmp.asASCIICharArray());
-                    retVal = false;
-                }
-
+                // Raw Event support
+                // multiple -e's are allowed
+                m_rawEventsStringVec.push_back(optArg);
                 break;
 
             case 'f':
