@@ -32,7 +32,10 @@ def buildDrv(target, source, env):
 
     # do a make 
     cmd = "make -C %s" %baseDir
-    print cmd
+    run(cmd)
+
+    # clean temprary file 
+    cmd = "make clean -C %s" %baseDir
     run(cmd)
 
     # create CodeXLPwrProfDriverSource.tar.gz file

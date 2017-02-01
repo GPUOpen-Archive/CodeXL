@@ -290,4 +290,6 @@ CodeXL/Components/GpuProfiling/Non-OpenSource
 /Common/Src/**/*.a
 /Common/Src/**/*.o
 
-
+# Linux Power Profiler driver temp files
+CodeXL/Components/PowerProfiling/Backend/AMDTPowerProfilingDrivers/common/*.o
+CodeXL/Components/PowerProfiling/Backend/AMDTPowerProfilingDrivers/common/*.o.cmd
