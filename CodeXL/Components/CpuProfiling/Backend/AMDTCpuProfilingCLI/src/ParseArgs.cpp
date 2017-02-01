@@ -615,7 +615,7 @@ bool ParseArgs::InitializeArgs(int nbrArgs, wchar_t* args[])
                 break;
 
             case 'f':
-                // Profile the children the launched application
+                // Profile children of the launched application
                 m_profileChildren = true;
                 break;
 

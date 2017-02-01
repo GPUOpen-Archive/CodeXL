@@ -103,76 +103,91 @@ int PrintVersion()
 int PrintCollectOptions()
 {
     fprintf(stderr, "\nCollect Options:\n");
-    fprintf(stderr, "    -m <profile type>          Predefined profile type to be used to collect samples.\n");
-    fprintf(stderr, "                               Supported profile types are:-\n");
-    fprintf(stderr, "                                   tbp         - Time-based Sampling\n");
-    fprintf(stderr, "                                   assess      - Assess Performance\n");
-    fprintf(stderr, "                                   branch      - Investigate Branching\n");
+    fprintf(stderr, "    -m <profile type>      Predefined profile type to be used to collect samples\n");
+    fprintf(stderr, "                           Supported profile types are:-\n");
+    fprintf(stderr, "                               tbp         - Time-based Sampling\n");
+    fprintf(stderr, "                               assess      - Assess Performance\n");
+    fprintf(stderr, "                               branch      - Investigate Branching\n");
 #if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
-    fprintf(stderr, "                                   clu         - Cache Line Utilization\n");
+    fprintf(stderr, "                               clu         - Cache Line Utilization\n");
 #endif
-    fprintf(stderr, "                                   data_access - Investigate Data Access\n");
-    fprintf(stderr, "                                   ibs         - Instruction-based Sampling\n");
-    fprintf(stderr, "                                   inst_access - Investigate Instruction Access\n");
-    fprintf(stderr, "                                   l2_access   - Investigate L2 Cache Access\n");
+    fprintf(stderr, "                               data_access - Investigate Data Access\n");
+    fprintf(stderr, "                               ibs         - Instruction-based Sampling\n");
+    fprintf(stderr, "                               inst_access - Investigate Instruction Access\n");
+    fprintf(stderr, "                               l2_access   - Investigate L2 Cache Access\n");
 
-    fprintf(stderr, "\n    -T <n>                     Custom Time based profiling.\n");
-    fprintf(stderr, "                               (sampling interval n in milli-seconds).\n");
+    fprintf(stderr, "\n    -T <n>                 Custom Time based profiling.\n");
+    fprintf(stderr, "                           (sampling interval 'n' in milli-seconds).\n");
+    fprintf(stderr, "\n    -C <Custom profile>    Path to the custom profile XML file.\n");
+    fprintf(stderr, "\n    -E                     Specify raw PMU or IBS counter in the form of\n");
+    fprintf(stderr, "                           comma seperated key=value pair. Supported keys are\n");
+    fprintf(stderr, "                               event=<PMU-event-select> \n");
+    fprintf(stderr, "                               event=ibs-fetch | ibs-op \n");
+    fprintf(stderr, "                               umask=<unit-mask> \n");
+    fprintf(stderr, "                               user=<0 | 1> \n");
+    fprintf(stderr, "                               os=<0 | 1> \n");
+    fprintf(stderr, "                               ibsop-count-control=<0 | 1> \n");
+    fprintf(stderr, "                               interval=<sampling-interval>\n");
+    fprintf(stderr, "                           The PMU-event-select and unit-mask values can be \n");
+    fprintf(stderr, "                           in decimal or hex. if ibsop-count-control is 0,\n");
+    fprintf(stderr, "                           then count clock cycles otherwise, count dispatched\n");
+    fprintf(stderr, "                           dispatched micro ops.\n");
 
-    fprintf(stderr, "\n    -d <n>                     Profile duration in seconds.\n");
+    fprintf(stderr, "\n    -o <file name>         Base name of the output file.\n");
+    fprintf(stderr, "                           Default path will be %sCodeXL-CpuProfile-<TS>.\n", DEFAULT_TEMP_PATH);
 
-    fprintf(stderr, "\n    -o <file name>             Base name of the output file.\n");
-    fprintf(stderr, "                               Default path will be %sCodexl-CpuProfile-<time>.\n", DEFAULT_TEMP_PATH);
+    fprintf(stderr, "\n    -p <PID,PID,..>        Profile existing processes (processes to attach to).\n");
+    fprintf(stderr, "                           Process IDs are separated by comma.\n");
 
-    fprintf(stderr, "\n    -p <PID,PID,..>            Profile existing processes (processes to attach to).\n");
-    fprintf(stderr, "                               Process IDs are separated by comma.\n");
+    fprintf(stderr, "\n    -a                     System Wide Profile (SWP).\n");
+    fprintf(stderr, "                           Otherwise, profile only the launched application \n");
+    fprintf(stderr, "                           or the PIDs attached.\n");
 
-    fprintf(stderr, "\n    -a                         System Wide Profile (SWP).\n");
-    fprintf(stderr, "                               Otherwise, profile only the launched application or the\n");
-    fprintf(stderr, "                               PIDs attached.\n");
-
-    fprintf(stderr, "\n    -G                         Enable Callstack sampling with default Unwind Interval\n");
-    fprintf(stderr, "                               and Unwind Depth. The default values are:\n");
-    fprintf(stderr, "                                   Unwind Interval - %d\n", CP_CSS_DEFAULT_UNWIND_INTERVAL);
-    fprintf(stderr, "                                   Unwind Depth    - %d\n", CP_CSS_DEFAULT_UNWIND_DEPTH);
+    fprintf(stderr, "\n    -G                     Enable Callstack sampling with default Unwind \n");
+    fprintf(stderr, "                           Interval and Unwind Depth. The default values:\n");
+    fprintf(stderr, "                               Unwind Interval - %d\n", CP_CSS_DEFAULT_UNWIND_INTERVAL);
+    fprintf(stderr, "                               Unwind Depth    - %d\n", CP_CSS_DEFAULT_UNWIND_DEPTH);
 #if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
-    fprintf(stderr, "                                   Scope           - User\n");
-    fprintf(stderr, "                                   Collect missing frames due to Frame Pointer omission - No\n");
-    fprintf(stderr, "\n    -g <Interval:Depth:Scope:Fpo>\n");
-    fprintf(stderr, "                                 Enable Callstack Sampling.\n");
-    fprintf(stderr, "                               Specify the Unwind Interval and Unwind Depth values.\n");
-    fprintf(stderr, "                               Scope should contain one of these options:\n");
-    fprintf(stderr, "                                   user   - Collect Callstack only for code executed in user space.\n");
-    fprintf(stderr, "                                   kernel - Collect Callstack only for code executed in kernel space.\n");
-    fprintf(stderr, "                                   all    - Collect Callstack for code executed in user space and kernel space.\n");
-    fprintf(stderr, "                               Specify to collect missing frames due to omission of frame pointers by compiler.\n");
-    fprintf(stderr, "                                   fpo    - Collect missing callstack frames.\n");
-    fprintf(stderr, "                                   nofpo  - Do not collect missing callstack frames.\n");
+    fprintf(stderr, "                               Scope           - User\n");
+    fprintf(stderr, "                               fpo             - No\n");
+    fprintf(stderr, "\n    -g <I:D:S:F>           Enable Callstack Sampling.\n");
+    fprintf(stderr, "                           Specify the Unwind Interval(I) and Unwind Depth(D)\n");
+    fprintf(stderr, "                           values. Scope(S) should contain one of these options\n");
+    fprintf(stderr, "                               user   - Collect only for user space code.\n");
+    fprintf(stderr, "                               kernel - Collect only for kernel space code.\n");
+    fprintf(stderr, "                               all    - Collect for code executed in user and \n");
+    fprintf(stderr, "                                        kernel space code.\n");
+    fprintf(stderr, "                           Specify to collect missing frames due to omission of\n");
+    fprintf(stderr, "                           frame pointers by compiler.\n");
+    fprintf(stderr, "                               fpo    - Collect missing callstack frames.\n");
+    fprintf(stderr, "                               nofpo  - Do not collect missing callstack frames.\n");
 #else
-    fprintf(stderr, "\n    -g <Interval:Depth>        Enable Callstack Sampling.\n");
-    fprintf(stderr, "                               Specify the Unwind Interval and Unwind Depth values.\n");
+    fprintf(stderr, "\n    -g <I:D>               Enable Callstack Sampling.\n");
+    fprintf(stderr, "                           Specify the Unwind Interval(I) and Unwind Depth(D) values.\n");
 #endif
 
-    fprintf(stderr, "\n    -c <core-id,..>            Core Affinity.\n");
-    fprintf(stderr, "                               Comma seperated list of CPUs. Ranges of CPUs also can be \n");
-    fprintf(stderr, "                               specified with -: 0-3. Default affinity is all the available cores.) \n");
-    fprintf(stderr, "                               In System-wide profiling, samples are collected only\n");
-    fprintf(stderr, "                               from these cores. In Per-Process profile, processor\n");
-    fprintf(stderr, "                               affinity is set for the launched application.\n");
-    fprintf(stderr, "\n    -f                         Profile the children of the launched application.\n");
-    fprintf(stderr, "\n    -b                         Terminate the launched application after profile\n");
-    fprintf(stderr, "                               collection.\n");
-    fprintf(stderr, "\n    -s <n>                     Start Delay (n in seconds).\n");
-    fprintf(stderr, "                               Start profiling after the specified duration.\n");
-    fprintf(stderr, "                               If n is 0, then wait indefinitely, used for profile control.\n");
-    fprintf(stderr, "\n    -v                         Print version string.\n");
-    fprintf(stderr, "\n    -w                         Specify the working directory.\n");
-    fprintf(stderr, "                               Default will be the path of the launched application.\n");
-    fprintf(stderr, "\n    -h                         Displays this help information.\n");
-    fprintf(stderr, "\n    -C <Custom profile>        Path to the custom profile XML file.\n");
+    fprintf(stderr, "\n    -c <core-id,..>        Core Affinity.\n");
+    fprintf(stderr, "                           Comma seperated list of CPUs. Ranges of CPUs also \n");
+    fprintf(stderr, "                           also be specified with -: 0-3. Default affinity is \n");
+    fprintf(stderr, "                           all the available cores.) In System-wide profiling, \n");
+    fprintf(stderr, "                           samples are collected only from these cores. In \n");
+    fprintf(stderr, "                           Per-Process profile, processor affinity is set for \n");
+    fprintf(stderr, "                           the launched application.\n");
+    fprintf(stderr, "\n    -f                     Profile the children of the launched application.\n");
+    fprintf(stderr, "\n    -b                     Terminate the launched application after profile\n");
+    fprintf(stderr, "                           collection.\n");
+    fprintf(stderr, "\n    -s <n>                 Start Delay ('n' in seconds).\n");
+    fprintf(stderr, "                           Start profiling after the specified duration. If 'n'\n");
+    fprintf(stderr, "                           is 0, then wait indefinitely. Used for profile\n");
+    fprintf(stderr, "                           control.\n");
+    fprintf(stderr, "\n    -v                     Print version string.\n");
+    fprintf(stderr, "\n    -w                     Specify the working directory.\n");
+    fprintf(stderr, "                           Default will be the path of the launched\n");
+    fprintf(stderr, "                           application.\n");
+    fprintf(stderr, "\n    -h                     Displays this help information.\n");
 
-    fprintf(stderr, "\n    -L <n>                     Specify debug log messaging level. Valid values are 1 to 3.\n");
-    fprintf(stderr, "                                   1 - INFO, 2 - DEBUG, 3 - EXTENSIVE\n");
+    fprintf(stderr, "\n    -L <n>                 Specify debug log messaging level. Valid values\n");
+    fprintf(stderr, "                           are 1 to 3. 1 - INFO, 2 - DEBUG, 3 - EXTENSIVE\n");
 
     return 0;
 }
@@ -182,55 +197,56 @@ int PrintReportOptions()
     // REPORT Options
     fprintf(stderr, "\nReport Options:");
 
-    fprintf(stderr, "\n    -i <file name>             Input file name.\n");
-    fprintf(stderr, "                               Either the raw profile data file (%s) or the \n", CPUPROFILE_RAWFILE_EXT_STR);
-    fprintf(stderr, "                               processed data file (.ebp or .cxlcpdb) can be specified.\n");
+    fprintf(stderr, "\n    -i <file name>         Input file name.\n");
+    fprintf(stderr, "                           Either the raw profile data file (%s) or the \n", CPUPROFILE_RAWFILE_EXT_STR);
+    fprintf(stderr, "                           processed data file (.ebp or .cxlcpdb) can be\n");
+    fprintf(stderr, "                           specified.\n");
 
-    fprintf(stderr, "\n    -o <output dir>            Output dir in which .cxlcpdb file will be created.\n");
-    fprintf(stderr, "                               Default path will be %s<base-name-of-input-file>.\n", DEFAULT_TEMP_PATH);
+    fprintf(stderr, "\n    -o <output dir>        Output dir in which .cxlcpdb file will be created.\n");
+    fprintf(stderr, "                           Default will be %s<base-name-of-input-file>.\n", DEFAULT_TEMP_PATH);
 
     // TBD: Currently only CSV file format is supported
     // fprintf(stderr, "\n    -F <csv|xml|text>          Output file format.\n");
     // fprintf(stderr, "                               Default file format is CSV.\n");
 
-    fprintf(stderr, "\n    -V <view xml>              Specify the View Config XML file.\n");
-    fprintf(stderr, "                               All the raw data will be reported.\n");
+    fprintf(stderr, "\n    -V <view xml>          Specify the View Config XML file.\n");
+    fprintf(stderr, "                           All the raw data will be reported.\n");
 
-    fprintf(stderr, "\n    -R <section,..>            Specify the report sections to be generated.\n");
-    fprintf(stderr, "                               Supported Report sections are:\n");
-    fprintf(stderr, "                                   all       - Report all the sections (except imix).\n");
-    fprintf(stderr, "                                   overview  - Report Overview section.\n");
-    fprintf(stderr, "                                   process   - Report process details.\n");
-    fprintf(stderr, "                                   module    - Report module details.\n");
-    fprintf(stderr, "                                   callgraph - Report callgraph.\n");
-    fprintf(stderr, "                                   imix      - Report imix details.\n");
-    fprintf(stderr, "                               process and module together are not allowed.\n");
-    fprintf(stderr, "                               module and callgraph together are not allowed.\n");
+    fprintf(stderr, "\n    -R <section,..>        Specify the report sections to be generated.\n");
+    fprintf(stderr, "                           Supported Report sections are:\n");
+    fprintf(stderr, "                               all       - Report all sections (except imix)\n");
+    fprintf(stderr, "                               overview  - Report Overview section.\n");
+    fprintf(stderr, "                               process   - Report process details.\n");
+    fprintf(stderr, "                               module    - Report module details.\n");
+    fprintf(stderr, "                               callgraph - Report callgraph.\n");
+    fprintf(stderr, "                               imix      - Report imix details.\n");
+    fprintf(stderr, "                           process and module together are not allowed.\n");
+    fprintf(stderr, "                           module and callgraph together are not allowed.\n");
 
-    fprintf(stderr, "\n    -e                         Specify the event index for which callgraph will be\n");
-    fprintf(stderr, "                               generated. This event is also used to find the hot\n");
-    fprintf(stderr, "                               functions in the Overview section.\n");
+    fprintf(stderr, "\n    -e                     Specify the event index for which callgraph will be\n");
+    fprintf(stderr, "                           generated. This event is also used to find the hot\n");
+    fprintf(stderr, "                           functions in the Overview section.\n");
 
-    fprintf(stderr, "\n    -I                         Ignore samples from System Modules.\n");
-    fprintf(stderr, "\n    -P                         Show Percentage.\n");
+    fprintf(stderr, "\n    -I                     Ignore samples from System Modules.\n");
+    fprintf(stderr, "\n    -P                     Show Percentage.\n");
 
-    fprintf(stderr, "\n    -D <path1;path2..>         Debug Symbol paths.\n");
-    fprintf(stderr, "\n    -S <path1;path2..>         Symbol Server directories.\n");
-    fprintf(stderr, "\n    -X <path>                  Path to store the symbols downloaded from");
-    fprintf(stderr, "\n                               the Symbol Servers.\n");
+    fprintf(stderr, "\n    -D <path1;path2..>     Debug Symbol paths.\n");
+    fprintf(stderr, "\n    -S <path1;path2..>     Symbol Server directories.\n");
+    fprintf(stderr, "\n    -X <path>              Path to store the symbols downloaded from the\n");
+    fprintf(stderr, "                           Symbol Servers.\n");
 #if 0
-    fprintf(stderr, "\n    -O                        Report by separate cores.\n");
-    fprintf(stderr, "\n    -N                        Report by NUMA.\n");
+    fprintf(stderr, "\n    -O                     Report by separate cores.\n");
+    fprintf(stderr, "\n    -N                     Report by NUMA.\n");
 
-    fprintf(stderr, "\n    -c <core mask>            Core Mask for which samples to be reported.\n");
-    fprintf(stderr, "                              By default report samples collected from all the cores.\n");
+    fprintf(stderr, "\n    -c <core mask>         Core Mask for which samples to be reported.\n");
+    fprintf(stderr, "                           By default report samples collected from all the cores.\n");
 
-    fprintf(stderr, "\n    -L <n1,n2,n3>             Cutoff to limit the process/modules/functions reported.\n");
-    fprintf(stderr, "                              Percent-cutoff, Cumulative-cutoff, Minimum-count.\n");
+    fprintf(stderr, "\n    -L <n1,n2,n3>          Cutoff to limit the process/modules/functions reported.\n");
+    fprintf(stderr, "                           Percent-cutoff, Cumulative-cutoff, Minimum-count.\n");
 #endif //0
 
-    fprintf(stderr, "\n    -L <n>                     Specify debug log messaging level. Valid values are 1 to 3.\n");
-    fprintf(stderr, "                                   1 - INFO, 2 - DEBUG, 3 - EXTENSIVE\n");
+    fprintf(stderr, "\n    -L <n>                 Specify debug log messaging level. Valid values\n");
+    fprintf(stderr, "                           are 1 to 3. 1 - INFO, 2 - DEBUG, 3 - EXTENSIVE\n");
 
     return 0;
 }

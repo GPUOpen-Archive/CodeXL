@@ -688,6 +688,11 @@ void CpuProfileCollect::ValidateProfile()
 
                 m_profileDcConfig.SetConfigName("Custom Profile");
             }
+            else
+            {
+                // error in raw event string
+                return;
+            }
         }
         else if (!IsTP())
         {
@@ -732,105 +737,257 @@ bool CpuProfileCollect::ProcessRawEvent(gtVector<DcEventConfig>& eventConfigVec,
     bool ret = false;
     gtVector<gtString> rawEventStrVec = m_args.GetRawEventString();
 
-    for(const auto& rawEventStr : rawEventStrVec)
+    for (const auto& rawEventStr : rawEventStrVec)
     {
         gtStringTokenizer tokens(rawEventStr, L",");
         gtString value;
-
-        int i = 0;
-        gtUInt32 aNumber = 0;
-        gtUInt64 interval = 0;
         unsigned int eventSelect = 0;
-        unsigned int unitMask = 0;
-        bool usrEvents = true;
-        bool osEvents = true;
-        bool countingEvent = true;
-        gtUInt64 performanceEvent = 0;
-        gtUInt32 pmcMsrId = 0;
-        IbsConfig aIbsConfig;
-        bool ibsEvent = false;
 
-        while (tokens.getNextToken(value))
+        tokens.getNextToken(value);
+
+        if (value.toUnsignedIntNumber(eventSelect))
         {
-            switch (i)
+            ret = ProcessRawEventId(rawEventStr, eventConfigVec, ibsConfig);
+        }
+        else
+        {
+            ret = ProcessRawEventStr(rawEventStr, eventConfigVec, ibsConfig);
+        }
+    }
+
+    return ret;
+}
+
+bool CpuProfileCollect::ProcessRawEventId(const gtString& rawEventStr, gtVector<DcEventConfig>& eventConfigVec, IbsConfig& ibsConfig)
+{
+    bool ret = false;
+    gtStringTokenizer tokens(rawEventStr, L",");
+    gtString value;
+
+    int i = 0;
+    gtUInt32 aNumber = 0;
+    gtUInt64 interval = 0;
+    unsigned int eventSelect = 0;
+    unsigned int unitMask = 0;
+    bool usrEvents = true;
+    bool osEvents = true;
+    bool countingEvent = true;
+    gtUInt64 performanceEvent = 0;
+    gtUInt32 pmcMsrId = 0;
+    IbsConfig aIbsConfig;
+    bool ibsEvent = false;
+
+    while (tokens.getNextToken(value))
+    {
+        switch (i)
+        {
+        case 0:
+            value.toUnsignedIntNumber(eventSelect);
+
+            if (eventSelect == 0xf000)
             {
-            case 0:
-                value.toUnsignedIntNumber(eventSelect);
-
-                if (eventSelect == 0xf000)
-                {
-                    aIbsConfig.fetchSampling = true;
-                }
-                else if (eventSelect == 0xf100)
-                {
-                    aIbsConfig.opSampling = true;
-                }
-
-                ibsEvent = aIbsConfig.fetchSampling || aIbsConfig.opSampling;
-
-                break;
-
-            case 1:
-                value.toUnsignedIntNumber(unitMask);
-
-                if (aIbsConfig.opSampling)
-                {
-                    aIbsConfig.opCycleCount = (unitMask == 1) ? true : false;
-                }
-
-                break;
-
-            case 2:
-                if (value.toUnsignedIntNumber(aNumber))
-                {
-                    usrEvents = aNumber ? true : false;
-                }
-                break;
-
-            case 3:
-                if (value.toUnsignedIntNumber(aNumber))
-                {
-                    osEvents = aNumber ? true : false;
-                }
-                break;
-
-            case 4:
-                value.toUnsignedInt64Number(interval);
-
-                if (interval > 0)
-                {
-                    countingEvent = false;
-                }
-
-                break;
-
-            case 5:
-                m_hasPmcEventMsrMap = true;
-                value.toUnsignedIntNumber(pmcMsrId);
-                break;
-
-            default:
-                break;
+                aIbsConfig.fetchSampling = true;
+            }
+            else if (eventSelect == 0xf100)
+            {
+                aIbsConfig.opSampling = true;
             }
 
-            i++;
+            ibsEvent = aIbsConfig.fetchSampling || aIbsConfig.opSampling;
+
+            break;
+
+        case 1:
+            value.toUnsignedIntNumber(unitMask);
+
+            if (aIbsConfig.opSampling)
+            {
+                aIbsConfig.opCycleCount = (unitMask == 1) ? true : false;
+            }
+
+            break;
+
+        case 2:
+            if (value.toUnsignedIntNumber(aNumber))
+            {
+                usrEvents = aNumber ? true : false;
+            }
+            break;
+
+        case 3:
+            if (value.toUnsignedIntNumber(aNumber))
+            {
+                osEvents = aNumber ? true : false;
+            }
+            break;
+
+        case 4:
+            value.toUnsignedInt64Number(interval);
+
+            if (interval > 0)
+            {
+                countingEvent = false;
+            }
+
+            break;
+
+        case 5:
+            m_hasPmcEventMsrMap = true;
+            value.toUnsignedIntNumber(pmcMsrId);
+            break;
+
+        default:
+            break;
         }
 
-        if (ibsEvent)
+        i++;
+    }
+
+    if (ibsEvent)
+    {
+        if (aIbsConfig.fetchSampling)
         {
-            if (aIbsConfig.fetchSampling)
-            {
-                ibsConfig.fetchSampling = true;
-                ibsConfig.fetchMaxCount = interval;
-            }
-            else if (aIbsConfig.opSampling)
-            {
-                ibsConfig.opSampling = true;
-                ibsConfig.opCycleCount = aIbsConfig.opCycleCount;
-                ibsConfig.opMaxCount = interval;
-            }
+            ibsConfig.fetchSampling = true;
+            ibsConfig.fetchMaxCount = interval;
+        }
+        else if (aIbsConfig.opSampling)
+        {
+            ibsConfig.opSampling = true;
+            ibsConfig.opCycleCount = aIbsConfig.opCycleCount;
+            ibsConfig.opMaxCount = interval;
+        }
+
+        ret = true;
+    }
+    else
+    {
+        HRESULT res = fnMakeProfileEvent(eventSelect,
+            unitMask,
+            false, // edge detect
+            usrEvents,
+            osEvents,
+            false, // guestOnlyEvents,
+            false, // hostOnlyEvents,
+            countingEvent, // countingEvent,
+            &performanceEvent);
+
+        if (SUCCEEDED(res))
+        {
+            DcEventConfig ec;
+            ec.pmc.perf_ctl = performanceEvent;
+            ec.eventCount = interval;
+            eventConfigVec.push_back(ec);
+
+            m_pmcEventMsrMap.insert({ performanceEvent, pmcMsrId });
 
             ret = true;
+        }
+        else
+        {
+            reportError(true, L"There was a problem configuring the raw profile event(0x%lx). (error code 0x%lx)\n\n", eventSelect, m_error);
+        }
+    }
+
+    return ret;
+}
+
+bool CpuProfileCollect::ProcessRawEventStr(const gtString& rawEventStr, gtVector<DcEventConfig>& eventConfigVec, IbsConfig& ibsConfig)
+{
+    bool ret = false;
+    gtStringTokenizer tokens(rawEventStr, L",=");
+    gtString key;
+    gtUInt32 aNumber = 0;
+    gtUInt64 interval = 0;
+    unsigned int eventSelect = 0;
+    unsigned int unitMask = 0;
+    bool usrEvents = true;
+    bool osEvents = true;
+    bool countingEvent = true;
+    gtUInt64 performanceEvent = 0;
+    IbsConfig aIbsConfig;
+    bool ibsEvent = false;
+    bool validEventStr = true;
+
+    while (validEventStr && tokens.getNextToken(key))
+    {
+        gtString value;
+
+        if (!key.compareNoCase(L"event") && tokens.getNextToken(value))
+        {
+            if (!value.toUnsignedIntNumber(eventSelect))
+            {
+                aIbsConfig.fetchSampling = (!value.compareNoCase(L"ibs-fetch")) ? true : false;
+                aIbsConfig.opSampling = (!value.compareNoCase(L"ibs-op")) ? true : false;
+
+                if (!aIbsConfig.fetchSampling && !aIbsConfig.opSampling)
+                {
+                    reportError(false, L"Invalid event(" STR_FORMAT ") specified with option(-E).\n", value.asCharArray());
+                    validEventStr = false;
+                }
+            }
+
+            ibsEvent = aIbsConfig.fetchSampling || aIbsConfig.opSampling;
+        }
+        else if (!key.compareNoCase(L"umask") && tokens.getNextToken(value))
+        {
+            value.toUnsignedIntNumber(unitMask);
+        }
+        else if (!key.compareNoCase(L"ibsop-count-control") && tokens.getNextToken(value) && value.toUnsignedIntNumber(aNumber))
+        {
+            aIbsConfig.opCycleCount = aNumber ? false : true;
+        }
+        else if (!key.compareNoCase(L"count-cycles"))
+        {
+            aIbsConfig.opCycleCount = true;
+        }
+        else if (!key.compareNoCase(L"count-ops"))
+        {
+            aIbsConfig.opCycleCount = false;
+        }
+        else if (!key.compareNoCase(L"user") && tokens.getNextToken(value) && value.toUnsignedIntNumber(aNumber))
+        {
+            usrEvents = aNumber ? true : false;
+        }
+        else if (!key.compareNoCase(L"os") && tokens.getNextToken(value) && value.toUnsignedIntNumber(aNumber))
+        {
+            osEvents = aNumber ? true : false;
+        }
+        else if (!key.compareNoCase(L"interval") && tokens.getNextToken(value))
+        {
+            value.toUnsignedInt64Number(interval);
+            countingEvent = (interval > 0) ? false : true;
+        }
+        else
+        {
+            reportError(false, L"Invalid parameter (" STR_FORMAT ") specified with option(-E).\n", key.asCharArray());
+            validEventStr = false;
+        }
+    }
+
+    if (validEventStr)
+    {
+        if (ibsEvent)
+        {
+            if (interval)
+            {
+                if (aIbsConfig.fetchSampling)
+                {
+                    ibsConfig.fetchSampling = true;
+                    ibsConfig.fetchMaxCount = interval;
+                }
+                else if (aIbsConfig.opSampling)
+                {
+                    ibsConfig.opSampling = true;
+                    ibsConfig.opCycleCount = aIbsConfig.opCycleCount;
+                    ibsConfig.opMaxCount = interval;
+                }
+
+                ret = true;
+            }
+            else
+            {
+                reportError(false, L"Either sampling interval is missing or invalid interval is specified with option(-E).\n");
+            }
         }
         else
         {
@@ -850,9 +1007,6 @@ bool CpuProfileCollect::ProcessRawEvent(gtVector<DcEventConfig>& eventConfigVec,
                 ec.pmc.perf_ctl = performanceEvent;
                 ec.eventCount = interval;
                 eventConfigVec.push_back(ec);
-
-                m_pmcEventMsrMap.insert({ performanceEvent, pmcMsrId });
-
                 ret = true;
             }
             else

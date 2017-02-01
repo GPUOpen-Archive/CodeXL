@@ -168,6 +168,9 @@ private:
     void ValidateProfile();
     void VerifyAndSetEvents(EventConfiguration** ppDriverSampleEvents, EventConfiguration** ppDriverCountEvents);
     bool ProcessRawEvent(gtVector<DcEventConfig>& eventConfigVec, IbsConfig& ibsConfig);
+    bool ProcessRawEventId(const gtString& eventStr, gtVector<DcEventConfig>& eventConfigVec, IbsConfig& ibsConfig);
+    bool ProcessRawEventStr(const gtString& eventStr, gtVector<DcEventConfig>& eventConfigVec, IbsConfig& ibsConfig);
+
     void ConfigureProfile();
 
     void SetTbpConfig();
