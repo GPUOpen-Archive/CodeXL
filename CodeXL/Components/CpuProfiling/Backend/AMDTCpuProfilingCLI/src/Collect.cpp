@@ -670,22 +670,30 @@ void CpuProfileCollect::ValidateProfile()
         {
             gtVector<DcEventConfig> eventConfigVec;
             IbsConfig ibsConfig;
+            int timerInterval = 0;
 
-            if (ProcessRawEvent(eventConfigVec, ibsConfig))
+            if (ProcessRawEvent(eventConfigVec, ibsConfig, timerInterval))
             {
+                DcConfigType type = DCConfigTBP;
+
+                if (timerInterval > 0)
+                {
+                    m_profileDcConfig.SetTimerInterval(static_cast<float>(timerInterval));
+                }
+
                 if (ibsConfig.fetchSampling || ibsConfig.opSampling)
                 {
                     m_profileDcConfig.SetIBSInfo(ibsConfig);
-                    m_profileDcConfig.SetConfigType(DCConfigIBS);
+                    type = ((timerInterval > 0) || (eventConfigVec.size() > 0)) ? DCConfigMultiple : DCConfigIBS;
                 }
 
                 if (!eventConfigVec.empty())
                 {
-                    DcConfigType type = (ibsConfig.fetchSampling || ibsConfig.opSampling) ? DCConfigMultiple : DCConfigEBP;
+                    type = ((timerInterval > 0) || ibsConfig.fetchSampling || ibsConfig.opSampling) ? DCConfigMultiple : DCConfigEBP;
                     m_profileDcConfig.SetEventInfo(eventConfigVec);
-                    m_profileDcConfig.SetConfigType(type);
                 }
 
+                m_profileDcConfig.SetConfigType(type);
                 m_profileDcConfig.SetConfigName("Custom Profile");
             }
             else
@@ -732,10 +740,11 @@ void CpuProfileCollect::ValidateProfile()
     return;
 }
 
-bool CpuProfileCollect::ProcessRawEvent(gtVector<DcEventConfig>& eventConfigVec, IbsConfig& ibsConfig)
+bool CpuProfileCollect::ProcessRawEvent(gtVector<DcEventConfig>& eventConfigVec, IbsConfig& ibsConfig, int& timerInterval)
 {
     bool ret = false;
     gtVector<gtString> rawEventStrVec = m_args.GetRawEventString();
+    timerInterval = 0;
 
     for (const auto& rawEventStr : rawEventStrVec)
     {
@@ -747,19 +756,20 @@ bool CpuProfileCollect::ProcessRawEvent(gtVector<DcEventConfig>& eventConfigVec,
 
         if (value.toUnsignedIntNumber(eventSelect))
         {
-            ret = ProcessRawEventId(rawEventStr, eventConfigVec, ibsConfig);
+            ret = ProcessRawEventId(rawEventStr, eventConfigVec, ibsConfig, timerInterval);
         }
         else
         {
-            ret = ProcessRawEventStr(rawEventStr, eventConfigVec, ibsConfig);
+            ret = ProcessRawEventStr(rawEventStr, eventConfigVec, ibsConfig, timerInterval);
         }
     }
 
     return ret;
 }
 
-bool CpuProfileCollect::ProcessRawEventId(const gtString& rawEventStr, gtVector<DcEventConfig>& eventConfigVec, IbsConfig& ibsConfig)
+bool CpuProfileCollect::ProcessRawEventId(const gtString& rawEventStr, gtVector<DcEventConfig>& eventConfigVec, IbsConfig& ibsConfig, int& timerInterval)
 {
+    UNREFERENCED_PARAMETER(timerInterval);
     bool ret = false;
     gtStringTokenizer tokens(rawEventStr, L",");
     gtString value;
@@ -891,7 +901,7 @@ bool CpuProfileCollect::ProcessRawEventId(const gtString& rawEventStr, gtVector<
     return ret;
 }
 
-bool CpuProfileCollect::ProcessRawEventStr(const gtString& rawEventStr, gtVector<DcEventConfig>& eventConfigVec, IbsConfig& ibsConfig)
+bool CpuProfileCollect::ProcessRawEventStr(const gtString& rawEventStr, gtVector<DcEventConfig>& eventConfigVec, IbsConfig& ibsConfig, int& timerInterval)
 {
     bool ret = false;
     gtStringTokenizer tokens(rawEventStr, L",=");
@@ -907,6 +917,7 @@ bool CpuProfileCollect::ProcessRawEventStr(const gtString& rawEventStr, gtVector
     IbsConfig aIbsConfig;
     bool ibsEvent = false;
     bool validEventStr = true;
+    bool isTimer = false;
 
     while (validEventStr && tokens.getNextToken(key))
     {
@@ -916,12 +927,13 @@ bool CpuProfileCollect::ProcessRawEventStr(const gtString& rawEventStr, gtVector
         {
             if (!value.toUnsignedIntNumber(eventSelect))
             {
+                isTimer = (!value.compareNoCase(L"timer")) ? true : false;
                 aIbsConfig.fetchSampling = (!value.compareNoCase(L"ibs-fetch")) ? true : false;
                 aIbsConfig.opSampling = (!value.compareNoCase(L"ibs-op")) ? true : false;
 
-                if (!aIbsConfig.fetchSampling && !aIbsConfig.opSampling)
+                if (!aIbsConfig.fetchSampling && !aIbsConfig.opSampling && !isTimer)
                 {
-                    reportError(false, L"Invalid event(" STR_FORMAT ") specified with option(-E).\n", value.asCharArray());
+                    reportError(false, L"Invalid event(" STR_FORMAT ") specified with option(-e).\n", value.asCharArray());
                     validEventStr = false;
                 }
             }
@@ -959,7 +971,7 @@ bool CpuProfileCollect::ProcessRawEventStr(const gtString& rawEventStr, gtVector
         }
         else
         {
-            reportError(false, L"Invalid parameter (" STR_FORMAT ") specified with option(-E).\n", key.asCharArray());
+            reportError(false, L"Invalid parameter (" STR_FORMAT ") specified with option(-e).\n", key.asCharArray());
             validEventStr = false;
         }
     }
@@ -986,8 +998,13 @@ bool CpuProfileCollect::ProcessRawEventStr(const gtString& rawEventStr, gtVector
             }
             else
             {
-                reportError(false, L"Either sampling interval is missing or invalid interval is specified with option(-E).\n");
+                reportError(false, L"Either sampling interval is missing or invalid interval is specified with option(-e).\n");
             }
+        }
+        else if (isTimer)
+        {
+            timerInterval = static_cast<int>(interval);
+            ret = true;
         }
         else
         {

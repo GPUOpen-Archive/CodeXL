@@ -167,9 +167,9 @@ private:
     void EnableProfiling();
     void ValidateProfile();
     void VerifyAndSetEvents(EventConfiguration** ppDriverSampleEvents, EventConfiguration** ppDriverCountEvents);
-    bool ProcessRawEvent(gtVector<DcEventConfig>& eventConfigVec, IbsConfig& ibsConfig);
-    bool ProcessRawEventId(const gtString& eventStr, gtVector<DcEventConfig>& eventConfigVec, IbsConfig& ibsConfig);
-    bool ProcessRawEventStr(const gtString& eventStr, gtVector<DcEventConfig>& eventConfigVec, IbsConfig& ibsConfig);
+    bool ProcessRawEvent(gtVector<DcEventConfig>& eventConfigVec, IbsConfig& ibsConfig, int& timerInterval);
+    bool ProcessRawEventId(const gtString& eventStr, gtVector<DcEventConfig>& eventConfigVec, IbsConfig& ibsConfig, int& timerInterval);
+    bool ProcessRawEventStr(const gtString& eventStr, gtVector<DcEventConfig>& eventConfigVec, IbsConfig& ibsConfig, int& timerInterval);
 
     void ConfigureProfile();
 

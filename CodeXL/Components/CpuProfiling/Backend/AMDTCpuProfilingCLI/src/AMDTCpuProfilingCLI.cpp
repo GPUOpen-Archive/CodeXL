@@ -116,10 +116,10 @@ int PrintCollectOptions()
     fprintf(stderr, "                               inst_access - Investigate Instruction Access\n");
     fprintf(stderr, "                               l2_access   - Investigate L2 Cache Access\n");
 
-    fprintf(stderr, "\n    -e                     Specify PMU or IBS event in the form of comma\n");
-    fprintf(stderr, "                           seperated key=value pair. Supported keys are\n");
+    fprintf(stderr, "\n    -e <EVENT>             Specify Timer, PMU or IBS event in the form of\n");
+    fprintf(stderr, "                           comma seperated key=value pair. Supported keys are\n");
     fprintf(stderr, "                               event=<PMU-event-select>\n");
-    fprintf(stderr, "                               event=<ibs-fetch | ibs-op>\n");
+    fprintf(stderr, "                               event=<timer | ibs-fetch | ibs-op>\n");
     fprintf(stderr, "                               umask=<unit-mask>\n");
     fprintf(stderr, "                               user=<0 | 1>\n");
     fprintf(stderr, "                               os=<0 | 1>\n");
@@ -130,15 +130,16 @@ int PrintCollectOptions()
     fprintf(stderr, "                           os=1, interval=0, ibsop-count-control=0.\n");
     fprintf(stderr, "                           For a PMC event, if the interval is not set or 0,\n");
     fprintf(stderr, "                           then the event will be monitored in count mode.\n");
-    fprintf(stderr, "                           For IBS events valid sampling interval is required.\n");
+    fprintf(stderr, "                           For timer, ibs-fetch and ibs-op events valid\n");
+    fprintf(stderr, "                           sampling interval is required.\n");
+    fprintf(stderr, "                           For timer, the interval is in milli-seconds.\n");
     fprintf(stderr, "                           If ibsop-count-control is 0, then count clock cycles\n");
     fprintf(stderr, "                           otherwise count dispatched micro ops.\n");
     fprintf(stderr, "                           Multiple occurrences of -e is allowed.\n");
 
-    fprintf(stderr, "\n    -T <n>                 Custom Time based profiling.\n");
-    fprintf(stderr, "                           (sampling interval 'n' in milli-seconds).\n");
-
-    fprintf(stderr, "\n    -C <Custom profile>    Path to the custom profile XML file.\n");
+    //fprintf(stderr, "\n    -T <n>                 Custom Time based profiling.\n");
+    //fprintf(stderr, "                           (sampling interval 'n' in milli-seconds).\n");
+    //fprintf(stderr, "\n    -C <Custom profile>    Path to the custom profile XML file.\n");
 
     fprintf(stderr, "\n    -o <file name>         Base name of the output file.\n");
     fprintf(stderr, "                           Default path will be %sCodeXL-CpuProfile-<TS>.\n", DEFAULT_TEMP_PATH);
