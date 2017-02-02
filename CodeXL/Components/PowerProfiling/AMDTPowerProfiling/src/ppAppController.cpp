@@ -23,6 +23,7 @@
 #include <AMDTOSWrappers/Include/osDirectory.h>
 #include <AMDTOSWrappers/Include/osMachine.h>
 #include <AMDTOSWrappers/Include/osProcess.h>
+#include <AMDTOSWrappers/Include/osCpuid.h>
 #include <AMDTBaseTools/Include/gtAssert.h>
 #include <AMDTApplicationComponents/Include/acMessageBox.h>
 #include <AMDTAPIClasses/Include/Events/apEventsHandler.h>
@@ -765,12 +766,14 @@ ppSessionTreeNodeData* ppAppController::CreateSession(const gtString& profileTyp
     ProfileSessionScope profileScope = SharedProfileSettingPage::Instance()->CurrentSharedProfileSettings().m_profileScope;
 
     osPortAddress portAddress;
+
     if (isValidApplicationInfo.isRemoteSession)
     {
-      portAddress.setAsRemotePortAddress(projectSettings.remoteTargetName(), projectSettings.remoteTargetDaemonConnectionPort());
-      isValidApplicationInfo.portAddress = &portAddress;
+        portAddress.setAsRemotePortAddress(projectSettings.remoteTargetName(), projectSettings.remoteTargetDaemonConnectionPort());
+        isValidApplicationInfo.portAddress = &portAddress;
 
     }
+
     if (profileScope != PM_PROFILE_SCOPE_SYS_WIDE)
     {
         afIsApplicationPathsValid(isValidApplicationInfo, isAppValid, isWorkingFolderValid);
@@ -781,20 +784,20 @@ ppSessionTreeNodeData* ppAppController::CreateSession(const gtString& profileTyp
     {
         gtString projectName = projectSettings.projectName();
         gtString projectDir = afProjectManager::instance().currentProjectFilePath().fileDirectoryAsString();
-    
+
         gtString strSessionDisplayName;
         osDirectory sessionOsDir;
         osFilePath projectDirPath(projectDir);
-    
+
         // Only create new session if there is no empty one:
         wasSessionCreated = !ProfileApplicationTreeHandler::instance()->DoesEmptySessionExist();
-    
+
         // get the next session name and dir from the session naming helper (and clean the dir if there is any old cruft)
         ProfileApplicationTreeHandler::instance()->GetNextSessionNameAndDir(projectName, projectDirPath, strSessionDisplayName, sessionOsDir, wasSessionCreated);
-    
+
         // Try to use the empty session item data:
         afApplicationTreeItemData* pEmptySession = ProfileApplicationTreeHandler::instance()->RenameEmptySession(acGTStringToQString(strSessionDisplayName));
-    
+
         if (pEmptySession == nullptr)
         {
             pRetVal = new ppSessionTreeNodeData;
@@ -803,13 +806,13 @@ ppSessionTreeNodeData* ppAppController::CreateSession(const gtString& profileTyp
         else
         {
             pRetVal = qobject_cast<ppSessionTreeNodeData*>(pEmptySession->extendedItemData());
-    
+
             // In case of rename empty data, remove the old session file:
             osFilePath newSessionDBFile;
             newSessionDBFile.setFileDirectory(pRetVal->SessionDir());
             newSessionDBFile.setFileName(PM_STR_NewSessionName);
             newSessionDBFile.setFileExtension(PP_STR_dbFileExt);
-    
+
             if (newSessionDBFile.exists())
             {
                 osFile fileToDelete(newSessionDBFile);
@@ -817,62 +820,62 @@ ppSessionTreeNodeData* ppAppController::CreateSession(const gtString& profileTyp
                 GT_ASSERT(rc);
             }
         }
-    
+
         GT_IF_WITH_ASSERT((pRetVal != nullptr) && (pRetVal->m_pParentData != nullptr))
         {
             pRetVal->m_name = acGTStringToQString(strSessionDisplayName);
             pRetVal->m_displayName = pRetVal->m_name;
             pRetVal->m_profileTypeStr = acGTStringToQString(profileTypeStr);
-    
+
             // get the last dir path this is our session name:
             m_executedSessionName = GetProjectNameFromSessionDir(sessionOsDir);
-    
+
             osFilePath outputFilePath(sessionOsDir.directoryPath());
             outputFilePath.setFileName(strSessionDisplayName);
             outputFilePath.setFileExtension(PP_STR_dbFileExt);
             pRetVal->m_pParentData->m_filePath = outputFilePath;
-    
+
             pRetVal->m_isImported = false;
             pRetVal->m_projectName = acGTStringToQString(projectName);
-    
+
             pRetVal->m_commandArguments.clear();
-              
+
             pRetVal->m_workingDirectory = acGTStringToQString(isValidApplicationInfo.workingFolderPath);
             gtString exeName;
             projectSettings.executablePath().getFileNameAndExtension(exeName);
             pRetVal->m_exeName = acGTStringToQString(exeName);
             pRetVal->m_exeFullPath = acGTStringToQString(isValidApplicationInfo.appFilePath);
-    
+
             if (pRetVal->m_exeFullPath.isEmpty())
             {
                 pRetVal->m_exeFullPath = acGTStringToQString(projectSettings.windowsStoreAppUserModelID());
             }
-    
+
             pRetVal->m_profileScope = profileScope;
-    
+
             if (pRetVal->m_profileScope == PM_PROFILE_SCOPE_SINGLE_EXE)
             {
                 // Single exe scope is not supported for this profile type:
                 pRetVal->m_profileScope = PM_PROFILE_SCOPE_SYS_WIDE_FOCUS_ON_EXE;
                 SharedProfileSettingPage::Instance()->CurrentSharedProfileSettings().m_profileScope = PM_PROFILE_SCOPE_SYS_WIDE_FOCUS_ON_EXE;
-    
+
             }
-    
+
             pRetVal->m_shouldProfileEntireDuration = true;
-    
+
             if (wasSessionCreated)
             {
                 // Add the created session to the tree:
                 ProfileApplicationTreeHandler::instance()->AddSession(pRetVal, true);
             }
-    
+
             GT_IF_WITH_ASSERT(pRetVal->m_pParentData != nullptr)
             {
                 pRetVal->m_pParentData->m_filePath = outputFilePath;
                 pRetVal->m_pParentData->m_filePathLineNumber = ppSessionController::PP_SESSION_STATE_RUNNING;
             }
         }
-    } 
+    }
     else
     {
         m_midTierLastInitError = PPR_WRONG_PROJECT_SETTINGS;
@@ -1562,6 +1565,10 @@ void ppAppController::InitSessionInfo(const ppSessionTreeNodeData* pProfileData)
         {
             m_currentSessionInfo.m_sessionScope = PM_STR_ProfileScopeSystemWideWithFocus;
         }
+
+        osCpuid cpuId;
+        m_currentSessionInfo.m_cpuFamily = cpuId.getFamily();
+        m_currentSessionInfo.m_cpuModel = cpuId.getModel();
 
         // Set the profile start time:
         // set the current time as profile end time

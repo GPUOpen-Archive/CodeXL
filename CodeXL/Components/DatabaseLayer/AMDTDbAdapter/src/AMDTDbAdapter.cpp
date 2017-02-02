@@ -222,10 +222,18 @@ bool AmdtDatabaseAdapter::InsertSessionConfiguration(const AMDTProfileSessionInf
         GT_ASSERT(isOk);
     }
 
+    gtString valueStr;
+
+    valueStr.makeEmpty();
+    valueStr << sessionInfo.m_cpuFamily;
+    m_pDbAccessor->InsertSessionInfoKeyValue(AMDT_SESSION_INFO_CPU_FAMILY, valueStr);
+
+    valueStr.makeEmpty();
+    valueStr << sessionInfo.m_cpuModel;
+    m_pDbAccessor->InsertSessionInfoKeyValue(AMDT_SESSION_INFO_CPU_MODEL, valueStr);
+
     if (IsAggregateMode())
     {
-        gtString valueStr;
-
         m_pDbAccessor->InsertSessionInfoKeyValue(AMDT_SESSION_INFO_KEY_SESSION_END_TIME, sessionInfo.m_sessionEndTime);
 
         m_pDbAccessor->InsertSessionInfoKeyValue(AMDT_SESSION_INFO_CSS_ENABLED, sessionInfo.m_cssEnabled ? AMDT_SESSION_INFO_VALUE_YES : AMDT_SESSION_INFO_VALUE_NO);
@@ -242,14 +250,6 @@ bool AmdtDatabaseAdapter::InsertSessionConfiguration(const AMDTProfileSessionInf
         m_pDbAccessor->InsertSessionInfoKeyValue(AMDT_SESSION_INFO_CSS_INTERVAL, valueStr);
 
         m_pDbAccessor->InsertSessionInfoKeyValue(AMDT_SESSION_INFO_FPO_ENABLED, sessionInfo.m_cssFPOEnabled ? AMDT_SESSION_INFO_VALUE_YES : AMDT_SESSION_INFO_VALUE_NO);
-
-        valueStr.makeEmpty();
-        valueStr << sessionInfo.m_cpuFamily;
-        m_pDbAccessor->InsertSessionInfoKeyValue(AMDT_SESSION_INFO_CPU_FAMILY, valueStr);
-
-        valueStr.makeEmpty();
-        valueStr << sessionInfo.m_cpuModel;
-        m_pDbAccessor->InsertSessionInfoKeyValue(AMDT_SESSION_INFO_CPU_MODEL, valueStr);
 
         valueStr.makeEmpty();
         valueStr << sessionInfo.m_coreCount;
@@ -274,6 +274,7 @@ bool AmdtDatabaseAdapter::InsertSessionConfiguration(const AMDTProfileSessionInf
 bool AmdtDatabaseAdapter::GetSessionConfiguration(AMDTProfileSessionInfo& sessionInfo)
 {
     bool isOk = false;
+    gtString valueStr;
 
     if (m_pDbAccessor != nullptr)
     {
@@ -321,6 +322,22 @@ bool AmdtDatabaseAdapter::GetSessionConfiguration(AMDTProfileSessionInfo& sessio
         isOk = m_pDbAccessor->GetSessionInfoValue(gtString(AMDT_SESSION_INFO_KEY_SESSION_END_TIME), sessionInfo.m_sessionEndTime);
         GT_ASSERT(isOk);
 
+
+        isOk = m_pDbAccessor->GetSessionInfoValue(gtString(AMDT_SESSION_INFO_CPU_FAMILY), valueStr);
+
+        if (isOk)
+        {
+            valueStr.toUnsignedIntNumber(sessionInfo.m_cpuFamily);
+        }
+
+        valueStr.makeEmpty();
+        isOk = m_pDbAccessor->GetSessionInfoValue(gtString(AMDT_SESSION_INFO_CPU_MODEL), valueStr);
+
+        if (isOk)
+        {
+            valueStr.toUnsignedIntNumber(sessionInfo.m_cpuModel);
+        }
+
     }
 
     if (isOk && IsTimelineMode())
@@ -343,23 +360,6 @@ bool AmdtDatabaseAdapter::GetSessionConfiguration(AMDTProfileSessionInfo& sessio
 
     if (isOk && IsAggregateMode())
     {
-        gtString valueStr;
-
-        isOk = m_pDbAccessor->GetSessionInfoValue(gtString(AMDT_SESSION_INFO_CPU_FAMILY), valueStr);
-
-        if (isOk)
-        {
-            valueStr.toUnsignedIntNumber(sessionInfo.m_cpuFamily);
-        }
-
-        valueStr.makeEmpty();
-        isOk = m_pDbAccessor->GetSessionInfoValue(gtString(AMDT_SESSION_INFO_CPU_MODEL), valueStr);
-
-        if (isOk)
-        {
-            valueStr.toUnsignedIntNumber(sessionInfo.m_cpuModel);
-        }
-
         valueStr.makeEmpty();
         isOk = m_pDbAccessor->GetSessionInfoValue(gtString(AMDT_SESSION_INFO_CORE_AFFNITY), valueStr);
 
