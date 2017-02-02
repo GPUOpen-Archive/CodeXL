@@ -19,6 +19,9 @@
 #include <AMDTBaseTools/Include/gtList.h>
 #include <AMDTBaseTools/Include/gtVector.h>
 
+// Backend
+#include <AMDTCpuPerfEventUtils/inc/EventEngine.h>
+
 // Project:
 #include <Reporter.h>
 #include <CommonUtils.h>
@@ -157,7 +160,15 @@ bool CSVReporter::ReportSamplingSpec(
     {
         gtString sampSpec(L"\n");
 
-        sampSpec.appendFormattedString(L",\"" STR_FORMAT L"(%x)\"", counter.m_name.asCharArray(), samplingConfig[idx].m_hwEventId);
+        if (IsPmcEvent(static_cast<gtUInt16>(samplingConfig[idx].m_hwEventId)))
+        {
+            sampSpec.appendFormattedString(L",\"" STR_FORMAT L" (0x%x)\"", counter.m_name.asCharArray(), samplingConfig[idx].m_hwEventId);
+        }
+        else
+        {
+            sampSpec.appendFormattedString(L",\"" STR_FORMAT L"\"", counter.m_name.asCharArray());
+        }
+
         sampSpec.appendFormattedString(L",%d", samplingConfig[idx].m_samplingInterval);
         sampSpec.appendFormattedString(L",%x", samplingConfig[idx].m_unitMask);
         sampSpec.appendFormattedString(L"," STR_FORMAT, samplingConfig[idx].m_userMode ? L"True" : L"False");

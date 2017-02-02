@@ -1392,7 +1392,7 @@ void CpuProfileReport::ReportOverviewData(AMDTProfileSessionInfo& sessionInfo)
         // Here m_profileDbReader.GetModuleSummary is not used as the CLI 
         // reports all the counters data in the Overview section
         m_profileDbReader.GetModuleProfileData(AMDT_PROFILE_ALL_PROCESSES, AMDT_PROFILE_ALL_MODULES, moduleProfileData);
-        std::sort(processProfileData.begin(), processProfileData.end(),
+        std::sort(moduleProfileData.begin(), moduleProfileData.end(),
             [idx](AMDTProfileData const& a, AMDTProfileData const& b) { return a.m_sampleValue.at(idx).m_sampleCount > b.m_sampleValue.at(idx).m_sampleCount; });
 
         m_pReporter->WriteOverviewModule(sectionHdrs, moduleProfileData, m_args.IsShowPercentage());
@@ -1446,6 +1446,8 @@ void CpuProfileReport::ReportProcessData()
             //// Get the module data for this pid
             AMDTProfileDataVec moduleProfileData;
             m_profileDbReader.GetModuleProfileData(static_cast<AMDTProcessId>(proc.m_id), AMDT_PROFILE_ALL_MODULES, moduleProfileData);
+            std::sort(moduleProfileData.begin(), moduleProfileData.end(),
+                [idx](AMDTProfileData const& a, AMDTProfileData const& b) { return a.m_sampleValue.at(idx).m_sampleCount > b.m_sampleValue.at(idx).m_sampleCount; });
 
             // MODULE section Hdrs
             sectionHdrs.clear();
@@ -1473,6 +1475,8 @@ void CpuProfileReport::ReportProcessData()
             //  FUNCTIONS  SUMMARY
             AMDTProfileDataVec functionProfileData;
             m_profileDbReader.GetFunctionProfileData(static_cast<AMDTProcessId>(proc.m_id), AMDT_PROFILE_ALL_MODULES, functionProfileData);
+            std::sort(functionProfileData.begin(), functionProfileData.end(),
+                [idx](AMDTProfileData const& a, AMDTProfileData const& b) { return a.m_sampleValue.at(idx).m_sampleCount > b.m_sampleValue.at(idx).m_sampleCount; });
 
             sectionHdrs.clear();
             sectionHdrs.push_back(FUNCTION_SUMMARY_SECTION_HDR);

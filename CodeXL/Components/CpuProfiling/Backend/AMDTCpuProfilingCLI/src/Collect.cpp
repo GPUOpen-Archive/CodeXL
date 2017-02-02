@@ -1566,31 +1566,31 @@ void CpuProfileCollect::SetIbsConfig()
                     opCycleCount = cluConfig.cluCycleCount;
                     opInterval = cluConfig.cluMaxCount;
                 }
-            }
 
-            // Profile only on selected cores specified in the CPU Affinity Mask
-            gtUInt64* pCpuCoreMask = nullptr;
-            gtUInt32 cpuCoreMaskSize = 0;
+                // Profile only on selected cores specified in the CPU Affinity Mask
+                gtUInt64* pCpuCoreMask = nullptr;
+                gtUInt32 cpuCoreMaskSize = 0;
 
-            m_args.GetCoreMask(pCpuCoreMask, cpuCoreMaskSize);
+                m_args.GetCoreMask(pCpuCoreMask, cpuCoreMaskSize);
 
-            gtUInt64 fetchPeriod = ibsConfig.fetchSampling ? ibsConfig.fetchMaxCount : 0;
-            gtUInt64 opPeriod = opSample ? opInterval : 0;
-            //m_error = fnSetIbsConfiguration(cpuCoreMask,
-            //                                static_cast<gtUInt32>(fetchPeriod),
-            //                                static_cast<gtUInt32>(opPeriod),
-            //                                true,
-            //                                !opCycleCount);
-            m_error = fnSetIbsConfiguration(static_cast<gtUInt32>(fetchPeriod),
-                                            static_cast<gtUInt32>(opPeriod),
-                                            true,
-                                            !opCycleCount,
-                                            pCpuCoreMask,
-                                            cpuCoreMaskSize);
+                gtUInt64 fetchPeriod = ibsConfig.fetchSampling ? ibsConfig.fetchMaxCount : 0;
+                gtUInt64 opPeriod = opSample ? opInterval : 0;
+                //m_error = fnSetIbsConfiguration(cpuCoreMask,
+                //                                static_cast<gtUInt32>(fetchPeriod),
+                //                                static_cast<gtUInt32>(opPeriod),
+                //                                true,
+                //                                !opCycleCount);
+                m_error = fnSetIbsConfiguration(static_cast<gtUInt32>(fetchPeriod),
+                    static_cast<gtUInt32>(opPeriod),
+                    true,
+                    !opCycleCount,
+                    pCpuCoreMask,
+                    cpuCoreMaskSize);
 
-            if (!isOK())
-            {
-                reportError(true, L"There was a problem configuring the IBS profile. (error code 0x%lx)\n\n", m_error);
+                if (!isOK())
+                {
+                    reportError(true, L"There was a problem configuring the IBS profile. (error code 0x%lx)\n\n", m_error);
+                }
             }
         }
     }
