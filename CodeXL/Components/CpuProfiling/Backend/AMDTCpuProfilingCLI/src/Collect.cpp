@@ -769,7 +769,7 @@ bool CpuProfileCollect::ProcessRawEvent(gtVector<DcEventConfig>& eventConfigVec,
 
 bool CpuProfileCollect::ProcessRawEventId(const gtString& rawEventStr, gtVector<DcEventConfig>& eventConfigVec, IbsConfig& ibsConfig, int& timerInterval)
 {
-    UNREFERENCED_PARAMETER(timerInterval);
+    GT_UNREFERENCED_PARAMETER(timerInterval);
     bool ret = false;
     gtStringTokenizer tokens(rawEventStr, L",");
     gtString value;
