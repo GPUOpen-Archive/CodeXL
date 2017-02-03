@@ -477,6 +477,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CXLPowerProfileCLI", "..\Co
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CXLThreadProfileAPI", "..\Components\CpuProfiling\Backend\AMDTThreadProfileAPI\AMDTThreadProfileAPI.vcxproj", "{63FAB7FE-DE15-420B-B231-66C5BD95D319}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CXLPowerProfilePlugin", "..\Components\PowerProfiling\Backend\AMDTPowerProfilePlugin\AMDTPowerProfilePlugin.vcxproj", "{A5541D02-4F42-45BE-A579-A832B235AF5E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -1259,6 +1261,18 @@ Global
 		{63FAB7FE-DE15-420B-B231-66C5BD95D319}.Teapot-Debug|Win32.Build.0 = Debug|Win32
 		{63FAB7FE-DE15-420B-B231-66C5BD95D319}.Teapot-Debug|x64.ActiveCfg = Release|Win32
 		{63FAB7FE-DE15-420B-B231-66C5BD95D319}.Teapot-Debug|x64.Build.0 = Release|Win32
+		{A5541D02-4F42-45BE-A579-A832B235AF5E}.Debug|Win32.ActiveCfg = Debug|Win32
+		{A5541D02-4F42-45BE-A579-A832B235AF5E}.Debug|Win32.Build.0 = Debug|Win32
+		{A5541D02-4F42-45BE-A579-A832B235AF5E}.Debug|x64.ActiveCfg = Debug|x64
+		{A5541D02-4F42-45BE-A579-A832B235AF5E}.Debug|x64.Build.0 = Debug|x64
+		{A5541D02-4F42-45BE-A579-A832B235AF5E}.Release|Win32.ActiveCfg = Release|Win32
+		{A5541D02-4F42-45BE-A579-A832B235AF5E}.Release|Win32.Build.0 = Release|Win32
+		{A5541D02-4F42-45BE-A579-A832B235AF5E}.Release|x64.ActiveCfg = Release|x64
+		{A5541D02-4F42-45BE-A579-A832B235AF5E}.Release|x64.Build.0 = Release|x64
+		{A5541D02-4F42-45BE-A579-A832B235AF5E}.Teapot-Debug|Win32.ActiveCfg = Debug|Win32
+		{A5541D02-4F42-45BE-A579-A832B235AF5E}.Teapot-Debug|Win32.Build.0 = Debug|Win32
+		{A5541D02-4F42-45BE-A579-A832B235AF5E}.Teapot-Debug|x64.ActiveCfg = Debug|x64
+		{A5541D02-4F42-45BE-A579-A832B235AF5E}.Teapot-Debug|x64.Build.0 = Debug|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1347,5 +1361,6 @@ Global
 		{57994E9F-779E-4131-9DA5-0C02847EA670} = {62963CE7-D831-47D4-8968-5A8BE25AC763}
 		{8341BDB2-8A70-46DC-B47C-7F51B9694B35} = {B5E9CB00-DE4C-4434-8193-2CBF121B03B6}
 		{63FAB7FE-DE15-420B-B231-66C5BD95D319} = {28049FA1-F84B-44BF-9DBF-C4FB29FDD000}
+		{A5541D02-4F42-45BE-A579-A832B235AF5E} = {B5E9CB00-DE4C-4434-8193-2CBF121B03B6}
 	EndGlobalSection
 EndGlobal
