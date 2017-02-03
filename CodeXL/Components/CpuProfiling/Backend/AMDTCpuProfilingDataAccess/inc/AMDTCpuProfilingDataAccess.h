@@ -32,9 +32,9 @@
 #endif
 
 #define CXL_DATAACCESS_SUCCESS                               0
-#define CXL_DATAACCESS_ERROR_INTERNAL                       0xF0000001
-#define CXL_DATAACCESS_WARN_SRC_INFO_NOTAVAILABLE           0xF0000002   // debug info not available
-#define CXL_DATAACCESS_ERROR_DASM_INFO_NOTAVAILABLE         0xF0000003   // binary not available
+#define CXL_DATAACCESS_ERROR_INTERNAL                       0x80000001L
+#define CXL_DATAACCESS_WARN_SRC_INFO_NOTAVAILABLE           0x70000002L   // debug info not available
+#define CXL_DATAACCESS_ERROR_DASM_INFO_NOTAVAILABLE         0x80000003L   // binary not available
 
 struct cgEdge
 {

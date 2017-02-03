@@ -401,7 +401,7 @@ bool SourceCodeTreeModel::BuildDisassemblyTree()
                                                                 m_tid,
                                                                 functionData);
 
-    if (retVal != static_cast<int>(CXL_DATAACCESS_ERROR_DASM_INFO_NOTAVAILABLE))
+    if (retVal != CXL_DATAACCESS_ERROR_DASM_INFO_NOTAVAILABLE)
     {
         retVal = m_pProfDataRdr->GetFunctionSourceAndDisasmInfo(m_funcId, srcFilePath, srcInfoVec);
     }
@@ -783,7 +783,7 @@ bool SourceCodeTreeModel::BuildTree(const std::vector<SourceViewTreeItem*>& srcL
     AMDTProfileFunctionData functionData;
     int ret = m_pProfDataRdr->GetFunctionDetailedProfileData(m_funcId, m_pid, m_tid, functionData);
 
-    if (ret != static_cast<int>(CXL_DATAACCESS_ERROR_DASM_INFO_NOTAVAILABLE))
+    if (ret != CXL_DATAACCESS_ERROR_DASM_INFO_NOTAVAILABLE)
     {
         gtString srcFilePath;
         AMDTSourceAndDisasmInfoVec srcInfoVec;
@@ -1326,7 +1326,7 @@ void SourceCodeTreeModel::SetHotSpotSamples(AMDTUInt32 counterId)
                                                                     m_tid,
                                                                     functionData);
 
-        if (retVal != static_cast<int>(CXL_DATAACCESS_ERROR_DASM_INFO_NOTAVAILABLE))
+        if (retVal != CXL_DATAACCESS_ERROR_DASM_INFO_NOTAVAILABLE)
         {
             AMDTSourceAndDisasmInfoVec srcInfoVec;
             gtString srcFilePath;
