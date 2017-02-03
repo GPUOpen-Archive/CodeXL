@@ -51,21 +51,8 @@
     <ResourceCompile Include="$(CommonProjectsDir)\VersionInfo\VersionResource.rc" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Condition="'$(AMDT_BUILD)'=='AMDT_INTERNAL'" Include="Non-OpenSource\AMDTPowerProfileApi-Internal.cpp" />
-    <ClCompile Condition="'$(AMDT_BUILD)'=='AMDT_NDA'" Include="Non-OpenSource\AMDTPowerProfileApi-Internal.cpp" />
-    <ClCompile Condition="'$(AMDT_BUILD)'=='AMDT_INTERNAL'" Include="Non-OpenSource\AMDTPowerFamily17Internal.cpp" />
-    <ClCompile Condition="'$(AMDT_BUILD)'=='AMDT_NDA'" Include="Non-OpenSource\AMDTPowerFamily17Internal.cpp" />
     <ClCompile Include="src\AMDTPowerProfilePlugin.cpp" />
     <ClCompile Include="src\DllMain.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="inc\AMDTPowerProfilePlugin.h" />
-    <ClInclude Include="src\BasicCounterList.h" />
-    <ClInclude Include="src\ppCountersStringConstants.h" />
-    <ClInclude Include="src\Smu75CounterList.h" />
-    <ClInclude Include="src\Smu7CounterList.h" />
-    <ClInclude Include="src\Smu7DgpuCounterList.h" />
-    <ClInclude Include="src\Smu8CounterList.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
