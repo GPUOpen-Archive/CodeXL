@@ -18,6 +18,7 @@
 #include <AMDTBaseTools/Include/gtString.h>
 #include <AMDTOSWrappers/Include/osTime.h>
 #include <AMDTApplicationComponents/Include/acFunctions.h>
+#include <AMDTApplicationComponents/Include/acCustomPlot.h>
 
 // AMDTApplicationFramework:
 #include <AMDTApplicationFramework/Include/afProjectManager.h>
@@ -39,7 +40,7 @@
 #define DEFAULT_BAR_GAP 10
 #define DEFAULT_NUM_OF_BARS_POWER 8
 #define DEFAULT_NUM_OF_BARS_FREQ 3
-#define DEFAULT_POWER_GRAPH_YAxis_RANGE 40
+#define DEFAULT_POWER_GRAPH_YAxis_RANGE 20
 #define DEFAULT_POWER_GRAPH_YAxis_TICKS 5
 
 // Frequency graph init
@@ -57,8 +58,8 @@
 
 #define FREQUENCY_GRAPH_BARS_VALUE_TYPE ppDataUtils::STACKEDBARGRAPH_VALUETYPE_MILLISECONDS
 
-#define PP_SUMMARY_PLOT_MIN_HEIGHT 80
-#define PP_SUMMARY_PLOT_MIN_WIDTH 200
+#define PP_SUMMARY_PLOT_MIN_HEIGHT 400
+#define PP_SUMMARY_PLOT_MIN_WIDTH 1200
 // ---------------------------------------------------------------------------
 ppSummaryView::ppSummaryView(ppSessionView* pParentSession, ppSessionController* pSessionController) :
     acSplitter(Qt::Vertical, pParentSession),
@@ -96,13 +97,6 @@ ppSummaryView::ppSummaryView(ppSessionView* pParentSession, ppSessionController*
     // Do not allow the collapse of top or bottom sections:
     setChildrenCollapsible(false);
 
-    // init graphs
-    InitGraphsArea();
-
-    // Create the HTML window for the summary information:
-    m_pHTMLInfoWindow = new acQHTMLWindow(nullptr);
-    addWidget(m_pHTMLInfoWindow);
-
     // get session state
     ppSessionController::SessionState currentState = ppSessionController::PP_SESSION_STATE_NEW;
     GT_IF_WITH_ASSERT(m_pSessionController != nullptr)
@@ -110,6 +104,13 @@ ppSummaryView::ppSummaryView(ppSessionView* pParentSession, ppSessionController*
         // Get the state from the controller:
         currentState = m_pSessionController->GetSessionState();
     }
+
+	// init graphs
+	InitGraphsArea(GetCpuFamily());
+
+	// Create the HTML window for the summary information:
+	m_pHTMLInfoWindow = new acQHTMLWindow(nullptr);
+	addWidget(m_pHTMLInfoWindow);
 
     int samplingDuration = 0;
 
@@ -151,6 +152,13 @@ ppSummaryView::~ppSummaryView()
     m_lastGPUBucketsPerCounter.clear();
 
     m_selectedCunterIdsPerGraphMap.clear();
+}
+
+typename ppSummaryView::CpuFamily ppSummaryView::GetCpuFamily() const
+{
+	AMDTProfileSessionInfo info;
+	m_pSessionController->GetProfilerBL().GetSessionInfo(info);
+	return info.m_cpuFamily >= 0x17 ? FAMILY17 : OTHERS;
 }
 
 // ---------------------------------------------------------------------------
@@ -261,104 +269,174 @@ void ppSummaryView::OnProfileStopped(const QString& sessionName)
     ReplotAllGrpahs();
 }
 
-// ---------------------------------------------------------------------------
-void ppSummaryView::InitGraphsArea()
+void ppSummaryView::SetupGraphs()
 {
-    // Create a scroll area for the top layer of the view:
-    QScrollArea* pScrollArea = new QScrollArea;
+	m_pFreqCpuGraph = new acGroupedBarsGraph();
+	m_pFreqGpuGraph = new acGroupedBarsGraph();
 
-    // Set the scrollbar area policy:
+	m_pFreqCpuGraph->SetGraphTitle(PP_STR_SummaryCPUFrequencyCaption);
+	m_pFreqGpuGraph->SetGraphTitle(PP_STR_SummaryGPUFrequencyCaption);
+
+	m_pFreqCpuGraph->GetPlot()->setMinimumSize(QSize(PP_SUMMARY_PLOT_MIN_WIDTH, PP_SUMMARY_PLOT_MIN_HEIGHT + 40));
+	m_pFreqGpuGraph->GetPlot()->setMinimumSize(QSize(PP_SUMMARY_PLOT_MIN_WIDTH, PP_SUMMARY_PLOT_MIN_HEIGHT + 40));
+
+	// Set the graphs background color:
+	QColor graphsBGColor = Qt::black;
+	graphsBGColor.setAlpha(7);
+
+	m_pFreqCpuGraph->GetPlot()->xAxis->axisRect()->setBackground(graphsBGColor);
+	m_pFreqGpuGraph->GetPlot()->xAxis->axisRect()->setBackground(graphsBGColor);
+
+	// Create the graphs:
+	m_pPowerGraph = new acColoredBarsGraph();
+	m_pEnergyGraph = new acColoredBarsGraph();
+
+	// Set the captions for each of the graphs:
+	m_pPowerGraph->SetGraphTitle(PP_STR_SummaryAveragePowerCaption);
+	m_pEnergyGraph->SetGraphTitle(PP_STR_SummaryCumulativeEnergyCaption);
+
+	// Set the minimum height for the graphs:
+	m_pPowerGraph->GetPlot()->setMinimumSize(QSize(PP_SUMMARY_PLOT_MIN_WIDTH, PP_SUMMARY_PLOT_MIN_HEIGHT));
+	m_pEnergyGraph->GetPlot()->setMinimumSize(QSize(PP_SUMMARY_PLOT_MIN_WIDTH, PP_SUMMARY_PLOT_MIN_HEIGHT));
+
+	m_pPowerGraph->GetPlot()->xAxis->axisRect()->setBackground(graphsBGColor);
+	m_pEnergyGraph->GetPlot()->xAxis->axisRect()->setBackground(graphsBGColor);
+}
+
+// ---------------------------------------------------------------------------
+void ppSummaryView::InitGraphsAreaForOthers()
+{
+	// Create a scroll area for the top layer of the view:
+	QScrollArea* pScrollArea = new QScrollArea;
+
+	// Set the scrollbar area policy:
+	pScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+	QWidget* pScrollAreaWidget = new QWidget;
+	pScrollArea->setWidget(pScrollAreaWidget);
+
+	// Create vertical layout for the scroll area:
+	QVBoxLayout* pVScrollingAreaLayout = new QVBoxLayout;
+	pScrollAreaWidget->setLayout(pVScrollingAreaLayout);
+
+	m_pSessionDurationLabel = new QLabel(PP_STR_SummaryDurationLabel);
+	pVScrollingAreaLayout->addWidget(m_pSessionDurationLabel, 0, Qt::AlignLeft);
+
+	SetupGraphs();
+
+	acSplitter* pTopHorizontalSplitter = new acSplitter(Qt::Horizontal);
+
+	m_pTopLeftHorizontalSplitter = new acSplitter(Qt::Vertical);
+	m_pTopRightHorizontalSplitter = new acSplitter(Qt::Vertical);
+
+	// Connect the left splitter move signal (synchronize with the right one):
+	bool rc = connect(m_pTopLeftHorizontalSplitter, SIGNAL(splitterMoved(int, int)), this, SLOT(OnTopSplitterMoved(int, int)));
+	GT_ASSERT(rc);
+
+	// Connect the right splitter move signal (synchronize with the left one):
+	rc = connect(m_pTopRightHorizontalSplitter, SIGNAL(splitterMoved(int, int)), this, SLOT(OnTopSplitterMoved(int, int)));
+	GT_ASSERT(rc);
+
+	QList<int> splitterSizes;
+	splitterSizes << 1;
+	splitterSizes << 1;
+
+	m_pTopLeftHorizontalSplitter->addWidget(m_pEnergyGraph->GetPlot());
+	m_pTopRightHorizontalSplitter->addWidget(m_pPowerGraph->GetPlot());
+
+	m_pTopLeftHorizontalSplitter->addWidget(m_pFreqCpuGraph->GetPlot());
+
+	m_pTopLeftHorizontalSplitter->setCollapsible(0, false);
+	m_pTopLeftHorizontalSplitter->setCollapsible(1, false);
+	m_pTopLeftHorizontalSplitter->setStretchFactor(0, 1);
+	m_pTopLeftHorizontalSplitter->setStretchFactor(1, 1);
+	m_pTopLeftHorizontalSplitter->setSizes(splitterSizes);
+
+	m_pTopRightHorizontalSplitter->addWidget(m_pFreqGpuGraph->GetPlot());
+
+	m_pTopRightHorizontalSplitter->setCollapsible(0, false);
+	m_pTopRightHorizontalSplitter->setCollapsible(1, false);
+	m_pTopRightHorizontalSplitter->setStretchFactor(0, 1);
+	m_pTopRightHorizontalSplitter->setStretchFactor(1, 1);
+	m_pTopRightHorizontalSplitter->setSizes(splitterSizes);
+
+	pTopHorizontalSplitter->addWidget(m_pTopLeftHorizontalSplitter);
+	pTopHorizontalSplitter->addWidget(m_pTopRightHorizontalSplitter);
+
+	pTopHorizontalSplitter->setCollapsible(0, false);
+	pTopHorizontalSplitter->setCollapsible(1, false);
+
+	pVScrollingAreaLayout->addWidget(pTopHorizontalSplitter, 1);
+
+	addWidget(pScrollAreaWidget);
+
+	InitGraphs();
+
+}
+
+// ---------------------------------------------------------------------------
+void ppSummaryView::InitGraphsAreaForFamily17()
+{
+    // Create a scroll area for the top layer of the view
+	setLayout(new QVBoxLayout);
+	QWidget* pScrollAreaWidget = new QWidget(this);
+    QScrollArea* pScrollArea = new QScrollArea;
     pScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
-    QWidget* pScrollAreaWidget = new QWidget;
-    pScrollArea->setWidget(pScrollAreaWidget);
 
     // Create vertical layout for the scroll area:
-    QVBoxLayout* pVScrollingAreaLayout = new QVBoxLayout;
+    QVBoxLayout* pVScrollingAreaLayout = new QVBoxLayout(pScrollAreaWidget);
     pScrollAreaWidget->setLayout(pVScrollingAreaLayout);
+	pScrollArea->setWidget(pScrollAreaWidget);
+	pScrollArea->setWidgetResizable(true);
+
+	SetupGraphs();
 
     m_pSessionDurationLabel = new QLabel(PP_STR_SummaryDurationLabel);
     pVScrollingAreaLayout->addWidget(m_pSessionDurationLabel, 0, Qt::AlignLeft);
 
-    m_pFreqCpuGraph = new acGroupedBarsGraph();
-    m_pFreqGpuGraph = new acGroupedBarsGraph();
+	m_topLeftParent1 = new QWidget(this);
+	m_topLeftParent1->setLayout(new QVBoxLayout);
+	m_topLeftParent1->layout()->addWidget(m_pEnergyGraph->GetPlot());
+	m_topLeftParent1->setMinimumHeight(PP_SUMMARY_PLOT_MIN_HEIGHT);
+	pScrollAreaWidget->layout()->addWidget(m_topLeftParent1);
 
-    m_pFreqCpuGraph->SetGraphTitle(PP_STR_SummaryCPUFrequencyCaption);
-    m_pFreqGpuGraph->SetGraphTitle(PP_STR_SummaryGPUFrequencyCaption);
+	m_topRightParent1 = new QWidget(this);
+	m_topRightParent1->setLayout(new QVBoxLayout);
+	m_topRightParent1->layout()->addWidget(m_pPowerGraph->GetPlot());
+	m_topRightParent1->setMinimumHeight(PP_SUMMARY_PLOT_MIN_HEIGHT);
+	pScrollAreaWidget->layout()->addWidget(m_topRightParent1);
 
-    m_pFreqCpuGraph->GetPlot()->setMinimumSize(QSize(PP_SUMMARY_PLOT_MIN_WIDTH, PP_SUMMARY_PLOT_MIN_HEIGHT));
-    m_pFreqGpuGraph->GetPlot()->setMinimumSize(QSize(PP_SUMMARY_PLOT_MIN_WIDTH, PP_SUMMARY_PLOT_MIN_HEIGHT));
+	m_topLeftParent2 = new QWidget(this);
+	m_topLeftParent2->setLayout(new QVBoxLayout);
+	m_topLeftParent2->layout()->addWidget(m_pFreqCpuGraph->GetPlot());
+	m_topLeftParent2->setMinimumHeight(PP_SUMMARY_PLOT_MIN_HEIGHT + 40);
+	pScrollAreaWidget->layout()->addWidget(m_topLeftParent2);
 
-    // Set the graphs background color:
-    QColor graphsBGColor = Qt::black;
-    graphsBGColor.setAlpha(7);
-
-    m_pFreqCpuGraph->GetPlot()->xAxis->axisRect()->setBackground(graphsBGColor);
-    m_pFreqGpuGraph->GetPlot()->xAxis->axisRect()->setBackground(graphsBGColor);
-
-    acSplitter* pTopHorizontalSplitter = new acSplitter(Qt::Horizontal);
-
-    m_pTopLeftHorizontalSplitter = new acSplitter(Qt::Vertical);
-    m_pTopRightHorizontalSplitter = new acSplitter(Qt::Vertical);
-
-    // Connect the left splitter move signal (synchronize with the right one):
-    bool rc = connect(m_pTopLeftHorizontalSplitter, SIGNAL(splitterMoved(int, int)), this, SLOT(OnTopSplitterMoved(int, int)));
-    GT_ASSERT(rc);
-
-    // Connect the right splitter move signal (synchronize with the left one):
-    rc = connect(m_pTopRightHorizontalSplitter, SIGNAL(splitterMoved(int, int)), this, SLOT(OnTopSplitterMoved(int, int)));
-    GT_ASSERT(rc);
-
-    QList<int> splitterSizes;
-    splitterSizes << 1;
-    splitterSizes << 1;
-
-
-    // Create the graphs:
-    m_pPowerGraph = new acColoredBarsGraph();
-    m_pEnergyGraph = new acColoredBarsGraph();
-
-    // Set the captions for each of the graphs:
-    m_pPowerGraph->SetGraphTitle(PP_STR_SummaryAveragePowerCaption);
-    m_pEnergyGraph->SetGraphTitle(PP_STR_SummaryCumulativeEnergyCaption);
-
-    // Set the minimum height for the graphs:
-    m_pPowerGraph->GetPlot()->setMinimumSize(QSize(PP_SUMMARY_PLOT_MIN_WIDTH, PP_SUMMARY_PLOT_MIN_HEIGHT));
-    m_pEnergyGraph->GetPlot()->setMinimumSize(QSize(PP_SUMMARY_PLOT_MIN_WIDTH, PP_SUMMARY_PLOT_MIN_HEIGHT));
-
-    m_pPowerGraph->GetPlot()->xAxis->axisRect()->setBackground(graphsBGColor);
-    m_pEnergyGraph->GetPlot()->xAxis->axisRect()->setBackground(graphsBGColor);
-
-    m_pTopLeftHorizontalSplitter->addWidget(m_pEnergyGraph->GetPlot());
-    m_pTopRightHorizontalSplitter->addWidget(m_pPowerGraph->GetPlot());
-
-    m_pTopLeftHorizontalSplitter->addWidget(m_pFreqCpuGraph->GetPlot());
-
-    m_pTopLeftHorizontalSplitter->setCollapsible(0, false);
-    m_pTopLeftHorizontalSplitter->setCollapsible(1, false);
-    m_pTopLeftHorizontalSplitter->setStretchFactor(0, 1);
-    m_pTopLeftHorizontalSplitter->setStretchFactor(1, 1);
-    m_pTopLeftHorizontalSplitter->setSizes(splitterSizes);
-
-    m_pTopRightHorizontalSplitter->addWidget(m_pFreqGpuGraph->GetPlot());
-
-    m_pTopRightHorizontalSplitter->setCollapsible(0, false);
-    m_pTopRightHorizontalSplitter->setCollapsible(1, false);
-    m_pTopRightHorizontalSplitter->setStretchFactor(0, 1);
-    m_pTopRightHorizontalSplitter->setStretchFactor(1, 1);
-    m_pTopRightHorizontalSplitter->setSizes(splitterSizes);
-
-    pTopHorizontalSplitter->addWidget(m_pTopLeftHorizontalSplitter);
-    pTopHorizontalSplitter->addWidget(m_pTopRightHorizontalSplitter);
-
-    pTopHorizontalSplitter->setCollapsible(0, false);
-    pTopHorizontalSplitter->setCollapsible(1, false);
-
-    pVScrollingAreaLayout->addWidget(pTopHorizontalSplitter, 1);
-
-    addWidget(pScrollAreaWidget);
+	m_topRightParent2 = new QWidget(this);
+	m_topRightParent2->setLayout(new QVBoxLayout);
+	m_topRightParent2->layout()->addWidget(m_pFreqGpuGraph->GetPlot());
+	m_topRightParent1->setMinimumHeight(PP_SUMMARY_PLOT_MIN_HEIGHT + 40);
+	pScrollAreaWidget->layout()->addWidget(m_topRightParent2);
+	
+	addWidget(pScrollArea);
 
     InitGraphs();
 
+}
+
+void ppSummaryView::InitGraphsArea(CpuFamily family)
+{
+	switch (family)
+	{
+	case FAMILY17: 
+		InitGraphsAreaForFamily17();
+		break;
+	case OTHERS: 
+		InitGraphsAreaForOthers();
+		break;
+	default:
+		InitGraphsAreaForOthers();
+		break;
+	}
 }
 
 void ppSummaryView::InitGraphs()
@@ -433,6 +511,11 @@ void ppSummaryView::InitPowerGraphs()
                                 AF_STR_EmptyA, energyTitle, true);
         }
 
+		if (GetCpuFamily() == FAMILY17)
+		{
+			m_topLeftParent1->setVisible(shouldDisplayPowerGraphs);
+			m_topRightParent1->setVisible(shouldDisplayPowerGraphs);
+		}
         m_pPowerGraph->GetPlot()->setVisible(shouldDisplayPowerGraphs);
         m_pEnergyGraph->GetPlot()->setVisible(shouldDisplayPowerGraphs);
     }
@@ -564,6 +647,8 @@ void ppSummaryView::InitCpuGraph()
     else
     {
         m_pFreqCpuGraph->GetPlot()->setVisible(false);
+		if (GetCpuFamily() == FAMILY17)
+			m_topLeftParent2->setVisible(false);
     }
 }
 
@@ -598,6 +683,8 @@ void ppSummaryView::InitGpuGraph()
     else
     {
         m_pFreqGpuGraph->GetPlot()->setVisible(false);
+		if (GetCpuFamily() == FAMILY17)
+			m_topRightParent2->setVisible(false);
     }
 }
 
