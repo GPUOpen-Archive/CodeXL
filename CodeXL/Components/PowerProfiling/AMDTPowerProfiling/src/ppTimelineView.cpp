@@ -574,9 +574,9 @@ void ppTimeLineView::InitStackedGraph(ppDataUtils::GraphViewCategoryType categor
     m_pPowerPlot->SetShown(false, false);
     m_pPowerPlot->GetPlot()->EnableDragAndDrop(false);
 
-    m_pPowerPlot->GetPlot()->setContextMenuPolicy(Qt::CustomContextMenu);
-    bool rc = connect(m_pPowerPlot->GetPlot(), SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(OnContextMenuRequest(const QPoint&)));
-    GT_ASSERT(rc);
+    //m_pPowerPlot->GetPlot()->setContextMenuPolicy(Qt::CustomContextMenu);
+    //bool rc = connect(m_pPowerPlot->GetPlot(), SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(OnContextMenuRequest(const QPoint&)));
+    //GT_ASSERT(rc);
 
     m_pPowerStackedPlot = new ppMultiLnePowerStackedPlot(m_pSessionController);
 
@@ -591,9 +591,9 @@ void ppTimeLineView::InitStackedGraph(ppDataUtils::GraphViewCategoryType categor
     m_allRibbonsVec << m_pPowerStackedPlot;
 
     // connect the context menu
-    m_pPowerStackedPlot->GetPlot()->setContextMenuPolicy(Qt::CustomContextMenu);
-    rc = connect(m_pPowerStackedPlot->GetPlot(), SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(OnContextMenuRequest(const QPoint&)));
-    GT_ASSERT(rc);
+    //m_pPowerStackedPlot->GetPlot()->setContextMenuPolicy(Qt::CustomContextMenu);
+    //rc = connect(m_pPowerStackedPlot->GetPlot(), SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(OnContextMenuRequest(const QPoint&)));
+    //GT_ASSERT(rc);
 
 }
 
