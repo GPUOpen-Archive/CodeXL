@@ -1400,6 +1400,42 @@ void CpuProfileReport::ReportOverviewData(AMDTProfileSessionInfo& sessionInfo)
     }
 }
 
+void CpuProfileReport::ApplyCutoff(AMDTProfileDataVec& profileDataVec)
+{
+    float percentCutoff = 0.0;
+    float cumulativeCutoff = 0.0;
+    int countCutoff = 0;
+
+    gtUInt32 idx = m_sortEventIdx;
+
+    m_args.GetCutoffLimits(percentCutoff, cumulativeCutoff, countCutoff);
+
+    float currCumulativeCutoff = 0.0;
+    int currCount = 0;
+
+    for (const auto& aData : profileDataVec)
+    {
+        currCount++;
+        currCumulativeCutoff += static_cast<float>(aData.m_sampleValue.at(idx).m_sampleCountPercentage);
+
+        if (   (currCount < countCutoff)
+            || (aData.m_sampleValue.at(idx).m_sampleCountPercentage >= percentCutoff)
+            || (currCumulativeCutoff < cumulativeCutoff))
+        {
+            continue;
+        }
+        else
+        {
+            break;
+        }
+    }
+
+    if (static_cast<int>(profileDataVec.size()) > currCount)
+    {
+        profileDataVec.erase(profileDataVec.begin() + currCount, profileDataVec.end());
+    }
+}
+
 void CpuProfileReport::ReportProcessData()
 {
     if (!IsReportAggregateByProcess() && !IsReportCallGraph())
@@ -1413,10 +1449,12 @@ void CpuProfileReport::ReportProcessData()
     AMDTProfileDataVec processProfileData;
     gtUInt32 idx = m_sortEventIdx;
     m_profileDbReader.GetProcessProfileData(AMDT_PROFILE_ALL_PROCESSES, AMDT_PROFILE_ALL_MODULES, processProfileData);
+    
     std::sort(processProfileData.begin(), processProfileData.end(),
         [idx](AMDTProfileData const& a, AMDTProfileData const& b) { return a.m_sampleValue.at(idx).m_sampleCount > b.m_sampleValue.at(idx).m_sampleCount; });
+    
+    ApplyCutoff(processProfileData);
 
-    // TBD - just print the top 5 processes
     for (const auto& proc : processProfileData)
     {
         AMDTProcessId pid = static_cast<AMDTProcessId>(proc.m_id);
@@ -1449,6 +1487,8 @@ void CpuProfileReport::ReportProcessData()
             std::sort(moduleProfileData.begin(), moduleProfileData.end(),
                 [idx](AMDTProfileData const& a, AMDTProfileData const& b) { return a.m_sampleValue.at(idx).m_sampleCount > b.m_sampleValue.at(idx).m_sampleCount; });
 
+            ApplyCutoff(moduleProfileData);
+
             // MODULE section Hdrs
             sectionHdrs.clear();
             sectionHdrs.push_back(MODULE_SUMMARY_SECTION_HDR);
@@ -1477,6 +1517,8 @@ void CpuProfileReport::ReportProcessData()
             m_profileDbReader.GetFunctionProfileData(static_cast<AMDTProcessId>(proc.m_id), AMDT_PROFILE_ALL_MODULES, functionProfileData);
             std::sort(functionProfileData.begin(), functionProfileData.end(),
                 [idx](AMDTProfileData const& a, AMDTProfileData const& b) { return a.m_sampleValue.at(idx).m_sampleCount > b.m_sampleValue.at(idx).m_sampleCount; });
+
+            ApplyCutoff(functionProfileData);
 
             sectionHdrs.clear();
             sectionHdrs.push_back(FUNCTION_SUMMARY_SECTION_HDR);

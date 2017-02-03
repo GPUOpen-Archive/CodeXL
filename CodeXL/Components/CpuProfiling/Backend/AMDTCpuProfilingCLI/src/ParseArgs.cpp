@@ -308,7 +308,7 @@ bool ParseArgs::InitializeArgs(int nbrArgs, wchar_t* args[])
     bool printCSSWarning = true;
     gtSet<gtUInt32> coreIdUniqueSet;
 
-    while ((opt = getOption(nbrArgs, args, "C:D:E:F:GIL:NOPR:S:T:V:X:abc:d:e:fg:hi:m:o:p:s:vw:")) != -1)
+    while ((opt = getOption(nbrArgs, args, "C:D:E:F:GIL:NOPR:S:T:V:X:abc:d:e:fg:hi:l:m:o:p:s:vw:")) != -1)
     {
         switch (opt)
         {
@@ -372,34 +372,32 @@ bool ParseArgs::InitializeArgs(int nbrArgs, wchar_t* args[])
                 break;
 
             case 'L':
-                // Enable logging debug statements
-                tmp = gtString(optArg);
-
-                if (tmp.isIntegerNumber())
+                // REPORT Option - cutoff limits
                 {
-                    tmp.toIntNumber(m_debugLogLevel);
+                    tmp = gtString(optArg);
+                    gtStringTokenizer tokens(tmp, L":");
+                    gtString value;
 
-                    if (m_debugLogLevel == 9)
+                    if (tokens.getNextToken(value) && value.toIntNumber(tmpNbr))
                     {
-                        m_printSampleCount = true;
-                        m_debugLogLevel = 0;
-                    }
-                    else
-                    {
-                        // check if -L is non negative
-                        if (m_debugLogLevel < OS_DEBUG_LOG_ERROR || m_debugLogLevel > OS_DEBUG_LOG_EXTENSIVE)
+                        m_percentCutoff = static_cast<float>(tmpNbr);
+
+                        if (tokens.getNextToken(value))
                         {
-                            fprintf(stderr, "Invalid debug log level(%d) specified with option(-L), setting this to default value(0).\n", m_debugLogLevel);
-                            m_debugLogLevel = 0; // set to default
+                            tmpNbr = 0;
+
+                            if (value.toIntNumber(tmpNbr))
+                            {
+                                m_cumulativeCutoff = static_cast<float>(tmpNbr);
+                            }
+
+                            if (tokens.getNextToken(value) && value.toIntNumber(tmpNbr))
+                            {
+                                m_minCount = tmpNbr;
+                            }
                         }
                     }
                 }
-                else
-                {
-                    fprintf(stderr, "Invalid debug log level(%s) is specified with option(-L), setting this to default value(0).\n", tmp.asASCIICharArray());
-                    m_debugLogLevel = 0; // set to default
-                }
-
                 break;
 
             case 'N':
@@ -758,6 +756,37 @@ bool ParseArgs::InitializeArgs(int nbrArgs, wchar_t* args[])
             case 'i':
                 // REPORT Option - input file
                 m_inputFile = gtString(optArg);
+                break;
+
+            case 'l':
+                // Enable logging debug statements
+                tmp = gtString(optArg);
+
+                if (tmp.isIntegerNumber())
+                {
+                    tmp.toIntNumber(m_debugLogLevel);
+
+                    if (m_debugLogLevel == 9)
+                    {
+                        m_printSampleCount = true;
+                        m_debugLogLevel = 0;
+                    }
+                    else
+                    {
+                        // check if -L is non negative
+                        if (m_debugLogLevel < OS_DEBUG_LOG_ERROR || m_debugLogLevel > OS_DEBUG_LOG_EXTENSIVE)
+                        {
+                            fprintf(stderr, "Invalid debug log level(%d) specified with option(-L), setting this to default value(0).\n", m_debugLogLevel);
+                            m_debugLogLevel = 0; // set to default
+                        }
+                    }
+                }
+                else
+                {
+                    fprintf(stderr, "Invalid debug log level(%s) is specified with option(-L), setting this to default value(0).\n", tmp.asASCIICharArray());
+                    m_debugLogLevel = 0; // set to default
+                }
+
                 break;
 
             case 'm':

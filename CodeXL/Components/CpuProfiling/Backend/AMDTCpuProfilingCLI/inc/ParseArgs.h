@@ -26,6 +26,10 @@
 #include <AMDTOSWrappers/Include/osDebugLog.h>
 #include <AMDTCommonHeaders/AMDTProfileCoreMaskInfo.h>
 
+#define CP_FUNCTION_PERCENT_CUTOFF              2
+#define CP_FUNCTION_CUMULATIVE_CUTOFF           80
+#define CP_FUNCTION_MIN_COUNT                   10
+
 //
 // codexl-cli  // print usage & exit
 // codexl-cli -v // print version & exit
@@ -104,6 +108,12 @@ public:
     gtString GetSymbolCachePath() const { return m_cachePath; }
 
     int GetSortEventIndex() const { return m_sortEventIndex; }
+    void GetCutoffLimits(float& percentCutoff, float& cumulativeCutoff, int& minCout) const
+    { 
+        percentCutoff = m_percentCutoff;
+        cumulativeCutoff = m_cumulativeCutoff;
+        minCout = m_minCount;
+    }
 
     bool IsIgnoreSystemModules() const { return m_ignoreSystemModules; }
     bool IsReportByNuma() const { return m_reportByNuma; }
@@ -135,6 +145,10 @@ private:
     int       m_tbpSamplingInterval = 0;  // TBP sampling interval in milli-seconds
     int       m_profileDuration = 0;      // Profile Duration in Seconds
     int       m_startDelay = -1;          // start delay duration in Seconds
+
+    float     m_percentCutoff = CP_FUNCTION_PERCENT_CUTOFF;
+    float     m_cumulativeCutoff = CP_FUNCTION_CUMULATIVE_CUTOFF;
+    int       m_minCount = CP_FUNCTION_MIN_COUNT;
 
     int       m_unwindInterval = CP_CSS_DEFAULT_UNWIND_INTERVAL;
     int       m_unwindDepth = CP_CSS_DEFAULT_UNWIND_DEPTH;

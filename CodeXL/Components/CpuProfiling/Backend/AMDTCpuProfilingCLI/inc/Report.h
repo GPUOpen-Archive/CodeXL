@@ -200,6 +200,7 @@ private:
     bool IsReportCallGraph() const { return m_isReportCallGraph; }
     bool IsReportImix() const { return m_isReportImix; }
 
+    void ApplyCutoff(AMDTProfileDataVec& profileDataVec);
     void ReportSampleCount(bool sepByCore);
     void ReportExecution(AMDTProfileSessionInfo& sessionInfo);
     void ReportProfileDetails(AMDTProfileSessionInfo& sessionInfo);

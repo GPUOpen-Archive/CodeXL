@@ -188,14 +188,10 @@ int PrintCollectOptions()
     fprintf(stderr, "                           Start profiling after the specified duration. If 'n'\n");
     fprintf(stderr, "                           is 0, then wait indefinitely. Used for profile\n");
     fprintf(stderr, "                           control.\n");
-    fprintf(stderr, "\n    -v                     Print version string.\n");
+
     fprintf(stderr, "\n    -w                     Specify the working directory.\n");
     fprintf(stderr, "                           Default will be the path of the launched\n");
     fprintf(stderr, "                           application.\n");
-    fprintf(stderr, "\n    -h                     Displays this help information.\n");
-
-    fprintf(stderr, "\n    -L <n>                 Specify debug log messaging level. Valid values\n");
-    fprintf(stderr, "                           are 1 to 3. 1 - INFO, 2 - DEBUG, 3 - EXTENSIVE\n");
 
     return 0;
 }
@@ -248,12 +244,23 @@ int PrintReportOptions()
 
     fprintf(stderr, "\n    -c <core mask>         Core Mask for which samples to be reported.\n");
     fprintf(stderr, "                           By default report samples collected from all the cores.\n");
-
-    fprintf(stderr, "\n    -L <n1,n2,n3>          Cutoff to limit the process/modules/functions reported.\n");
-    fprintf(stderr, "                           Percent-cutoff, Cumulative-cutoff, Minimum-count.\n");
 #endif //0
 
-    fprintf(stderr, "\n    -L <n>                 Specify debug log messaging level. Valid values\n");
+    fprintf(stderr, "\n    -L <n1:n2:n3>          Cutoff to limit the number of process, modules and\n");
+    fprintf(stderr, "                           functions reported. n1 is percent_cutoff, n2 is\n");
+    fprintf(stderr, "                           cumulative_percent_cutoff, n3 is minimum_count.\n");
+    fprintf(stderr, "                           Default values are 2:80:10\n");
+
+    return 0;
+}
+
+int PrintCommonOptions()
+{
+    // REPORT Options
+    fprintf(stderr, "\nCommon Options:");
+    fprintf(stderr, "\n    -h                     Displays this help information.\n");
+    fprintf(stderr, "\n    -v                     Print version string.\n");
+    fprintf(stderr, "\n    -l <n>                 Specify debug log messaging level. Valid values\n");
     fprintf(stderr, "                           are 1 to 3. 1 - INFO, 2 - DEBUG, 3 - EXTENSIVE\n");
 
     return 0;
@@ -324,6 +331,8 @@ int PrintHelp()
     PrintCollectOptions();
 
     PrintReportOptions();
+
+    PrintCommonOptions();
 
     PrintExamples();
 
