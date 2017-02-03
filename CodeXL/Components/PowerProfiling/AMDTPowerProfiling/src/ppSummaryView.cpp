@@ -287,6 +287,14 @@ void ppSummaryView::SetupGraphs()
     m_pFreqCpuGraph->GetPlot()->xAxis->axisRect()->setBackground(graphsBGColor);
     m_pFreqGpuGraph->GetPlot()->xAxis->axisRect()->setBackground(graphsBGColor);
 
+    // Add zooming and dragging functionality
+    m_pFreqCpuGraph->GetPlot()->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom);
+    m_pFreqGpuGraph->GetPlot()->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom);
+    m_pFreqGpuGraph->GetPlot()->axisRect()->setRangeDragAxes(m_pFreqGpuGraph->GetPlot()->xAxis, 0);
+    m_pFreqGpuGraph->GetPlot()->axisRect()->setRangeZoomAxes(m_pFreqGpuGraph->GetPlot()->xAxis, 0);
+    m_pFreqCpuGraph->GetPlot()->axisRect()->setRangeDragAxes(m_pFreqCpuGraph->GetPlot()->xAxis, 0);
+    m_pFreqCpuGraph->GetPlot()->axisRect()->setRangeZoomAxes(m_pFreqCpuGraph->GetPlot()->xAxis, 0);
+
     // Create the graphs:
     m_pPowerGraph = new acColoredBarsGraph();
     m_pEnergyGraph = new acColoredBarsGraph();
