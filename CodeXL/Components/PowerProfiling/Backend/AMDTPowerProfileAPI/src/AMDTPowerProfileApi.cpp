@@ -1529,7 +1529,7 @@ AMDTResult AMDTPwrStartProfiling()
         }
     }
 
-    if (AMDT_STATUS_OK == ret)
+    if ((AMDT_STATUS_OK == ret) && (PROFILE_TYPE_PROCESS_PROFILING != g_profileType))
     {
         PwrSupportedCounterMap* pCounters = PwrGetSupportedCounterList();
         auto foundActive = std::find_if(pCounters->begin(), pCounters->end(),

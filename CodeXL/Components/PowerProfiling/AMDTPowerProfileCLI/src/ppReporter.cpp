@@ -36,8 +36,8 @@
 #define PROCESS_INFO_TXT_FORMAT        "%d\t%d\t" U_FORMAT "\t%3.2f\t\t%3.2f\t\t%-45.45s\t%s\n"
 #define PROCESS_INFO_CSV_FORMAT        "%d,%d," U_FORMAT ",%3.2f,%3.2f,%s,%s\n"
 
-#define MODULE_INFO_TXT_HDR_FORMAT     "\nSNo\tPID\tProcess Name\t\t\t\t\tProcess Path\t\t\t\t\t\t\t\tSamples\tKernel\tPower(Joules)\tPower(%)\tLoad Addr\t\tsize\t\t\tModule Name\t\t\t\t\tModule Path\n\n"
-#define MODULE_INFO_CSV_HDR_FORMAT     "\nSNo,PID,Process Name, Process Path, Samples,Kernel,Power(Joules),Power(%),Load Addr,size,Module Name,ModulePath\n"
+#define MODULE_INFO_TXT_HDR_FORMAT     "\nSNo\tPID\tProcess Name\t\t\t\t\tProcess Path\t\t\t\t\t\t\t\tSamples\tKernel\tPower(Milli Joules)\tPower(%)\tLoad Addr\t\tsize\t\t\tModule Name\t\t\t\t\tModule Path\n\n"
+#define MODULE_INFO_CSV_HDR_FORMAT     "\nSNo,PID,Process Name, Process Path, Samples,Kernel,Power(Milli Joules),Power(%),Load Addr,size,Module Name,ModulePath\n"
 #define MODULE_INFO_TXT_FORMAT         "%d\t%d\t%-45.45s\t%-65.85s\t" U_FORMAT "\t%d\t%3.2f\t\t%3.2f\t\t0x%-8.8" H_FORMAT "\t\t%-1.8" D_FORMAT "\t\t%-45.45s\t%s\n"
 
 #define MODULE_INFO_CSV_FORMAT         "%d,%d,%s,%s," U_FORMAT ",%d,%3.2f,%3.2f,0x%" H_FORMAT ",%" D_FORMAT ",%s,%s\n"
@@ -484,7 +484,7 @@ void ppReporterText::WriteProcessData(AMDTUInt32 recCnt, AMDTPwrProcessInfo*& pI
     {
         recInfo = &pInfo[cnt];
 
-        if (nullptr != recInfo)
+        if ((nullptr != recInfo) && (recInfo->m_power >= 1.0))
         {
             m_dataStr.clear();
 
@@ -525,7 +525,7 @@ void ppReporterText::WriteModuleData(AMDTUInt32 recCnt, AMDTPwrModuleData*& pInf
     {
         recInfo = &pInfo[cnt];
 
-        if (nullptr != recInfo)
+        if ((nullptr != recInfo) && (recInfo->m_power >= 1.0))
         {
             m_dataStr.clear();
             sprintf(m_pDataStr, MODULE_INFO_TXT_FORMAT,
@@ -826,7 +826,7 @@ void ppReporterCsv::WriteProcessData(AMDTUInt32 recCnt, AMDTPwrProcessInfo*& pIn
     {
         recInfo = &pInfo[cnt];
 
-        if (nullptr != recInfo)
+        if ((nullptr != recInfo) && (recInfo->m_power >= 1.0))
         {
             m_dataStr.clear();
 
@@ -865,7 +865,7 @@ void ppReporterCsv::WriteModuleData(AMDTUInt32 recCnt, AMDTPwrModuleData*& pInfo
     {
         recInfo = &pInfo[cnt];
 
-        if (nullptr != recInfo)
+        if ((nullptr != recInfo) && (recInfo->m_power >= 1.0))
         {
             m_dataStr.clear();
             sprintf(m_pDataStr,  MODULE_INFO_CSV_FORMAT,
