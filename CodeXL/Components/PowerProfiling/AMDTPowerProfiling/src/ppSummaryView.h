@@ -73,11 +73,11 @@ private slots:
     void OnTopSplitterMoved(int index, int position);
 
 private:
-	enum CpuFamily : unsigned
-	{
-		FAMILY17 = 0,
-		OTHERS
-	};
+    enum CpuFamily : unsigned
+    {
+        CPU_FAMILY_17 = 0,
+        CPU_FAMILY_OTHERS
+    };
 
     enum PowerGraphMeasurementUnit : unsigned long
     {
@@ -88,16 +88,16 @@ private:
         MEASUREMENTUNIT_TERAJOULES = 4
     };
 
-	CpuFamily GetCpuFamily() const;
+    CpuFamily GetCpuFamily() const;
 
     /// inits the graph scrolled area and its widgets
     void InitGraphsArea(CpuFamily);
 
-	void InitGraphsAreaForOthers();
+    void InitGraphsAreaForOthers();
 
-	void InitGraphsAreaForFamily17();
+    void InitGraphsAreaForFamily17();
 
-	void SetupGraphs();
+    void SetupGraphs();
 
     /// calls to all graphs init functions
     void InitGraphs();
@@ -187,9 +187,9 @@ private:
     acSplitter* m_pTopRightHorizontalSplitter;
     acSplitter* m_pTopLeftHorizontalSplitter;
 
-	/// Scroll views for graphs
-	QWidget *m_topLeftParent1, *m_topLeftParent2;
-	QWidget *m_topRightParent1, *m_topRightParent2;
+    /// Scroll views for graphs
+    QWidget *m_topLeftParent1, *m_topLeftParent2;
+    QWidget *m_topRightParent1, *m_topRightParent2;
 
     /// last event data
     gtMap<int, double> m_lastEventPowerGrpahData;       /// last cumulative power graph event data
