@@ -511,7 +511,7 @@ void ppSummaryView::InitPowerGraphs()
                                 AF_STR_EmptyA, energyTitle, true);
         }
 
-        if (GetCpuFamily() == FAMILY17)
+        if (GetCpuFamily() == CPU_FAMILY_17)
         {
             m_topLeftParent1->setVisible(shouldDisplayPowerGraphs);
             m_topRightParent1->setVisible(shouldDisplayPowerGraphs);
@@ -647,7 +647,7 @@ void ppSummaryView::InitCpuGraph()
     else
     {
         m_pFreqCpuGraph->GetPlot()->setVisible(false);
-        if (GetCpuFamily() == FAMILY17)
+        if (GetCpuFamily() == CPU_FAMILY_17)
             m_topLeftParent2->setVisible(false);
     }
 }
@@ -683,7 +683,7 @@ void ppSummaryView::InitGpuGraph()
     else
     {
         m_pFreqGpuGraph->GetPlot()->setVisible(false);
-        if (GetCpuFamily() == FAMILY17)
+        if (GetCpuFamily() == CPU_FAMILY_17)
             m_topRightParent2->setVisible(false);
     }
 }
