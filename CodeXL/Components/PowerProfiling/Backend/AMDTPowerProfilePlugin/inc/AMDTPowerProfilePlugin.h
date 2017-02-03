@@ -1,5 +1,5 @@
 //==================================================================================
-// Copyright (c) 2016 , Advanced Micro Devices, Inc.  All rights reserved.
+// Copyright (c) 2017 , Advanced Micro Devices, Inc.  All rights reserved.
 //
 /// \author AMD Developer Tools Team
 /// \file AMDTPowerProfilePlugin.h
@@ -9,7 +9,6 @@
 #ifndef _AMDTPOWERPROFILEPLUGIN_H_
 #define _AMDTPOWERPROFILEPLUGIN_H_
 
-/// Begin AMDTActivityLogger block
 /// Nested calls to amdtBeginMarker will result in markers showing in a hierarchical way.
 /// \param szMarkerName Marker name
 /// \param szGroupName Group name, Optional, Pass in NULL to use default group name
