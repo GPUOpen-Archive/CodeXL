@@ -56,8 +56,6 @@ SessionSourceCodeView::SessionSourceCodeView(QWidget* pParent,
 {
     m_exportString = CP_sourceCodeViewExportString;
 
-    afGlobalVariablesManager::instance().SetShouldAlertMissingSourceFile(true);
-
     // Create the tree model object:
     m_pTreeViewModel = new SourceCodeTreeModel(m_sessionDir, m_pProfDataRdr, m_pDisplayFilter);
 }

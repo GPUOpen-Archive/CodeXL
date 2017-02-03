@@ -406,7 +406,7 @@ bool SourceCodeTreeModel::BuildDisassemblyTree()
         retVal = m_pProfDataRdr->GetFunctionSourceAndDisasmInfo(m_funcId, srcFilePath, srcInfoVec);
     }
 
-    if (retVal == CXL_DATAACCESS_SUCCESS)
+    if (retVal == CXL_DATAACCESS_SUCCESS || retVal == CXL_DATAACCESS_WARN_SRC_INFO_NOTAVAILABLE)
     {
         // Fetch aggregated samples for each counter id
         AMDTSampleValueVec aggrSampleValueVec;

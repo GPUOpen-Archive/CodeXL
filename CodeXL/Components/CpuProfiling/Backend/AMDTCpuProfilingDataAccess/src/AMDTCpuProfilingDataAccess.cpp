@@ -2370,7 +2370,7 @@ public:
             AMDTProfileFunctionData* pCurrFunctionData = &functionData;
             retVal = GetFunctionSourceAndDisasmInfo__(funcId, srcFilePath, srcInfoVec, pCurrFunctionData);
 
-            if (CXL_DATAACCESS_SUCCESS == retVal)
+            if (CXL_DATAACCESS_WARN_SRC_INFO_NOTAVAILABLE == retVal || CXL_DATAACCESS_SUCCESS == retVal)
             {
                 AMDTProfileSourceLineDataVec& srcLineDataVec = functionData.m_srcLineDataList;
                 AMDTProfileInstructionDataVec& instDataVec = functionData.m_instDataList;
