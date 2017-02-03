@@ -481,6 +481,7 @@ private:
     bool WriteThreadInfoIntoDB(PidProcessMap& processMap);
     bool WriteModuleInfoIntoDB(NameModuleMap& moduleMap);
     bool WriteModuleInstanceInfoIntoDB(NameModuleMap& moduleMap, ModInstanceMap& modInstanceMap);
+    bool WriteJavaInlineModuleInstanceInfoIntoDB(const NameModuleMap& moduleMap);
     bool WriteFunctionInfoIntoDB(NameModuleMap& moduleMap);
     bool WriteSampleProfileDataIntoDB(const NameModuleMap& moduleMap);
     bool WriteCallgraphProfileDataIntoDB(const NameModuleMap& modMap);

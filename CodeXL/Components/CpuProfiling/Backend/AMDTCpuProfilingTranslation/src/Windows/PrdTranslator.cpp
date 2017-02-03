@@ -2180,7 +2180,7 @@ bool PrdTranslator::WriteModuleInstanceInfoIntoDB(NameModuleMap& moduleMap, ModI
 
                 if (moduleMap.end() != it)
                 {
-                    // Baskar: Some modules may only have the deep samples in CSS.
+                    // Some modules may only have the deep samples in CSS.
                     // We need to store details about all the load-modules of a process.
                     moduleId = it->second.m_moduleId;
                     pModuleInstanceList->emplace_back(modIt.first, moduleId, std::get<1>(modIt.second), std::get<2>(modIt.second));
@@ -2197,6 +2197,55 @@ bool PrdTranslator::WriteModuleInstanceInfoIntoDB(NameModuleMap& moduleMap, ModI
                     gtUInt64 modLoadAddr = std::get<1>(it);
 
                     pModuleInstanceList->emplace_back(instanceId, moduleId, pid, modLoadAddr);
+                }
+            }
+
+            ret = pModuleInstanceList->size() > 0 ? true : false;
+            m_dbWriter->Push({ TRANSLATED_DATA_TYPE_MODINSTANCE_INFO, (void*)pModuleInstanceList });
+            pModuleInstanceList = nullptr;
+        }
+    }
+
+    return ret;
+}
+
+bool PrdTranslator::WriteJavaInlineModuleInstanceInfoIntoDB(const NameModuleMap& moduleMap)
+{
+    bool ret = false;
+
+    if (m_dbWriter)
+    {
+        // Populate Java module instance info
+        // modInstanceInfoMap : Map of < instanceId, tuple of <modName, pid, loadAddr> >
+        CPAModuleInstanceList *pModuleInstanceList = new (std::nothrow) CPAModuleInstanceList;
+
+        if (nullptr != pModuleInstanceList)
+        {
+            gtUInt32 instanceCount = 0;
+
+            for (const auto& module : moduleMap)
+            {
+                if (module.second.m_modType == CpuProfileModule::JAVAMODULE)
+                {
+                    instanceCount += module.second.m_moduleInstanceInfo.size();
+                }
+            }
+
+            pModuleInstanceList->reserve(instanceCount);
+
+            for (const auto& module : moduleMap)
+            {
+                if (module.second.m_modType == CpuProfileModule::JAVAMODULE)
+                {
+                    for (const auto& it : module.second.m_moduleInstanceInfo)
+                    {
+                        gtUInt32 moduleId = module.second.m_moduleId;
+                        gtUInt64 pid = std::get<0>(it);
+                        gtUInt64 modLoadAddr = std::get<1>(it);
+                        gtUInt32 instanceId = std::get<2>(it);
+
+                        pModuleInstanceList->emplace_back(instanceId, moduleId, pid, modLoadAddr);
+                    }
                 }
             }
 
@@ -3699,6 +3748,9 @@ HRESULT PrdTranslator::TranslateDataPrdFile(const osFilePath& proFile,
 
     if (m_dbWriter)
     {
+        // Java inline instance info is update in WriteProfile
+        WriteJavaInlineModuleInstanceInfoIntoDB(*modMap);
+
         // This moduleMap is aggregated
         WriteSampleProfileDataIntoDB(*modMap);
         WriteCallgraphProfileDataIntoDB(*modMap);
@@ -5223,6 +5275,11 @@ bool PrdTranslator::GetTimerInterval(gtUInt64* resolution)
 void PrdTranslator::addJavaInlinedMethods(CpuProfileModule&  mod,
     gtVector<std::tuple<gtUInt32, gtUInt32, gtUInt32, gtUInt64, gtUInt64, gtUInt64>>& inlinedJitInfo)
 {
+    if (CpuProfileModule::JAVAMODULE != mod.getModType())
+    {
+        return;
+    }
+
     AddrFunctionMultMap inlinedFuncMap;
     gtUInt32 nextFuncId = 0;
 
@@ -5242,24 +5299,22 @@ void PrdTranslator::addJavaInlinedMethods(CpuProfileModule&  mod,
     //  if the ip falls in Inlined method
     //  create a new CA_Function for this IP
 
-    if (CpuProfileModule::JAVAMODULE != mod.getModType())
-    {
-        return;
-    }
-
     AddrFunctionMultMap::iterator it = mod.getBeginFunction();
     AddrFunctionMultMap::iterator itEnd = mod.getEndFunction();
 
     for (; it != itEnd; ++it)
     {
-        const CpuProfileFunction& tmpFunction = (*it).second;
+        const CpuProfileFunction& tmpFunction = it->second;
+
         // Construct the JNC file path and Open the JNCfile
+
+        osFilePath tmpPath(m_dataFile);
+
         wchar_t jncName[OS_MAX_PATH] = { L'\0' };
-        gtString path(m_dataFile);
-        osFilePath tmpPath(path);
         swprintf(jncName, OS_MAX_PATH, L"%s\\%s",
                  tmpPath.fileDirectoryAsString().asCharArray(),
                  tmpFunction.getJncFileName().asCharArray());
+
         JavaJncReader javaJncReader;
 
         // Open the JNC file
@@ -5272,7 +5327,7 @@ void PrdTranslator::addJavaInlinedMethods(CpuProfileModule&  mod,
         JavaInlineMap* jilMap = javaJncReader.GetInlineMap();
 
         // If there is no inlined functions in this JNC file, go to next function
-        if (jilMap->begin() == jilMap->end())
+        if (jilMap == nullptr || jilMap->empty())
         {
             javaJncReader.Close();
             continue;
@@ -5288,19 +5343,26 @@ void PrdTranslator::addJavaInlinedMethods(CpuProfileModule&  mod,
         }
 
         javaJncReader.Close();
-    } // AddrFunctionMultMap entries
-
-    // Now add the inlined functions to CpuProfileModule
-    AddrFunctionMultMap::const_iterator inlineIt = inlinedFuncMap.begin();
-    AddrFunctionMultMap::const_iterator inlineItEnd = inlinedFuncMap.end();
-
-    for (; inlineIt != inlineItEnd; inlineIt++)
-    {
-        mod.recordFunction(inlineIt->first, &(inlineIt->second));
     }
 
-    return;
-} // addJavaInlinedMethods
+    // Add the inlined functions to CpuProfileModule
+    for (const auto& iter : inlinedFuncMap)
+    {
+        mod.recordFunction(iter.first, &(iter.second));
+    }
+
+    // Add the inlined functions module instance info to CpuProfileModule
+    for (const auto& iter : inlinedJitInfo)
+    {
+        //<pid,loadAddr,instanceId>
+        //gtVector<std::tuple<gtUInt64, gtUInt64, gtUInt32>> m_moduleInstanceInfo;
+        gtUInt64 pid = std::get<3>(iter);
+        gtUInt64 loadAddr = std::get<4>(iter);
+        gtUInt32 instanceId = std::get<2>(iter);
+
+        mod.m_moduleInstanceInfo.emplace_back(pid, loadAddr, instanceId);
+    }
+}
 
 
 bool
@@ -5347,8 +5409,7 @@ PrdTranslator::CheckForJavaInlinedFunction(
             for (; ilmit != ilmitEnd && (false == foundInline); ilmit++)
             {
                 // DEBUG:
-                //fprintf(pPRDDebugFP, "     methodId = 0x%lx (key=0x%lx)\n",
-                //        ilmit->second.methodId, ilmit->first);
+                //fprintf(pPRDDebugFP, "     methodId = 0x%lx (key=0x%lx)\n", ilmit->second.methodId, ilmit->first);
                 //fprintf(pPRDDebugFP, "      lineNum = %d\n", ilmit->second.lineNum);
                 //fprintf(pPRDDebugFP, "   sourceFile = %s\n", ilmit->second.sourceFile.c_str());
                 //fprintf(pPRDDebugFP, "      symName = %s\n", ilmit->second.symName.c_str());
@@ -5369,15 +5430,13 @@ PrdTranslator::CheckForJavaInlinedFunction(
                         funcAddr = stAddr;
                     }
 
-                    //fprintf(pPRDDebugFP, " IP: 0x%lx Address range 0x%lx - 0x%lx\n",
-                    //          ip, stAddr, stopAddr);
+                    //fprintf(pPRDDebugFP, " IP: 0x%lx Address range 0x%lx - 0x%lx\n", ip, stAddr, stopAddr);
 
                     if ((ip >= stAddr) && (ip <= stopAddr))
                     {
                         foundInline = true;
 
-                        //fprintf(pPRDDebugFP, " Found Inlined Method for IP(0x%lx) - range 0x%lx - 0x%lx\n",
-                        //   ip, ar.startAddr, ar.stopAddr);
+                        //fprintf(pPRDDebugFP, " Found Inlined Method for IP(0x%lx) - range 0x%lx - 0x%lx\n", ip, ar.startAddr, ar.stopAddr);
                         //fprintf(pPRDDebugFP, "   sourceFile = %s\n", ilmit->second.sourceFile.c_str());
                         //fprintf(pPRDDebugFP, "      symName = %s\n", ilmit->second.symName.c_str());
 
@@ -5396,7 +5455,7 @@ PrdTranslator::CheckForJavaInlinedFunction(
                         if (fit == inlinedFuncMap.end())
                         {
                             CpuProfileFunction func1(javaFuncName, funcAddr, static_cast<gtUInt32>((stopAddr - funcAddr)), func.getJncFileName(), javaSrcFileName);
-                            func1.m_functionId = ++nextFuncId;
+                            func1.m_functionId = nextFuncId++;
                             fit = inlinedFuncMap.insert(AddrFunctionMultMap::value_type(funcAddr, func1));
                             fit->second.insertSample(aAptKey, aSample);
 
@@ -5429,13 +5488,14 @@ PrdTranslator::CheckForJavaInlinedFunction(
                     //     fprintf(pPRDDebugFP, " No Inlined Method for IP(0x%lx) - funcAddr(0x%lx), range 0x%lx - 0x%lx\n",
                     //         ip, funcAddr, ar.startAddr, ar.stopAddr);
                     //}
+
                     if (foundInline)
                     {
                         break;
                     }
-                } // address range in a inlined methos
-            } // JNCInlineMap entries
-        } // java inline map entries in a CpuProfileFunction
+                }
+            }
+        }
 
         AptAggregatedSampleMap::iterator tmpait = ait;
         tmpait++;
@@ -5446,7 +5506,7 @@ PrdTranslator::CheckForJavaInlinedFunction(
         }
 
         ait = tmpait;
-    } // AptAggregatedSampleMap entries
+    }
 
     return true;
 }
@@ -5523,8 +5583,7 @@ PrdTranslator::CheckForNestedJavaInlinedFunction(
             for (; ilmit != ilmitEnd && (false == foundInline); ilmit++)
             {
                 // DEBUG:
-                //fprintf(pPRDDebugFP, "     methodId = 0x%lx (key=0x%lx)\n",
-                //        ilmit->second.methodId, ilmit->first);
+                //fprintf(pPRDDebugFP, "     methodId = 0x%lx (key=0x%lx)\n", ilmit->second.methodId, ilmit->first);
                 //fprintf(pPRDDebugFP, "      lineNum = %d\n", ilmit->second.lineNum);
                 //fprintf(pPRDDebugFP, "   sourceFile = %s\n", ilmit->second.sourceFile.c_str());
                 //fprintf(pPRDDebugFP, "      symName = %s\n", ilmit->second.symName.c_str());
@@ -5545,8 +5604,7 @@ PrdTranslator::CheckForNestedJavaInlinedFunction(
                         funcAddr = stAddr;
                     }
 
-                    //fprintf(pPRDDebugFP, " IP: 0x%lx Address range 0x%lx - 0x%lx\n",
-                    //          ip, stAddr, stopAddr);
+                    //fprintf(pPRDDebugFP, " IP: 0x%lx Address range 0x%lx - 0x%lx\n", ip, stAddr, stopAddr);
 
                     if ((ip >= stAddr) && (ip <= stopAddr))
                     {
@@ -5575,7 +5633,7 @@ PrdTranslator::CheckForNestedJavaInlinedFunction(
                         if (fit == inlinedFuncMap.end())
                         {
                             CpuProfileFunction func1(javaFuncName, funcAddr, static_cast<gtUInt32>((stopAddr - funcAddr)), func.getJncFileName(), javaSrcFileName);
-                            func1.m_functionId = ++nextFuncId;
+                            func1.m_functionId = nextFuncId++;
                             fit = inlinedFuncMap.insert(AddrFunctionMultMap::value_type(funcAddr, func1));
                             fit->second.insertSample(aAptKey, aSample);
 
@@ -5608,13 +5666,14 @@ PrdTranslator::CheckForNestedJavaInlinedFunction(
                     //     fprintf(pPRDDebugFP, " No Inlined Method for IP(0x%lx) - funcAddr(0x%lx), range 0x%lx - 0x%lx\n",
                     //         ip, funcAddr, ar.startAddr, ar.stopAddr);
                     //}
+
                     if (foundInline)
                     {
                         break;
                     }
-                } // address range in a inlined methods
-            } // JNCInlineMap entries
-        } // java inline map entries in a CpuProfileFunction
+                }
+            }
+        }
 
         AptAggregatedSampleMap::iterator tmpait = ait;
         tmpait++;
@@ -5625,7 +5684,7 @@ PrdTranslator::CheckForNestedJavaInlinedFunction(
         }
 
         ait = tmpait;
-    } // AptAggregatedSampleMap entries
+    }
 
     return true;
 }
