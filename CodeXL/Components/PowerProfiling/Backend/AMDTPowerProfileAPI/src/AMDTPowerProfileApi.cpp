@@ -196,7 +196,7 @@ AMDTResult CleanBuffers()
 }
 
 // ConvertTimeStamp: Conver Epoc time to seconds and micro seconds
-void ConvertTimeStamp(AMDTPwrSystemTime* pTimeStamp , AMDTUInt64 data)
+void ConvertTimeStamp(AMDTPwrSystemTime* pTimeStamp, AMDTUInt64 data)
 {
     // The Windows ticks are in 100 nanoseconds (10^-7).
 #define WINDOWS_TICK_PER_SEC 10000000
@@ -1526,6 +1526,18 @@ AMDTResult AMDTPwrStartProfiling()
         if (0 == g_samplingPeriod)
         {
             ret = AMDT_ERROR_TIMER_NOT_SET;
+        }
+    }
+
+    if (AMDT_STATUS_OK == ret)
+    {
+        PwrSupportedCounterMap* pCounters = PwrGetSupportedCounterList();
+        auto foundActive = std::find_if(pCounters->begin(), pCounters->end(),
+        [](std::pair<AMDTUInt32, PwrCounterInfo> counter) { return counter.second.m_isActive == true; });
+
+        if (foundActive == pCounters->end())
+        {
+            ret = AMDT_ERROR_COUNTER_NOT_ENABLED;
         }
     }
 
