@@ -574,6 +574,7 @@ void ppTimeLineView::InitStackedGraph(ppDataUtils::GraphViewCategoryType categor
     m_pPowerPlot->SetShown(false, false);
     m_pPowerPlot->GetPlot()->EnableDragAndDrop(false);
 
+    // Disabling context menu in timelive view for upcoming version
     //m_pPowerPlot->GetPlot()->setContextMenuPolicy(Qt::CustomContextMenu);
     //bool rc = connect(m_pPowerPlot->GetPlot(), SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(OnContextMenuRequest(const QPoint&)));
     //GT_ASSERT(rc);
@@ -590,7 +591,7 @@ void ppTimeLineView::InitStackedGraph(ppDataUtils::GraphViewCategoryType categor
     m_visibleRibbonsVec << m_pPowerStackedPlot;
     m_allRibbonsVec << m_pPowerStackedPlot;
 
-    // connect the context menu
+    // Disabling context menu in timelive view for upcoming version
     //m_pPowerStackedPlot->GetPlot()->setContextMenuPolicy(Qt::CustomContextMenu);
     //rc = connect(m_pPowerStackedPlot->GetPlot(), SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(OnContextMenuRequest(const QPoint&)));
     //GT_ASSERT(rc);
