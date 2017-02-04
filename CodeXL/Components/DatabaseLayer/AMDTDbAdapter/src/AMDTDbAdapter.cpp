@@ -224,7 +224,6 @@ bool AmdtDatabaseAdapter::InsertSessionConfiguration(const AMDTProfileSessionInf
 
     gtString valueStr;
 
-    valueStr.makeEmpty();
     valueStr << sessionInfo.m_cpuFamily;
     m_pDbAccessor->InsertSessionInfoKeyValue(AMDT_SESSION_INFO_CPU_FAMILY, valueStr);
 
@@ -235,9 +234,9 @@ bool AmdtDatabaseAdapter::InsertSessionConfiguration(const AMDTProfileSessionInf
     if (IsAggregateMode())
     {
         m_pDbAccessor->InsertSessionInfoKeyValue(AMDT_SESSION_INFO_KEY_SESSION_END_TIME, sessionInfo.m_sessionEndTime);
-
         m_pDbAccessor->InsertSessionInfoKeyValue(AMDT_SESSION_INFO_CSS_ENABLED, sessionInfo.m_cssEnabled ? AMDT_SESSION_INFO_VALUE_YES : AMDT_SESSION_INFO_VALUE_NO);
 
+        valueStr.makeEmpty();
         valueStr << sessionInfo.m_unwindDepth;
         m_pDbAccessor->InsertSessionInfoKeyValue(AMDT_SESSION_INFO_CSS_UNWIND_DEPTH, valueStr);
 
