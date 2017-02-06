@@ -172,6 +172,24 @@ AMDTResult PwrProfTranslateLinux::PwrGetProfileData(CXLContextProfileType type,
             std::sort(m_moduleList.begin(), m_moduleList.end(),
             [](AMDTPwrModuleData const & a, AMDTPwrModuleData const & b) { return a.m_power > b.m_power; });
             *pData = &m_moduleList[0];
+
+            // For system idle process set module size to zero
+            // list is sorted, if process id 0 exists it should be always at index 0
+            try
+            {
+                auto& findProcessZero = m_moduleList.at(0);
+
+                if (0 == findProcessZero.m_processId)
+                {
+                    findProcessZero.m_size = 0;
+                }
+            }
+            catch (const std::out_of_range& oor)
+            {
+                PwrTrace("Trying to access, non existent process id.");
+            }
+
+
             *pCnt = static_cast<AMDTUInt32>(m_moduleList.size());
         }
     }
