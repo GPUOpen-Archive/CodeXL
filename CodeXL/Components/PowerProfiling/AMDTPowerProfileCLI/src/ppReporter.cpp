@@ -31,8 +31,8 @@
 //
 //  Reporter
 //
-#define PROCESS_INFO_TXT_HDR_FORMAT    "\nSNo\tPID\tSamples\tPower(Joules)\tPower(%)\tName\t\t\t\t\t\tPath\n\n"
-#define PROCESS_INFO_CSV_HDR_FORMAT    "\nSNo,PID,Samples,Power(Joules),Power(%),Name,Path\n"
+#define PROCESS_INFO_TXT_HDR_FORMAT    "\nSNo\tPID\tSamples\tPower(Milli Joules)\tPower(%)\tName\t\t\t\t\t\tPath\n\n"
+#define PROCESS_INFO_CSV_HDR_FORMAT    "\nSNo,PID,Samples,Power(Milli Joules),Power(%),Name,Path\n"
 #define PROCESS_INFO_TXT_FORMAT        "%d\t%d\t" U_FORMAT "\t%3.2f\t\t%3.2f\t\t%-45.45s\t%s\n"
 #define PROCESS_INFO_CSV_FORMAT        "%d,%d," U_FORMAT ",%3.2f,%3.2f,%s,%s\n"
 
