@@ -307,6 +307,11 @@ void ConstructProfileSessionInfo(ppParseArgs& args, AMDTProfileSessionInfo& sess
     sessionInfo.m_sessionScope = L"System Wide";
     sessionInfo.m_targetAppCmdLineArgs = args.GetLaunchAppArgs();
     sessionInfo.m_targetAppPath = args.GetLaunchApp();
+    
+    // CPU Family and Model
+    osCpuid cpuId;
+    sessionInfo.m_cpuFamily = cpuId.getFamily();
+    sessionInfo.m_cpuModel = cpuId.getModel();
 
     // Session start time.
     osTime timing;
