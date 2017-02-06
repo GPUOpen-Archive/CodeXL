@@ -348,14 +348,14 @@ AMDTResult PrepareSystemTopologyInfo()
     {
         //TODO: GUI shouldn't check for constant string
         memset(pkg0->m_pName, 0, AMDT_PWR_EXE_NAME_LENGTH);
-        sprintf(pkg0->m_pName, "%s", g_sysInfo.m_nodeInfo.m_shortName);
+        sprintf(pkg0->m_pName, "%s", g_sysInfo.m_nodeInfo.m_name);
         sprintf(pkg0->m_pDescription, "%s", g_sysInfo.m_nodeInfo.m_shortName);
     }
     else
     {
         memset(pkg0->m_pName, 0, AMDT_PWR_EXE_NAME_LENGTH);
-        sprintf(pkg0->m_pName, "%s", "Unsupported Apu");
-        sprintf(pkg0->m_pDescription, "%s", "Unsupported Apu device");
+        sprintf(pkg0->m_pName, "%s", "Unknown Node");
+        sprintf(pkg0->m_pDescription, "%s", "Unknown Node");
     }
 
     // ONLY if supported AMD platform

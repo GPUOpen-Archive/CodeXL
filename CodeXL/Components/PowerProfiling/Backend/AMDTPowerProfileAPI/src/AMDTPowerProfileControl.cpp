@@ -1352,7 +1352,7 @@ bool GetAvailableSmuList(SmuList* pList)
                                     || (DEVICE_TYPE_NPU_NO_SMU == pDevInfo->m_deviceType))
                                 {
                                     PlatformInfo* pInfo = &g_pTargetSystemInfo->m_nodeInfo;
-                                    memcpy(pInfo->m_name, pDevInfo->m_name, PWR_MAX_NAME_LEN);
+                                    memcpy(pInfo->m_name, pDevInfo->m_modelName, PWR_MAX_NAME_LEN);
                                     memcpy(pInfo->m_shortName, pDevInfo->m_shortName, PWR_MAX_NAME_LEN);
                                     pInfo->m_family = g_pTargetSystemInfo->m_family;
                                     pInfo->m_modelHigh = (g_pTargetSystemInfo->m_platformId && 0xFF00) >> 8;

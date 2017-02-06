@@ -11,25 +11,25 @@
 PciDeviceInfo g_deviceTable[PWR_MAX_DEVICE_LIST_SIZE] =
 {
     // Kaveri -- will probably need multiple entries in g_deviceInfo for these
-    { GDT_SPECTRE, 0x1304, DEVICE_TYPE_APU, "Spectre", "KV SPECTRE MOBILE 35W (1304)", "KV", SMU_IPVERSION_7_0}, // OK tested
-    { GDT_SPECTRE, 0x1305, DEVICE_TYPE_APU, "Spectre", "KV SPECTRE DESKTOP 95W (1305)", "KV", SMU_IPVERSION_7_0},
-    { GDT_SPECTRE_SL, 0x1306, DEVICE_TYPE_APU, "Spectre", "KV SPECTRE SL MOBILE 35W (1306)", "KV", SMU_IPVERSION_7_0},
-    { GDT_SPECTRE_SL, 0x1307, DEVICE_TYPE_APU, "Spectre", "KV SPECTRE SL DESKTOP 95W (1307)", "KV", SMU_IPVERSION_7_0},
-    { GDT_SPECTRE_LITE, 0x1309, DEVICE_TYPE_APU, "Spectre", "AMD Radeon(TM) R7 Graphics", "KV", SMU_IPVERSION_7_0},
-    { GDT_SPECTRE_LITE, 0x130A, DEVICE_TYPE_APU, "Spectre", "AMD Radeon(TM) R6 Graphics", "KV", SMU_IPVERSION_7_0},
-    { GDT_SPECTRE_SL, 0x130B, DEVICE_TYPE_APU, "Spectre", "AMD Radeon(TM) R4 Graphics", "KV", SMU_IPVERSION_7_0},
-    { GDT_SPECTRE, 0x130C, DEVICE_TYPE_APU, "Spectre", "AMD Radeon(TM) R7 Graphics", "KV", SMU_IPVERSION_7_0},
-    { GDT_SPECTRE_LITE, 0x130D, DEVICE_TYPE_APU, "Spectre", "AMD Radeon(TM) R6 Graphics", "KV", SMU_IPVERSION_7_0},
-    { GDT_SPECTRE_SL, 0x130E, DEVICE_TYPE_APU, "Spectre", "AMD Radeon(TM) R5 Graphics", "KV", SMU_IPVERSION_7_0},
-    { GDT_SPECTRE, 0x130F, DEVICE_TYPE_APU, "Spectre", "AMD Radeon(TM) R7 Graphics", "KV", SMU_IPVERSION_7_0},
-    { GDT_SPECTRE, 0x1310, DEVICE_TYPE_APU,  "Spectre", "KV SPECTRE WORKSTATION 65W (1310)", "KV", SMU_IPVERSION_7_0},
-    { GDT_SPECTRE, 0x1311, DEVICE_TYPE_APU,  "Spectre", "KV SPECTRE WORKSTATION 95W (1311)", "KV", SMU_IPVERSION_7_0},
-    { GDT_SPECTRE_LITE, 0x1313, DEVICE_TYPE_APU,  "Spectre", "AMD Radeon(TM) R7 Graphics", "KV", SMU_IPVERSION_7_0},
-    { GDT_SPECTRE_SL, 0x1315, DEVICE_TYPE_APU,  "Spectre", "AMD Radeon(TM) R5 Graphics", "KV", SMU_IPVERSION_7_0},
-    { GDT_SPECTRE_SL, 0x1318, DEVICE_TYPE_APU,  "Spectre", "AMD Radeon(TM) R5 Graphics", "KV", SMU_IPVERSION_7_0},
-    { GDT_SPECTRE_SL, 0x131B, DEVICE_TYPE_APU,  "Spectre", "AMD Radeon(TM) R4 Graphics", "KV", SMU_IPVERSION_7_0},
-    { GDT_SPECTRE, 0x131C, DEVICE_TYPE_APU,  "Spectre", "AMD Radeon(TM) R7 Graphics", "KV", SMU_IPVERSION_7_0},
-    { GDT_SPECTRE_LITE, 0x131D, DEVICE_TYPE_APU,  "Spectre", "AMD Radeon(TM) R6 Graphics", "KV", SMU_IPVERSION_7_0},
+    { GDT_SPECTRE, 0x1304, DEVICE_TYPE_APU, "Kaveri", "KV SPECTRE MOBILE 35W (1304)", "KV", SMU_IPVERSION_7_0}, // OK tested
+    { GDT_SPECTRE, 0x1305, DEVICE_TYPE_APU, "Kaveri", "KV SPECTRE DESKTOP 95W (1305)", "KV", SMU_IPVERSION_7_0},
+    { GDT_SPECTRE_SL, 0x1306, DEVICE_TYPE_APU, "Kaveri", "KV SPECTRE SL MOBILE 35W (1306)", "KV", SMU_IPVERSION_7_0},
+    { GDT_SPECTRE_SL, 0x1307, DEVICE_TYPE_APU, "Kaveri", "KV SPECTRE SL DESKTOP 95W (1307)", "KV", SMU_IPVERSION_7_0},
+    { GDT_SPECTRE_LITE, 0x1309, DEVICE_TYPE_APU, "Kaveri", "AMD Radeon(TM) R7 Graphics", "KV", SMU_IPVERSION_7_0},
+    { GDT_SPECTRE_LITE, 0x130A, DEVICE_TYPE_APU, "Kaveri", "AMD Radeon(TM) R6 Graphics", "KV", SMU_IPVERSION_7_0},
+    { GDT_SPECTRE_SL, 0x130B, DEVICE_TYPE_APU, "Kaveri", "AMD Radeon(TM) R4 Graphics", "KV", SMU_IPVERSION_7_0},
+    { GDT_SPECTRE, 0x130C, DEVICE_TYPE_APU, "Kaveri", "AMD Radeon(TM) R7 Graphics", "KV", SMU_IPVERSION_7_0},
+    { GDT_SPECTRE_LITE, 0x130D, DEVICE_TYPE_APU, "Kaveri", "AMD Radeon(TM) R6 Graphics", "KV", SMU_IPVERSION_7_0},
+    { GDT_SPECTRE_SL, 0x130E, DEVICE_TYPE_APU, "Kaveri", "AMD Radeon(TM) R5 Graphics", "KV", SMU_IPVERSION_7_0},
+    { GDT_SPECTRE, 0x130F, DEVICE_TYPE_APU, "Kaveri", "AMD Radeon(TM) R7 Graphics", "KV", SMU_IPVERSION_7_0},
+    { GDT_SPECTRE, 0x1310, DEVICE_TYPE_APU,  "Kaveri", "KV SPECTRE WORKSTATION 65W (1310)", "KV", SMU_IPVERSION_7_0},
+    { GDT_SPECTRE, 0x1311, DEVICE_TYPE_APU,  "Kaveri", "KV SPECTRE WORKSTATION 95W (1311)", "KV", SMU_IPVERSION_7_0},
+    { GDT_SPECTRE_LITE, 0x1313, DEVICE_TYPE_APU,  "Kaveri", "AMD Radeon(TM) R7 Graphics", "KV", SMU_IPVERSION_7_0},
+    { GDT_SPECTRE_SL, 0x1315, DEVICE_TYPE_APU,  "Kaveri", "AMD Radeon(TM) R5 Graphics", "KV", SMU_IPVERSION_7_0},
+    { GDT_SPECTRE_SL, 0x1318, DEVICE_TYPE_APU,  "Kaveri", "AMD Radeon(TM) R5 Graphics", "KV", SMU_IPVERSION_7_0},
+    { GDT_SPECTRE_SL, 0x131B, DEVICE_TYPE_APU,  "Kaveri", "AMD Radeon(TM) R4 Graphics", "KV", SMU_IPVERSION_7_0},
+    { GDT_SPECTRE, 0x131C, DEVICE_TYPE_APU,  "Kaveri", "AMD Radeon(TM) R7 Graphics", "KV", SMU_IPVERSION_7_0},
+    { GDT_SPECTRE_LITE, 0x131D, DEVICE_TYPE_APU,  "Kaveri", "AMD Radeon(TM) R6 Graphics", "KV", SMU_IPVERSION_7_0},
     { GDT_SPOOKY, 0x1312, DEVICE_TYPE_APU,  "Spooky", "KV SPOOKY DESKTOP 95W (1312)", "Fusion", SMU_IPVERSION_7_0},
     { GDT_SPOOKY, 0x1316, DEVICE_TYPE_APU,  "Spooky", "AMD Radeon(TM) R5 Graphics", "Fusion", SMU_IPVERSION_7_0},
     { GDT_SPOOKY, 0x1317, DEVICE_TYPE_APU,  "Spooky", "KV SPOOKY MOBILE 35W (1317)", "Fusion", SMU_IPVERSION_7_0},
@@ -44,7 +44,7 @@ PciDeviceInfo g_deviceTable[PWR_MAX_DEVICE_LIST_SIZE] =
     { GDT_KALINDI, 0x983F, DEVICE_TYPE_APU,  "Kalindi", "Not Used", "FT3 socket", SMU_IPVERSION_7_0},
 
     // Godavari
-    { GDT_SPECTRE, 0x1422, DEVICE_TYPE_APU,  "Spectre", "Kaveri", "GV", SMU_IPVERSION_7_0},
+    { GDT_SPECTRE, 0x1422, DEVICE_TYPE_APU,  "Kaveri", "Kaveri", "GV", SMU_IPVERSION_7_0},
 
     // Beema
     { GDT_KALINDI, 0x9850, DEVICE_TYPE_APU,  "Mullins", "AMD Radeon(TM) R3 Graphics", "ML", SMU_IPVERSION_7_0},
@@ -153,7 +153,7 @@ PlatformInfo g_platformTable[] =
 {
     // Kaveri -- will probably need multiple entries in g_deviceInfo for these
     { GDT_OROCHI, 0x15, 0x0, 0xf, DEVICE_TYPE_CPU_NO_SMU, "Orochi", "FX series"},
-    { GDT_SPECTRE, 0x15, 0x30, 0x3f, DEVICE_TYPE_NPU_NO_SMU, "Spectre ", "Kaveri"},
+    { GDT_SPECTRE, 0x15, 0x30, 0x3f, DEVICE_TYPE_NPU_NO_SMU, "Kaveri ", "Kaveri"},
     { GDT_ZEPPELIN, 0x17, 0x00, 0x00, DEVICE_TYPE_CPU_WITH_SMU, "Zeppelin ", "ZP"},
 };
 #endif //_SUPPORTEDDEVICELIST_H_
