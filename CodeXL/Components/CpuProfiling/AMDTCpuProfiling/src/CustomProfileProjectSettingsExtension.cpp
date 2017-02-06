@@ -1299,7 +1299,12 @@ bool CustomProfileProjectSettingsExtension::addConfigurationToTree(const gtStrin
 QString CustomProfileProjectSettingsExtension::buildEventName(gtUInt16 event, const QString& eventName)
 {
     QString strRet;
-    strRet.sprintf("[%03X] ", event);
+
+    if (IsPmcEvent(event) || IsL2IEvent(event))
+    {
+        strRet.sprintf("[%03X] ", event);
+    }
+
     strRet.append(eventName);
     return strRet;
 }
@@ -1654,35 +1659,32 @@ bool CustomProfileProjectSettingsExtension::addAllEventsToAvailable(bool isIbsAv
         for (; it != endIt; ++it)
         {
             //All PMC events are less than the Timer event,
-            if (!IsPmcEvent(it->m_value) && !IsL2IEvent(it->m_value))
+            if (IsPmcEvent(it->m_value) || IsL2IEvent(it->m_value) || IsIbsEvent(it->m_value))
             {
-                break;
-            }
+                QTreeWidgetItem* pItem = new QTreeWidgetItem(pParent, ((int)QTreeWidgetItem::UserType + it->m_value));
 
-            QTreeWidgetItem* pItem = new QTreeWidgetItem(pParent, ((int) QTreeWidgetItem::UserType + it->m_value));
+                srcIt = sources.find(it->m_source.data());
 
-            srcIt = sources.find(it->m_source.data());
+                if (sources.end() == srcIt)
+                {
+                    QTreeWidgetItem* pHardwareSource = new QTreeWidgetItem(pHardwareParent);
 
-            if (sources.end() == srcIt)
-            {
-                QTreeWidgetItem* pHardwareSource = new QTreeWidgetItem(pHardwareParent);
+                    pHardwareSource->setText(EVENT_NAME_COLUMN, extendSourceName(QString(it->m_source.data())));
+                    srcIt = sources.insert(QString(it->m_source.data()), pHardwareSource);
+                }
 
-                pHardwareSource->setText(EVENT_NAME_COLUMN, extendSourceName(QString(it->m_source.data())));
-                srcIt = sources.insert(QString(it->m_source.data()), pHardwareSource);
-            }
+                QTreeWidgetItem* pSourceItem = new QTreeWidgetItem(srcIt.value(), ((int) QTreeWidgetItem::UserType + it->m_value));
 
-            QTreeWidgetItem* pSourceItem = new QTreeWidgetItem(srcIt.value(), ((int) QTreeWidgetItem::UserType + it->m_value));
+                pItem->setFlags(pItem->flags() | Qt::ItemIsEditable);
+                pSourceItem->setFlags(pSourceItem->flags() | Qt::ItemIsEditable);
+                pItem->setText(EVENT_NAME_COLUMN, buildEventName(it->m_value, QString(it->m_name.data())));
+                pSourceItem->setText(EVENT_NAME_COLUMN, buildEventName(it->m_value, QString(it->m_name.data())));
 
-            pItem->setFlags(pItem->flags() | Qt::ItemIsEditable);
-            pSourceItem->setFlags(pSourceItem->flags() | Qt::ItemIsEditable);
-            pItem->setText(EVENT_NAME_COLUMN, buildEventName(it->m_value, QString(it->m_name.data())));
-            pSourceItem->setText(EVENT_NAME_COLUMN, buildEventName(it->m_value, QString(it->m_name.data())));
+                //Default Count
+                gtUInt64 count(50000);
 
-            //Default Count
-            gtUInt64 count(50000);
-
-            switch (it->m_value)
-            {
+                switch (it->m_value)
+                {
                 case 0x76:
                     count = 1000000;
                     break;
@@ -1691,56 +1693,70 @@ bool CustomProfileProjectSettingsExtension::addAllEventsToAvailable(bool isIbsAv
                     count = 10000;
                     break;
 
+                case IBS_FETCH_BASE:
+                case IBS_OP_BASE:
+                    count = DEFAULT_IBS_INTERVAL;
+                    break;
+
                 default:
                     break;
-            }
-
-            pItem->setData(EVENT_INTERVAL_COLUMN, Qt::EditRole, QVariant((qulonglong)count));
-            pSourceItem->setData(EVENT_INTERVAL_COLUMN, Qt::EditRole, QVariant((qulonglong)count));
-
-            gtUByte mask(0);
-            QString maskTip;
-            //Set all unit masks of the event on by default
-            UnitMaskList::const_iterator umit;
-
-            for (umit = m_pEventFile->FirstUnitMask(*it);
-                 umit != m_pEventFile->EndOfUnitMasks(*it); ++umit)
-            {
-                if (umit->m_value >= (size_t) MAX_UNITMASK)
-                {
-                    continue;
                 }
 
-                mask |= 1 << umit->m_value;
+                pItem->setData(EVENT_INTERVAL_COLUMN, Qt::EditRole, QVariant((qulonglong)count));
+                pSourceItem->setData(EVENT_INTERVAL_COLUMN, Qt::EditRole, QVariant((qulonglong)count));
 
-                if (!maskTip.isEmpty())
+                gtUByte mask(0);
+                QString maskTip;
+                //Set all unit masks of the event on by default
+                UnitMaskList::const_iterator umit;
+
+                for (umit = m_pEventFile->FirstUnitMask(*it);
+                    umit != m_pEventFile->EndOfUnitMasks(*it); ++umit)
                 {
-                    maskTip.append("\n");
+                    if (umit->m_value >= (size_t) MAX_UNITMASK)
+                    {
+                        continue;
+                    }
+
+                    mask |= 1 << umit->m_value;
+
+                    if (!maskTip.isEmpty())
+                    {
+                        maskTip.append("\n");
+                    }
+
+                    maskTip.append(umit->m_name.data());
                 }
 
-                maskTip.append(umit->m_name.data());
+                // IBS Fetch has no unit mask
+                if (!IsIbsFetchEvent(it->m_value))
+                {
+                    pItem->setText(EVENT_UNITMASK_COLUMN, "0x" + QString::number(mask, 16));
+                    pSourceItem->setText(EVENT_UNITMASK_COLUMN, "0x" + QString::number(mask, 16));
+                    pItem->setToolTip(EVENT_UNITMASK_COLUMN, maskTip);
+                    pSourceItem->setToolTip(EVENT_UNITMASK_COLUMN, maskTip);
+                }
+
+                // IBS Fetch & OP has no kernel and user control
+                if (!IsIbsEvent(it->m_value))
+                {
+                    pItem->setCheckState(EVENT_USR_COLUMN, Qt::Checked);
+                    pSourceItem->setCheckState(EVENT_USR_COLUMN, Qt::Checked);
+                    pItem->setToolTip(EVENT_USR_COLUMN, CP_STR_cpuProfileProjectSettingsUsrColumnTooltip);
+                    pSourceItem->setToolTip(EVENT_USR_COLUMN, CP_STR_cpuProfileProjectSettingsUsrColumnTooltip);
+                    pItem->setCheckState(EVENT_OS_COLUMN, Qt::Checked);
+                    pSourceItem->setCheckState(EVENT_OS_COLUMN, Qt::Checked);
+                    pItem->setToolTip(EVENT_OS_COLUMN, CP_STR_cpuProfileProjectSettingsOSColumnTooltip);
+                    pSourceItem->setToolTip(EVENT_OS_COLUMN, CP_STR_cpuProfileProjectSettingsOSColumnTooltip);
+                }
             }
 
-            pItem->setText(EVENT_UNITMASK_COLUMN, "0x" + QString::number(mask, 16));
-            pSourceItem->setText(EVENT_UNITMASK_COLUMN, "0x" + QString::number(mask, 16));
-            pItem->setToolTip(EVENT_UNITMASK_COLUMN, maskTip);
-            pSourceItem->setToolTip(EVENT_UNITMASK_COLUMN, maskTip);
+            //Add each Hw source list
+            m_pAvailableTree->addTopLevelItem(pHardwareParent);
 
-            pItem->setCheckState(EVENT_USR_COLUMN, Qt::Checked);
-            pSourceItem->setCheckState(EVENT_USR_COLUMN, Qt::Checked);
-            pItem->setToolTip(EVENT_USR_COLUMN, CP_STR_cpuProfileProjectSettingsUsrColumnTooltip);
-            pSourceItem->setToolTip(EVENT_USR_COLUMN, CP_STR_cpuProfileProjectSettingsUsrColumnTooltip);
-            pItem->setCheckState(EVENT_OS_COLUMN, Qt::Checked);
-            pSourceItem->setCheckState(EVENT_OS_COLUMN, Qt::Checked);
-            pItem->setToolTip(EVENT_OS_COLUMN, CP_STR_cpuProfileProjectSettingsOSColumnTooltip);
-            pSourceItem->setToolTip(EVENT_OS_COLUMN, CP_STR_cpuProfileProjectSettingsOSColumnTooltip);
+            //Add all events
+            m_pAvailableTree->addTopLevelItem(pParent);
         }
-
-        //Add each Hw source list
-        m_pAvailableTree->addTopLevelItem(pHardwareParent);
-
-        //Add all events
-        m_pAvailableTree->addTopLevelItem(pParent);
     }
 
     return bRet;
@@ -1806,6 +1822,10 @@ QString CustomProfileProjectSettingsExtension::extendSourceName(const QString& s
     else if ("DSM L2I" == source)
     {
         strRet = "DSM L2I Events";
+    }
+    else if ("IBS" == source)
+    {
+        strRet = "Instruction Based Sampling";
     }
 
     return strRet;

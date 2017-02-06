@@ -57,6 +57,8 @@ inline bool IsL2IEvent(gtUInt16 event) { return event >= L2I_BASE && event <= L2
 inline bool IsIbsFetchEvent(gtUInt16 event) { return event >= IBS_FETCH_BASE && event <= IBS_FETCH_MAX; }
 //Is the event value any of the IBS ops derived events
 inline bool IsIbsOpEvent(gtUInt16 event) { return event >= IBS_OP_BASE && event <= IBS_OP_MAX; }
+// Is this base IBS Fetch and OP Event
+inline bool IsIbsEvent(gtUInt16 event) { return (event == IBS_OP_BASE || event == IBS_FETCH_BASE); }
 //Is the event value any of the IBS CLU events
 inline bool IsIbsCluEvent(gtUInt16 event) { return event >= IBS_CLU_BASE && event <= IBS_CLU_MAX; }
 //Get the arbitrary timer event value
