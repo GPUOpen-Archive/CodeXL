@@ -276,8 +276,8 @@ void ppSummaryView::SetupGraphs()
     m_pFreqCpuGraph = new acGroupedBarsGraph();
     m_pFreqGpuGraph = new acGroupedBarsGraph();
 
-	m_pFreqCpuGraph->SetGraphTitle(PP_STR_SummaryCPUFrequencyCaption);
-	m_pFreqGpuGraph->SetGraphTitle(PP_STR_SummaryGPUFrequencyCaption);
+    m_pFreqCpuGraph->SetGraphTitle(PP_STR_SummaryCPUFrequencyCaption);
+    m_pFreqGpuGraph->SetGraphTitle(PP_STR_SummaryGPUFrequencyCaption);
 
     m_pFreqCpuGraph->GetPlot()->setMinimumSize(QSize(PP_SUMMARY_PLOT_MIN_WIDTH, PP_SUMMARY_PLOT_MIN_HEIGHT + PP_SUMMARY_PLOT_EXTRA_HEIGHT));
     m_pFreqGpuGraph->GetPlot()->setMinimumSize(QSize(PP_SUMMARY_PLOT_MIN_WIDTH, PP_SUMMARY_PLOT_MIN_HEIGHT + PP_SUMMARY_PLOT_EXTRA_HEIGHT));
@@ -301,10 +301,10 @@ void ppSummaryView::SetupGraphs()
     m_pPowerGraph = new acColoredBarsGraph();
     m_pEnergyGraph = new acColoredBarsGraph();
 
-	m_pPowerGraph->SetGraphTitle(PP_STR_SummaryAveragePowerCaption);
-	m_pEnergyGraph->SetGraphTitle(PP_STR_SummaryCumulativeEnergyCaption);
+    m_pPowerGraph->SetGraphTitle(PP_STR_SummaryAveragePowerCaption);
+    m_pEnergyGraph->SetGraphTitle(PP_STR_SummaryCumulativeEnergyCaption);
 
-	// Set the minimum height for the graphs:
+    // Set the minimum height for the graphs:
     m_pPowerGraph->GetPlot()->setMinimumSize(QSize(PP_SUMMARY_PLOT_MIN_WIDTH, PP_SUMMARY_PLOT_MIN_HEIGHT));
     m_pEnergyGraph->GetPlot()->setMinimumSize(QSize(PP_SUMMARY_PLOT_MIN_WIDTH, PP_SUMMARY_PLOT_MIN_HEIGHT));
 
@@ -384,15 +384,15 @@ void ppSummaryView::InitGraphsAreaForOthers()
 
 void ppSummaryView::AddGraphVertically(QCustomPlot* plot, GraphContainer container, QWidget* parent)
 {
-	QWidget* widget = m_pGraphContainers[container];
-	widget->setLayout(new QVBoxLayout);
-	widget->layout()->addWidget(plot);
-	if (container == CONTAINER_PP_FREQ_CPU_GRAPH ||
-		container == CONTAINER_PP_FREQ_GPU_GRAPH)
-		widget->setMinimumSize(PP_SUMMARY_PLOT_MIN_WIDTH, PP_SUMMARY_PLOT_MIN_HEIGHT + PP_SUMMARY_PLOT_EXTRA_HEIGHT);
-	else
-		widget->setMinimumSize(PP_SUMMARY_PLOT_MIN_WIDTH, PP_SUMMARY_PLOT_MIN_HEIGHT);
-	parent->layout()->addWidget(widget);
+    QWidget* widget = m_pGraphContainers[container];
+    widget->setLayout(new QVBoxLayout);
+    widget->layout()->addWidget(plot);
+    if (container == CONTAINER_PP_FREQ_CPU_GRAPH ||
+        container == CONTAINER_PP_FREQ_GPU_GRAPH)
+        widget->setMinimumSize(PP_SUMMARY_PLOT_MIN_WIDTH, PP_SUMMARY_PLOT_MIN_HEIGHT + PP_SUMMARY_PLOT_EXTRA_HEIGHT);
+    else
+        widget->setMinimumSize(PP_SUMMARY_PLOT_MIN_WIDTH, PP_SUMMARY_PLOT_MIN_HEIGHT);
+    parent->layout()->addWidget(widget);
 }
 
 // ---------------------------------------------------------------------------
@@ -411,19 +411,19 @@ void ppSummaryView::InitGraphsAreaForFamily17()
     pScrollArea->setWidgetResizable(true);
 
     SetupGraphs();
-	m_pEnergyGraph->DecreaseXAxisTickLabelFont(1);
-	m_pPowerGraph->DecreaseXAxisTickLabelFont(1);
+    m_pEnergyGraph->DecreaseXAxisTickLabelFont(1);
+    m_pPowerGraph->DecreaseXAxisTickLabelFont(1);
 
     m_pSessionDurationLabel = new QLabel(PP_STR_SummaryDurationLabel);
     pVScrollingAreaLayout->addWidget(m_pSessionDurationLabel, 0, Qt::AlignLeft);
 
-	for (int i = 0; i < TOTAL_CONTAINER_PP; ++i)
-		m_pGraphContainers[i] = new QWidget(this);
+    for (int i = 0; i < TOTAL_CONTAINER_PP; ++i)
+        m_pGraphContainers[i] = new QWidget(this);
 
-	AddGraphVertically(m_pEnergyGraph->GetPlot(), CONTAINER_PP_ENERGY_GRAPH, pScrollAreaWidget);
-	AddGraphVertically(m_pPowerGraph->GetPlot(), CONTAINER_PP_POWER_GRAPH, pScrollAreaWidget);
-	AddGraphVertically(m_pFreqCpuGraph->GetPlot(), CONTAINER_PP_FREQ_CPU_GRAPH, pScrollAreaWidget);
-	AddGraphVertically(m_pFreqGpuGraph->GetPlot(), CONTAINER_PP_FREQ_GPU_GRAPH, pScrollAreaWidget);
+    AddGraphVertically(m_pEnergyGraph->GetPlot(), CONTAINER_PP_ENERGY_GRAPH, pScrollAreaWidget);
+    AddGraphVertically(m_pPowerGraph->GetPlot(), CONTAINER_PP_POWER_GRAPH, pScrollAreaWidget);
+    AddGraphVertically(m_pFreqCpuGraph->GetPlot(), CONTAINER_PP_FREQ_CPU_GRAPH, pScrollAreaWidget);
+    AddGraphVertically(m_pFreqGpuGraph->GetPlot(), CONTAINER_PP_FREQ_GPU_GRAPH, pScrollAreaWidget);
     
     addWidget(pScrollArea);
 
@@ -521,8 +521,8 @@ void ppSummaryView::InitPowerGraphs()
 
         if (GetCpuFamily() == CPU_FAMILY_17)
         {
-			m_pGraphContainers[CONTAINER_PP_ENERGY_GRAPH]->setVisible(shouldDisplayPowerGraphs);
-			m_pGraphContainers[CONTAINER_PP_POWER_GRAPH]->setVisible(shouldDisplayPowerGraphs);
+            m_pGraphContainers[CONTAINER_PP_ENERGY_GRAPH]->setVisible(shouldDisplayPowerGraphs);
+            m_pGraphContainers[CONTAINER_PP_POWER_GRAPH]->setVisible(shouldDisplayPowerGraphs);
         }
         m_pPowerGraph->GetPlot()->setVisible(shouldDisplayPowerGraphs);
         m_pEnergyGraph->GetPlot()->setVisible(shouldDisplayPowerGraphs);
@@ -545,17 +545,17 @@ void ppSummaryView::SetPowerOrEnergyGraphData(bool isDataFromEvent, const ppData
         {
             double totalValue = 0;
 
-			if (GetCpuFamily() == CPU_FAMILY_17)
-			{
-				if (counterIds.size() > 10)
-				{
-					int ratio = PP_SUMMARY_PLOT_MIN_WIDTH / 10;
-					if (sampledGraphType == ppDataUtils::POWERGRAPHTYPE_CUMULATIVE)
-						m_pGraphContainers[CONTAINER_PP_ENERGY_GRAPH]->setMinimumWidth(PP_SUMMARY_PLOT_MIN_WIDTH + (ratio*(counterIds.size()-10)));
-					else
-						m_pGraphContainers[CONTAINER_PP_POWER_GRAPH]->setMinimumWidth(PP_SUMMARY_PLOT_MIN_WIDTH + (ratio*(counterIds.size() - 10)));
-				}
-			}
+            if (GetCpuFamily() == CPU_FAMILY_17)
+            {
+                if (counterIds.size() > 10)
+                {
+                    int ratio = PP_SUMMARY_PLOT_MIN_WIDTH / 10;
+                    if (sampledGraphType == ppDataUtils::POWERGRAPHTYPE_CUMULATIVE)
+                        m_pGraphContainers[CONTAINER_PP_ENERGY_GRAPH]->setMinimumWidth(PP_SUMMARY_PLOT_MIN_WIDTH + (ratio*(counterIds.size()-10)));
+                    else
+                        m_pGraphContainers[CONTAINER_PP_POWER_GRAPH]->setMinimumWidth(PP_SUMMARY_PLOT_MIN_WIDTH + (ratio*(counterIds.size() - 10)));
+                }
+            }
 
             if (isDataFromEvent)
             {
@@ -668,7 +668,7 @@ void ppSummaryView::InitCpuGraph()
     {
         m_pFreqCpuGraph->GetPlot()->setVisible(false);
         if (GetCpuFamily() == CPU_FAMILY_17)
-			m_pGraphContainers[CONTAINER_PP_FREQ_CPU_GRAPH]->setVisible(false);
+            m_pGraphContainers[CONTAINER_PP_FREQ_CPU_GRAPH]->setVisible(false);
     }
 }
 
@@ -704,7 +704,7 @@ void ppSummaryView::InitGpuGraph()
     {
         m_pFreqGpuGraph->GetPlot()->setVisible(false);
         if (GetCpuFamily() == CPU_FAMILY_17)
-			m_pGraphContainers[CONTAINER_PP_FREQ_GPU_GRAPH]->setVisible(false);
+            m_pGraphContainers[CONTAINER_PP_FREQ_GPU_GRAPH]->setVisible(false);
     }
 }
 
@@ -1261,15 +1261,15 @@ void ppSummaryView::SetPowerGraphsCaption()
         powerGraphText = QString(PP_STR_SummaryViewEnergyGraphTypeCumulative).arg(qstrValue).arg(PP_STR_UnitsWatts);
 
         // Update the total / average text items in power & energy graphs:
-		if (GetCpuFamily() == CPU_FAMILY_17)
-		{
-			
-		}
-		else
-		{
-			m_pPowerGraph->SetGraphTitle(powerGraphText);
-			m_pEnergyGraph->SetGraphTitle(energyGraphText);
-		}
+        if (GetCpuFamily() == CPU_FAMILY_17)
+        {
+            
+        }
+        else
+        {
+            m_pPowerGraph->SetGraphTitle(powerGraphText);
+            m_pEnergyGraph->SetGraphTitle(energyGraphText);
+        }
         
     }
 }

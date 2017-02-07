@@ -88,14 +88,14 @@ private:
         MEASUREMENTUNIT_TERAJOULES = 4
     };
 
-	enum GraphContainer : unsigned
-	{
-		CONTAINER_PP_POWER_GRAPH = 0,
-		CONTAINER_PP_ENERGY_GRAPH,
-		CONTAINER_PP_FREQ_CPU_GRAPH,
-		CONTAINER_PP_FREQ_GPU_GRAPH,
-		TOTAL_CONTAINER_PP       // should be last enum member or count
-	};
+    enum GraphContainer : unsigned
+    {
+        CONTAINER_PP_POWER_GRAPH = 0,
+        CONTAINER_PP_ENERGY_GRAPH,
+        CONTAINER_PP_FREQ_CPU_GRAPH,
+        CONTAINER_PP_FREQ_GPU_GRAPH,
+        TOTAL_CONTAINER_PP       // should be last enum member or count
+    };
 
     CpuFamily GetCpuFamily() const;
 
@@ -108,7 +108,7 @@ private:
 
     void SetupGraphs();
 
-	void AddGraphVertically(QCustomPlot*, GraphContainer, QWidget*);
+    void AddGraphVertically(QCustomPlot*, GraphContainer, QWidget*);
 
     /// calls to all graphs init functions
     void InitGraphs();
