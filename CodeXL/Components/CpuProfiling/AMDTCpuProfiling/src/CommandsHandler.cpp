@@ -1954,8 +1954,12 @@ HRESULT CommandsHandler::verifyAndSetEvents(EventConfiguration** ppDriverEvents)
 
             if (eventSource.startsWith(L"NB"))
             {
+                gtString nbEventName;
+                nbEventName.fromASCIIString(eventData.m_name.data());
+
                 gtString errorMessage;
-                errorMessage.appendFormattedString(CP_STR_FailedToFindNBEvent, eventData.m_value, eventData.m_name.data());
+                errorMessage.appendFormattedString(CP_STR_FailedToFindNBEvent, eventData.m_value, nbEventName.asCharArray());
+
                 ReportErrorMessage(false, errorMessage, errorMessage.asCharArray());
                 hr = E_NOTAVAILABLE;
                 break;

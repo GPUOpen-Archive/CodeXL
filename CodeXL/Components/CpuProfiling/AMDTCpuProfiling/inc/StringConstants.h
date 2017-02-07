@@ -158,7 +158,7 @@ const QString CPU_PROF_MESSAGE(QObject::tr("CPU Profiling Error"));
 
 #define CP_STR_FailedToFindNBEvent L"The configuration contains a northbridge event:\n"\
     L"[%#x] %ls\n which is not a valid sampling event. "\
-    L"Please fix the configuration"
+    L"Please fix the configuration."
 
 #define CP_STR_FailedToSetCounterRange L"The configuration has too many events specified for the event counter range."\
     L"\nPlease choose a different configuration."
