@@ -1540,20 +1540,20 @@ void CustomProfileProjectSettingsExtension::OnSettingsTreeSelectionAboutToChange
 
 bool CustomProfileProjectSettingsExtension::addAllEventsToAvailable(bool isIbsAvailable, bool isAmdSystem)
 {
-    bool bRet(false);
+    bool bRet = false;
     CpuEvent oneEvent;
 
     //Add the parent item
     QTreeWidgetItem* pParent = new QTreeWidgetItem(QStringList(CP_STR_cpuProfileProjectSettingsCustomAllEvents));
 
-    bRet = nullptr != pParent;
+    bRet = (nullptr != pParent);
 
     //If add the timer
     if (bRet)
     {
         QTreeWidgetItem* pItem = new QTreeWidgetItem(pParent, ((int) QTreeWidgetItem::UserType + GetTimerEvent()));
 
-        bRet = nullptr != pParent;
+        bRet = (nullptr != pItem);
 
         if (bRet)
         {
@@ -1577,7 +1577,7 @@ bool CustomProfileProjectSettingsExtension::addAllEventsToAvailable(bool isIbsAv
     {
         QTreeWidgetItem* pItem = new QTreeWidgetItem(pParent, ((int) QTreeWidgetItem::UserType + GetIbsOpEvent()));
 
-        bRet = nullptr != pParent;
+        bRet = (nullptr != pItem);
 
         if (bRet)
         {
@@ -1600,7 +1600,7 @@ bool CustomProfileProjectSettingsExtension::addAllEventsToAvailable(bool isIbsAv
 
         pItem = new QTreeWidgetItem(pParent, ((int) QTreeWidgetItem::UserType + GetIbsFetchEvent()));
 
-        bRet = nullptr != pParent;
+        bRet = (nullptr != pItem);
 
         if (bRet)
         {
@@ -1621,7 +1621,7 @@ bool CustomProfileProjectSettingsExtension::addAllEventsToAvailable(bool isIbsAv
 #if (AMDT_BUILD_TARGET == AMDT_WINDOWS_OS)
         pItem = new QTreeWidgetItem(pParent, ((int) QTreeWidgetItem::UserType + GetIbsCluEvent()));
 
-        bRet = nullptr != pParent;
+        bRet = (nullptr != pItem);
 
         if (bRet)
         {
@@ -1646,7 +1646,7 @@ bool CustomProfileProjectSettingsExtension::addAllEventsToAvailable(bool isIbsAv
     //Add the hardware parent item
     QTreeWidgetItem* pHardwareParent = new QTreeWidgetItem(QStringList(CP_STR_cpuProfileProjectSettingsCustomHardwareParent));
 
-    bRet &= nullptr != pHardwareParent;
+    bRet &= (nullptr != pHardwareParent);
 
     //Add each of the events to the "All events" and the source
     if ((bRet) && (nullptr != m_pEventFile))
@@ -1658,10 +1658,15 @@ bool CustomProfileProjectSettingsExtension::addAllEventsToAvailable(bool isIbsAv
 
         for (; it != endIt; ++it)
         {
-            //All PMC events are less than the Timer event,
-            if (IsPmcEvent(it->m_value) || IsL2IEvent(it->m_value) || IsIbsEvent(it->m_value))
+            //Add all PMC, L2I events.
+            if (IsPmcEvent(it->m_value) || IsL2IEvent(it->m_value))
             {
                 QTreeWidgetItem* pItem = new QTreeWidgetItem(pParent, ((int)QTreeWidgetItem::UserType + it->m_value));
+
+                if (pItem == nullptr)
+                {
+                    break;
+                }
 
                 srcIt = sources.find(it->m_source.data());
 
@@ -1705,8 +1710,9 @@ bool CustomProfileProjectSettingsExtension::addAllEventsToAvailable(bool isIbsAv
                 pItem->setData(EVENT_INTERVAL_COLUMN, Qt::EditRole, QVariant((qulonglong)count));
                 pSourceItem->setData(EVENT_INTERVAL_COLUMN, Qt::EditRole, QVariant((qulonglong)count));
 
-                gtUByte mask(0);
+                gtUByte mask = 0;
                 QString maskTip;
+
                 //Set all unit masks of the event on by default
                 UnitMaskList::const_iterator umit;
 
@@ -1728,27 +1734,19 @@ bool CustomProfileProjectSettingsExtension::addAllEventsToAvailable(bool isIbsAv
                     maskTip.append(umit->m_name.data());
                 }
 
-                // IBS Fetch has no unit mask
-                if (!IsIbsFetchEvent(it->m_value))
-                {
-                    pItem->setText(EVENT_UNITMASK_COLUMN, "0x" + QString::number(mask, 16));
-                    pSourceItem->setText(EVENT_UNITMASK_COLUMN, "0x" + QString::number(mask, 16));
-                    pItem->setToolTip(EVENT_UNITMASK_COLUMN, maskTip);
-                    pSourceItem->setToolTip(EVENT_UNITMASK_COLUMN, maskTip);
-                }
+                pItem->setText(EVENT_UNITMASK_COLUMN, "0x" + QString::number(mask, 16));
+                pSourceItem->setText(EVENT_UNITMASK_COLUMN, "0x" + QString::number(mask, 16));
+                pItem->setToolTip(EVENT_UNITMASK_COLUMN, maskTip);
+                pSourceItem->setToolTip(EVENT_UNITMASK_COLUMN, maskTip);
 
-                // IBS Fetch & OP has no kernel and user control
-                if (!IsIbsEvent(it->m_value))
-                {
-                    pItem->setCheckState(EVENT_USR_COLUMN, Qt::Checked);
-                    pSourceItem->setCheckState(EVENT_USR_COLUMN, Qt::Checked);
-                    pItem->setToolTip(EVENT_USR_COLUMN, CP_STR_cpuProfileProjectSettingsUsrColumnTooltip);
-                    pSourceItem->setToolTip(EVENT_USR_COLUMN, CP_STR_cpuProfileProjectSettingsUsrColumnTooltip);
-                    pItem->setCheckState(EVENT_OS_COLUMN, Qt::Checked);
-                    pSourceItem->setCheckState(EVENT_OS_COLUMN, Qt::Checked);
-                    pItem->setToolTip(EVENT_OS_COLUMN, CP_STR_cpuProfileProjectSettingsOSColumnTooltip);
-                    pSourceItem->setToolTip(EVENT_OS_COLUMN, CP_STR_cpuProfileProjectSettingsOSColumnTooltip);
-                }
+                pItem->setCheckState(EVENT_USR_COLUMN, Qt::Checked);
+                pSourceItem->setCheckState(EVENT_USR_COLUMN, Qt::Checked);
+                pItem->setToolTip(EVENT_USR_COLUMN, CP_STR_cpuProfileProjectSettingsUsrColumnTooltip);
+                pSourceItem->setToolTip(EVENT_USR_COLUMN, CP_STR_cpuProfileProjectSettingsUsrColumnTooltip);
+                pItem->setCheckState(EVENT_OS_COLUMN, Qt::Checked);
+                pSourceItem->setCheckState(EVENT_OS_COLUMN, Qt::Checked);
+                pItem->setToolTip(EVENT_OS_COLUMN, CP_STR_cpuProfileProjectSettingsOSColumnTooltip);
+                pSourceItem->setToolTip(EVENT_OS_COLUMN, CP_STR_cpuProfileProjectSettingsOSColumnTooltip);
             }
 
             //Add each Hw source list
