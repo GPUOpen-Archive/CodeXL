@@ -1,0 +1,63 @@
+<?xml version="1.0"?>
+<!DOCTYPE view_configuration SYSTEM "..\viewconfig.dtd">
+
+<!--
+        Show near return prediction measurements
+        View configuration
+        Date:    14 January 2016
+        Version: 1.05
+        Processor: AMD family 15h Models 70h - 7Fh
+        Copyright (c) 2016 Advanced Micro Devices, Inc. All rights reserved.
+
+        The near return view should be available when retired instructions,
+        near returns and mispredicted near returns are available.
+
+        Related DC configurations: branch.xml
+ -->
+
+<view_configuration>
+
+  <view name="Near return report"
+        separate_cpus="F"
+        separate_processes="F"
+        separate_threads="F"
+        >
+
+    <data>
+      <event id="Ret_instructions" select="c0" mask="00" />
+      <event id="Near_returns"     select="c8" mask="00" />
+      <event id="Mispred_near_ret" select="c9" mask="00" />
+    </data>
+
+    <output>
+      <column title="Ret inst" sort="descending">
+        <value id="Ret_instructions" />
+      </column>
+      <column title="Ret near RET" sort="none">
+        <value id="Near_returns" />
+      </column>
+      <column title="Ret near RET misp" sort="none">
+        <value id="Mispred_near_ret" />
+      </column>
+      <column title="Misp rate" sort="none">
+        <ratio left="Mispred_near_ret" right="Ret_instructions" />
+      </column>
+      <column title="Misp ratio" sort="none">
+        <ratio left="Mispred_near_ret" right="Near_returns" />
+      </column>
+      <column title="Instr per call" sort="none">
+        <ratio left="Ret_instructions" right="Near_returns" />
+      </column>
+    </output>
+
+    <tool_tip>
+      Show near return mispredictions
+    </tool_tip>
+
+    <description>
+      Use this view to find code with poorly predicted near returns.
+    </description>
+
+  </view>
+
+</view_configuration>
