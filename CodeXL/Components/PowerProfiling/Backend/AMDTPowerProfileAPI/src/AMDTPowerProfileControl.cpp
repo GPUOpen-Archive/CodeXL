@@ -1070,34 +1070,30 @@ bool IsSmuLogAccessible(SmuInfo* pSmu, DeviceType devType)
 
         default:
         {
-            if (DEVICE_TYPE_DGPU == devType)
+
+            // User must need to run any OpenCL program if dGPU is in BACO state.
+            // Otherwise, counters may not be availables
+            AMDTUInt32 retry = SMU_LOG_MSG_RETRY_MAX;
+
+            do
             {
-                ret = true;
+                // Initiate smu logging and stop loggin to check if smu is accessible
+                ret = Smu7DriverMsg(pSmu, SMU_PM_STATUS_LOG_START);
+
+                if (true == ret)
+                {
+                    break;
+                }
+
+                SLEEP_IN_MS(50);
             }
-            else
+            while (--retry);
+
+            PwrTrace("Smu7DriverMsg: rety cnt %d", SMU_LOG_MSG_RETRY_MAX - retry);
+
+            if (false == ret)
             {
-                AMDTUInt32 retry = SMU_LOG_MSG_RETRY_MAX;
-
-                do
-                {
-                    // Initiate smu logging and stop loggin to check if smu is accessible
-                    ret = Smu7DriverMsg(pSmu, SMU_PM_STATUS_LOG_START);
-
-                    if (true == ret)
-                    {
-                        break;
-                    }
-
-                    SLEEP_IN_MS(50);
-                }
-                while (--retry);
-
-                PwrTrace("Smu7DriverMsg: rety cnt %d", SMU_LOG_MSG_RETRY_MAX - retry);
-
-                if (false == ret)
-                {
-                    PwrTrace("IsSmuLogAccessible: SMU_PM_STATUS_LOG_START failed");
-                }
+                PwrTrace("IsSmuLogAccessible: SMU_PM_STATUS_LOG_START failed");
             }
 
             break;
