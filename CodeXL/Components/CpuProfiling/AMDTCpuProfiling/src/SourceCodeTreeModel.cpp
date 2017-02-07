@@ -31,7 +31,7 @@ const unsigned int FIRST_DISASSEMBLY_FETCH_BLOCK_SIZE = 1024;
 
 static inline double CalculatePercent(double sampleValue, double totalSamples)
 {
-    return (sampleValue / totalSamples) * 100;
+    return (totalSamples > 0.0) ? ((sampleValue / totalSamples) * 100) : 0.0;
 }
 
 void DebugPrintMapToOutput(const OffsetLinenumMap& map)
@@ -70,6 +70,23 @@ SourceCodeTreeModel::SourceCodeTreeModel(const QString& sessionDir,
     // Set the gray forground color:
     QColor color = acGetSystemDefaultBackgroundColor();
     m_forgroundColor = QColor::fromRgb(color.red() * 8 / 10, color.green() * 8 / 10, color.blue() * 8 / 10);
+
+    // construct the raw counter id map
+    if (nullptr != m_pProfDataRdr)
+    {
+        AMDTProfileCounterDescVec counterDescVec;
+        
+        if (m_pProfDataRdr->GetSampledCountersList(counterDescVec))
+        {
+            for (const auto& aCounter : counterDescVec)
+            {
+                if (AMDT_PROFILE_COUNTER_TYPE_RAW == aCounter.m_type)
+                {
+                    m_rawCounterIdMap.insert({ aCounter.m_id, true });
+                }
+            }
+        }
+    }
 }
 
 SourceCodeTreeModel::~SourceCodeTreeModel()
@@ -84,6 +101,7 @@ SourceCodeTreeModel::~SourceCodeTreeModel()
     m_headerTooltips.clear();
     m_headerCaptions.clear();
     m_srcLinesCache.clear();
+    m_rawCounterIdMap.clear();
 
     m_pSessionSourceCodeTreeView = nullptr;
 }
@@ -106,12 +124,7 @@ int SourceCodeTreeModel::columnCount(const QModelIndex& parent) const
     GT_UNREFERENCED_PARAMETER(parent);
     int retVal = SOURCE_VIEW_SAMPLES_PERCENT_COLUMN + 1;
 
-    GT_IF_WITH_ASSERT(m_pProfDataRdr != nullptr)
-    {
-        AMDTProfileCounterDescVec counterDesc;
-        m_pProfDataRdr->GetSampledCountersList(counterDesc);
-        retVal += counterDesc.size();
-    }
+    retVal += (nullptr != m_pDisplayFilter) ? m_pDisplayFilter->GetCounterDescription().size() : 0;
 
     return retVal;
 }
@@ -410,6 +423,7 @@ bool SourceCodeTreeModel::BuildDisassemblyTree()
     {
         // Fetch aggregated samples for each counter id
         AMDTSampleValueVec aggrSampleValueVec;
+        // This returns the total samples across the profile run
         m_pProfDataRdr->GetSampleCount(false, aggrSampleValueVec);
 
         AMDTUInt64 moduleBaseAddr = functionData.m_modBaseAddress;
@@ -442,19 +456,19 @@ bool SourceCodeTreeModel::BuildDisassemblyTree()
                     auto counterId = aSampleValue.m_counterId;
                     auto sampleCount = aSampleValue.m_sampleCount;
                     auto funcSamplePercent = aSampleValue.m_sampleCountPercentage;
+                    bool isRawCounter = IsRawCounter(counterId);
+                    double appSamplePercent = 0.0;
 
-                    auto iter = std::find_if(aggrSampleValueVec.cbegin(), aggrSampleValueVec.cend(),
-                        [&](const AMDTSampleValue& sampleInfo) {
-                        return counterId == sampleInfo.m_counterId;
-                    });
-
-                    if (iter == aggrSampleValueVec.cend())
+                    if (isRawCounter)
                     {
-                        continue;
-                    }
+                        auto iter = std::find_if(aggrSampleValueVec.cbegin(), aggrSampleValueVec.cend(),
+                            [&](const AMDTSampleValue& sampleInfo) {
+                            return counterId == sampleInfo.m_counterId;
+                        });
 
-                    double totalSamples = iter->m_sampleCount;
-                    auto appSamplePercent = CalculatePercent(sampleCount, totalSamples);
+                        auto totalSamples = (iter != aggrSampleValueVec.cend()) ? iter->m_sampleCount : 0.0;
+                        appSamplePercent = CalculatePercent(sampleCount, totalSamples);
+                    }
 
                     if (isFirst)
                     {
@@ -465,9 +479,12 @@ bool SourceCodeTreeModel::BuildDisassemblyTree()
                         pAsmItem->setData(SOURCE_VIEW_SAMPLES_PERCENT_COLUMN, funcSamplePercent);
                         pAsmItem->setForeground(SOURCE_VIEW_SAMPLES_PERCENT_COLUMN, acRED_NUMBER_COLOUR);
 
-                        SetTooltipFormat(sampleCount, funcSamplePercent, appSamplePercent, var);
-                        pAsmItem->setTooltip(SOURCE_VIEW_SAMPLES_COLUMN, var);
-                        pAsmItem->setTooltip(SOURCE_VIEW_SAMPLES_PERCENT_COLUMN, var);
+                        if (isRawCounter)
+                        {
+                            SetTooltipFormat(sampleCount, funcSamplePercent, appSamplePercent, var);
+                            pAsmItem->setTooltip(SOURCE_VIEW_SAMPLES_COLUMN, var);
+                            pAsmItem->setTooltip(SOURCE_VIEW_SAMPLES_PERCENT_COLUMN, var);
+                        }
 
                         isFirst = false;
                     }
@@ -485,9 +502,12 @@ bool SourceCodeTreeModel::BuildDisassemblyTree()
                         pAsmItem->setData(column, var);
                     }
 
-                    QVariant tooltip;
-                    SetTooltipFormat(sampleCount, funcSamplePercent, appSamplePercent, tooltip);
-                    pAsmItem->setTooltip(column, tooltip);
+                    if (isRawCounter)
+                    {
+                        QVariant tooltip;
+                        SetTooltipFormat(sampleCount, funcSamplePercent, appSamplePercent, tooltip);
+                        pAsmItem->setTooltip(column, tooltip);
+                    }
 
                     column++;
                 }
@@ -629,21 +649,21 @@ void SourceCodeTreeModel::PopulateFunctionSampleData(const AMDTProfileFunctionDa
 
         for (const auto& sample : srcData.m_sampleValues)
         {
-            auto iter = std::find_if(aggrSampleValueVec.cbegin(), aggrSampleValueVec.cend(),
-                [&](const AMDTSampleValue& sampleInfo) {
-                return sample.m_counterId == sampleInfo.m_counterId;
-            });
-
-            if (iter == aggrSampleValueVec.cend())
-            {
-                continue;
-            }
-
-            double totalSamples = iter->m_sampleCount;
-
+            bool isRawCounter = IsRawCounter(sample.m_counterId);
             auto sampleValue = sample.m_sampleCount;
             auto sampleValuePer = sample.m_sampleCountPercentage;
-            auto appSamplePercent = CalculatePercent(sampleValue, totalSamples);
+            double appSamplePercent = 0.0;
+
+            if (isRawCounter)
+            {
+                auto iter = std::find_if(aggrSampleValueVec.cbegin(), aggrSampleValueVec.cend(),
+                    [&](const AMDTSampleValue& sampleInfo) {
+                    return sample.m_counterId == sampleInfo.m_counterId;
+                });
+
+                auto totalSamples = (iter != aggrSampleValueVec.cend()) ? iter->m_sampleCount : 0.0;
+                appSamplePercent = CalculatePercent(sampleValue, totalSamples);
+            }
 
             if (isFirst)
             {
@@ -654,9 +674,12 @@ void SourceCodeTreeModel::PopulateFunctionSampleData(const AMDTProfileFunctionDa
                 pLineItem->setData(SOURCE_VIEW_SAMPLES_PERCENT_COLUMN, sampleValuePer);
                 pLineItem->setForeground(SOURCE_VIEW_SAMPLES_PERCENT_COLUMN, acRED_NUMBER_COLOUR);
 
-                SetTooltipFormat(sampleValue, sampleValuePer, appSamplePercent, var);
-                pLineItem->setTooltip(SOURCE_VIEW_SAMPLES_COLUMN, var);
-                pLineItem->setTooltip(SOURCE_VIEW_SAMPLES_PERCENT_COLUMN, var);
+                if (isRawCounter)
+                {
+                    SetTooltipFormat(sampleValue, sampleValuePer, appSamplePercent, var);
+                    pLineItem->setTooltip(SOURCE_VIEW_SAMPLES_COLUMN, var);
+                    pLineItem->setTooltip(SOURCE_VIEW_SAMPLES_PERCENT_COLUMN, var);
+                }
 
                 isFirst = false;
             }
@@ -674,9 +697,12 @@ void SourceCodeTreeModel::PopulateFunctionSampleData(const AMDTProfileFunctionDa
                 pLineItem->setData(column, var);
             }
 
-            QVariant tooltip;
-            SetTooltipFormat(sample.m_sampleCount, sample.m_sampleCountPercentage, appSamplePercent, tooltip);
-            pLineItem->setTooltip(column, tooltip);
+            if (isRawCounter)
+            {
+                QVariant tooltip;
+                SetTooltipFormat(sample.m_sampleCount, sample.m_sampleCountPercentage, appSamplePercent, tooltip);
+                pLineItem->setTooltip(column, tooltip);
+            }
 
             column++;
         }
@@ -703,24 +729,24 @@ void SourceCodeTreeModel::PopulateFunctionSampleData(const AMDTProfileFunctionDa
                 // by default the hotspot is always DC Access(index = 0)
                 column = SOURCE_VIEW_SAMPLES_PERCENT_COLUMN + 1;
                 bool isFirstSample = true;
+                double appSamplePercent = 0.0;
 
                 for (const auto& aSampleValue : sampleValue)
                 {
+                    bool isRawCounter = IsRawCounter(aSampleValue.m_counterId);
                     auto sampleCount = aSampleValue.m_sampleCount;
                     auto sampleCountPer = aSampleValue.m_sampleCountPercentage;
 
-                    auto iter = std::find_if(aggrSampleValueVec.cbegin(), aggrSampleValueVec.cend(),
-                        [&](const AMDTSampleValue& sampleInfo) {
-                        return aSampleValue.m_counterId == sampleInfo.m_counterId;
-                    });
-
-                    if (iter == aggrSampleValueVec.cend())
+                    if (isRawCounter)
                     {
-                        continue;
-                    }
+                        auto iter = std::find_if(aggrSampleValueVec.cbegin(), aggrSampleValueVec.cend(),
+                            [&](const AMDTSampleValue& sampleInfo) {
+                            return aSampleValue.m_counterId == sampleInfo.m_counterId;
+                        });
 
-                    auto totalSamples = iter->m_sampleCount;
-                    auto appSamplePercent = CalculatePercent(sampleCount, totalSamples);
+                        auto totalSamples = (iter != aggrSampleValueVec.cend()) ? iter->m_sampleCount : 0.0;
+                        appSamplePercent = CalculatePercent(sampleCount, totalSamples);
+                    }
 
                     if (isFirstSample)
                     {
@@ -730,9 +756,12 @@ void SourceCodeTreeModel::PopulateFunctionSampleData(const AMDTProfileFunctionDa
                         pAsmItem->setData(SOURCE_VIEW_SAMPLES_PERCENT_COLUMN, sampleCountPer);
                         pAsmItem->setForeground(SOURCE_VIEW_SAMPLES_PERCENT_COLUMN, acRED_NUMBER_COLOUR);
 
-                        SetTooltipFormat(sampleCount, sampleCountPer, appSamplePercent, var);
-                        pAsmItem->setTooltip(SOURCE_VIEW_SAMPLES_COLUMN, var);
-                        pAsmItem->setTooltip(SOURCE_VIEW_SAMPLES_PERCENT_COLUMN, var);
+                        if (isRawCounter)
+                        {
+                            SetTooltipFormat(sampleCount, sampleCountPer, appSamplePercent, var);
+                            pAsmItem->setTooltip(SOURCE_VIEW_SAMPLES_COLUMN, var);
+                            pAsmItem->setTooltip(SOURCE_VIEW_SAMPLES_PERCENT_COLUMN, var);
+                        }
 
                         isFirstSample = false;
                     }
@@ -750,9 +779,12 @@ void SourceCodeTreeModel::PopulateFunctionSampleData(const AMDTProfileFunctionDa
                         pAsmItem->setData(column, var);
                     }
 
-                    QVariant tooltip;
-                    SetTooltipFormat(sampleCount, sampleCountPer, appSamplePercent, tooltip);
-                    pAsmItem->setTooltip(column, tooltip);
+                    if (isRawCounter)
+                    {
+                        QVariant tooltip;
+                        SetTooltipFormat(sampleCount, sampleCountPer, appSamplePercent, tooltip);
+                        pAsmItem->setTooltip(column, tooltip);
+                    }
 
                     column++;
                 }
@@ -1187,22 +1219,23 @@ void SourceCodeTreeModel::SetHotSpotsrcLnSamples(AMDTUInt32 counterId,
                 pLineItem->setData(SOURCE_VIEW_SAMPLES_PERCENT_COLUMN, sampleValuePer);
                 pLineItem->setForeground(SOURCE_VIEW_SAMPLES_PERCENT_COLUMN, acRED_NUMBER_COLOUR);
 
-                auto iter = std::find_if(aggrSampleValueVec.cbegin(), aggrSampleValueVec.cend(),
-                    [&](const AMDTSampleValue& sampleInfo) {
+                QVariant tooltip;
+
+                if (IsRawCounter(counterId))
+                {
+                    auto iter = std::find_if(aggrSampleValueVec.cbegin(), aggrSampleValueVec.cend(),
+                        [&](const AMDTSampleValue& sampleInfo) {
                         return sampleCounterId == sampleInfo.m_counterId;
                     });
 
-                if (iter == aggrSampleValueVec.cend())
-                {
-                    continue;
+                    auto totalSamples = (iter != aggrSampleValueVec.cend()) ? iter->m_sampleCount : 0.0;
+                    auto appSamplePercent = CalculatePercent(sampleCount, totalSamples);
+
+                    SetTooltipFormat(sampleCount, sampleValuePer, appSamplePercent, tooltip);
                 }
 
-                double totalSamples = iter->m_sampleCount;
-                auto appSamplePercent = CalculatePercent(sampleCount, totalSamples);
-
-                SetTooltipFormat(sampleCount, sampleValuePer, appSamplePercent, var);
-                pLineItem->setTooltip(SOURCE_VIEW_SAMPLES_COLUMN, var);
-                pLineItem->setTooltip(SOURCE_VIEW_SAMPLES_PERCENT_COLUMN, var);
+                pLineItem->setTooltip(SOURCE_VIEW_SAMPLES_COLUMN, tooltip);
+                pLineItem->setTooltip(SOURCE_VIEW_SAMPLES_PERCENT_COLUMN, tooltip);
 
                 int idx = 0;
 
@@ -1228,22 +1261,23 @@ void SourceCodeTreeModel::SetHotSpotsrcLnSamples(AMDTUInt32 counterId,
                                 pAsmItem->setData(SOURCE_VIEW_SAMPLES_PERCENT_COLUMN, sampleCountPer);
                                 pAsmItem->setForeground(SOURCE_VIEW_SAMPLES_PERCENT_COLUMN, acRED_NUMBER_COLOUR);
 
-                                auto iter = std::find_if(aggrSampleValueVec.cbegin(), aggrSampleValueVec.cend(),
-                                    [&](const AMDTSampleValue& sampleInfo) {
+                                QVariant tooltip;
+
+                                if (IsRawCounter(counterId))
+                                {
+                                    auto iter = std::find_if(aggrSampleValueVec.cbegin(), aggrSampleValueVec.cend(),
+                                        [&](const AMDTSampleValue& sampleInfo) {
                                         return sample.m_counterId == sampleInfo.m_counterId;
                                     });
 
-                                if (iter == aggrSampleValueVec.cend())
-                                {
-                                    continue;
+                                    auto totalSamples = (iter != aggrSampleValueVec.cend()) ? iter->m_sampleCount : 0.0;
+                                    auto appSamplePercent = CalculatePercent(sampleCount, totalSamples);
+
+                                    SetTooltipFormat(sampleCount, sampleCountPer, appSamplePercent, tooltip);
                                 }
 
-                                double totalSamples = iter->m_sampleCount;
-                                double appSamplePercent = CalculatePercent(sampleCount, totalSamples);
-
-                                SetTooltipFormat(sampleCount, sampleCountPer, appSamplePercent, var);
-                                pAsmItem->setTooltip(SOURCE_VIEW_SAMPLES_COLUMN, var);
-                                pAsmItem->setTooltip(SOURCE_VIEW_SAMPLES_PERCENT_COLUMN, var);
+                                pAsmItem->setTooltip(SOURCE_VIEW_SAMPLES_COLUMN, tooltip);
+                                pAsmItem->setTooltip(SOURCE_VIEW_SAMPLES_PERCENT_COLUMN, tooltip);
                             }
                         }
                     }
@@ -1288,22 +1322,23 @@ void SourceCodeTreeModel::SetHotSpotDisamOnlySamples(AMDTUInt32 counterId,
                     pAsmItem->setData(SOURCE_VIEW_SAMPLES_PERCENT_COLUMN, samplePercent);
                     pAsmItem->setForeground(SOURCE_VIEW_SAMPLES_PERCENT_COLUMN, acRED_NUMBER_COLOUR);
 
-                    auto iter = std::find_if(aggrSampleValueVec.cbegin(), aggrSampleValueVec.cend(),
-                        [&](const AMDTSampleValue& sampleInfo) {
+                    QVariant tooltip;
+
+                    if (IsRawCounter(counterId))
+                    {
+                        auto iter = std::find_if(aggrSampleValueVec.cbegin(), aggrSampleValueVec.cend(),
+                            [&](const AMDTSampleValue& sampleInfo) {
                             return counterId == sampleInfo.m_counterId;
                         });
 
-                    if (iter == aggrSampleValueVec.cend())
-                    {
-                        continue;
+                        auto totalSamples = (iter != aggrSampleValueVec.cend()) ? iter->m_sampleCount : 0.0;
+                        auto appSamplesPercent = CalculatePercent(sampleCount, totalSamples);
+
+                        SetTooltipFormat(sampleCount, samplePercent, appSamplesPercent, tooltip);
                     }
 
-                    double totalSamples = iter->m_sampleCount;
-                    double appSamplesPercent = CalculatePercent(sampleCount, totalSamples);
-
-                    SetTooltipFormat(sampleCount, samplePercent, appSamplesPercent, var);
-                    pAsmItem->setTooltip(SOURCE_VIEW_SAMPLES_COLUMN, var);
-                    pAsmItem->setTooltip(SOURCE_VIEW_SAMPLES_PERCENT_COLUMN, var);
+                    pAsmItem->setTooltip(SOURCE_VIEW_SAMPLES_COLUMN, tooltip);
+                    pAsmItem->setTooltip(SOURCE_VIEW_SAMPLES_PERCENT_COLUMN, tooltip);
                 }
             }
 

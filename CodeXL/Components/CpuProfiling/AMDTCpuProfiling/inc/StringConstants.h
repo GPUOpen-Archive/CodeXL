@@ -264,7 +264,7 @@ const QString CPU_PROF_MESSAGE(QObject::tr("CPU Profiling Error"));
 #define CP_sourceCodeViewDoubleClickText "Scroll down to display the next block of disassembly instructions."
 #define CP_sourceCodeViewDoubleClickTooltip "Disassembly size is too large to display. Scroll down to display the next block of disassembly instructions."
 #define CP_sourceCodeViewBreak "----- break -----"
-#define CP_sourceCodeViewFunctionsPercentageTooltip "%2.2f%% of functions samples, %2.2f%% of application samples"
+#define CP_sourceCodeViewFunctionsPercentageTooltip "%2.2f%% of functions samples, %2.2f%% of total samples"
 #define CP_sourceCodeViewDisassemblyChunkSizeExtractionFailure L"Failed to extract disassembly instructions chunk size from the global settings."
 #define CP_sourceCodeViewProgressDisassemblyUpdate L"Building Disassembly Instructions..."
 #define CP_sourceCodeViewProgressSamplesUpdate L"Updating Source Code Sample Values..."

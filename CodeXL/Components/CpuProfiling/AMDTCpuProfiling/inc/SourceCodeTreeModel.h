@@ -128,6 +128,12 @@ private:
                               const AMDTProfileInstructionDataVec& dataVec,
                               AMDTSampleValueVec& sampleValue) const;
 
+    bool IsRawCounter(AMDTCounterId counterId)
+    {
+        auto ctr = m_rawCounterIdMap.find(counterId);
+        return (ctr != m_rawCounterIdMap.end()) ? ctr->second : false;
+    }
+
 private:
     SourceCodeTreeView* m_pSessionSourceCodeTreeView = nullptr;
 
@@ -174,6 +180,9 @@ private:
     // srcLineNumber for sampled  --> SourceViewTreeItem
     std::vector<std::pair<AMDTProfileSourceLineData, SourceViewTreeItem*>> m_sampleSrcLnViewTreeList;
     std::vector<SourceViewTreeItem*> m_srcLineViewTreeMap;
+
+    // Raw CounterId Map
+    gtMap<AMDTCounterId, bool> m_rawCounterIdMap;
 };
 
 #endif //__SOURCECODETREEMODEL_H

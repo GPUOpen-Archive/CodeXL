@@ -83,6 +83,7 @@ public:
 
     // Returns the information about the counters used for sampling to collect profile data.
     // Does not return the calculated counetrs like CPI, IPC etc
+    bool GetCounterDescById(AMDTCounterId counterId, AMDTProfileCounterDesc& counterDesc);
     bool GetSampledCountersList(AMDTProfileCounterDescVec& counterDesc);
     bool GetSamplingConfiguration(AMDTUInt32 counterId, AMDTProfileSamplingConfig& counterDesc);
     bool GetReportConfigurations(AMDTProfileReportConfigVec& reportConfigs);

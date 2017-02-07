@@ -265,6 +265,7 @@ bool DisplayFilter::InitToDefault()
         m_options.m_isSeperateByCore = false;
         m_options.m_isSeperateByNuma = false;
         m_options.m_ignoreSystemModules = !g_displaySystemModule;
+        m_options.m_counters.clear();
 
         //setting all counters for config "All Data"
         for (auto const& counter : m_reportConfigs[0].m_counterDescs)

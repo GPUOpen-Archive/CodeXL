@@ -1037,9 +1037,7 @@ bool CpuSessionWindow::checkIfDataIsPresent()
 {
     bool ret = true;
 
-    // TODO: SessionHasSamples() is not returning correct result for CLU.
-
-    if (!IsProfilingTypeCLU() && !m_pProfDataRd->SessionHasSamples())
+    if (!m_pProfDataRd->SessionHasSamples())
     {
         ret = false;
         QMessageBox::information(this, "No Samples available", "The selected session does not have any data, please try again.");

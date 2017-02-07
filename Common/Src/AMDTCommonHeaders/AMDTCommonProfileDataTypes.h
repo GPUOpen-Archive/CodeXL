@@ -73,6 +73,11 @@ enum AMDTProfileCounterUnit
     AMDT_PROFILE_COUNTER_UNIT_PERCENT = 3,
 };
 
+enum AMDTProfileCategory
+{
+    AMDT_PROFILE_COUNTER_CATEGORY_CLU = 1,
+};
+
 enum AMDTModuleType
 {
     AMDT_MODULE_TYPE_NONE           = 0,
@@ -149,7 +154,7 @@ struct AMDTProfileCounterDesc
     AMDTUInt32              m_type;         // AMDTProfileCounterType
     AMDTUInt32              m_category;     // UNUSED for CPU Profiler. For Power profiler it is Power/Frequency/Temperature
     AMDTUInt32              m_unit;         // AMDTProfileCounterUnit
-
+    bool                    m_isLowerValueBetter = true;
 
     // these are required due to old pp table design
     gtString                m_typeStr;

@@ -844,43 +844,43 @@ public:
             ColumnSpecList columnSpecList;
             columnSpecList.reserve(nbrEvents + 3);
 
-            ColumnSpec cs;
-
-            // First Add the derived counters?
-            PrepareComputedCounterForCLU(CXL_CLU_EVENT_CLU_PERCENTAGE, cs);
-            columnSpecList.push_back(cs);
-
-            PrepareComputedCounterForCLU(CXL_CLU_EVENT_BYTES_PER_L1_EVICTION, cs);
-            columnSpecList.push_back(cs);
-
-            PrepareComputedCounterForCLU(CXL_CLU_EVENT_ACCESSES_PER_L1_EVICTION, cs);
-            columnSpecList.push_back(cs);
-
             for (auto& event : m_sampledCounterDescVec)
             {
-                if ((CXL_CLU_EVENT_CLU_PERCENTAGE == event.m_id)
-                    || (CXL_CLU_EVENT_BYTES_PER_L1_EVICTION == event.m_id)
-                    || (CXL_CLU_EVENT_ACCESSES_PER_L1_EVICTION == event.m_id))
+                ColumnSpec cs;
+                if (CXL_CLU_EVENT_CLU_PERCENTAGE == event.m_id)
                 {
-                    continue;
-                }
-
-                AMDTProfileSamplingConfig sampleConfig;
-                ret = GetSamplingConfiguration(event.m_id, sampleConfig);
-
-                if (ret)
-                {
-                    cs.type = ColumnValue;
-                    cs.sorting = NoSort;
-                    cs.title = std::string(event.m_name.asASCIICharArray());
-                    cs.dataSelectRight.eventSelect = 0;
-                    cs.dataSelectRight.eventUnitMask = 0;
-                    cs.dataSelectRight.bitOs = 0;
-                    cs.dataSelectRight.bitUsr = 0;
-
-                    ConstructEventConfig(sampleConfig, cs.dataSelectLeft);
-
+                    PrepareComputedCounterForCLU(CXL_CLU_EVENT_CLU_PERCENTAGE, cs);
                     columnSpecList.push_back(cs);
+                }
+                else if (CXL_CLU_EVENT_BYTES_PER_L1_EVICTION == event.m_id)
+                {
+                    PrepareComputedCounterForCLU(CXL_CLU_EVENT_BYTES_PER_L1_EVICTION, cs);
+                    columnSpecList.push_back(cs);
+                }
+                else if (CXL_CLU_EVENT_ACCESSES_PER_L1_EVICTION == event.m_id)
+                {
+                    PrepareComputedCounterForCLU(CXL_CLU_EVENT_ACCESSES_PER_L1_EVICTION, cs);
+                    columnSpecList.push_back(cs);
+                }
+                else
+                {
+                    AMDTProfileSamplingConfig sampleConfig;
+                    ret = GetSamplingConfiguration(event.m_id, sampleConfig);
+
+                    if (ret)
+                    {
+                        cs.type = ColumnValue;
+                        cs.sorting = NoSort;
+                        cs.title = std::string(event.m_name.asASCIICharArray());
+                        cs.dataSelectRight.eventSelect = 0;
+                        cs.dataSelectRight.eventUnitMask = 0;
+                        cs.dataSelectRight.bitOs = 0;
+                        cs.dataSelectRight.bitUsr = 0;
+
+                        ConstructEventConfig(sampleConfig, cs.dataSelectLeft);
+
+                        columnSpecList.push_back(cs);
+                    }
                 }
             }
 
@@ -911,6 +911,8 @@ public:
                     eventDesc.m_id = cluCounterDesc.m_id;
                     eventDesc.m_type = cluCounterDesc.m_type;
                     eventDesc.m_unit = cluCounterDesc.m_unit;
+                    eventDesc.m_category = AMDT_PROFILE_COUNTER_CATEGORY_CLU;
+                    eventDesc.m_isLowerValueBetter = false;
                 }
             }
             else if (eventDesc.m_id == CXL_CLU_EVENT_BYTES_PER_L1_EVICTION)
@@ -920,6 +922,8 @@ public:
                     eventDesc.m_id = cluCounterDesc.m_id;
                     eventDesc.m_type = cluCounterDesc.m_type;
                     eventDesc.m_unit = cluCounterDesc.m_unit;
+                    eventDesc.m_category = AMDT_PROFILE_COUNTER_CATEGORY_CLU;
+                    eventDesc.m_isLowerValueBetter = false;
                 }
             }
             else if (eventDesc.m_id == CXL_CLU_EVENT_ACCESSES_PER_L1_EVICTION)
@@ -929,6 +933,8 @@ public:
                     eventDesc.m_id = cluCounterDesc.m_id;
                     eventDesc.m_type = cluCounterDesc.m_type;
                     eventDesc.m_unit = cluCounterDesc.m_unit;
+                    eventDesc.m_category = AMDT_PROFILE_COUNTER_CATEGORY_CLU;
+                    eventDesc.m_isLowerValueBetter = false;
                 }
             }
         }
@@ -1379,17 +1385,17 @@ public:
             counterIdList.push_back(counterId);
 
             ret = m_pDbAdapter->GetProfileData(type,
-                                               AMDT_PROFILE_ALL_PROCESSES,
-                                               AMDT_PROFILE_ALL_MODULES,
-                                               AMDT_PROFILE_ALL_THREADS,
-                                               counterIdList,
-                                               m_options.m_coreMask,
-                                               m_options.m_ignoreSystemModules,
-                                               m_options.m_isSeperateByCore,
-                                               false,  // separateByProcess
-                                               m_options.m_doSort,
-                                               m_options.m_summaryCount,
-                                               summaryDataVec);
+                AMDT_PROFILE_ALL_PROCESSES,
+                AMDT_PROFILE_ALL_MODULES,
+                AMDT_PROFILE_ALL_THREADS,
+                counterIdList,
+                m_options.m_coreMask,
+                m_options.m_ignoreSystemModules,
+                m_options.m_isSeperateByCore,
+                false,  // separateByProcess
+                m_options.m_doSort,
+                m_options.m_summaryCount,
+                summaryDataVec);
 
             ret = AddOthersEntry(type, summaryDataVec, counterId);
 
@@ -1669,7 +1675,7 @@ public:
         {
             AMDTCounterIdVec countersList;
 
-            ret = GetAllSampledCountersIdList(countersList);
+            ret = GetCountersList(countersList);
 
             ret = ret && m_pDbAdapter->GetCounterTotals(AMDT_PROFILE_DATA_PROCESS,
                                                         AMDT_PROFILE_ALL_PROCESSES,
@@ -1702,7 +1708,12 @@ public:
 
                 ret = ret && RemoveUnnecessaryCounters(counterId, processSummaryData);
 
-                // TODO: Return only the top five entriess
+                if (desc.m_category == AMDT_PROFILE_COUNTER_CATEGORY_CLU)
+                {
+                    std::sort(processSummaryData.begin(), processSummaryData.end(),
+                        [](AMDTProfileData const& a, AMDTProfileData const& b) { return a.m_sampleValue.at(0).m_sampleCount < b.m_sampleValue.at(0).m_sampleCount; });
+                }
+
                 if (processSummaryData.size() > 5)
                 {
                     processSummaryData.erase(processSummaryData.begin() + 5, processSummaryData.end());
@@ -1728,19 +1739,22 @@ public:
             if (AMDT_PROFILE_COUNTER_TYPE_RAW == desc.m_type)
             {
                 ret = GetSummaryData(AMDT_PROFILE_DATA_MODULE, counterId, moduleSummaryData);
-
             }
             else if (AMDT_PROFILE_COUNTER_TYPE_COMPUTED == desc.m_type)
             {
                 ret = GetModuleProfileData(AMDT_PROFILE_ALL_PROCESSES, AMDT_PROFILE_ALL_MODULES, moduleSummaryData);
                 ret = ret && RemoveUnnecessaryCounters(counterId, moduleSummaryData);
 
-                // TODO: Return only the top five entriess
+                if (desc.m_category == AMDT_PROFILE_COUNTER_CATEGORY_CLU)
+                {
+                    std::sort(moduleSummaryData.begin(), moduleSummaryData.end(),
+                        [](AMDTProfileData const& a, AMDTProfileData const& b) { return a.m_sampleValue.at(0).m_sampleCount < b.m_sampleValue.at(0).m_sampleCount; });
+                }
+
                 if (moduleSummaryData.size() > 5)
                 {
                     moduleSummaryData.erase(moduleSummaryData.begin() + 5, moduleSummaryData.end());
                 }
-
             }
         }
 
@@ -1763,7 +1777,12 @@ public:
                 ret = GetFunctionProfileData(AMDT_PROFILE_ALL_PROCESSES, AMDT_PROFILE_ALL_MODULES, funcSummaryData);
                 ret = ret && RemoveUnnecessaryCounters(counterId, funcSummaryData);
 
-                // TODO: Return only the top five entriess
+                if (desc.m_category == AMDT_PROFILE_COUNTER_CATEGORY_CLU)
+                {
+                    std::sort(funcSummaryData.begin(), funcSummaryData.end(),
+                        [](AMDTProfileData const& a, AMDTProfileData const& b) { return a.m_sampleValue.at(0).m_sampleCount < b.m_sampleValue.at(0).m_sampleCount; });
+                }
+
                 if (funcSummaryData.size() > 5)
                 {
                     funcSummaryData.erase(funcSummaryData.begin() + 5, funcSummaryData.end());
@@ -2628,6 +2647,7 @@ public:
         {
             srcInfoVec = funcSrcInfoIt->second;
             foundSrcInfo = true;
+            rv = CXL_DATAACCESS_SUCCESS;
         }
 
         if (!foundSrcInfo)
@@ -4583,6 +4603,18 @@ bool cxlProfileDataReader::GetCpuTopology(AMDTCpuTopologyVec& cpuTopologyVec)
     if (nullptr != m_pImpl)
     {
         ret = m_pImpl->GetCpuTopology(cpuTopologyVec);
+    }
+
+    return ret;
+}
+
+bool cxlProfileDataReader::GetCounterDescById(AMDTCounterId counterId, AMDTProfileCounterDesc& counterDesc)
+{
+    bool ret = false;
+
+    if (nullptr != m_pImpl)
+    {
+        ret = m_pImpl->GetCounterDescById(counterId, counterDesc);
     }
 
     return ret;
