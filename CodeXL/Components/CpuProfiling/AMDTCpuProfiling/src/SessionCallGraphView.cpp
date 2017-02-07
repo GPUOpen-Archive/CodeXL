@@ -38,6 +38,9 @@
 #include <AMDTSharedProfiling/inc/ProfileApplicationTreeHandler.h>
 #include <AMDTSharedProfiling/inc/StringConstants.h>
 
+// Backend
+#include <AMDTCpuPerfEventUtils/inc/EventEngine.h>
+
 // Local:
 #include <inc/AmdtCpuProfiling.h>
 #include <inc/Auxil.h>
@@ -1775,9 +1778,15 @@ bool SessionCallGraphView::fillCounterIndicatorCombo()
 
         for (const auto& counter : counterDesc)
         {
-            // TODO : change with abbreviation
-            supportedCounterList << acGTStringToQString(counter.m_name);
-            m_hotSpotCounterIdMap.push_back(counter.m_id);
+            gtUInt16 eventId = counter.m_hwEventId;
+
+            // If IBS profiling, show only the Fetch and OP events. This should be handled in BE report layer
+            if (IsTimerEvent(eventId) || IsPmcEvent(eventId) || IsL2IEvent(eventId) || IsIbsEvent(eventId))
+            {
+                // TODO : change with abbreviation
+                supportedCounterList << acGTStringToQString(counter.m_name);
+                m_hotSpotCounterIdMap.push_back(counter.m_id);
+            }
         }
 
         if (!supportedCounterList.empty())
@@ -1788,6 +1797,7 @@ bool SessionCallGraphView::fillCounterIndicatorCombo()
         // Enable the combo if there are strings in the list:
         m_pHotSpotIndicatorComboBoxAction->UpdateEnabled(supportedCounterList.size() > 1);
     }
+
     return true;
 }
 
