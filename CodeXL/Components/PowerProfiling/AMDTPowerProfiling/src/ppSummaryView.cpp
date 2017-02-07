@@ -390,9 +390,13 @@ void ppSummaryView::AddGraphVertically(QCustomPlot* plot, GraphContainer contain
     widget->layout()->addWidget(plot);
     if (container == CONTAINER_PP_FREQ_CPU_GRAPH ||
         container == CONTAINER_PP_FREQ_GPU_GRAPH)
+    {
         widget->setMinimumSize(PP_SUMMARY_PLOT_MIN_WIDTH, PP_SUMMARY_PLOT_MIN_HEIGHT + PP_SUMMARY_PLOT_EXTRA_HEIGHT);
+    }
     else
+    {
         widget->setMinimumSize(PP_SUMMARY_PLOT_MIN_WIDTH, PP_SUMMARY_PLOT_MIN_HEIGHT);
+    }
     parent->layout()->addWidget(widget);
 }
 
