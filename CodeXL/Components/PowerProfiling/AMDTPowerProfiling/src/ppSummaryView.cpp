@@ -113,6 +113,7 @@ ppSummaryView::ppSummaryView(ppSessionView* pParentSession, ppSessionController*
 
     // Create the HTML window for the summary information:
     m_pHTMLInfoWindow = new acQHTMLWindow(nullptr);
+    // Excluding extra information section as it is redundant
     //addWidget(m_pHTMLInfoWindow);
 
     int samplingDuration = 0;
