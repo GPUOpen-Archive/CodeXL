@@ -351,7 +351,14 @@ VOID NTAPI SampleDataCallback(PCORE_DATA* pData)
         pCoreCfg->m_contextData.m_timeStamp = pData->timeStamp;
         pCoreCfg->m_contextData.m_ip =  KxGetInstructionPointerFromTrapFrame(pData->pTrapFrame);
 
-        WriteSampleData(pCoreCfg);
+        if(!pCoreCfg->m_skipFirst)
+        {
+            WriteSampleData(pCoreCfg);
+        }
+        else
+        {
+            pCoreCfg->m_skipFirst = 0;
+        }
 
         // Trigger event to client to inform the data availability
         if (1 == pCoreCfg->m_sampleId)

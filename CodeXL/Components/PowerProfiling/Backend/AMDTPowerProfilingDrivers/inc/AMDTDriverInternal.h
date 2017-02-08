@@ -73,6 +73,8 @@ typedef struct CoreData
     OsCoreCfgData*   m_pOsData;
     PmcCounters      m_pmc[PMC_EVENT_MAX_CNT];
     PwrInternalAddr  m_internalCounter;
+    uint32           m_skipFirst;
+    uint32           m_fill1;
 } CoreData;
 
 #endif //_AMDTDRIVER_INTERNAL_H

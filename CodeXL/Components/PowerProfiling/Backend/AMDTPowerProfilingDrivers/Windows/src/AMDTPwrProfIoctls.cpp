@@ -599,6 +599,12 @@ NTSTATUS IoctlAddProfConfigsHandler(IN PPWRPROF_DEV_EXTENSION pDevExt,
                 pCoreCfg->m_counterMask = coreCounterMask | phyCoreMask;
                 pCoreCfg->m_smuCfg = NULL;
             }
+            pCoreCfg->m_skipFirst = 0;
+
+            if (PROFILE_TYPE_PROCESS_PROFILING != pCoreCfg->m_profileType)
+            {
+                pCoreCfg->m_skipFirst = 1;
+            }
 
             PwrExecuteDpc(static_cast<uint32>(confCount), (PKDEFERRED_ROUTINE)PwrCoreInitialize, false);
 
