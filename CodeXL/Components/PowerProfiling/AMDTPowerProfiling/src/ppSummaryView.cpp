@@ -1266,15 +1266,8 @@ void ppSummaryView::SetPowerGraphsCaption()
         powerGraphText = QString(PP_STR_SummaryViewEnergyGraphTypeCumulative).arg(qstrValue).arg(PP_STR_UnitsWatts);
 
         // Update the total / average text items in power & energy graphs:
-        if (GetCpuFamily() == CPU_FAMILY_17)
-        {
-            
-        }
-        else
-        {
-            m_pPowerGraph->SetGraphTitle(powerGraphText);
-            m_pEnergyGraph->SetGraphTitle(energyGraphText);
-        }
+        m_pPowerGraph->SetGraphTitle(powerGraphText);
+        m_pEnergyGraph->SetGraphTitle(energyGraphText);
         
     }
 }
