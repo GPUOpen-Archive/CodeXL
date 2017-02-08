@@ -77,8 +77,9 @@ FOR %%L IN (HwDbg) DO FOR %%E IN (dll pdb) DO xcopy /r /d /y %VSIX_COPY_COMMON_F
 FOR %%L IN (OpenCLDebugAPI) DO FOR %%E IN (dll pdb) DO xcopy /r /d /y %VSIX_COPY_COMMON_FOLDER%Lib\AMD\%%L\1.3\lib\x64\*.%%E %VSIX_COPY_TARGET_DIR%
 
 rem copy data needed for cpu profiling
-xcopy /r /d /y %VSIX_COPY_COMMON_FOLDER%Lib\AMD\AMDTCpuPerfEventUtils\1.0\Data\Profiles\* %VSIX_COPY_TARGET_DIR%Data\Profiles\
-xcopy /r /d /y %VSIX_COPY_COMMON_FOLDER%Lib\AMD\AMDTCpuPerfEventUtils\1.0\Data\Events\Public\* %VSIX_COPY_TARGET_DIR%Data\Events\
+xcopy /r /d /y %VSIX_COPY_CODEXL_FOLDER%Components\CpuProfiling\Data\Profiles\* %VSIX_COPY_TARGET_DIR%Data\Profiles\
+xcopy /r /d /y %VSIX_COPY_CODEXL_FOLDER%Components\CpuProfiling\Data\Events\Public\* %VSIX_COPY_TARGET_DIR%Data\Events\
+xcopy /r /d /y %VSIX_COPY_CODEXL_FOLDER%Components\CpuProfiling\Data\Views\* %VSIX_COPY_TARGET_DIR%Data\Views\
 
 rem copy CodeXL version XML:
 xcopy /r /d /y %VSIX_COPY_CODEXL_FOLDER%Data\Public\VersionSettings.xml %VSIX_COPY_TARGET_DIR%Data\
