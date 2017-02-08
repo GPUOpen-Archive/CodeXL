@@ -28,6 +28,9 @@ const gtUInt32 SAMPLE_PRECISION = 6;
 // The size of disassembly block to be fetched on first time.
 const unsigned int FIRST_DISASSEMBLY_FETCH_BLOCK_SIZE = 1024;
 
+#define SOURCE_CODE_FONT_NAME "Courier New"
+#define SOURCE_CODE_FONT_SIZE 8
+
 
 static inline double CalculatePercent(double sampleValue, double totalSamples)
 {
@@ -71,11 +74,18 @@ SourceCodeTreeModel::SourceCodeTreeModel(const QString& sessionDir,
     QColor color = acGetSystemDefaultBackgroundColor();
     m_forgroundColor = QColor::fromRgb(color.red() * 8 / 10, color.green() * 8 / 10, color.blue() * 8 / 10);
 
+    // Calculate the source code column width:
+    // Set the width to max 80 chars.
+    QFont font(SOURCE_CODE_FONT_NAME, SOURCE_CODE_FONT_SIZE);
+    QFontMetrics fm(font);
+    int width = fm.averageCharWidth();
+    m_sourceColumnWidth = (width > 1) ? (width * 80) : 240;
+
     // construct the raw counter id map
     if (nullptr != m_pProfDataRdr)
     {
         AMDTProfileCounterDescVec counterDescVec;
-        
+
         if (m_pProfDataRdr->GetSampledCountersList(counterDescVec))
         {
             for (const auto& aCounter : counterDescVec)
@@ -179,7 +189,7 @@ QVariant SourceCodeTreeModel::data(const QModelIndex& index, int role) const
             if (index.column() == SOURCE_VIEW_SOURCE_COLUMN ||
                 index.column() == SOURCE_VIEW_CODE_BYTES_COLUMN)
             {
-                QFont font("Courier New", 8);
+                QFont font(SOURCE_CODE_FONT_NAME, SOURCE_CODE_FONT_SIZE);
                 font.setStyleHint(QFont::Monospace);
                 return font;
             }
@@ -190,6 +200,16 @@ QVariant SourceCodeTreeModel::data(const QModelIndex& index, int role) const
             if (index.column() > SOURCE_VIEW_CODE_BYTES_COLUMN)
             {
                 return Qt::AlignCenter;
+            }
+            break;
+        }
+        case Qt::SizeHintRole:
+        {
+            if (index.column() == SOURCE_VIEW_SOURCE_COLUMN)
+            {
+                QSize size;
+                size.setWidth(m_sourceColumnWidth);
+                return size;
             }
             break;
         }

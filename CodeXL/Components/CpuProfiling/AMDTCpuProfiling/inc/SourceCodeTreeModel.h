@@ -9,6 +9,9 @@
 #ifndef __SOURCECODETREEMODEL_H
 #define __SOURCECODETREEMODEL_H
 
+// STL:
+#include <vector>
+
 // Qt:
 #include <QAbstractItemModel>
 
@@ -170,6 +173,8 @@ private:
     QStringList m_headerTooltips;
 
     QColor m_forgroundColor;
+
+    int m_sourceColumnWidth = 0;
 
     AMDTProfileSourceLineDataVec m_srcLineDataVec;
 
