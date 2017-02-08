@@ -423,7 +423,9 @@ void ppSummaryView::InitGraphsAreaForFamily17()
     pVScrollingAreaLayout->addWidget(m_pSessionDurationLabel, 0, Qt::AlignLeft);
 
     for (int i = 0; i < TOTAL_CONTAINER_PP; ++i)
+    {
         m_pGraphContainers[i] = new QWidget(this);
+    }
 
     AddGraphVertically(m_pEnergyGraph->GetPlot(), CONTAINER_PP_ENERGY_GRAPH, pScrollAreaWidget);
     AddGraphVertically(m_pPowerGraph->GetPlot(), CONTAINER_PP_POWER_GRAPH, pScrollAreaWidget);
@@ -556,9 +558,13 @@ void ppSummaryView::SetPowerOrEnergyGraphData(bool isDataFromEvent, const ppData
                 {
                     int ratio = PP_SUMMARY_PLOT_MIN_WIDTH / 10;
                     if (sampledGraphType == ppDataUtils::POWERGRAPHTYPE_CUMULATIVE)
+                    {
                         m_pGraphContainers[CONTAINER_PP_ENERGY_GRAPH]->setMinimumWidth(PP_SUMMARY_PLOT_MIN_WIDTH + (ratio*(counterIds.size()-10)));
+                    }
                     else
+                    {
                         m_pGraphContainers[CONTAINER_PP_POWER_GRAPH]->setMinimumWidth(PP_SUMMARY_PLOT_MIN_WIDTH + (ratio*(counterIds.size() - 10)));
+                    }
                 }
             }
 
@@ -673,7 +679,9 @@ void ppSummaryView::InitCpuGraph()
     {
         m_pFreqCpuGraph->GetPlot()->setVisible(false);
         if (GetCpuFamily() == CPU_FAMILY_17)
+        {
             m_pGraphContainers[CONTAINER_PP_FREQ_CPU_GRAPH]->setVisible(false);
+        }
     }
 }
 
@@ -709,7 +717,9 @@ void ppSummaryView::InitGpuGraph()
     {
         m_pFreqGpuGraph->GetPlot()->setVisible(false);
         if (GetCpuFamily() == CPU_FAMILY_17)
+        {
             m_pGraphContainers[CONTAINER_PP_FREQ_GPU_GRAPH]->setVisible(false);
+        }
     }
 }
 
