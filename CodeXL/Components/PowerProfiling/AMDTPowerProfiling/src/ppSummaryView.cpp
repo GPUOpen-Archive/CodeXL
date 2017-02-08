@@ -422,7 +422,7 @@ void ppSummaryView::InitGraphsAreaForFamily17()
     m_pSessionDurationLabel = new QLabel(PP_STR_SummaryDurationLabel);
     pVScrollingAreaLayout->addWidget(m_pSessionDurationLabel, 0, Qt::AlignLeft);
 
-    for (int i = 0; i < TOTAL_CONTAINER_PP; ++i)
+    for (unsigned int i = 0; i < TOTAL_CONTAINER_PP; ++i)
     {
         m_pGraphContainers[i] = new QWidget(this);
     }
