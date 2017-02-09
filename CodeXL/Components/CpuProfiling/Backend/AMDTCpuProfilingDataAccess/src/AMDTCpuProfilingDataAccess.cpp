@@ -620,7 +620,7 @@ public:
                     counterDesc.m_type = AMDT_PROFILE_COUNTER_TYPE_COMPUTED;
                     counterDesc.m_hwEventId = AMDT_PROFILE_ALL_COUNTERS;
                     counterDesc.m_deviceId = 0;
-                    counterDesc.m_category = 0;
+                    counterDesc.m_category = AMDT_PROFILE_COUNTER_CATEGORY_NONE;
 
                     counterDesc.m_unit = (colSpec.type == ColumnRatio)
                                             ? AMDT_PROFILE_COUNTER_UNIT_RATIO : AMDT_PROFILE_COUNTER_UNIT_PERCENT;
@@ -2112,6 +2112,7 @@ public:
                         {
                             sampleData.m_counterId = counterId;
                             sampleData.m_sampleCount = sampleValue;
+                            sampleData.m_sampleCountPercentage = sampleValue;
                         }
 
                         newProfileDataVec.push_back(sampleData);

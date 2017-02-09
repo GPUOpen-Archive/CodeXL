@@ -82,6 +82,25 @@ void Reporter::SetSortEventIndex(int sortEventIndex)
     return;
 }
 
+void CSVReporter::WriteCounterValue(const AMDTProfileCounterDesc& counterDesc, const AMDTSampleValue& sample, gtString& rowStr)
+{
+    if (m_showPerc || (AMDT_PROFILE_COUNTER_UNIT_PERCENT == counterDesc.m_unit))
+    {
+        rowStr.appendFormattedString(L",%0.2f%%", sample.m_sampleCountPercentage);
+    }
+    else
+    {
+        if (AMDT_PROFILE_COUNTER_UNIT_RATIO == counterDesc.m_unit)
+        {
+            rowStr.appendFormattedString(L",%0.2f", sample.m_sampleCount);
+        }
+        else
+        {
+            rowStr.appendFormattedString(L",%llu", static_cast<AMDTUInt64>(sample.m_sampleCount));
+        }
+    }
+}
+
 bool CSVReporter::ReportExecution(gtVector<gtString> sectionHdrs, gtList<std::pair<gtString, gtString> > sectionData)
 {
     WriteSectionHeaders(sectionHdrs);
@@ -158,23 +177,35 @@ bool CSVReporter::ReportSamplingSpec(
 
     for (auto& counter : counters)
     {
-        gtString sampSpec(L"\n");
+        gtString sampSpec;
+        gtUInt16 eventId = static_cast<gtUInt16>(samplingConfig[idx].m_hwEventId);
 
-        if (IsPmcEvent(static_cast<gtUInt16>(samplingConfig[idx].m_hwEventId)))
+        if (IsPmcEvent(eventId) || IsL2IEvent(eventId))
         {
-            sampSpec.appendFormattedString(L",\"" STR_FORMAT L" (0x%x)\"", counter.m_name.asCharArray(), samplingConfig[idx].m_hwEventId);
+            sampSpec.appendFormattedString(L"\n,\"" STR_FORMAT L" (0x%x)\"", counter.m_name.asCharArray(), eventId);
+            sampSpec.appendFormattedString(L",%d", samplingConfig[idx].m_samplingInterval);
+            sampSpec.appendFormattedString(L",%x", samplingConfig[idx].m_unitMask);
+            sampSpec.appendFormattedString(L"," STR_FORMAT, samplingConfig[idx].m_userMode ? L"True" : L"False");
+            sampSpec.appendFormattedString(L"," STR_FORMAT, samplingConfig[idx].m_osMode ? L"True" : L"False");
         }
-        else
+        else if (IsTimerEvent(eventId))
         {
-            sampSpec.appendFormattedString(L",\"" STR_FORMAT L"\"", counter.m_name.asCharArray());
+            sampSpec.appendFormattedString(L"\n,\"" STR_FORMAT L"\"", counter.m_name.asCharArray());
+            sampSpec.appendFormattedString(L",%d", samplingConfig[idx].m_samplingInterval);
+        }
+        else if (IsIbsEvent(eventId))
+        {
+            sampSpec.appendFormattedString(L"\n,\"" STR_FORMAT L"\"", counter.m_name.asCharArray());
+            sampSpec.appendFormattedString(L",%d", samplingConfig[idx].m_samplingInterval);
+            //sampSpec.appendFormattedString(L",%x", samplingConfig[idx].m_unitMask);
+            // TODO: Add cycle count or dispatched op count and random enabled
         }
 
-        sampSpec.appendFormattedString(L",%d", samplingConfig[idx].m_samplingInterval);
-        sampSpec.appendFormattedString(L",%x", samplingConfig[idx].m_unitMask);
-        sampSpec.appendFormattedString(L"," STR_FORMAT, samplingConfig[idx].m_userMode ? L"True" : L"False");
-        sampSpec.appendFormattedString(L"," STR_FORMAT, samplingConfig[idx].m_osMode ? L"True" : L"False");
+        if (!sampSpec.isEmpty())
+        {
+            m_reportFile.writeString(sampSpec);
+        }
 
-        m_reportFile.writeString(sampSpec);
         ++idx;
     }
 
@@ -183,10 +214,7 @@ bool CSVReporter::ReportSamplingSpec(
     return true;
 }
 
-bool CSVReporter::WriteOverviewFunction(
-    gtVector<gtString>&   sectionHdrs,
-    AMDTProfileDataVec&   funcProfileData,
-    bool                  showPerc)
+bool CSVReporter::WriteOverviewFunction(gtVector<gtString>& sectionHdrs, AMDTProfileDataVec& funcProfileData)
 {
     WriteSectionHeaders(sectionHdrs);
     m_reportFile.writeString(L"\n");
@@ -202,17 +230,11 @@ bool CSVReporter::WriteOverviewFunction(
 
         gtString rowStr;
         rowStr.appendFormattedString(L"%ls", funcInfo.m_name.asCharArray());
+        int idx = 0;
 
-        for (const auto& ev : funcInfo.m_sampleValue)
+        for (const auto& sample : funcInfo.m_sampleValue)
         {
-            if (showPerc)
-            {
-                rowStr.appendFormattedString(L",%0.2f%%", ev.m_sampleCountPercentage);
-            }
-            else
-            {
-                rowStr.appendFormattedString(L",%u", static_cast<unsigned int>(ev.m_sampleCount));
-            }
+            WriteCounterValue(m_counterDescVec.at(idx++), sample, rowStr);
         }
 
         m_reportFile.writeString(rowStr);
@@ -225,10 +247,7 @@ bool CSVReporter::WriteOverviewFunction(
     return true;
 }
 
-bool CSVReporter::WriteOverviewProcess(
-    gtVector<gtString>& sectionHdrs,
-    AMDTProfileDataVec& processProfileData,
-    bool                showPerc)
+bool CSVReporter::WriteOverviewProcess(gtVector<gtString>& sectionHdrs, AMDTProfileDataVec& processProfileData)
 {
     WriteSectionHeaders(sectionHdrs);
     m_reportFile.writeString(L"\n");
@@ -237,17 +256,11 @@ bool CSVReporter::WriteOverviewProcess(
     {
         gtString rowStr;
         rowStr.appendFormattedString(L"%ls (PID - %u)", proc.m_name.asCharArray(), proc.m_id);
+        int idx = 0;
 
         for (const auto& sample : proc.m_sampleValue)
         {
-            if (showPerc)
-            {
-                rowStr.appendFormattedString(L",%0.2f%%", sample.m_sampleCountPercentage);
-            }
-            else
-            {
-                rowStr.appendFormattedString(L",%u", static_cast<unsigned>(sample.m_sampleCount));
-            }
+            WriteCounterValue(m_counterDescVec.at(idx++), sample, rowStr);
         }
 
         m_reportFile.writeString(rowStr);
@@ -258,10 +271,7 @@ bool CSVReporter::WriteOverviewProcess(
     return true;
 }
 
-bool CSVReporter::WriteOverviewModule(
-    gtVector<gtString>& sectionHdrs,
-    AMDTProfileDataVec& moduleProfileData,
-    bool                showPerc)
+bool CSVReporter::WriteOverviewModule(gtVector<gtString>& sectionHdrs, AMDTProfileDataVec& moduleProfileData)
 {
     WriteSectionHeaders(sectionHdrs);
     m_reportFile.writeString(L"\n");
@@ -276,17 +286,11 @@ bool CSVReporter::WriteOverviewModule(
 
         gtString rowStr;
         rowStr.appendFormattedString(L"%ls", module.m_name.asCharArray());
+        int idx = 0;
 
         for (const auto& sample : module.m_sampleValue)
         {
-            if (showPerc)
-            {
-                rowStr.appendFormattedString(L",%0.2f%%", sample.m_sampleCountPercentage);
-            }
-            else
-            {
-                rowStr.appendFormattedString(L",%u", static_cast<unsigned>(sample.m_sampleCount));
-            }
+            WriteCounterValue(m_counterDescVec.at(idx++), sample, rowStr);
         }
 
         m_reportFile.writeString(rowStr);
@@ -300,29 +304,18 @@ bool CSVReporter::WriteOverviewModule(
 
 bool CSVReporter::WritePidSummary(
     gtVector<gtString>&    sectionHdrs,
-    const AMDTProfileData& procInfo,
-    bool                   showPerc,
-    bool                   sepByCore)
+    const AMDTProfileData& procInfo)
 {
-    //TODO: use sepByCore while generating report
-    GT_UNREFERENCED_PARAMETER(sepByCore);
-
     WriteSectionHeaders(sectionHdrs);
     m_reportFile.writeString(L"\n");
 
     gtString rowStr;
     rowStr.appendFormattedString(L"%ls", procInfo.m_name.asCharArray());
+    int idx = 0;
 
     for (const auto& sample : procInfo.m_sampleValue)
     {
-        if (showPerc)
-        {
-            rowStr.appendFormattedString(L",%0.2f%%", sample.m_sampleCountPercentage);
-        }
-        else
-        {
-            rowStr.appendFormattedString(L",%u", static_cast<unsigned>(sample.m_sampleCount));
-        }
+        WriteCounterValue(m_counterDescVec.at(idx++), sample, rowStr);
     }
 
     m_reportFile.writeString(rowStr);
@@ -332,14 +325,8 @@ bool CSVReporter::WritePidSummary(
     return true;
 }
 
-bool CSVReporter::WritePidModuleSummary(gtVector<gtString>&  sectionHdrs,
-    AMDTProfileDataVec&      modList,
-    bool                  showPerc,
-    bool                  sepByCore)
+bool CSVReporter::WritePidModuleSummary(gtVector<gtString>& sectionHdrs, AMDTProfileDataVec& modList)
 {
-    //TODO: use sepByCore while generating report
-    GT_UNREFERENCED_PARAMETER(sepByCore);
-
     WriteSectionHeaders(sectionHdrs);
     m_reportFile.writeString(L"\n");
 
@@ -347,17 +334,11 @@ bool CSVReporter::WritePidModuleSummary(gtVector<gtString>&  sectionHdrs,
     {
         gtString rowStr;
         rowStr.appendFormattedString(L"%ls", modInfo.m_name.asCharArray());
+        int idx = 0;
 
         for (const auto& sample : modInfo.m_sampleValue)
         {
-            if (showPerc)
-            {
-                rowStr.appendFormattedString(L",%0.2f%%", sample.m_sampleCountPercentage);
-            }
-            else
-            {
-                rowStr.appendFormattedString(L",%u", static_cast<unsigned>(sample.m_sampleCount));
-            }
+            WriteCounterValue(m_counterDescVec.at(idx++), sample, rowStr);
         }
 
         m_reportFile.writeString(rowStr);
@@ -369,14 +350,8 @@ bool CSVReporter::WritePidModuleSummary(gtVector<gtString>&  sectionHdrs,
     return true;
 }
 
-bool CSVReporter::WritePidFunctionSummary(gtVector<gtString>&   sectionHdrs,
-    AMDTProfileDataVec& funcList,
-    bool                 showPerc,
-    bool                 sepByCore)
+bool CSVReporter::WritePidFunctionSummary(gtVector<gtString>& sectionHdrs, AMDTProfileDataVec& funcList)
 {
-    //TODO: use sepByCore while generating report
-    GT_UNREFERENCED_PARAMETER(sepByCore);
-
     WriteSectionHeaders(sectionHdrs);
     m_reportFile.writeString(L"\n");
 
@@ -384,17 +359,11 @@ bool CSVReporter::WritePidFunctionSummary(gtVector<gtString>&   sectionHdrs,
     {
         gtString rowStr;
         rowStr.appendFormattedString(L"%ls", funcInfo.m_name.asCharArray());
+        int idx = 0;
 
         for (const auto& sample : funcInfo.m_sampleValue)
         {
-            if (showPerc)
-            {
-                rowStr.appendFormattedString(L",%0.2f%%", sample.m_sampleCountPercentage);
-            }
-            else
-            {
-                rowStr.appendFormattedString(L",%u", static_cast<unsigned>(sample.m_sampleCount));
-            }
+            WriteCounterValue(m_counterDescVec.at(idx++), sample, rowStr);
         }
 
         m_reportFile.writeString(rowStr);
@@ -406,10 +375,7 @@ bool CSVReporter::WritePidFunctionSummary(gtVector<gtString>&   sectionHdrs,
     return true;
 }
 
-bool CSVReporter::WriteCallGraphFunctionSummary(
-    gtVector<gtString>        sectionHdrs,
-    AMDTCallGraphFunctionVec& cgFuncsVec,
-    bool                      showPerc)
+bool CSVReporter::WriteCallGraphFunctionSummary(gtVector<gtString> sectionHdrs, AMDTCallGraphFunctionVec& cgFuncsVec)
 {
     bool retVal = false;
 
@@ -426,11 +392,8 @@ bool CSVReporter::WriteCallGraphFunctionSummary(
             tmpStr.appendFormattedString(L",%u", static_cast<unsigned>(cgFunc.m_totalSelfSamples));
             tmpStr.appendFormattedString(L",%u", static_cast<unsigned>(cgFunc.m_totalDeepSamples));
 
-            if (showPerc)
-            {
-                // tmpStr.appendFormattedString(L" (%3.02f%%)", cgFunc.m_deepSamplesPerc);
-                tmpStr.appendFormattedString(L",%3.02f%%", cgFunc.m_deepSamplesPerc);
-            }
+            // tmpStr.appendFormattedString(L" (%3.02f%%)", cgFunc.m_deepSamplesPerc);
+            tmpStr.appendFormattedString(L",%3.02f%%", cgFunc.m_deepSamplesPerc);
 
             tmpStr.appendFormattedString(L",%u", cgFunc.m_pathCount);
 
@@ -459,12 +422,10 @@ bool CSVReporter::WriteCallGraphHdr(gtVector<gtString>  sectionHdrs)
     return true;
 }
 
-bool CSVReporter::WriteCallGraph(const AMDTCallGraphFunction&     self,
-                                 AMDTCallGraphFunctionVec&  caller,
-                                 AMDTCallGraphFunctionVec&  callee,
-                                 bool                       showPerc)
+bool CSVReporter::WriteCallGraph(const AMDTCallGraphFunction&  self,
+                                 AMDTCallGraphFunctionVec&     caller,
+                                 AMDTCallGraphFunctionVec&     callee)
 {
-    (void)(showPerc);
     bool retVal = true;
 
     // Write the Parents/Callers

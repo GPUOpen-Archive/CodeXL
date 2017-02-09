@@ -41,6 +41,10 @@ public:
     int          m_sortEventIndex;
     osFilePath   m_reportFilePath;  // output report
     osFile       m_reportFile;
+    bool         m_showPerc = false;
+    bool         m_reportByCore = false;
+
+    AMDTProfileCounterDescVec  m_counterDescVec;
 
     Reporter(osFilePath& filePath) : m_error(S_OK),
         m_sortOrder(DESCENDING_ORDER),
@@ -57,51 +61,25 @@ public:
 
     void SetSortOrder(SortOrder sortOrder);
     void SetSortEventIndex(int sortEvent);
+    void SetProfileCounterDesc(AMDTProfileCounterDescVec& counterDescVec) { m_counterDescVec = counterDescVec; }
+    void SetShowPercentage(bool value) { m_showPerc = value; }
+    void SetReportByCore(bool value) { m_reportByCore = value; }
 
     virtual bool ReportExecution(gtVector<gtString> sectionHdrs, gtList<std::pair<gtString, gtString> > sectionData) = 0;
     virtual bool ReportProfileData(gtVector<gtString> sectionHdrs, gtList<std::pair<gtString, gtString> > sectionData) = 0;
-    virtual bool ReportSamplingSpec(gtVector<gtString>&           sectionHdrs,
-                                    AMDTProfileCounterDescVec&    counters,
-                                    AMDTProfileSamplingConfigVec& samplingConfig) = 0;
+    virtual bool ReportSamplingSpec(gtVector<gtString>& sectionHdrs, AMDTProfileCounterDescVec& counters, AMDTProfileSamplingConfigVec& samplingConfig) = 0;
 
     // OVERVIEW Reporters
-    virtual bool WriteOverviewProcess(gtVector<gtString>& sectionHdrs,
-        AMDTProfileDataVec& processProfileData,
-        bool                 showPerc) = 0;
-
-    virtual bool WriteOverviewModule(gtVector<gtString>& sectionHdrs,
-        AMDTProfileDataVec& moduleProfileData,
-        bool                 showPerc) = 0;
-
-    virtual bool WriteOverviewFunction(gtVector<gtString>&   sectionHdrs,
-                                       AMDTProfileDataVec&  funcProfileData,
-                                       bool                 showPerc) = 0;
+    virtual bool WriteOverviewProcess(gtVector<gtString>& sectionHdrs, AMDTProfileDataVec& processProfileData) = 0;
+    virtual bool WriteOverviewModule(gtVector<gtString>& sectionHdrs, AMDTProfileDataVec& moduleProfileData) = 0;
+    virtual bool WriteOverviewFunction(gtVector<gtString>& sectionHdrs, AMDTProfileDataVec& funcProfileData) = 0;
 
     // PROCESS Specific reporters
-    virtual bool WritePidSummary(gtVector<gtString>&  sectionHdrs,
-        const AMDTProfileData&      procInfo,
-        bool                 showPerc,
-        bool                 sepByCore) = 0;
-
-    virtual bool WritePidModuleSummary(gtVector<gtString>&  sectionHdrs,
-        AMDTProfileDataVec&      modList,
-        bool                  showPerc,
-        bool                  sepByCore) = 0;
-
-     virtual bool WritePidFunctionSummary(gtVector<gtString>&   sectionHdrs,
-        AMDTProfileDataVec& funcList,
-        bool                 showPerc,
-        bool                 sepByCore) = 0;
-
-    virtual bool WriteCallGraphFunctionSummary(gtVector<gtString>        sectionHdrs,
-                                               AMDTCallGraphFunctionVec& cgFuncsVec,
-                                               bool                      showPerc) = 0;
-
-    virtual bool WriteCallGraph(const AMDTCallGraphFunction&  self,
-                                AMDTCallGraphFunctionVec&     caller,
-                                AMDTCallGraphFunctionVec&     callee,
-                                bool                          showPerc) = 0;
-
+    virtual bool WritePidSummary(gtVector<gtString>& sectionHdrs, const AMDTProfileData& procInfo) = 0;
+    virtual bool WritePidModuleSummary(gtVector<gtString>& sectionHdrs, AMDTProfileDataVec&  modList) = 0;
+    virtual bool WritePidFunctionSummary(gtVector<gtString>& sectionHdrs, AMDTProfileDataVec& funcList) = 0;
+    virtual bool WriteCallGraphFunctionSummary(gtVector<gtString> sectionHdrs, AMDTCallGraphFunctionVec& cgFuncsVec) = 0;
+    virtual bool WriteCallGraph(const AMDTCallGraphFunction& self, AMDTCallGraphFunctionVec& caller, AMDTCallGraphFunctionVec& callee) = 0;
     virtual bool WriteCallGraphHdr(gtVector<gtString>  sectionHdrs) = 0;
 
     // IMIX Specific reporters
@@ -127,55 +105,21 @@ public:
 
     bool ReportExecution(gtVector<gtString> sectionHdrs, gtList<std::pair<gtString, gtString> > sectionData);
     bool ReportProfileData(gtVector<gtString> sectionHdrs, gtList<std::pair<gtString, gtString> > sectionData);
-    bool ReportSamplingSpec(gtVector<gtString>& sectionHdrs,
-                            AMDTProfileCounterDescVec& counters,
-                            AMDTProfileSamplingConfigVec& samplingConfig);
+    bool ReportSamplingSpec(gtVector<gtString>& sectionHdrs, AMDTProfileCounterDescVec& counters, AMDTProfileSamplingConfigVec& samplingConfig);
 
     // OVERVIEW reporters
-    bool WriteOverviewProcess(
-        gtVector<gtString>& sectionHdrs,
-        AMDTProfileDataVec& processProfileData,
-        bool                showPerc);
-
-    bool WriteOverviewModule(
-        gtVector<gtString>& sectionHdrs,
-        AMDTProfileDataVec& moduleProfileData,
-        bool                showPerc);
-
-    bool WriteOverviewFunction(
-        gtVector<gtString>&  sectionHdrs,
-        AMDTProfileDataVec&  funcProfileData,
-        bool                 showPerc);
+    bool WriteOverviewProcess(gtVector<gtString>& sectionHdrs, AMDTProfileDataVec& processProfileData);
+    bool WriteOverviewModule(gtVector<gtString>& sectionHdrs, AMDTProfileDataVec& moduleProfileData);
+    bool WriteOverviewFunction(gtVector<gtString>&  sectionHdrs, AMDTProfileDataVec&  funcProfileData);
 
     // PROCESS reporters
-    bool WritePidSummary(
-        gtVector<gtString>&    sectionHdrs,
-        const AMDTProfileData& procInfo,
-        bool                   showPerc,
-        bool                   sepByCore);
+    bool WritePidSummary(gtVector<gtString>& sectionHdrs, const AMDTProfileData& procInfo);
+    bool WritePidModuleSummary(gtVector<gtString>& sectionHdrs, AMDTProfileDataVec&  modList);
+    bool WritePidFunctionSummary(gtVector<gtString>& sectionHdrs, AMDTProfileDataVec& funcList);
 
-    bool WritePidModuleSummary(
-        gtVector<gtString>&  sectionHdrs,
-        AMDTProfileDataVec&  modList,
-        bool                 showPerc,
-        bool                 sepByCore);
-
-    bool WritePidFunctionSummary(
-        gtVector<gtString>& sectionHdrs,
-        AMDTProfileDataVec& funcList,
-        bool                showPerc,
-        bool                sepByCore);
-
-    bool WriteCallGraphFunctionSummary(gtVector<gtString>        sectionHdrs,
-                                       AMDTCallGraphFunctionVec& cgFuncsVec,
-                                       bool                      showPerc);
-
-    bool WriteCallGraph(const AMDTCallGraphFunction&     self,
-                        AMDTCallGraphFunctionVec&  caller,
-                        AMDTCallGraphFunctionVec&  callee,
-                        bool                       showPerc);
-
-    bool WriteCallGraphHdr(gtVector<gtString>  sectionHdrs);
+    bool WriteCallGraphFunctionSummary(gtVector<gtString> sectionHdrs, AMDTCallGraphFunctionVec& cgFuncsVec);
+    bool WriteCallGraph(const AMDTCallGraphFunction& self, AMDTCallGraphFunctionVec& caller, AMDTCallGraphFunctionVec& callee);
+    bool WriteCallGraphHdr(gtVector<gtString> sectionHdrs);
 
 #ifdef AMDT_CPCLI_ENABLE_IMIX
     bool WriteImixSummaryInfo(gtVector<gtString>   sectionHdrs,
@@ -189,6 +133,7 @@ public:
 
 private:
     void WriteSectionHeaders(gtVector<gtString>& sectionHdrs);
+    void WriteCounterValue(const AMDTProfileCounterDesc& counterDesc, const AMDTSampleValue& sample, gtString& str);
 };
 
 #endif // #ifndef _CPUPROFILE_REPORTER_H_

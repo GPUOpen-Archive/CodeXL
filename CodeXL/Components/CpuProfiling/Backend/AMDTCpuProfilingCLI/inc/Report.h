@@ -47,6 +47,8 @@
 
 #define CPUPROFILE_DBFILE_EXTENSION         L"cxlcpdb"
 
+#define CPUPROFILE_TYPE_CLU                 L"Cache Line Utilization"
+
 #define CODEXL_REPORT_HDR            L"CODEXL CPU-PROFILE REPORT\n"
 
 #define EXECUTION_SECTION_HDR        L"EXECUTION"
@@ -170,6 +172,10 @@ private:
     gtUInt32            m_sortCounterId;
     gtUInt32            m_sortEventIdx = 0;
     gtVector<gtString>  m_profileEventsNameVec;   // this is used for column headers
+    
+    AMDTProfileSessionInfo        m_sessionInfo;
+    AMDTProfileCounterDescVec     m_counterDescVec;
+    AMDTProfileSamplingConfigVec  m_samplingConfigVec;
 
     gtVector<gtUInt32>  m_coresList; // List of cores for which samples need to be aggregated
 
@@ -199,13 +205,19 @@ private:
     bool IsReportAggregateByModule() const { return m_isReportAggregateByModule; }
     bool IsReportCallGraph() const { return m_isReportCallGraph; }
     bool IsReportImix() const { return m_isReportImix; }
+    bool IsCLU() const { return (!m_sessionInfo.m_sessionType.compareNoCase(CPUPROFILE_TYPE_CLU)); }
+
+    void InitializeReportOptions();
+    bool IsSortDescendingOrder() const { return m_counterDescVec[m_sortEventIdx].m_isLowerValueBetter; }
 
     void ApplyCutoff(AMDTProfileDataVec& profileDataVec);
+    void SortProfileData(AMDTProfileDataVec& profileDataVec);
+
     void ReportSampleCount(bool sepByCore);
-    void ReportExecution(AMDTProfileSessionInfo& sessionInfo);
-    void ReportProfileDetails(AMDTProfileSessionInfo& sessionInfo);
+    void ReportExecution();
+    void ReportProfileDetails();
     void ReportMonitoredEventDetails();
-    void ReportOverviewData(AMDTProfileSessionInfo& sessionInfo);
+    void ReportOverviewData();
     void ReportProcessData();
     bool ReportCSSData(AMDTProcessId pid);
     void ReportImixData();

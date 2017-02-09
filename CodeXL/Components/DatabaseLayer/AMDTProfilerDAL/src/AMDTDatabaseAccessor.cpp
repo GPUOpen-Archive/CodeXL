@@ -2961,7 +2961,7 @@ public:
                 counterDesc.m_hwEventId = sqlite3_column_int(pQueryStmt, 1);
                 counterDesc.m_type = AMDT_PROFILE_COUNTER_TYPE_RAW;
                 counterDesc.m_unit = AMDT_PROFILE_COUNTER_UNIT_COUNT;
-                counterDesc.m_category = 0;
+                counterDesc.m_category = AMDT_PROFILE_COUNTER_CATEGORY_NONE;
                 counterDesc.m_deviceId = 0;
 
                 if (GetCounterNameAndDescription(counterDesc.m_hwEventId, name, abbrev, desc))

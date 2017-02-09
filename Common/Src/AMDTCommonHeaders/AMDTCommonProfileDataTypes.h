@@ -54,6 +54,7 @@ enum AMDTProfileMode
 
 enum AMDTProfileDataType
 {
+    AMDT_PROFILE_DATA_NONE     = 0,
     AMDT_PROFILE_DATA_PROCESS  = 1,
     AMDT_PROFILE_DATA_THREAD   = 2,
     AMDT_PROFILE_DATA_MODULE   = 3,
@@ -62,12 +63,14 @@ enum AMDTProfileDataType
 
 enum AMDTProfileCounterType
 {
+    AMDT_PROFILE_COUNTER_TYPE_NONE     = 1,
     AMDT_PROFILE_COUNTER_TYPE_RAW      = 1,
     AMDT_PROFILE_COUNTER_TYPE_COMPUTED = 2,
 };
 
 enum AMDTProfileCounterUnit
 {
+    AMDT_PROFILE_COUNTER_UNIT_NONE    = 1,
     AMDT_PROFILE_COUNTER_UNIT_COUNT   = 1,
     AMDT_PROFILE_COUNTER_UNIT_RATIO   = 2,
     AMDT_PROFILE_COUNTER_UNIT_PERCENT = 3,
@@ -75,7 +78,8 @@ enum AMDTProfileCounterUnit
 
 enum AMDTProfileCategory
 {
-    AMDT_PROFILE_COUNTER_CATEGORY_CLU = 1,
+    AMDT_PROFILE_COUNTER_CATEGORY_NONE = 0,
+    AMDT_PROFILE_COUNTER_CATEGORY_CLU  = 1,
 };
 
 enum AMDTModuleType
@@ -151,9 +155,9 @@ struct AMDTProfileCounterDesc
     gtString                m_name;
     gtString                m_abbrev;
     gtString                m_description;
-    AMDTUInt32              m_type;         // AMDTProfileCounterType
-    AMDTUInt32              m_category;     // UNUSED for CPU Profiler. For Power profiler it is Power/Frequency/Temperature
-    AMDTUInt32              m_unit;         // AMDTProfileCounterUnit
+    AMDTUInt32              m_type = AMDT_PROFILE_COUNTER_TYPE_RAW;
+    AMDTUInt32              m_category = AMDT_PROFILE_COUNTER_CATEGORY_NONE;
+    AMDTUInt32              m_unit = AMDT_PROFILE_COUNTER_UNIT_COUNT;
     bool                    m_isLowerValueBetter = true;
 
     // these are required due to old pp table design
