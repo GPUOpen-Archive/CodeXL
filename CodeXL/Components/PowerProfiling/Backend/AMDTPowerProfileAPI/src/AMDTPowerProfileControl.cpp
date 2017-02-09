@@ -767,9 +767,10 @@ AMDTResult AMDTPwrGetTargetSystemInfo(
             // Get platform id
             g_pTargetSystemInfo->m_platformId = GetSupportedTargetPlatformId();
 
-            if (PLATFORM_INVALID != g_pTargetSystemInfo->m_platformId)
+            ret = GetCpuFamilyDetails(&family, &model, &isAmd);
+
+            if (AMDT_STATUS_OK == ret)
             {
-                ret = GetCpuFamilyDetails(&family, &model, &isAmd);
                 g_pTargetSystemInfo->m_family = family;
                 g_pTargetSystemInfo->m_model = model;
                 g_pTargetSystemInfo->m_isAmd = isAmd;
@@ -792,9 +793,8 @@ AMDTResult AMDTPwrGetTargetSystemInfo(
             }
 
             // If node platform is not supported and no valid dgpu connected
-            if ((PLATFORM_INVALID == g_pTargetSystemInfo->m_platformId)
-                || ((0 == g_pTargetSystemInfo->m_smuTable.m_count)
-                    && (false == g_pTargetSystemInfo->m_isPlatformSupported)))
+            if ((0 == g_pTargetSystemInfo->m_smuTable.m_count)
+                    && (false == g_pTargetSystemInfo->m_isPlatformSupported))
             {
                 ret = AMDT_ERROR_PLATFORM_NOT_SUPPORTED;
             }
