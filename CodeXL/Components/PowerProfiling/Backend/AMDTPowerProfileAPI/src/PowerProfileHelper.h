@@ -202,5 +202,8 @@ AMDTFloat32 PwrGetCountsPerSecs(void);
 // PwrGetPhysicalCores:
 AMDTUInt32 PwrGetPhysicalCores(void);
 
+// Get Process Id
+AMDTInt32 PwrGetProcessId(void);
+
 #endif //_POWERPROFILEHELPER_H_
 

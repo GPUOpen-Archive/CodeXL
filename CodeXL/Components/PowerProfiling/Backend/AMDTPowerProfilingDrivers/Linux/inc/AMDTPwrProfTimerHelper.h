@@ -33,6 +33,7 @@
 int AllocateAndInitClientData(ClientData** ppClientData,
                               uint32 clientId,
                               cpumask_t affinity,
+                              pid_t parentPID,
                               const ProfileConfig* config);
 
 // IntialiseCoreData

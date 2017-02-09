@@ -86,57 +86,26 @@ static ClientList tlist =
 //
 bool CheckParentPid(pid_t parentPid)
 {
-    struct timespec tstamp1;
-    struct timespec tstamp2;
-    struct task_struct* pParent = NULL;
-    struct task_struct* pTemp = NULL;
-    struct pid* pspid = NULL;
-    bool ret = false;
+    struct pid* pid_struct  = NULL;
+    struct task_struct* task    = NULL;
+    bool ret            = true;
 
-    // Before we re add the timer again, lets double check to see if the task that has
-    // started the timer is alive. If not, dont readd the timer and trigger a delete
-    getnstimeofday(&tstamp1);
-    rcu_read_lock();
-    pParent = &init_task;               // start at init
+    pid_struct = find_get_pid(parentPid);
 
-    do
+    if (NULL != pid_struct)
     {
-        if (pParent->pid == parentPid)
+        task = pid_task(pid_struct, PIDTYPE_PID);
+
+        if (NULL == task)
         {
-            // does the pid (not tgid) match?
-            pTemp = pParent;
-            break;
-        }
-
-        pParent = next_task(pParent);   // this isn't the task you're looking for
-    }
-    while (pParent != &init_task);      // stop when we get back to init
-
-    getnstimeofday(&tstamp2);
-
-    if (pTemp != NULL)
-    {
-        DRVPRINT("time taken for finding the parent task %lu ", tstamp2.tv_nsec - tstamp1.tv_nsec);
-        pspid = pTemp->pids[PIDTYPE_PID].pid;
-
-        if (pspid == NULL)
-        {
-            printk(KERN_WARNING "Power Profiler: PID %d seems to be dead. Cleaning up power profiler.\n", parentPid);
             ret = false;
-        }
-        else
-        {
-            DRVPRINT("found the parent task for pid %d ", parentPid);
-            ret = true;
         }
     }
     else
     {
-        printk(KERN_WARNING "Power Profiler: Could not locate task for PID  %d. Cleaning up power profiler. \n", parentPid);
         ret = false;
     }
 
-    rcu_read_unlock();
     return ret;
 }
 
@@ -205,7 +174,7 @@ int SampleDataCallback(ClientData* pClientData)
         }
         else
         {
-            MarkClientForCleanup(pCoreClientData->m_clientId);
+            MarkClientForCleanup(pClientData->m_clientId);
             errorCode = -1;
         }
     }
@@ -251,12 +220,11 @@ int StartTimer(uint32 clientId)
     int ret = 0;
     int cpu = 0;
 
-    DRVPRINT("Starting Timer for client id : %d ", clientId);
+    DRVPRINT("Start Timer for client id : %d ", clientId);
+
     list_for_each(pCurrent, &tlist.list)
     {
         pClients = list_entry(pCurrent, ClientList, list);
-
-        DRVPRINT(" Check client %d ", pClients->m_pClientData->m_clientId);
 
         if ((pClients->m_pClientData->m_clientId == clientId))
         {
@@ -473,7 +441,7 @@ int StopTimer(uint32 clientId)
 {
     struct list_head* pCurrent = NULL;
     ClientList* pClients = NULL;
-    bool m_stopped = false;
+    bool stopped = false;
 
     DRVPRINT(" Stopping the timers for client %d ", clientId);
 
@@ -488,19 +456,17 @@ int StopTimer(uint32 clientId)
             if (pClients->m_pClientData->m_clientId == clientId)
             {
                 pClients->m_pClientData->m_osClientCfg.m_stopped = true;
-                m_stopped = true;
+                stopped = true;
             }
         }
 
-        // Release memory pool
-        ReleaseMemoryPool(&g_sessionPool);
     }
     else
     {
         printk(KERN_ERR "Power Profiler Timer: empty timerlist for client %d \n", clientId);
     }
 
-    if (false == m_stopped)
+    if (false == stopped)
     {
         printk(KERN_ERR "Power Profiler Timer:Could not stop profiler for client %d \n", clientId);
     }
@@ -508,7 +474,7 @@ int StopTimer(uint32 clientId)
     // m_stopped profiling, set state to 0
     moduleState = 0;
 
-    return m_stopped ? 0 : -1;
+    return stopped ? 0 : -1;
 }
 
 // PauseTimer
@@ -609,7 +575,8 @@ enum hrtimer_restart HrTimerCallback(struct hrtimer* timer_for_restart)
 
             if (NULL != pClients->m_pClientData
                 && pCoreClientData->m_clientId == pClients->m_pClientData->m_clientId
-                && false == pClients->m_pClientData->m_osClientCfg.m_paused)
+                && false == pClients->m_pClientData->m_osClientCfg.m_paused
+                && false == pClients->m_pClientData->m_osClientCfg.m_stopped)
             {
                 currtime = ktime_get();
                 errorCode = SampleDataCallback(pClients->m_pClientData);
@@ -700,7 +667,7 @@ int ConfigureTimer(ProfileConfig* config, uint32 clientId)
         return -ENOMEM;
     }
 
-    if (AllocateAndInitClientData(&pClientData, clientId, cpuAffinity, config) != 0)
+    if (AllocateAndInitClientData(&pClientData, clientId, cpuAffinity, config->m_fill, config) != 0)
     {
         return -ENOMEM;
     }
@@ -811,7 +778,7 @@ int UnconfigureTimer(uint32 clientId)
 
     list_for_each_safe(pCurrent, pTemp, &tlist.list)
     {
-        pClients = list_entry(pCurrent, ClientList , list);
+        pClients = list_entry(pCurrent, ClientList, list);
         pClientData = (ClientData*)pClients->m_pClientData;
 
         if ((NULL != pClientData) && (pClientData->m_clientId == clientId))
@@ -824,19 +791,24 @@ int UnconfigureTimer(uint32 clientId)
 
                 if (NULL != pCoreClientData)
                 {
-                    hrtimer_cancel(&pCoreClientData->m_pOsData->m_hrTimer);
+                    if (NULL != pCoreClientData->m_pOsData)
+                    {
+                        hrtimer_cancel(&pCoreClientData->m_pOsData->m_hrTimer);
+                    }
+
+                    FreeCoreData(pCoreClientData);
+                    memset(pCoreClientData, 0, sizeof(CoreData));
+                    // Release smu configuration
+                    ConfigureSmu(pCoreClientData->m_smuCfg, false);
+
+                    pCoreClientData = NULL;
                 }
 
-                FreeCoreData(pCoreClientData);
-
-                memset(pCoreClientData, 0, sizeof(CoreData));
             }
 
             pClientData->m_osClientCfg.m_stopped = true;
             pClientData->m_osClientCfg.m_paused = true;
 
-            // Release smu configuration
-            ConfigureSmu(pCoreClientData->m_smuCfg, false);
 
             CloseGenericCounterAccess();
 

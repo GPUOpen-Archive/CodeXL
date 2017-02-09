@@ -11,6 +11,7 @@ extern uint8_t* g_pSharedBuffer;
 int AllocateAndInitClientData(ClientData** ppClientData,
                               uint32 clientId,
                               cpumask_t affinity,
+                              pid_t parentPID,
                               const ProfileConfig* config)
 {
     ClientData* pClientData = NULL;
@@ -31,6 +32,7 @@ int AllocateAndInitClientData(ClientData** ppClientData,
     pClientData->m_osClientCfg.m_affinity         = affinity;
     pClientData->m_osClientCfg.m_paused           = false;
     pClientData->m_osClientCfg.m_stopped          = false;
+    pClientData->m_osClientCfg.m_parentPid    = parentPID;
     pClientData->m_configCount                    = config->m_samplingSpec.m_maskCnt;
 
     pClientData->m_header.m_pBuffer = kmalloc(HEADER_BUFFER_SIZE, false);
@@ -81,14 +83,14 @@ int IntializeCoreData(CoreData* pCoreClientData,
     pCoreClientData->m_recLen               = 0;
     pCoreClientData->m_coreId               = coreId;
 
-    if(0 == index)
+    if (0 == index)
     {
         pCoreClientData->m_bufferSize = PWRPROF_MASTER_CORE_BUFFER_SIZE;
     }
     else
     {
         pCoreClientData->m_bufferSize = PWRPROF_NONMASTER_CORE_BUFFER_SIZE;
-        offset += masterCoreBufferSize + ((index-1) * (sizeof(PageBuffer) + pCoreClientData->m_bufferSize));
+        offset += masterCoreBufferSize + ((index - 1) * (sizeof(PageBuffer) + pCoreClientData->m_bufferSize));
     }
 
     pCoreClientData->m_pCoreBuffer = (PageBuffer*)(g_pSharedBuffer + offset);
@@ -132,9 +134,9 @@ int IntializeCoreData(CoreData* pCoreClientData,
     pCoreClientData->m_smuCfg = NULL;
 
     // Check for core energy counters which are physical core specific
-    if(config->m_apuCounterMask & (1ULL << COUNTERID_CORE_ENERGY))
+    if (config->m_apuCounterMask & (1ULL << COUNTERID_CORE_ENERGY))
     {
-        if(!HelpPwrIsSmtEnabled() || (0 == (coreId % 2)))
+        if (!HelpPwrIsSmtEnabled() || (0 == (coreId % 2)))
         {
             phyCoreMask = (1ULL << COUNTERID_CORE_ENERGY);
         }
@@ -220,6 +222,7 @@ void FreeCoreData(CoreData* pCoreClientData)
             kfree(pCoreClientData->m_pOsData);
             pCoreClientData->m_pOsData = NULL;
         }
+
     }
 
     return;

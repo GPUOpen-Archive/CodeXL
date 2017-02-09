@@ -19,6 +19,7 @@
 #if ( defined (_WIN32) || defined (_WIN64) )
     #include <windows.h>
     #include <intrin.h>
+    #include <process.h>
 #endif
 #include <string.h>
 #include <stdio.h>
@@ -162,11 +163,12 @@ AMDTUInt32 GetSupportedTargetPlatformId()
     }
     else
     {
-        if( nullptr != g_fpPwrCheckFamily17)
+        if (nullptr != g_fpPwrCheckFamily17)
         {
             idx = g_fpPwrCheckFamily17(family, model);
         }
     }
+
 #if 0
     else if (0x17 == family)
     {
@@ -176,6 +178,7 @@ AMDTUInt32 GetSupportedTargetPlatformId()
             idx = PLATFORM_ZEPPELIN;
         }
     }
+
 #endif
     return idx;
 }
@@ -578,3 +581,17 @@ AMDTUInt32 PwrGetPhysicalCores(void)
 {
     return (PwrIsSmtEnabled()) ? (GetActiveCoreCount() / 2) : GetActiveCoreCount();
 }
+
+// PwrGetProcessId:  get the process id for backend process
+AMDTInt32 PwrGetProcessId(void)
+{
+    AMDTInt32 pId = 0;
+
+#ifdef LINUX
+    pId = getpid();
+#else
+    pId = _getpid();
+#endif
+    return pId;
+}
+

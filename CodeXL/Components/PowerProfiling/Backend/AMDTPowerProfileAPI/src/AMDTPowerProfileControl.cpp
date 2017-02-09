@@ -409,9 +409,8 @@ AMDTResult PwrSetProfileConfiguration(ProfileConfig* pConfig, AMDTUInt32 clientI
 
     if (AMDT_STATUS_OK == ret)
     {
-        AMDTUInt32 envVariable = 0;
-        envVariable = PwrGetEnvironmentVariable("CodeXL_Env");
-        pConfig->m_fill = envVariable;
+        AMDTUInt32 processID = PwrGetProcessId();
+        pConfig->m_fill = processID;
         //Prepare the list for the driver
         cfgList.ulStatus = 0;
         cfgList.ulConfigCnt = 1;

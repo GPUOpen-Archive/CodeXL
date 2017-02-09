@@ -41,6 +41,7 @@
 
 // EXTERN FUNCTIONS
 long CheckHwSupport(void);
+extern int moduleState;
 
 // STATIC VARIABLES
 // Minor build version for pcore
@@ -49,6 +50,7 @@ static unsigned int pcore_build_number = 001;
 // Client id and state
 static unsigned long g_clientId = 0L;
 static bool g_isClientActiv = false;
+static bool g_isClientStateDirty  = false;
 
 // LOCAL FUNCTIONS
 
@@ -58,6 +60,9 @@ void DeleteClient(void)
     g_isClientActiv = false;
     g_clientId = 0;
     UnconfigureTimer(g_clientId);
+
+    // Release memory pool
+    ReleaseMemoryPool(&g_sessionPool);
 }
 
 // Mark the client for cleanup.
@@ -65,8 +70,12 @@ void MarkClientForCleanup(unsigned long id)
 {
     if (id == g_clientId)
     {
-        g_isClientActiv = false;
-        printk("Cleaning up client %lu ", id);
+        // Stop the timer
+        StopTimer(g_clientId);
+
+        g_isClientActiv         = false;
+        g_isClientStateDirty    = true;
+        moduleState             = 0;
     }
     else
     {
@@ -127,7 +136,18 @@ long PwrProfDrvIoctlImpl(struct file* file, unsigned int ioctl_num, unsigned lon
             if (retval < 0)
             {
                 g_isClientActiv = false;
-		g_clientId = 0;
+                g_clientId = 0;
+
+                // if in previous run we have not clean the configuration
+                //  delete the old client config
+                if (true == g_isClientStateDirty)
+                {
+                    // TODO: Assuming only one client id can exist
+                    // Clean the old configuration
+                    DeleteClient();
+                    g_isClientStateDirty = false;
+                }
+
                 DRVPRINT(KERN_WARNING "Power Profiler: Unknown error  in register client retval %d", retval);
                 return -1;
             }
@@ -166,6 +186,7 @@ long PwrProfDrvIoctlImpl(struct file* file, unsigned int ioctl_num, unsigned lon
                 DRVPRINT(KERN_WARNING "Invalid parameter to Add profile Config");
                 return -1;
             }
+
 
             /* Get the profiler config */
             clientId = prof_configs.ulClientId;
@@ -279,7 +300,7 @@ long PwrProfDrvIoctlImpl(struct file* file, unsigned int ioctl_num, unsigned lon
             retval = GetDataBuffer(&data_buffer);
             DRVPRINT(" Avaliable Buffer Count %u", data_buffer.ulavailableBuffCnt);
 
-            if (CopyToUser((DATA_BUFFER*)ioctl_param , &data_buffer , sizeof(DATA_BUFFER)))
+            if (CopyToUser((DATA_BUFFER*)ioctl_param, &data_buffer, sizeof(DATA_BUFFER)))
             {
                 DRVPRINT(KERN_WARNING "Power Profiler: Error in get data buffer");
                 retval = -EACCES;
@@ -312,7 +333,7 @@ long PwrProfDrvIoctlImpl(struct file* file, unsigned int ioctl_num, unsigned lon
                 WritePCI(pci.address, pci.data);
             }
 
-            if (CopyToUser((ACCESS_PCI*)ioctl_param, &pci , sizeof(ACCESS_PCI)) != 0)
+            if (CopyToUser((ACCESS_PCI*)ioctl_param, &pci, sizeof(ACCESS_PCI)) != 0)
             {
                 DRVPRINT(KERN_WARNING "Power Profiler: unknown error");
                 retval = -EACCES;
@@ -345,7 +366,7 @@ long PwrProfDrvIoctlImpl(struct file* file, unsigned int ioctl_num, unsigned lon
                 WriteMSR((uint32)msr.regId, msr.data);
             }
 
-            if (CopyToUser((ACCESS_MSR*)ioctl_param, &msr , sizeof(ACCESS_MSR)) != 0)
+            if (CopyToUser((ACCESS_MSR*)ioctl_param, &msr, sizeof(ACCESS_MSR)) != 0)
             {
                 DRVPRINT(KERN_WARNING "Power Profiler: unknown error");
                 retval = -EACCES;
@@ -375,7 +396,7 @@ long PwrProfDrvIoctlImpl(struct file* file, unsigned int ioctl_num, unsigned lon
                 return retval;
             }
 
-            if (CopyToUser((ACCESS_MMIO*)ioctl_param, &mmio , sizeof(ACCESS_MMIO)) != 0)
+            if (CopyToUser((ACCESS_MMIO*)ioctl_param, &mmio, sizeof(ACCESS_MMIO)) != 0)
             {
                 DRVPRINT(KERN_WARNING "Power Profiler: unknown error");
                 retval = -EACCES;
@@ -409,6 +430,9 @@ void PwrProfDrvCleanup(void)
     g_isClientActiv = false;
     g_clientId = 0;
     UnconfigureTimer(g_clientId);
+
+    // Release memory pool
+    ReleaseMemoryPool(&g_sessionPool);
 }
 
 // check if hardware supported.
