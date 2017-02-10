@@ -853,6 +853,11 @@ bool ppCollect::AddCounterGroups()
             deviceType = AMDT_PWR_DEVICE_CNT;
             category = AMDT_PWR_CATEGORY_FREQUENCY;
         }
+        else if (!(*iter).compareNoCase(PP_COUNTER_GROUP_CONTROLLER))
+        {
+            deviceType = AMDT_PWR_DEVICE_PACKAGE;
+            category = AMDT_PWR_CATEGORY_CONTROLLER;
+        }
         else if (!(*iter).compareNoCase(PP_COUNTER_GROUP_CU_POWER))
         {
             deviceType = AMDT_PWR_DEVICE_CPU_COMPUTE_UNIT;

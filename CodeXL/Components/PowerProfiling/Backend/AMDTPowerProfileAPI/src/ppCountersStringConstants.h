@@ -30,6 +30,7 @@
 #define PP_STR_CountCategoryName        "Count"
 #define PP_STR_EnergyCategoryName       "Energy"
 #define PP_STR_CorrelatedPowerCategoryName       "Correlated Power"
+#define PP_STR_ControllerCategoryName       "Controllers"
 
 #define PP_STR_UnsupportedCategoryName  "Unsupported Category"
 

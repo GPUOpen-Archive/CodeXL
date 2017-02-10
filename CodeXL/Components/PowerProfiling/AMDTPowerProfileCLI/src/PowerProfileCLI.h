@@ -95,6 +95,7 @@
 #define PP_COUNTER_GROUP_CORE             L"core"
 #define PP_COUNTER_GROUP_SVI2             L"svi2"
 #define PP_COUNTER_GROUP_DVFS             L"dvfs"
+#define PP_COUNTER_GROUP_CONTROLLER       L"controller"
 #define PP_COUNTER_GROUP_ALL              L"all"
 
 typedef enum PowerProfileReportTypes

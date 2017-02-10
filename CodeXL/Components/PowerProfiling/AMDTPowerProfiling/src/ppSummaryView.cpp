@@ -302,8 +302,11 @@ void ppSummaryView::SetupGraphs()
     m_pPowerGraph = new acColoredBarsGraph();
     m_pEnergyGraph = new acColoredBarsGraph();
 
-    m_pPowerGraph->SetGraphTitle(PP_STR_SummaryAveragePowerCaption);
-    m_pEnergyGraph->SetGraphTitle(PP_STR_SummaryCumulativeEnergyCaption);
+    if (GetCpuFamily() != CPU_FAMILY_17)
+    {
+        m_pPowerGraph->SetGraphTitle(PP_STR_SummaryAveragePowerCaption);
+        m_pEnergyGraph->SetGraphTitle(PP_STR_SummaryCumulativeEnergyCaption);
+    }
 
     // Set the minimum height for the graphs:
     m_pPowerGraph->GetPlot()->setMinimumSize(QSize(PP_SUMMARY_PLOT_MIN_WIDTH, PP_SUMMARY_PLOT_MIN_HEIGHT));
@@ -1257,27 +1260,29 @@ void ppSummaryView::OnTopSplitterMoved(int index, int position)
 
 void ppSummaryView::SetPowerGraphsCaption()
 {
-    // Sanity check:
-    GT_IF_WITH_ASSERT((m_pEnergyGraph != nullptr) && (m_pPowerGraph != nullptr))
+    if (GetCpuFamily() != CPU_FAMILY_17)
     {
-        // Create the strings describing the total energy in Joules:
-        QString energyGraphText, powerGraphText;
-        double value = m_apuCounterLastCumulativeValue / pow((double)MEASUREMENTUNIT_POWER_BASE, (double)m_currentPowerMeasurementUnit);
-        gtString strValue;
-        strValue.appendFormattedString(L"%.2f", value);
-        strValue.addThousandSeperators();
-        QString qstrValue = acGTStringToQString(strValue);
-        energyGraphText = QString(PP_STR_SummaryViewPowerGraphTypeAverage).arg(qstrValue).arg(GetPowerGraphUnit(ppDataUtils::POWERGRAPHTYPE_CUMULATIVE));
-
-        strValue.makeEmpty();
-        strValue.appendFormattedString(L"%.2f", m_apuCounterLastAverageValue);
-        strValue.addThousandSeperators();
-        qstrValue = acGTStringToQString(strValue);
-        powerGraphText = QString(PP_STR_SummaryViewEnergyGraphTypeCumulative).arg(qstrValue).arg(PP_STR_UnitsWatts);
-
-        // Update the total / average text items in power & energy graphs:
-        m_pPowerGraph->SetGraphTitle(powerGraphText);
-        m_pEnergyGraph->SetGraphTitle(energyGraphText);
-        
+        // Sanity check:
+        GT_IF_WITH_ASSERT((m_pEnergyGraph != nullptr) && (m_pPowerGraph != nullptr))
+        {
+            // Create the strings describing the total energy in Joules:
+            QString energyGraphText, powerGraphText;
+            double value = m_apuCounterLastCumulativeValue / pow((double)MEASUREMENTUNIT_POWER_BASE, (double)m_currentPowerMeasurementUnit);
+            gtString strValue;
+            strValue.appendFormattedString(L"%.2f", value);
+            strValue.addThousandSeperators();
+            QString qstrValue = acGTStringToQString(strValue);
+            energyGraphText = QString(PP_STR_SummaryViewPowerGraphTypeAverage).arg(qstrValue).arg(GetPowerGraphUnit(ppDataUtils::POWERGRAPHTYPE_CUMULATIVE));
+    
+            strValue.makeEmpty();
+            strValue.appendFormattedString(L"%.2f", m_apuCounterLastAverageValue);
+            strValue.addThousandSeperators();
+            qstrValue = acGTStringToQString(strValue);
+            powerGraphText = QString(PP_STR_SummaryViewEnergyGraphTypeCumulative).arg(qstrValue).arg(PP_STR_UnitsWatts);
+    
+            // Update the total / average text items in power & energy graphs:
+            m_pPowerGraph->SetGraphTitle(powerGraphText);
+            m_pEnergyGraph->SetGraphTitle(energyGraphText);
+        }
     }
 }

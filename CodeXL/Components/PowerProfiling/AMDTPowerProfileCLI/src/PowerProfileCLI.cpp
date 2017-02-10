@@ -142,6 +142,7 @@ static int PrintHelp()
     fprintf(stderr, "                                   SVI2 - collect all SVI2 counters, if available\n");
 #endif
     fprintf(stderr, "                                   dvfs - collect all the available dvfs counters, if available\n");
+    fprintf(stderr, "                                   controller - collect all controller limit and value counters, if available\n");
     fprintf(stderr, "                                   all - collect all the supported counters\n");
     fprintf(stderr, "\n    -M  <profile mode>         Specify profile mode. Following profile modes are supported.\n");
     fprintf(stderr, "                                   process - process level profiling\n");

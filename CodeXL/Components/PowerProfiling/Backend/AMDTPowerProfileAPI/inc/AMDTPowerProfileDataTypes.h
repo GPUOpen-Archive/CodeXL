@@ -97,6 +97,7 @@ typedef enum
     AMDT_PWR_CATEGORY_COUNT,              /**< Generic count value */
     AMDT_PWR_CATEGORY_ENERGY,             /**< Energy consumed */
     AMDT_PWR_CATEGORY_CORRELATED_POWER,   /**< Energy consumed */
+    AMDT_PWR_CATEGORY_CONTROLLER,         /**< Controller Limit and values */
     AMDT_PWR_CATEGORY_CNT,                /**< Total category count */
 } AMDTPwrCategory;
 

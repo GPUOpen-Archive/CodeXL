@@ -2738,6 +2738,12 @@ AMDTResult AMDTPwrGetCategoryInfo(AMDTPwrCategory category, AMDTPwrCategoryInfo*
                 break;
             }
 
+            case AMDT_PWR_CATEGORY_CONTROLLER:
+            {
+                memcpy(pCategory->m_name, PP_STR_ControllerCategoryName, strlen(PP_STR_ControllerCategoryName));
+                break;
+            }
+
             case AMDT_PWR_CATEGORY_CNT:
             default:
             {
