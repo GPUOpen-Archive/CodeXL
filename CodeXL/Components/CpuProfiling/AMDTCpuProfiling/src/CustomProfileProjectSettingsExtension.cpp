@@ -1643,6 +1643,71 @@ bool CustomProfileProjectSettingsExtension::addAllEventsToAvailable(bool isIbsAv
 
     }
 
+    osCpuid cpuid;
+
+    if (bRet && (cpuid.getFamily() == FAMILY_ZN) && (m_pEventFile != nullptr) && isIbsAvailable)
+    {
+        //Add the IBS parent item
+        QTreeWidgetItem* pIBSParent = new QTreeWidgetItem(QStringList(PM_profileTypeInstructionBasedSampling));
+
+        bRet &= (nullptr != pIBSParent);
+
+        if (bRet)
+        {
+            QTreeWidgetItem* pItem = new QTreeWidgetItem(pIBSParent, ((int)QTreeWidgetItem::UserType + GetIbsOpEvent()));
+
+            bRet = (nullptr != pItem);
+
+            if (bRet)
+            {
+                //look up name of ibs event
+                if (m_pEventFile->FindEventByValue(GetIbsOpEvent(), oneEvent))
+                {
+                    pItem->setFlags(pItem->flags() | Qt::ItemIsEditable);
+                    pItem->setText(EVENT_NAME_COLUMN, buildEventName(GetIbsOpEvent(), oneEvent.m_name.data()));
+                    pItem->setData(EVENT_INTERVAL_COLUMN, Qt::EditRole, QVariant(DEFAULT_IBS_INTERVAL));
+                    // IBS Op Dispatch count
+                    pItem->setText(EVENT_UNITMASK_COLUMN, "0x1");
+                    pItem->setToolTip(EVENT_UNITMASK_COLUMN, opToolTip(false));
+                }
+                else
+                {
+                    //The IBS event isn't valid for this system
+                    delete pItem;
+                }
+            }
+
+            pItem = new QTreeWidgetItem(pIBSParent, ((int)QTreeWidgetItem::UserType + GetIbsFetchEvent()));
+
+            bRet = (nullptr != pItem);
+
+            if (bRet)
+            {
+                //look up name of ibs event
+                if (m_pEventFile->FindEventByValue(GetIbsFetchEvent(), oneEvent))
+                {
+                    pItem->setFlags(pItem->flags() | Qt::ItemIsEditable);
+                    pItem->setText(EVENT_NAME_COLUMN, buildEventName(GetIbsFetchEvent(), oneEvent.m_name.data()));
+                    pItem->setData(EVENT_INTERVAL_COLUMN, Qt::EditRole, QVariant(DEFAULT_IBS_INTERVAL));
+                }
+                else
+                {
+                    //The IBS event isn't valid for this system
+                    delete pItem;
+                }
+            }
+
+            if (pIBSParent->childCount() > 0)
+            {
+                m_pAvailableTree->addTopLevelItem(pIBSParent);
+            }
+            else
+            {
+                delete pIBSParent;
+            }
+        }
+    }
+
     //Add the hardware parent item
     QTreeWidgetItem* pHardwareParent = new QTreeWidgetItem(QStringList(CP_STR_cpuProfileProjectSettingsCustomHardwareParent));
 

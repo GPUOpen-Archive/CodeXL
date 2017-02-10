@@ -1723,5 +1723,12 @@ HRESULT fnWriteRunInfo(const wchar_t* pRIFilePath, const RunInfo* pRunInfo)
 HRESULT fnGetPredefinedProfilesAvailable(/*out*/ bool& isPredefinedProfilesAvailable)
 {
     isPredefinedProfilesAvailable = true;
+    osCpuid cpuInfo;
+
+    if ((cpuInfo.getFamily() == FAMILY_ZN) && (cpuInfo.getModel() <= 0xf))
+    {
+        isPredefinedProfilesAvailable = false;
+    }
+
     return S_OK;
 }
