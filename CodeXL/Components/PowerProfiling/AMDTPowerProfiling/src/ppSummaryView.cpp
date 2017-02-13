@@ -307,6 +307,11 @@ void ppSummaryView::SetupGraphs()
         m_pPowerGraph->SetGraphTitle(PP_STR_SummaryAveragePowerCaption);
         m_pEnergyGraph->SetGraphTitle(PP_STR_SummaryCumulativeEnergyCaption);
     }
+    else
+    {
+        m_pPowerGraph->SetGraphTitle(PP_STR_SummaryAveragePowerZenCaption);
+        m_pEnergyGraph->SetGraphTitle(PP_STR_SummaryCumulativeEnergyZenCaption);
+    }
 
     // Set the minimum height for the graphs:
     m_pPowerGraph->GetPlot()->setMinimumSize(QSize(PP_SUMMARY_PLOT_MIN_WIDTH, PP_SUMMARY_PLOT_MIN_HEIGHT));
