@@ -19,7 +19,7 @@ Else
    $ExitCode = -1
 EndIf
 
-Local $WordToHelpCmd = "C:\Program Files (x86)\Softany\WordToHelp\word2help.exe " & Chr(34) & "D:\jenkins\workspace\CodeXL-Doc\CodeXL\Help\CodeXL User Guide\CodeXL User Guide.wfw" & Chr(34) & " /B"
+Local $WordToHelpCmd = "C:\Program Files (x86)\Softany\WordToHelp\word2help.exe " & Chr(34) & "D:\jenkins\workspace\CodeXL-Doc-2.3\CodeXL\Help\CodeXL User Guide\CodeXL User Guide.wfw" & Chr(34) & " /B"
 ConsoleWrite ( "[AutoIt3] Executing command: " & $WordToHelpCmd  & @CRLF)
 
 ; Run WordToHelp to generate the documentation
