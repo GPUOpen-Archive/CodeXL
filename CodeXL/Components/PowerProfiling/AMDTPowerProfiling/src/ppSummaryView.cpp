@@ -173,7 +173,7 @@ void ppSummaryView::OnNewProfileData(ppQtEventData pSampledDataPerCounter)
 
         // Bucket width for online calculation.
         const unsigned CPU_HISTOGRAM_ONLINE_BUCKET_WIDTH = 350;
-        const unsigned GPU_HISTOGRAM_ONLINE_BUCKET_WIDTH = 150;
+        const unsigned GPU_HISTOGRAM_ONLINE_BUCKET_WIDTH = 200;
 
         // update upper duration label
         gtMap<int, PPSampledValuesBatch> eventData = *(pSampledDataPerCounter.data());

@@ -130,7 +130,7 @@ public:
     {
         const double FREQ_COUNTERS_MIN_VALUE_MHZ = 0.0;
         const double CPU_FREQ_COUNTERS_MAX_VALUE_MHZ = 4900;
-        const double GPU_FREQ_COUNTERS_MAX_VALUE_MHZ = 1200;
+        const double GPU_FREQ_COUNTERS_MAX_VALUE_MHZ = 1600;
 
         // Reset the output variables.
         minValue = maxValue = FREQ_COUNTERS_MIN_VALUE_MHZ;
