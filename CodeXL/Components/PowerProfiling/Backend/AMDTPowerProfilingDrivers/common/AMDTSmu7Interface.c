@@ -384,10 +384,7 @@ bool CollectSMU7RegisterValues(void* pSmu, uint8* pData, uint32* pLength)
         }
     }
 
-    if (true == result)
-    {
         *pLength = *pLength + offset;
-    }
 
     return result;
 }
