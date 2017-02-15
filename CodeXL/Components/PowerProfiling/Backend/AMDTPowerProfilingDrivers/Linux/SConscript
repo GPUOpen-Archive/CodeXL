@@ -12,9 +12,10 @@ cxl_env = CXL_env.Clone()
 env = Environment() 
 
 PwrProfInstaller    = "CodeXLPwrProfDriver.sh"
-PwrProSourceInstall = "CodeXLPwrProfDriverSource.tar.gz"
+PwrProSourceInstall = "/tmp/CodeXLPwrProfDriverSource.tar.gz"
 PwrProfVersion      = "CodeXLPwrProfVersion"
 baseDir     = Dir("#./Components/PowerProfiling/Backend/AMDTPowerProfilingDrivers/Linux/src").abspath
+scriptDir   = Dir("#./Components/PowerProfiling/Backend/AMDTPowerProfilingDrivers/Linux").abspath
 
 if (cxl_env['CXL_build_conf'] == 'INTERNAL' or cxl_env['CXL_build_conf'] == 'NDA'):
      cxl_env.Append(CPPDEFINES={'AMDT_INTERNAL_COUNTERS' : 1})
@@ -39,8 +40,8 @@ def buildDrv(target, source, env):
     run(cmd)
 
     # create CodeXLPwrProfDriverSource.tar.gz file
-    # cmd = "%s/AMDTPwrProfCreateSrcPkg.sh" %scriptDir
-    # run(cmd)
+    cmd = "%s/createPwrProfSourcePkg.sh" %scriptDir
+    run(cmd)
 
     return 0
 
