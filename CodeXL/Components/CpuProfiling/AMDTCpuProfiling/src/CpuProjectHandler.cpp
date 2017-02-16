@@ -70,6 +70,10 @@ const gtString CPUSessionTreeItemData::ms_CPU_PROFILE_FUNCTIONS_DISPLAY_STR = L"
     #define JAVA_EXE_NAME    L"java"
 #endif
 
+
+static bool CopySubdirsToDestinationDir(const osDirectory& srcDir, const osDirectory& destDir, const gtList<gtString>& filter);
+
+
 CPUSessionTreeItemData::CPUSessionTreeItemData()
     : SessionTreeNodeData()
 {
@@ -1317,13 +1321,7 @@ void CpuProjectHandler::handleRawDataFileImport(const osFilePath& importedFilePa
             osFilePath translatedFile = importedFilePath;
             translatedFile.setFileExtension(DATA_EXT);
 
-#if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
-            // Windows needs the path including the data file
             CommandsHandler::instance()->startTranslating(pHandle, translatedFile.asString(), true);
-#else
-            //gtString sessionDir = osFilePath(translatedFile).fileDirectoryAsString();
-            CommandsHandler::instance()->startTranslating(pHandle, translatedFile.fileDirectoryAsString(), true);
-#endif
         }
         else
         {
@@ -1396,9 +1394,8 @@ void CpuProjectHandler::handleDataFileImport(const osFilePath& importedSessionFi
         // Copy *.jnc files
         gtList<gtString> filter;
         filter.emplace_back(L"*.jnc");
-        // TODO : Copy only required subdirectories which contain jnc files related to current db
-        // Once jnc files added to DB, copy of jnc files not required.
-        oldDir.copyFilesToDirectory(baseDir.directoryPath().asString(), filter);
+
+        CopySubdirsToDestinationDir(oldDir, baseDir, filter);
 
         // Update the imported files to the imported session name:
         renameFilesInDir(baseDir, importProfile, profileFileName);
@@ -1686,3 +1683,71 @@ void CpuProjectHandler::OnClearCurrentProjectSettings()
     m_sessions.clear();
 }
 
+// If the source sub-directory contains filter files, then copy it to destination directory.
+static bool CopySubdirsToDestinationDir(const osDirectory& srcDir, const osDirectory& destDir, const gtList<gtString>& filter)
+{
+    bool retVal = false;
+
+    if (filter.empty())
+    {
+        // nothing to match, skip copy operation
+        retVal = false;
+    }
+
+    if (retVal && !srcDir.exists())
+    {
+        // nothing to copy from , skip copy operation
+        retVal = false;
+    }
+
+    if (retVal && !destDir.exists())
+    {
+        // destination directory missing
+        retVal = false;
+    }
+
+    if (retVal)
+    {
+        // Fetch all non-recursive sub-directories
+        gtList<osFilePath> allSubDirs;
+        srcDir.getSubDirectoriesPaths(osDirectory::SORT_BY_NAME_ASCENDING, allSubDirs);
+
+        // List of sub-directories to be copied to destination
+        gtList<osFilePath> copySubDirs;
+
+        // Iterate over the sub-directories to check if the target files exist inside.
+        for (const auto& subDirPath : allSubDirs)
+        {
+            osDirectory subDir(subDirPath);
+            gtList<osFilePath> fileList;
+
+            for (const auto& filterIter : filter)
+            {
+                subDir.getContainedFilePaths(filterIter, osDirectory::SORT_BY_NAME_ASCENDING, fileList, false);
+            }
+
+            if (!fileList.empty())
+            {
+                copySubDirs.push_back(subDirPath);
+            }
+        }
+
+        gtString destDirName = destDir.asString(true);
+        // Empty filter is same as all-files.
+        gtList<gtString> filterAll;
+
+        for (const auto& subDirPath : copySubDirs)
+        {
+            osDirectory subDir(subDirPath);
+            gtString subDirName;
+
+            subDirPath.getFileNameAndExtension(subDirName);
+            destDirName.append(subDirName);
+
+            subDir.copyFilesToDirectory(destDirName, filterAll);
+            retVal = true;
+        }
+    }
+
+    return retVal;
+}
