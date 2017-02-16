@@ -1470,20 +1470,9 @@ void CommandsHandler::onEvent(const apEvent& eve, bool& vetoEvent)
                                 QString importedFileFullPath = acGTStringToQString(m_profileSession.m_pParentData->m_filePath.asString());
 
                                 bool imported;
-#if AMDT_BUILD_TARGET != AMDT_WINDOWS_OS
-                                gtString strSep(osFilePath::osPathSeparator);
-                                QString strSeparator(acGTStringToQString(strSep));
-                                int lastIndex = importedFileFullPath.lastIndexOf(strSeparator);
-                                QString strTemp = importedFileFullPath.mid(lastIndex + 1);
-                                strTemp += '.';
-                                strTemp += QString::fromWCharArray(DATA_EXT);
-                                importedFileFullPath.append(strSeparator);
-                                importedFileFullPath.append(strTemp);
-#endif
                                 CpuProjectHandler::instance().onImportSession(importedFileFullPath, imported);
                             }
                         }
-
                         else
                         {
                             // Create a new data for the new profile:
