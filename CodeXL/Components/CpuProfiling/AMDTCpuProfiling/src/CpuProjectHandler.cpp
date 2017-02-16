@@ -1686,7 +1686,7 @@ void CpuProjectHandler::OnClearCurrentProjectSettings()
 // If the source sub-directory contains filter files, then copy it to destination directory.
 static bool CopySubdirsToDestinationDir(const osDirectory& srcDir, const osDirectory& destDir, const gtList<gtString>& filter)
 {
-    bool retVal = false;
+    bool retVal = true;
 
     if (filter.empty())
     {
@@ -1744,8 +1744,7 @@ static bool CopySubdirsToDestinationDir(const osDirectory& srcDir, const osDirec
             subDirPath.getFileNameAndExtension(subDirName);
             destDirName.append(subDirName);
 
-            subDir.copyFilesToDirectory(destDirName, filterAll);
-            retVal = true;
+            retVal = subDir.copyFilesToDirectory(destDirName, filterAll) && retVal;
         }
     }
 
