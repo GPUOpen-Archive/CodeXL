@@ -36,8 +36,8 @@ cp -r $LINUX_SRC_DIR/AMDT*.c $SOURCE_DIR/src/
 # add additional files for internal or nda build
 if [ "$1" != "PUBLIC" ] ; then
     echo $1
-    cp -r $COMMON_SRC_DIR/Non-OpenSource/AMDT*.c $SOURCE_DIR/src/
-    cp -r $COMMON_SRC_DIR/Non-OpenSource/AMDT*.h $SOURCE_DIR/inc/
+    cp -r $DRV_SRC/../Non-OpenSource/AMDT*.c $SOURCE_DIR/src/
+    cp -r $DRV_SRC/../Non-OpenSource/AMDT*.h $SOURCE_DIR/inc/
 fi
 
 files=""
