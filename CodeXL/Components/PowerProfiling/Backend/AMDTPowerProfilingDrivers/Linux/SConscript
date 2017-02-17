@@ -27,12 +27,9 @@ def run(cmd):
       sys.exit(1)
 
 def buildDrv(target, source, env):
-    # do a clean 
-    cmd = "make clean -C %s" %baseDir
-    run(cmd)
 
     # do a make 
-    cmd = "make -C %s" %baseDir
+    cmd = "make -C %s BUILD_CONF=%s" %(baseDir, cxl_env['CXL_build_conf'])
     run(cmd)
 
     # clean temprary file 
@@ -40,7 +37,7 @@ def buildDrv(target, source, env):
     run(cmd)
 
     # create CodeXLPwrProfDriverSource.tar.gz file
-    cmd = "%s/createPwrProfSourcePkg.sh" %scriptDir
+    cmd = "%s/createPwrProfSourcePkg.sh %s " %(scriptDir , cxl_env['CXL_build_conf']) 
     run(cmd)
 
     return 0

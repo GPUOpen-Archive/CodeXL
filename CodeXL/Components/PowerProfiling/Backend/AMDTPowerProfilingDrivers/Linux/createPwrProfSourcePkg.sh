@@ -33,7 +33,26 @@ cp -r $LINUX_INC_DIR/AMDT*.h $SOURCE_DIR/inc/
 cp -r $COMMON_SRC_DIR/AMDT*.c $SOURCE_DIR/src/
 cp -r $LINUX_SRC_DIR/AMDT*.c $SOURCE_DIR/src/
 
-cp $DRV_SRC/Makefile $SOURCE_DIR
+# add additional files for internal or nda build
+if [ "$1" != "PUBLIC" ] ; then
+    echo $1
+    cp -r $COMMON_SRC_DIR/Non-OpenSource/AMDT*.c $SOURCE_DIR/src/
+    cp -r $COMMON_SRC_DIR/Non-OpenSource/AMDT*.h $SOURCE_DIR/inc/
+fi
+
+files=""
+for f in $SOURCE_DIR/src/*
+do
+    filename=$(basename "$f")
+    files=$files" src\/"${filename%.*}"\.o"
+done
+
+# create temp Makefile and fill the object file names for 
+# internal  or public object files 
+cp $DRV_SRC/Makefile /tmp/Makefile.tmp
+sed  -i "s/#FILE_NAME_OBJS#/${files}/g" /tmp/Makefile.tmp
+
+cp /tmp/Makefile.tmp  $SOURCE_DIR/Makefile
 cp $DRV_SRC/dkms.conf $SOURCE_DIR
 cp $DRV_SRC/CodeXLPwrProfVersion $SOURCE_DIR
 
@@ -41,7 +60,8 @@ cp $DRV_SRC/CodeXLPwrProfVersion $SOURCE_DIR
 tar -C /tmp/ -zcf /tmp/CodeXLPwrProfDriverSource.tar.gz $MODULE_NAME-$MODULE_VERSION/
 echo "CodeXLPwrProfDriverSource.tar.gz created."
 
-# after taring delete the temp file.
+# delete the temp file.
 rm -rf $SOURCE_DIR 
+rm -rf /tmp/Makefile.tmp
 
 exit 0
