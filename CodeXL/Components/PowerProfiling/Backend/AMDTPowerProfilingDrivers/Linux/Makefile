@@ -48,11 +48,8 @@ endif
 # Module needs to be compiled
 obj-m += $(MODULE_NAME).o
 
-ifneq ($(AMDT_INTERNAL_COUNTERS), 1)
-${MODULE_NAME}-objs :=  src/AMDTPwrProfHwaccess.o src/AMDTPwrProfHelper.o src/AMDTSmu7Interface.o src/AMDTSmu8Interface.o src/AMDTCounterAccessInterface.o src/AMDTRawDataFile.o src/AMDTCommonConfig.o src/AMDTAccessPmcData.o src/AMDTHwAccessInterface.o src/AMDTPwrProfTimer.o src/AMDTPwrProfEntry.o src/AMDTPwrProfCoreUtils.o src/AMDTPwrProfModule.o src/AMDTPwrProfTimerHelper.o  src/AMDTPwrProfSharedMemOps.o src/AMDTPwrCommonHelper.o
-else
-${MODULE_NAME}-objs :=  src/AMDTPwrProfHwaccess.o src/AMDTPwrProfHelper.o src/AMDTSmu7Interface.o src/AMDTSmu8Interface.o src/AMDTCounterAccessInterface.o src/AMDTRawDataFile.o src/AMDTCommonConfig.o src/AMDTAccessPmcData.o src/AMDTHwAccessInterface.o src/AMDTPwrProfTimer.o src/AMDTPwrProfEntry.o src/AMDTPwrProfCoreUtils.o src/AMDTPwrProfModule.o src/AMDTPwrProfTimerHelper.o  src/AMDTPwrProfSharedMemOps.o src/AMDTPwrCommonHelper.o src/AMDTSmu9Interface.o
-endif
+# Fill object file names
+${MODULE_NAME}-objs := #FILE_NAME_OBJS#
 
 # make
 all:

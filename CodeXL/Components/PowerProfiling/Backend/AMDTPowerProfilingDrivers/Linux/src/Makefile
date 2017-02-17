@@ -8,7 +8,7 @@ endif
 
 obj-m += $(TARGET).o
 
-ifneq ($(AMDT_INTERNAL_COUNTERS), 1)
+ifeq ("$(BUILD_CONF)", "PUBLIC")
 ${TARGET}-objs :=  AMDTPwrProfHwaccess.o AMDTPwrProfHelper.o ../../common/AMDTSmu7Interface.o ../../common/AMDTSmu8Interface.o ../../common/AMDTAccessPmcData.o ../../common/AMDTCounterAccessInterface.o ../../common/AMDTRawDataFile.o ../../common/AMDTCommonConfig.o ../../common/AMDTHwAccessInterface.o ../../common/AMDTPwrCommonHelper.o AMDTPwrProfTimer.o AMDTPwrProfEntry.o AMDTPwrProfCoreUtils.o AMDTPwrProfModule.o AMDTPwrProfTimerHelper.o AMDTPwrProfSharedMemOps.o
 else
 ${TARGET}-objs :=  AMDTPwrProfHwaccess.o AMDTPwrProfHelper.o ../../common/AMDTSmu7Interface.o ../../common/AMDTSmu8Interface.o ../../common/AMDTAccessPmcData.o ../../common/AMDTCounterAccessInterface.o ../../common/AMDTRawDataFile.o ../../common/AMDTCommonConfig.o ../../common/AMDTHwAccessInterface.o ../../common/AMDTPwrCommonHelper.o AMDTPwrProfTimer.o AMDTPwrProfEntry.o AMDTPwrProfCoreUtils.o AMDTPwrProfModule.o AMDTPwrProfTimerHelper.o AMDTPwrProfSharedMemOps.o ../../Non-OpenSource/AMDTSmu9Interface.o
