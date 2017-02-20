@@ -192,6 +192,8 @@ AMDTResult ReleaseMemoryPool(MemoryPool* pPool);
 AMDTUInt32 PwrGetLogicalProcessCount();
 // PwrIsSmtEnabled: Check if thread per core is more than 1
 bool PwrIsSmtEnabled();
+// PwrGetCoreCntFromOS : Get the Core counts from OS
+AMDTUInt32 PwrGetCoreCntFromOS();
 
 // PwrGetEnvironmentVariable: Get environment variable
 AMDTUInt32 PwrGetEnvironmentVariable(const char* pName);
