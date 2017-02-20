@@ -20,6 +20,8 @@
     #include <windows.h>
     #include <intrin.h>
     #include <process.h>
+#else
+    #include <unistd.h>
 #endif
 #include <string.h>
 #include <stdio.h>
@@ -595,3 +597,17 @@ AMDTInt32 PwrGetProcessId(void)
     return pId;
 }
 
+AMDTUInt32 PwrGetCoreCntFromOS()
+{
+    AMDTUInt32 coreCnt = 0;
+
+#ifdef LINUX
+    coreCnt = sysconf(_SC_NPROCESSORS_ONLN);
+#else
+    SYSTEM_INFO sysinfo;
+    GetSystemInfo(&sysinfo);
+    coreCnt = sysinfo.dwNumberOfProcessors;
+#endif
+
+    return coreCnt;
+}

@@ -794,7 +794,7 @@ AMDTResult AMDTPwrGetTargetSystemInfo(
 
             // If node platform is not supported and no valid dgpu connected
             if ((0 == g_pTargetSystemInfo->m_smuTable.m_count)
-                    && (false == g_pTargetSystemInfo->m_isPlatformSupported))
+                && (false == g_pTargetSystemInfo->m_isPlatformSupported))
             {
                 ret = AMDT_ERROR_PLATFORM_NOT_SUPPORTED;
             }
@@ -813,7 +813,13 @@ AMDTResult AMDTPwrGetTargetSystemInfo(
 
                 if (AMDT_STATUS_OK == ret)
                 {
-                    if (GDT_KALINDI == g_pTargetSystemInfo->m_nodeInfo.m_hardwareType)
+                    if (g_pTargetSystemInfo->m_coreCnt != PwrGetCoreCntFromOS())
+                    {
+                        g_pTargetSystemInfo->m_computeUnitCnt = 1;
+                        g_pTargetSystemInfo->m_coresPerCu = 1;
+                        g_pTargetSystemInfo->m_coreCnt = 1;
+                    }
+                    else if (GDT_KALINDI == g_pTargetSystemInfo->m_nodeInfo.m_hardwareType)
                     {
                         // Mullins has only one compute unit. Refer D1F5x80 Compute Unit Status 1
                         g_pTargetSystemInfo->m_computeUnitCnt = 1;
