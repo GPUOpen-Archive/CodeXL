@@ -184,8 +184,11 @@ PPDevice* BackendDataConvertor::CreatePPDevice(const AMDTPwrDevice& bePwrDevice)
                 AMDTPwrCounterDesc* pCounter =
                     BackendDataConvertor::CopyPwrCounterDesc(*pCurrentCounter);
 
-                // Add that new counter to our supported counters list.
-                supportedCounters.push_back(pCounter);
+                if(AMDT_PWR_CATEGORY_CONTROLLER != pCounter->m_category)
+                {
+                    // Add that new counter to our supported counters list.
+                    supportedCounters.push_back(pCounter);
+                }
             }
 
             // Advance the pointer.
