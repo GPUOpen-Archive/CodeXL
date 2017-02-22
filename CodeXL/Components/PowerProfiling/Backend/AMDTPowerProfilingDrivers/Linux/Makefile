@@ -33,7 +33,7 @@ MODPROBE_OUTPUT=$(shell lsmod | grep $(MODULE_NAME))
 PCORE_DKMS_STATUS=$(shell dkms status | grep $(MODULE_NAME) | grep $(MODULE_VERSION))
 
 # Compilation flags
-EXTRA_CFLAGS=-I$(PWD)/inc -DKERNEL_MODULE -DLINUX -D_LINUX
+EXTRA_CFLAGS=-I$(PWD)/inc -DKERNEL_MODULE -DLINUX -D_LINUX #WRITE_CFLAGS#
 # Compilation flags with debug enabled
 # EXTRA_CFLAGS=-I$(PWD)/inc -DKERNEL_MODULE -g -DLINUX -D_LINUX -DDEBUG
 

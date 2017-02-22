@@ -52,6 +52,13 @@ done
 cp $DRV_SRC/Makefile /tmp/Makefile.tmp
 sed  -i "s/#FILE_NAME_OBJS#/${files}/g" /tmp/Makefile.tmp
 
+cflags=""
+if [ "$1" != "PUBLIC" ] ; then
+    cflags="-DAMDT_INTERNAL_COUNTERS"
+fi
+
+sed  -i "s/#WRITE_CFLAGS#/${cflags}/g" /tmp/Makefile.tmp
+
 cp /tmp/Makefile.tmp  $SOURCE_DIR/Makefile
 cp $DRV_SRC/dkms.conf $SOURCE_DIR
 cp $DRV_SRC/CodeXLPwrProfVersion $SOURCE_DIR
