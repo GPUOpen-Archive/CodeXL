@@ -1214,7 +1214,7 @@ bool GetAvailableSmuList(SmuList* pList)
 
             if (platformId == g_pTargetSystemInfo->m_platformId)
             {
-                bool smuAccessible = true;
+                bool smuAccessible = false;
                 g_pTargetSystemInfo->m_isPlatformWithSmu = true;
                 g_pTargetSystemInfo->m_isPlatformSupported = true;
 
@@ -1231,6 +1231,7 @@ bool GetAvailableSmuList(SmuList* pList)
                     if (nullptr != g_fpFillSmuInternal)
                     {
                         g_fpFillSmuInternal(&pList->m_info[smuCnt].m_access);
+			smuAccessible = true;
                     }
                 }
 
