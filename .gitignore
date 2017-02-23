@@ -293,3 +293,4 @@ CodeXL/Components/GpuProfiling/Non-OpenSource
 # Linux Power Profiler driver temp files
 CodeXL/Components/PowerProfiling/Backend/AMDTPowerProfilingDrivers/common/*.o
 CodeXL/Components/PowerProfiling/Backend/AMDTPowerProfilingDrivers/common/*.o.cmd
+CodeXL/Components/PowerProfiling/Backend/AMDTPowerProfilingDrivers/Linux/CodeXLPwrProfDriverSource.tar.gz

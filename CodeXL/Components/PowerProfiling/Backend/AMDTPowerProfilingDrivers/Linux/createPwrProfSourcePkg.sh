@@ -17,8 +17,8 @@ LINUX_SRC_DIR="$MODULE_SOURCE/src/"
 MODULE_NAME=amdtPwrProf
 # read Module version from ./VERSION file
 MODULE_VERSION=$(cat $DRV_SRC/CodeXLPwrProfVersion)
-# create a tempaary directory in /tmp/
-SOURCE_DIR=/tmp/$MODULE_NAME-$MODULE_VERSION
+# create a temp directory in current directory
+SOURCE_DIR=$DRV_SRC/$MODULE_NAME-$MODULE_VERSION
 
 # source files destination for moodule
 mkdir -p $SOURCE_DIR/src
@@ -49,31 +49,31 @@ done
 
 # create temp Makefile and fill the object file names for 
 # internal  or public object files 
-cp $DRV_SRC/Makefile /tmp/Makefile.tmp
-sed  -i "s/#FILE_NAME_OBJS#/${files}/g" /tmp/Makefile.tmp
+cp $DRV_SRC/Makefile $DRV_SRC/Makefile.tmp
+sed  -i "s/#FILE_NAME_OBJS#/${files}/g" $DRV_SRC/Makefile.tmp
 
 cflags=""
 if [ "$1" != "PUBLIC" ] ; then
     cflags="-DAMDT_INTERNAL_COUNTERS"
 fi
 
-sed  -i "s/#WRITE_CFLAGS#/${cflags}/g" /tmp/Makefile.tmp
+sed  -i "s/#WRITE_CFLAGS#/${cflags}/g" $DRV_SRC/Makefile.tmp
 
-cp /tmp/Makefile.tmp  $SOURCE_DIR/Makefile
+cp $DRV_SRC/Makefile.tmp  $SOURCE_DIR/Makefile
 cp $DRV_SRC/dkms.conf $SOURCE_DIR
 cp $DRV_SRC/CodeXLPwrProfVersion $SOURCE_DIR
 
-if [ -e /tmp/CodeXLPwrProfDriverSource.tar.gz ] ; then
+if [ -e $DRV_SRC/CodeXLPwrProfDriverSource.tar.gz ] ; then
     echo "Deleting stale CodeXLPwrProfDriverSource.tar.gz "
-    rm /tmp/CodeXLPwrProfDriverSource.tar.gz
+    rm $DRV_SRC/CodeXLPwrProfDriverSource.tar.gz
 fi
 
 # tar the files in current directory
-tar -C /tmp/ -zcf /tmp/CodeXLPwrProfDriverSource.tar.gz $MODULE_NAME-$MODULE_VERSION/
+tar -C $DRV_SRC -zcf $DRV_SRC/CodeXLPwrProfDriverSource.tar.gz $MODULE_NAME-$MODULE_VERSION/
 echo "Created CodeXLPwrProfDriverSource.tar.gz."
 
 # delete the temp file.
 rm -rf $SOURCE_DIR 
-rm -rf /tmp/Makefile.tmp
+rm -rf $DRV_SRC/Makefile.tmp
 
 exit 0

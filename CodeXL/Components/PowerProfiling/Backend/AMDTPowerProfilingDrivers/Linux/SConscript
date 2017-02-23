@@ -12,7 +12,7 @@ cxl_env = CXL_env.Clone()
 env = Environment() 
 
 PwrProfInstaller    = "CodeXLPwrProfDriver.sh"
-PwrProSourceInstall = "/tmp/CodeXLPwrProfDriverSource.tar.gz"
+PwrProSourceInstall = "CodeXLPwrProfDriverSource.tar.gz"
 PwrProfVersion      = "CodeXLPwrProfVersion"
 baseDir     = Dir("#./Components/PowerProfiling/Backend/AMDTPowerProfilingDrivers/Linux/src").abspath
 scriptDir   = Dir("#./Components/PowerProfiling/Backend/AMDTPowerProfilingDrivers/Linux").abspath
