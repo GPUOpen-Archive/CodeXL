@@ -6,12 +6,12 @@
 # used by the installer to install/uninstall power profiler module.
 
 # save the current directory path 
-MODULE_SOURCE=`pwd`
-DRV_SRC="$MODULE_SOURCE/Components/PowerProfiling/Backend/AMDTPowerProfilingDrivers/Linux/"
-COMMON_INC_DIR="$MODULE_SOURCE/Components/PowerProfiling/Backend/AMDTPowerProfilingDrivers/inc/"
-COMMON_SRC_DIR="$MODULE_SOURCE/Components/PowerProfiling/Backend/AMDTPowerProfilingDrivers/common/"
-LINUX_INC_DIR="$MODULE_SOURCE/Components/PowerProfiling/Backend/AMDTPowerProfilingDrivers/Linux/inc/"
-LINUX_SRC_DIR="$MODULE_SOURCE/Components/PowerProfiling/Backend/AMDTPowerProfilingDrivers/Linux/src/"
+MODULE_SOURCE="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+DRV_SRC=$MODULE_SOURCE
+COMMON_INC_DIR="$MODULE_SOURCE/../inc/"
+COMMON_SRC_DIR="$MODULE_SOURCE/../common/"
+LINUX_INC_DIR="$MODULE_SOURCE/inc/"
+LINUX_SRC_DIR="$MODULE_SOURCE/src/"
 
 # Module Name
 MODULE_NAME=amdtPwrProf
@@ -63,9 +63,14 @@ cp /tmp/Makefile.tmp  $SOURCE_DIR/Makefile
 cp $DRV_SRC/dkms.conf $SOURCE_DIR
 cp $DRV_SRC/CodeXLPwrProfVersion $SOURCE_DIR
 
+if [ -e /tmp/CodeXLPwrProfDriverSource.tar.gz ] ; then
+    echo "Deleting stale CodeXLPwrProfDriverSource.tar.gz "
+    rm /tmp/CodeXLPwrProfDriverSource.tar.gz
+fi
+
 # tar the files in current directory
 tar -C /tmp/ -zcf /tmp/CodeXLPwrProfDriverSource.tar.gz $MODULE_NAME-$MODULE_VERSION/
-echo "CodeXLPwrProfDriverSource.tar.gz created."
+echo "Created CodeXLPwrProfDriverSource.tar.gz."
 
 # delete the temp file.
 rm -rf $SOURCE_DIR 
