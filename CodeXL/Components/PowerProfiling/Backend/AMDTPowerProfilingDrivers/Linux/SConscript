@@ -20,38 +20,6 @@ scriptDir   = Dir("#./Components/PowerProfiling/Backend/AMDTPowerProfilingDriver
 if (cxl_env['CXL_build_conf'] == 'INTERNAL' or cxl_env['CXL_build_conf'] == 'NDA'):
      cxl_env.Append(CPPDEFINES={'AMDT_INTERNAL_COUNTERS' : 1})
 
-def run(cmd):
-    res = subprocess.check_call(cmd, shell=True)
-    if res != 0:
-      print "Error: Failed in building Power Profile Drv: " + str(res)
-      sys.exit(1)
-
-def buildDrv(target, source, env):
-
-    # do a make 
-    cmd = "make -C %s BUILD_CONF=%s" %(baseDir, cxl_env['CXL_build_conf'])
-    run(cmd)
-
-    # clean temprary file 
-    cmd = "make clean -C %s" %baseDir
-    run(cmd)
-
-    # create CodeXLPwrProfDriverSource.tar.gz file
-    cmd = "%s/createPwrProfSourcePkg.sh %s " %(scriptDir , cxl_env['CXL_build_conf']) 
-    run(cmd)
-
-    return 0
-
-def drvMessage(target = None, source = None, env = None):
-    return "Building Power Profile driver from '%s'\n at: %s" % (source[0], 
-      time.asctime(time.localtime(time.time())))
-
-drvMake = env.Command(
-    target      = 'PwrProfDriver', 
-    source      = Dir("#./Components/PowerProfiling/Backend/AMDTPowerProfilingDrivers/Linux/src"),
-    action      = Action(buildDrv, strfunction = drvMessage),
-)
-
 moduleSource = cxl_env.Install( 
 	dir = cxl_env['CXL_lib_dir'], 
 	source = PwrProSourceInstall)
@@ -64,6 +32,18 @@ moduleInstallScript = cxl_env.Install(
 	dir = cxl_env['CXL_lib_dir'], 
 	source = PwrProfInstaller)
 
-ResultsAction = drvMake + moduleSource + moduleVersion + moduleInstallScript
+is_clean = GetOption('clean')
+
+if not is_clean:
+    cmd = "make -C %s BUILD_CONF=%s" %(baseDir, cxl_env['CXL_build_conf'])
+    Execute(cmd)
+
+    cmd = "%s/createPwrProfSourcePkg.sh %s " %(scriptDir , cxl_env['CXL_build_conf'])
+    Execute(cmd)
+
+cmd = "make clean -C %s" %baseDir
+Execute(cmd)
+
+ResultsAction = moduleSource + moduleVersion + moduleInstallScript
 
 Return('ResultsAction')
