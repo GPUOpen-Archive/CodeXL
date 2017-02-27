@@ -3,7 +3,7 @@
 //                 CodeXL                 //
 ////////////////////////////////////////////
 
-This version supports Windows 7 64-bit, Windows 8 64-bit and Linux x86_64 architectures. 
+This version supports Windows 7 64-bit, Windows 8.1 64-bit,  Windows 10 64-bit and Linux x86_64 architectures. 
 
 Download
 ========
@@ -13,7 +13,7 @@ http://developer.amd.com/tools-and-sdks/opencl-zone/codexl/
 Install
 =======
 On Windows:
-To install CodeXL, use the provided MSI file.
+To install CodeXL, use the provided executable file AMD_CodeXL_*.exe
 
 On Linux:
 To install CodeXL, use the provided RPM file, Debian file, or simply extract the compressed archive onto your hard drive.
@@ -23,7 +23,8 @@ For further installation instructions see the CodeXL Quick Start Guide here on t
 Run
 ===
 On Windows:
-Use the Start menu and select All Programs -> AMD Developer Tools -> AMD CodeXL -> AMD CodeXL, or if you chose to enable the desktop shortcut installer option during installtion, double click the AMD CodeXL icon on your desktop.
+Use the Start menu and select All Programs -> AMD Developer Tools -> AMD CodeXL -> AMD CodeXL, or if you chose to enable the desktop shortcut installer option during installation, double click the AMD CodeXL icon on your desktop.
+If you chose to install the CodeXL Visual Studio extension, launch Visual Studio and click the CodeXL menu from the menu bar.
 
 On Linux:
 To run CodeXL, launch the CodeXL script from a command shell or double-click it in a file browser window in the installed location.
@@ -39,8 +40,8 @@ http://developer.amd.com/tools-and-sdks/opencl-zone/codexl/
 Open-Source Components
 ======================
 CodeXL uses several open-source components (see Legal section below).
-CodeXL uses QT 4.7.4. Source code for QT is available here: http://qt-project.org/downloads
-The QT DLLs used by CodeXL are renamed from the original name to include the suffix AmdDt4744. This is done to prevent accidental collision with different versions of QT that may be installed by other 3rd party software packages. The QT source code has not been tempered with and the built binaries are identical to what any user that downloads the source code from the web and builds them will produce, with the exception of the DLL names.
+CodeXL uses QT 5.3.0. Source code for QT is available here: http://qt-project.org/downloads
+The QT source code has not been tempered with and the built binaries are identical to what any user that downloads the source code from the web and builds them will produce, with the exception of the DLL names.
 
 Legal Information
 =================
@@ -78,8 +79,27 @@ LibDwarf:
 Microsoft Detours (CodeXL Windows version only):
     © 2012 Microsoft Corporation
     
+glew:
+	The OpenGL Extension Wrangler Library
+	Copyright (C) 2002-2007, Milan Ikits <milan ikits[]ieee org>
+	Copyright (C) 2002-2007, Marcelo E. Magallon <mmagallo[]debian org>
+	Copyright (C) 2002, Lev Povalahev
+	All rights reserved.
+	
+	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
+	AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
+	IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+	ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE 
+	LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR 
+	CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF 
+	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+	THE POSSIBILITY OF SUCH DAMAGE.
+    
 OpenCL:
-    Copyright (c) 2008-2014 The Khronos Group Inc.
+    Copyright (c) 2008-2015 The Khronos Group Inc.
 
 Sincerely,
 
