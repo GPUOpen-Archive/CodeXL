@@ -1,6 +1,20 @@
 CodeXL build instructions
 ===========================
 
+## Cloning
+CodeXL has several submodules. Clone with the `--recursive` flag to download all the source code required to build. For example:
+
+```bash
+git clone --recursive https://github.com/GPUOpen-Tools/CodeXL
+```
+
+To initialize the submodules after cloning the main repository run the following commands:
+
+```bash
+git submodule init
+git submodule update
+```
+
 ## Windows
 
 #### Installations
