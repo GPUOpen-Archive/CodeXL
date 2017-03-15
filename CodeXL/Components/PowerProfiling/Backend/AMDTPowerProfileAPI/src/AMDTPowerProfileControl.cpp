@@ -695,7 +695,7 @@ void PrepareApuPstateTable()
         regVal = msr.data;
 
         g_pStateInfo.m_stateInfo[cnt].m_frequency = (AMDTUInt32)(100.0 * (AMDTFloat64)((regVal & AMDT_CPUFID_MASK) + 0x10) /
-                                                                 (AMDTFloat64)(0x1 << ((regVal & AMDT_CPUDID_MASK) >> AMDT_CPUDID_BITSHIFT)));
+                                                                 (AMDTFloat64)(0x1ULL << ((regVal & AMDT_CPUDID_MASK) >> AMDT_CPUDID_BITSHIFT)));
 
         if (cnt < boostedStates)
         {

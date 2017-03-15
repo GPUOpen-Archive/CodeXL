@@ -574,7 +574,7 @@ AMDTResult PowerProfileTranslate::TranslateRawData()
                 if (true == m_isRunning)
                 {
                     GetFirstSetBitIndex(&coreId, tempCoreMask);
-                    tempCoreMask &= ~(1 << coreId);
+                    tempCoreMask &= ~(1ULL << coreId);
                     pCoreBuffer = m_pSahredBuffer + cnt;
                     offset = pCoreBuffer->m_processedOffset;
                     pRaw = (AMDTUInt8*)(pCoreBuffer->m_pBuffer);
@@ -802,7 +802,7 @@ AMDTResult PowerProfileTranslate::ReadSharedBuffer(SharedBuffer* pBuffer, AMDTUI
             AMDTUInt32 rawBufferbase = 0;
 
             GetFirstSetBitIndex(&coreId, tempCoreMask);
-            tempCoreMask &= ~(1 << coreId);
+            tempCoreMask &= ~(1ULL << coreId);
             SharedBuffer* pSBuffer = &pBuffer[idx];
 
             if (0 == idx)
@@ -887,7 +887,7 @@ AMDTResult PowerProfileTranslate::UpdateSharedBufferInfo(SharedBuffer* pBuffer, 
         AMDTUInt32 bufferBase = 0;
 
         GetFirstSetBitIndex(&coreId, tempCoreMask);
-        tempCoreMask &= ~(1 << coreId);
+        tempCoreMask &= ~(1ULL << coreId);
         AMDTUInt32 offset = 0;
         SharedBuffer* localBuffer = pBuffer + idx;
 
@@ -1318,7 +1318,7 @@ AMDTUInt32 PowerProfileTranslate::DecodeNodeCounters(PwrCounterDecodeInfo* pDeco
                 else
                 {
                     pStateFreq = (AMDTFloat64)(100.0 * (AMDTFloat64)((pState & AMDT_CPUFID_MASK) + 0x10) /
-                                               (AMDTFloat64)(0x1 << ((pState & AMDT_CPUDID_MASK) >> AMDT_CPUDID_BITSHIFT))); // in MHz
+                                               (AMDTFloat64)(0x1ULL << ((pState & AMDT_CPUDID_MASK) >> AMDT_CPUDID_BITSHIFT))); // in MHz
 
 
                     AMDTPwrApuPstateList* pStates = GetApuPStateInfo();
