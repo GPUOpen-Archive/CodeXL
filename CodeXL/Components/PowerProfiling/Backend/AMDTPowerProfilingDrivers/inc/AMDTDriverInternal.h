@@ -30,7 +30,7 @@
 #include <AMDTDriverTypedefs.h>
 
 // Data/Header buffer size
-#define DATA_PAGE_BUFFER_SIZE 4096
+#define DATA_PAGE_BUFFER_SIZE 12288 // 3 X 4096
 
 /// Header buffer size
 #define HEADER_BUFFER_SIZE 4096
