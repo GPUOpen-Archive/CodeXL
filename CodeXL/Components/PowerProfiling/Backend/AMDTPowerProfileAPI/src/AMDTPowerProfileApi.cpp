@@ -767,13 +767,13 @@ void PwrConfigureHistogramCounters()
     }
 }
 
-AMDTUInt32 PwrGetCoreMask()
+AMDTUInt64 PwrGetCoreMask()
 {
-    AMDTUInt32 mask = 0;
+    AMDTUInt64 mask = 0;
 
     if (PROFILE_TYPE_PROCESS_PROFILING == g_profileType)
     {
-        mask = ~0 ^ (~0 << g_sysInfo.m_coreCnt);
+        mask = ~0ULL ^ (~0ULL << g_sysInfo.m_coreCnt);
     }
     else
     {
@@ -788,7 +788,7 @@ AMDTUInt32 PwrGetCoreMask()
                     || ((INSTANCE_TYPE_PER_PHYSICAL_CORE == iter.second.m_basicInfo.m_instanceType)
                         && (CATEGORY_ENERGY == iter.second.m_basicInfo.m_category)))
                 {
-                    mask |= 1 << iter.second.m_instanceId;
+                    mask |= 1ULL << iter.second.m_instanceId;
                 }
             }
         }

@@ -484,7 +484,7 @@ void ppReporterText::WriteProcessData(AMDTUInt32 recCnt, AMDTPwrProcessInfo*& pI
     {
         recInfo = &pInfo[cnt];
 
-        if ((nullptr != recInfo) && (recInfo->m_power >= 1.0))
+        if ((nullptr != recInfo) && (recInfo->m_power >= 0.01))
         {
             m_dataStr.clear();
 
@@ -525,7 +525,7 @@ void ppReporterText::WriteModuleData(AMDTUInt32 recCnt, AMDTPwrModuleData*& pInf
     {
         recInfo = &pInfo[cnt];
 
-        if ((nullptr != recInfo) && (recInfo->m_power >= 1.0))
+        if ((nullptr != recInfo) && (recInfo->m_power >= 0.01))
         {
             m_dataStr.clear();
             sprintf(m_pDataStr, MODULE_INFO_TXT_FORMAT,
@@ -826,7 +826,7 @@ void ppReporterCsv::WriteProcessData(AMDTUInt32 recCnt, AMDTPwrProcessInfo*& pIn
     {
         recInfo = &pInfo[cnt];
 
-        if ((nullptr != recInfo) && (recInfo->m_power >= 1.0))
+        if ((nullptr != recInfo) && (recInfo->m_power >= 0.01))
         {
             m_dataStr.clear();
 
@@ -865,7 +865,7 @@ void ppReporterCsv::WriteModuleData(AMDTUInt32 recCnt, AMDTPwrModuleData*& pInfo
     {
         recInfo = &pInfo[cnt];
 
-        if ((nullptr != recInfo) && (recInfo->m_power >= 1.0))
+        if ((nullptr != recInfo) && (recInfo->m_power >= 0.01))
         {
             m_dataStr.clear();
             sprintf(m_pDataStr,  MODULE_INFO_CSV_FORMAT,
