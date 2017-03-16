@@ -273,6 +273,9 @@ AMDTResult PwrProfTranslateLinux::AttributePowerToSample()
         m_modSampleDataTable.push_back(ModuleSampleDataMap());
     }
 
+    // reset power component powers
+    memset(m_componentPower, 0, sizeof(AMDTFloat32) * MAX_PHYSICAL_CORE_CNT);
+
     return AMDT_STATUS_OK;
 }
 

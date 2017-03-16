@@ -37,6 +37,7 @@ AMDTResult PwrProfTranslateWin::PwrGetProfileData(CXLContextProfileType type, vo
             process.m_pid = processIter.first;
 
             memset(path, '\0', OS_MAX_PATH);
+
             if (S_OK == fnFindProcessName(process.m_pid, str, AMDT_PWR_EXE_PATH_LENGTH))
             {
                 wcstombs(path, str, OS_MAX_PATH);
@@ -96,6 +97,7 @@ AMDTResult PwrProfTranslateWin::PwrGetProfileData(CXLContextProfileType type, vo
                 {
                     wcstombs(path, str, OS_MAX_PATH);
                 }
+
                 ExtractNameAndPath(path, module.m_processName, module.m_processPath);
 
                 m_moduleList.push_back(module);
@@ -165,6 +167,8 @@ AMDTResult PwrProfTranslateWin::AttributePowerToSample()
         m_sampleIpcLoad[coreIdx] = 0;
     }
 
+    // reset power component powers
+    memset(m_componentPower, 0, sizeof(AMDTFloat32) * MAX_PHYSICAL_CORE_CNT);
     return AMDT_STATUS_OK;
 }
 
@@ -174,12 +178,9 @@ AMDTResult PwrProfTranslateWin::ProcessSample(ContextData* pCtx, AMDTUInt32 core
     (void)pCtx;
     (void)coreId;
     (void)componentIdx;
-
-#ifndef _WIN64
     AMDTFloat32 ipc = (AMDTFloat32)pCtx->m_pmcData[PMC_EVENT_RETIRED_MICRO_OPS]
                       / (AMDTFloat32)pCtx->m_pmcData[PMC_EVENT_CPU_CYCLE_NOT_HALTED];
 
-    (void)componentIdx;
     AMDTUInt64 key = 0;
     bool newModule = false;
     AMDTUInt64 deltaTick = 0;
@@ -230,7 +231,6 @@ AMDTResult PwrProfTranslateWin::ProcessSample(ContextData* pCtx, AMDTUInt32 core
         }
     }
 
-#endif
     return AMDT_STATUS_OK;
 }
 
