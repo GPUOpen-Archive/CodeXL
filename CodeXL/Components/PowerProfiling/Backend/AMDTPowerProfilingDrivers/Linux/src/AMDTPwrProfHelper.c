@@ -253,12 +253,20 @@ bool HelpAccessMSRAddress(PACCESS_MSR pData)
     return ret;
 }
 
-// Read MSR
+// Read MSR 64 bit
 uint64 HelpReadMsr64(uint32 reg)
 {
     uint64 data;
     ReadMSR(reg, &data);
     return data;
+}
+
+// Write MSR 64 bit
+uint32 HelpReadMsr64(uint32 reg, uint64 value)
+{
+    uint64 data;
+    WriteMSR(reg, value);
+    return STATUS_SUCCESS;
 }
 
 // Read from ndex and SMU soft north bridge specific register.

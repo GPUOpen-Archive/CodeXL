@@ -178,13 +178,33 @@ AMDTResult PwrProfTranslateWin::ProcessSample(ContextData* pCtx, AMDTUInt32 core
     (void)pCtx;
     (void)coreId;
     (void)componentIdx;
-    AMDTFloat32 ipc = (AMDTFloat32)pCtx->m_pmcData[PMC_EVENT_RETIRED_MICRO_OPS]
-                      / (AMDTFloat32)pCtx->m_pmcData[PMC_EVENT_CPU_CYCLE_NOT_HALTED];
+    AMDTUInt64 rerdMOps = 0;
+    AMDTUInt64 cpuNotHltd = 0;
 
     AMDTUInt64 key = 0;
     bool newModule = false;
     AMDTUInt64 deltaTick = 0;
-    SetElapsedTime(pCtx->m_timeStamp, (AMDTUInt64*)&deltaTick);
+    AMDTFloat32 ipc = 0;
+    rerdMOps = pCtx->m_pmcData[PMC_EVENT_RETIRED_MICRO_OPS];
+    cpuNotHltd = pCtx->m_pmcData[PMC_EVENT_CPU_CYCLE_NOT_HALTED];
+
+    if (PLATFORM_ZEPPELIN == GetSupportedTargetPlatformId())
+    {
+        rerdMOps = (rerdMOps > m_prevIpcData[coreId].m_ipcData[PMC_EVENT_RETIRED_MICRO_OPS]) ?
+                   (rerdMOps - m_prevIpcData[coreId].m_ipcData[PMC_EVENT_RETIRED_MICRO_OPS]) :
+                   (rerdMOps + ~m_prevIpcData[coreId].m_ipcData[PMC_EVENT_RETIRED_MICRO_OPS]);
+
+        cpuNotHltd = (cpuNotHltd > m_prevIpcData[coreId].m_ipcData[PMC_EVENT_CPU_CYCLE_NOT_HALTED]) ?
+                     (cpuNotHltd - m_prevIpcData[coreId].m_ipcData[PMC_EVENT_CPU_CYCLE_NOT_HALTED]) :
+                     (cpuNotHltd + ~m_prevIpcData[coreId].m_ipcData[PMC_EVENT_CPU_CYCLE_NOT_HALTED]);
+
+        m_prevIpcData[coreId].m_ipcData[PMC_EVENT_RETIRED_MICRO_OPS] = rerdMOps;
+        m_prevIpcData[coreId].m_ipcData[PMC_EVENT_CPU_CYCLE_NOT_HALTED] = cpuNotHltd;
+    }
+
+    ipc = (AMDTFloat32)((AMDTFloat64) rerdMOps / (AMDTFloat64) cpuNotHltd);
+
+          SetElapsedTime(pCtx->m_timeStamp, (AMDTUInt64*)&deltaTick);
 
     AMDTUInt32 instanceId = 0;
     pCtx->m_ip = pCtx->m_ip & 0x0000FFFFFFFFFFFF;

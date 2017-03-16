@@ -544,7 +544,13 @@ bool HelpAccessMSRAddress(PACCESS_MSR pData)
 uint64 HelpReadMsr64(uint32 reg)
 {
     return ReadMsrReg(reg);
+}
 
+// HelpWriteMsr64: Read 64 bit MSR address
+uint64 HelpWriteMsr64(uint32 reg, uint64 value)
+{
+    WriteMsrReg(reg, value);
+	return STATUS_SUCCESS;
 }
 
 // HelpGetBitsCount: Get the set bit count

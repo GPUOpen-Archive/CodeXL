@@ -46,7 +46,7 @@ void SetSmuAccessState(bool state);
 bool GetSmuAccessState(void);
 
 // PwrGetIpcData: collect IPC load parameters
-void PwrGetIpcData(PmcCounters* pSrc, uint32* pData);
+void PwrGetIpcData(PmcCounters* pSrc, uint64* pData);
 
 #endif //_RAWDATAFILEHEADER_H
 

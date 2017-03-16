@@ -21,9 +21,7 @@ bool ResetPMCCounters(PmcCounters* pPmc)
     for (index = 0; index < PMC_EVENT_MAX_CNT; index++)
     {
         // Initialize the counter value to 0;
-        pPmc[index].m_data.isReadAccess = false;
-        pPmc[index].m_data.data = 0ULL;
-        HelpAccessMSRAddress(&pPmc[index].m_data);
+        HelpWriteMsr64(pPmc[index].m_data.regId, 0ULL);
     }
 
     return retVal;
@@ -122,7 +120,7 @@ bool InitializePMCCounters(PmcCounters* pPmc)
 }
 
 // ReadPmcCounterData: Read PMC counter values
-uint32 ReadPmcCounterData(PmcCounters* pPmc, uint32* pData)
+uint32 ReadPmcCounterData(PmcCounters* pPmc, uint64* pData)
 {
     uint32 index = 0;
     uint32 retSize = 0;
@@ -131,9 +129,7 @@ uint32 ReadPmcCounterData(PmcCounters* pPmc, uint32* pData)
     {
         for (index = 0; index < PMC_EVENT_MAX_CNT; index++)
         {
-            pPmc[index].m_data.isReadAccess = true;
-            HelpAccessMSRAddress(&pPmc[index].m_data);
-            pData[index] = pPmc[index].m_data.data;
+            pData[index] = HelpReadMsr64(pPmc[index].m_data.regId);
         }
     }
     else

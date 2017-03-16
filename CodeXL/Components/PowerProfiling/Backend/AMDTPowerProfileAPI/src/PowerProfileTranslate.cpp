@@ -248,6 +248,8 @@ AMDTResult PowerProfileTranslate::InitPowerTranslate(const wchar_t* pFileName, A
         }
     }
 
+    // Reset Ipc storage
+    memset(m_prevIpcData, 0, sizeof(IpcData) * MAX_CORE_CNT);
     return ret;
 }
 

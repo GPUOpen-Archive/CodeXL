@@ -284,6 +284,9 @@ AMDTResult PwrProfTranslateLinux::ProcessSample(ContextData* pCtx, AMDTUInt32 co
 {
     (void)coreId;
     AMDTResult ret = AMDT_STATUS_OK;
+    AMDTFloat32 ipc = 1;
+    AMDTUInt64 rerdMOps = 0;
+    AMDTUInt64 cpuNotHltd = 0;
 
     if (MAX_PID_CNT < m_procPidModTable.size())
     {
@@ -291,14 +294,22 @@ AMDTResult PwrProfTranslateLinux::ProcessSample(ContextData* pCtx, AMDTUInt32 co
         PwrTrace("MAX_PID_CNT reached");
     }
 
-    AMDTFloat32 ipc = (AMDTFloat32) pCtx->m_pmcData[PMC_EVENT_RETIRED_MICRO_OPS]
-                      / (AMDTFloat32) pCtx->m_pmcData[PMC_EVENT_CPU_CYCLE_NOT_HALTED];
-
-
-    // for non zeppelin platform ipc = 1
-    if (PLATFORM_ZEPPELIN != m_platformId)
+    if (PLATFORM_ZEPPELIN == GetSupportedTargetPlatformId())
     {
-        ipc = 1;
+        rerdMOps = pCtx->m_pmcData[PMC_EVENT_RETIRED_MICRO_OPS];
+        cpuNotHltd = (pCtx->m_pmcData[PMC_EVENT_CPU_CYCLE_NOT_HALTED];
+        rerdMOps = (rerdMOps > m_prevIpcData[coreId].m_ipcData[PMC_EVENT_RETIRED_MICRO_OPS]) ?
+                   (rerdMOps - m_prevIpcData[coreId].m_ipcData[PMC_EVENT_RETIRED_MICRO_OPS]) :
+                    rerdMOps + ~m_prevIpcData[coreId].m_ipcData[PMC_EVENT_RETIRED_MICRO_OPS]);
+
+        cpuNotHltd = (cpuNotHltd > m_prevIpcData[coreId].m_ipcData[PMC_EVENT_CPU_CYCLE_NOT_HALTED]) ?
+                     (cpuNotHltd - m_prevIpcData[coreId].m_ipcData[PMC_EVENT_CPU_CYCLE_NOT_HALTED]) :
+                     (cpuNotHltd + ~m_prevIpcData[coreId].m_ipcData[PMC_EVENT_CPU_CYCLE_NOT_HALTED]);
+
+         ipc = (AMDTFloat32)((AMDTFloat64) rerdMOps / (AMDTFloat64) cpuNotHltd);
+
+         m_prevIpcData[coreId].m_ipcData[PMC_EVENT_RETIRED_MICRO_OPS] = rerdMOps;
+         m_prevIpcData[coreId].m_ipcData[PMC_EVENT_CPU_CYCLE_NOT_HALTED] = cpuNotHltd;
     }
 
     // search for the entry in /proc/pid/map details

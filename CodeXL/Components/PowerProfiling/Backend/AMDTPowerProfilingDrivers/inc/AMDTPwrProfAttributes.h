@@ -286,6 +286,16 @@ typedef struct
     uint32   data;
 } ACCESS_MSR, *PACCESS_MSR;
 
+/// \struct ACCESS_MSR to access MSR directly from user space
+typedef struct
+{
+    /// Access mode- read /write
+    bool isReadAccess;
+    uint32   regId;
+    uint64   data;
+} ACCESS_MSR64, *PACCESS_MSR64;
+
+
 /// \struct ACCESS_MMIO to access Memory Mapped space
 typedef struct
 {
