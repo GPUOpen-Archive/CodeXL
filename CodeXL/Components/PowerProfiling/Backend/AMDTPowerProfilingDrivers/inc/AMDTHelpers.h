@@ -125,8 +125,11 @@ bool HelpAccessPciAddress(PACCESS_PCI pData);
 //HelpAccessMSRAddress: Read or write generic MSR
 bool HelpAccessMSRAddress(PACCESS_MSR pData);
 
+// HelpReadMsr64: Read 64 bit MSR address
 uint64 HelpReadMsr64(uint32 reg);
 
+// HelpWriteMsr64: Write 64 bit MSR address
+uint64 HelpWriteMsr64(uint32 reg, uint64 value);
 
 // EncodeExtendedConfigSpaceAddress: Encode PCI address to extended PCI config speace.
 uint32 HelpEncodeExtendedConfigSpaceAddress(uint32 bus,

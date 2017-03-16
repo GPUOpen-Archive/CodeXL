@@ -76,6 +76,11 @@
 #define PWR_FAMILY17_DECODE_MSR_COUNTER
 
     /****************************************************************************/
+    typedef struct IpcData
+    {
+        AMDTUInt64 m_ipcData[PMC_EVENT_MAX_CNT];
+    }IpcData;
+
     typedef struct SampleConfig
     {
         AMDTUInt16 m_configId;
@@ -175,6 +180,9 @@
         AMDTUInt32 m_targetCoreCnt;
         AMDTUInt32 m_targetCuCnt;
         AMDTUInt32 m_coresPerComponent;
+
+        // Temporary storage to hold IPC data
+        IpcData m_prevIpcData[MAX_CORE_CNT];
 
     private:
         virtual void SetElapsedTime(AMDTUInt64 raw, AMDTUInt64* pResult) = 0;

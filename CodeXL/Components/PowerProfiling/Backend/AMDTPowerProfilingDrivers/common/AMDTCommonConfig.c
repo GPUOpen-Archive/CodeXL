@@ -185,7 +185,7 @@ void ConfigureSmu(SmuList* pList, bool isOn)
 
 }
 
-void PwrGetIpcData(PmcCounters* pSrc, uint32* pData)
+void PwrGetIpcData(PmcCounters* pSrc, uint64* pData)
 {
 #ifdef AMDT_INTERNAL_COUNTERS
 

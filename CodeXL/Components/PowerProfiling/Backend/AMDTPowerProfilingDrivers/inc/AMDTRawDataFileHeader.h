@@ -399,7 +399,7 @@ typedef struct ContextData
     uint64     m_ip;
     uint32     m_isKernel;
     uint32     m_fill;
-    uint32     m_pmcData[PMC_EVENT_MAX_CNT];
+    uint64     m_pmcData[PMC_EVENT_MAX_CNT];
 } ContextData;
 
 // MarkerTag Data
