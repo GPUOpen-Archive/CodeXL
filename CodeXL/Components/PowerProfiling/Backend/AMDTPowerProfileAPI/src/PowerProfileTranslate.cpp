@@ -613,7 +613,6 @@ AMDTResult PowerProfileTranslate::TranslateRawData()
 
                     pCoreCfg = PwrGetCoreConfig(sampleId);
                     AMDTUInt32 idx = 0;
-                    memset(m_componentPower, 0, MAX_PHYSICAL_CORE_CNT);
 
                     // Decode the counters as per sample id
                     for (idx = 0; idx < pCoreCfg->m_counters.size(); idx++)
