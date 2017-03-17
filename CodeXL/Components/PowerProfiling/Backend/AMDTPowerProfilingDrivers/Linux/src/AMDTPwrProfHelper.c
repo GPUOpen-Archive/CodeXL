@@ -262,9 +262,8 @@ uint64 HelpReadMsr64(uint32 reg)
 }
 
 // Write MSR 64 bit
-uint32 HelpReadMsr64(uint32 reg, uint64 value)
+uint32 HelpWriteMsr64(uint32 reg, uint64 value)
 {
-    uint64 data;
     WriteMSR(reg, value);
     return STATUS_SUCCESS;
 }

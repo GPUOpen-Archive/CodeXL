@@ -297,10 +297,10 @@ AMDTResult PwrProfTranslateLinux::ProcessSample(ContextData* pCtx, AMDTUInt32 co
     if (PLATFORM_ZEPPELIN == GetSupportedTargetPlatformId())
     {
         rerdMOps = pCtx->m_pmcData[PMC_EVENT_RETIRED_MICRO_OPS];
-        cpuNotHltd = (pCtx->m_pmcData[PMC_EVENT_CPU_CYCLE_NOT_HALTED];
+        cpuNotHltd = pCtx->m_pmcData[PMC_EVENT_CPU_CYCLE_NOT_HALTED];
         rerdMOps = (rerdMOps > m_prevIpcData[coreId].m_ipcData[PMC_EVENT_RETIRED_MICRO_OPS]) ?
                    (rerdMOps - m_prevIpcData[coreId].m_ipcData[PMC_EVENT_RETIRED_MICRO_OPS]) :
-                    rerdMOps + ~m_prevIpcData[coreId].m_ipcData[PMC_EVENT_RETIRED_MICRO_OPS]);
+                   (rerdMOps + ~m_prevIpcData[coreId].m_ipcData[PMC_EVENT_RETIRED_MICRO_OPS]);
 
         cpuNotHltd = (cpuNotHltd > m_prevIpcData[coreId].m_ipcData[PMC_EVENT_CPU_CYCLE_NOT_HALTED]) ?
                      (cpuNotHltd - m_prevIpcData[coreId].m_ipcData[PMC_EVENT_CPU_CYCLE_NOT_HALTED]) :
