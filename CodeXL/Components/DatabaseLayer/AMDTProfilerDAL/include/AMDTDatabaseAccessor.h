@@ -249,6 +249,7 @@ public:
                                gtVector<AMDTProfileData>&  dataList);
 
     bool GetModuleSummaryData(AMDTProcessId               processId,           // for a given process or for all processes
+                              AMDTThreadId                threadId,
                               AMDTModuleId                moduleId,
                               const gtVector<AMDTUInt32>& counterIdsList,      // samplingConfigId
                               AMDTUInt64                  coreMask,

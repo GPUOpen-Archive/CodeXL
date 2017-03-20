@@ -119,6 +119,10 @@ public:
     bool GetModuleProfileData(AMDTProcessId procId, AMDTModuleId modId, AMDTProfileDataVec& moduleProfileData);
     bool GetFunctionProfileData(AMDTProcessId procId, AMDTModuleId modId, AMDTProfileDataVec& funcProfileData);
 
+    bool GetAllThreadsProfileData(AMDTProfileDataVec& threadProfileData);
+    bool GetModuleProfileDataByThread(AMDTThreadId threadId, AMDTProfileDataVec& moduleProfileData);
+    bool GetFunctionProfileData(AMDTProcessId procId, AMDTProcessId threadId, AMDTModuleId modId, AMDTProfileDataVec& funcProfileData);
+
     // This will not give src/inst level profile data
     bool GetFunctionData(AMDTFunctionId            funcId,
                          AMDTProcessId             processId,

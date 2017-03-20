@@ -2167,7 +2167,7 @@ public:
     }
 
     // Process/Module/Funtion View APIs
-    bool GetSummaryData(AMDTProfileDataType type, AMDTProcessId procId, AMDTModuleId moduleId, AMDTProfileDataVec& summaryDataVec)
+    bool GetSummaryData(AMDTProfileDataType type, AMDTProcessId procId, AMDTThreadId threadId, AMDTModuleId moduleId, AMDTProfileDataVec& summaryDataVec)
     {
         bool ret = false;
 
@@ -2180,7 +2180,7 @@ public:
             ret = ret && m_pDbAdapter->GetProfileData(type,
                                                       procId,
                                                       moduleId,
-                                                      AMDT_PROFILE_ALL_THREADS,
+                                                      threadId,
                                                       countersList,
                                                       m_options.m_coreMask,
                                                       m_options.m_ignoreSystemModules,
@@ -2202,17 +2202,36 @@ public:
 
     bool GetProcessProfileData(AMDTProcessId procId, AMDTModuleId modId, AMDTProfileDataVec& processProfileData)
     {
-        return GetSummaryData(AMDT_PROFILE_DATA_PROCESS, procId, modId, processProfileData);
+        return GetSummaryData(AMDT_PROFILE_DATA_PROCESS, procId, AMDT_PROFILE_ALL_THREADS, modId, processProfileData);
+    }
+
+    bool GetAllThreadsProfileData(AMDTProfileDataVec& processProfileData)
+    {
+        return GetSummaryData(AMDT_PROFILE_DATA_THREAD, AMDT_PROFILE_ALL_PROCESSES, AMDT_PROFILE_ALL_THREADS, AMDT_PROFILE_ALL_MODULES, processProfileData);
     }
 
     bool GetModuleProfileData(AMDTProcessId procId, AMDTModuleId modId, AMDTProfileDataVec& moduleProfileData)
     {
-        return GetSummaryData(AMDT_PROFILE_DATA_MODULE, procId, modId, moduleProfileData);
+        return GetSummaryData(AMDT_PROFILE_DATA_MODULE, procId, AMDT_PROFILE_ALL_THREADS, modId, moduleProfileData);
+    }
+
+    bool GetModuleProfileDataByProcessThread(AMDTProcessId procId, AMDTThreadId threadId, AMDTProfileDataVec& moduleProfileData)
+    {
+        return GetSummaryData(AMDT_PROFILE_DATA_MODULE, procId, threadId, AMDT_PROFILE_ALL_MODULES, moduleProfileData);
     }
 
     bool GetFunctionProfileData(AMDTProcessId procId, AMDTModuleId modId, AMDTProfileDataVec& funcProfileData)
     {
-        bool ret = GetSummaryData(AMDT_PROFILE_DATA_FUNCTION, procId, modId, funcProfileData);
+        bool ret = GetSummaryData(AMDT_PROFILE_DATA_FUNCTION, procId, AMDT_PROFILE_ALL_THREADS, modId, funcProfileData);
+
+        ret = ret && HandleUnknownFunctions(funcProfileData);
+
+        return ret;
+    }
+
+    bool GetFunctionProfileData(AMDTProcessId procId, AMDTThreadId threadId, AMDTModuleId modId, AMDTProfileDataVec& funcProfileData)
+    {
+        bool ret = GetSummaryData(AMDT_PROFILE_DATA_FUNCTION, procId, threadId, modId, funcProfileData);
 
         ret = ret && HandleUnknownFunctions(funcProfileData);
 
@@ -4915,6 +4934,42 @@ bool cxlProfileDataReader::GetFunctionProfileData(AMDTProcessId procId, AMDTModu
     if (nullptr != m_pImpl)
     {
         ret = m_pImpl->GetFunctionProfileData(procId, modId, funcProfileData);
+    }
+
+    return ret;
+}
+
+bool cxlProfileDataReader::GetAllThreadsProfileData(AMDTProfileDataVec& threadProfileData)
+{
+    bool ret = false;
+
+    if (nullptr != m_pImpl)
+    {
+        ret = m_pImpl->GetAllThreadsProfileData(threadProfileData);
+    }
+
+    return ret;
+}
+
+bool cxlProfileDataReader::GetModuleProfileDataByThread(AMDTThreadId threadId, AMDTProfileDataVec& moduleProfileData)
+{
+    bool ret = false;
+
+    if (nullptr != m_pImpl)
+    {
+        ret = m_pImpl->GetModuleProfileDataByProcessThread(AMDT_PROFILE_ALL_PROCESSES, threadId, moduleProfileData);
+    }
+
+    return ret;
+}
+
+bool cxlProfileDataReader::GetFunctionProfileData(AMDTProcessId procId, AMDTProcessId threadId, AMDTModuleId modId, AMDTProfileDataVec& funcProfileData)
+{
+    bool ret = false;
+
+    if (nullptr != m_pImpl)
+    {
+        ret = m_pImpl->GetFunctionProfileData(procId, threadId, modId, funcProfileData);
     }
 
     return ret;

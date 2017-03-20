@@ -4514,6 +4514,7 @@ public:
     bool GetModuleSummaryData(
         AMDTModuleId                moduleId,
         AMDTProcessId               processId,           // for a given process or for all processes
+        AMDTThreadId                threadId,
         const gtVector<AMDTUInt32>& counterIdsList,      // samplingConfigId
         AMDTUInt64                  coreMask,
         bool                        ignoreSystemModules,
@@ -4546,7 +4547,17 @@ public:
             gtString partQuery;
             bool hasWhereClause = false;
 
-            if (IS_PROCESS_MODULE_QUERY(processId, moduleId))
+            if (IS_PROCESS_THREAD_QUERY(processId, threadId) && IS_MODULE_QUERY(moduleId))
+            {
+                partQuery.appendFormattedString(L" WHERE processId = %d AND threadId = %d AND moduleID = %d ", processId, threadId, moduleId);
+                hasWhereClause = true;
+            }
+            else if (IS_PROCESS_THREAD_QUERY(processId, threadId))
+            {
+                partQuery.appendFormattedString(L" WHERE processId = %d AND threadId = %d ", processId, threadId);
+                hasWhereClause = true;
+            }
+            else if (IS_PROCESS_MODULE_QUERY(processId, moduleId))
             {
                 partQuery.appendFormattedString(L" WHERE processId = %d AND moduleId = %d ", processId, moduleId);
                 hasWhereClause = true;
@@ -4554,6 +4565,11 @@ public:
             else if (IS_PROCESS_QUERY(processId))
             {
                 partQuery.appendFormattedString(L" WHERE processId = %d ", processId);
+                hasWhereClause = true;
+            }
+            else if (IS_THREAD_QUERY(threadId))
+            {
+                partQuery.appendFormattedString(L" WHERE threadId = %d ", threadId);
                 hasWhereClause = true;
             }
             else if (IS_MODULE_QUERY(moduleId))
@@ -7474,6 +7490,7 @@ bool AmdtDatabaseAccessor::GetProcessSummaryData(
 
 bool AmdtDatabaseAccessor::GetModuleSummaryData(
     AMDTProcessId               processId,           // for a given process or for all processes
+    AMDTThreadId                threadId,
     AMDTModuleId                moduleId,
     const gtVector<AMDTUInt32>& counterIdsList,      // samplingConfigId
     AMDTUInt64                  coreMask,
@@ -7489,6 +7506,7 @@ bool AmdtDatabaseAccessor::GetModuleSummaryData(
     {
         ret = m_pImpl->GetModuleSummaryData(moduleId,
                                             processId,
+                                            threadId,
                                             counterIdsList,
                                             coreMask,
                                             ignoreSystemModules,

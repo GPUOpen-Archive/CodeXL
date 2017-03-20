@@ -757,6 +757,7 @@ bool amdtProfileDbAdapter::GetProfileData(
             case AMDT_PROFILE_DATA_MODULE:
                 // TODO: should we also add thread
                 ret = m_pDbAccessor->GetModuleSummaryData(processId,
+                                                          threadId,
                                                           moduleId,
                                                           counterIdList,
                                                           coreMask,

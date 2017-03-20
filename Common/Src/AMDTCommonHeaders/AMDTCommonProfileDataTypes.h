@@ -272,8 +272,8 @@ using AMDTSampleValueVec = gtVector<AMDTSampleValue>;
 struct AMDTProfileData
 {
     AMDTProfileDataType  m_type;         // process, module, function, thread?
-    gtUInt64             m_id;          // Can be Process/Module/Function Id depending on the type
-    AMDTModuleId         m_moduleId;    // Valid for Functions,
+    gtUInt64             m_id;           // Can be Process/Thread/Module/Function Id depending on the type
+    AMDTModuleId         m_moduleId;     // Valid for Functions,
     gtString             m_name;         // name of the function/thread or path of the process/module
     AMDTSampleValueVec   m_sampleValue;
 };
