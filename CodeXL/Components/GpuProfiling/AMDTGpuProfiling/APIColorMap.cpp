@@ -24,7 +24,7 @@
 #include <AMDTApplicationComponents/Include/acColours.h>
 
 // Backend
-#include "../DX12Trace/DX12FunctionDefs.h"
+#include "DX12Trace/DX12FunctionDefs.h"
 
 // Local:
 #include <AMDTGpuProfiling/AMDTGpuProfilerDefs.h>

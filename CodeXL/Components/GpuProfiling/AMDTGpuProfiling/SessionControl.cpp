@@ -201,7 +201,7 @@ bool SessionControl::FillDataTableWithProfileData(GPUSessionTreeItemData* sessio
 
             if (sessionFile.open(QIODevice::ReadOnly | QIODevice::Text))
             {
-                const QMap<uint, QList<OccupancyInfo*> >& occTable = session->LoadAndGetOccupancyTable();
+                const OccupancyTable occTable = session->LoadAndGetOccupancyTable();
 
                 afProgressBarWrapper::instance().ShowProgressBar(s_LOADING_PERFCOUNTER_DATA_PROGRESS, 100);
                 float percentDone = 0;
@@ -313,15 +313,16 @@ bool SessionControl::FillDataTableWithProfileData(GPUSessionTreeItemData* sessio
 
                                 if ((occTable.contains(threadId)) && ((curIndex) < occTable[threadId].count()))
                                 {
-                                    OccupancyInfo* curKernelOccupancyInfo = occTable[threadId][curIndex];
+                                    const IOccupancyInfoDataHandler* curKernelOccupancyInfo = occTable[threadId][curIndex];
 
                                     QString strMethod = sessionFileStrList.value(m_iMethodColumnIndex).trimmed();
 
                                     if (!strMethod.isEmpty())
                                     {
                                         strMethod = strMethod.right(strMethod.length() - strMethod.lastIndexOf('_') - 1);
+                                        QString tempString = QString::fromStdString(curKernelOccupancyInfo->GetDeviceName());
 
-                                        if (strMethod.startsWith(curKernelOccupancyInfo->GetDeviceName()))
+                                        if (strMethod.startsWith(tempString))
                                         {
                                             if (threadOccupancyCounts.contains(threadId))
                                             {
@@ -505,9 +506,9 @@ void SessionControl::AssignTooltips(QTableView* tableView)
     }
 }
 
-OccupancyInfo* SessionControl::GetOccupancyForRow(int rowIndex, const QString& kernelName) const
+const IOccupancyInfoDataHandler* SessionControl::GetOccupancyForRow(int rowIndex, const QString& kernelName) const
 {
-    OccupancyInfo* retVal = nullptr;
+    const IOccupancyInfoDataHandler* retVal = nullptr;
 
     if (m_rowOccupancyInfoMap.contains(rowIndex))
     {
@@ -517,15 +518,19 @@ OccupancyInfo* SessionControl::GetOccupancyForRow(int rowIndex, const QString& k
         {
             // If the occupancy info doesn't match the one in the map, this means that the user sorted the table,
             // and the information in the map is no longer reflecting the correct line numbers:
-            if (!kernelName.startsWith(retVal->GetKernelName()))
+            QString tempString;
+            tempString.fromStdString(retVal->GetKernelName());
+            if (!kernelName.startsWith(tempString))
             {
-                QMap<int, OccupancyInfo*>::const_iterator iter = m_rowOccupancyInfoMap.begin();
+                QMap<int, const IOccupancyInfoDataHandler*>::const_iterator iter = m_rowOccupancyInfoMap.begin();
 
-                for (; iter != m_rowOccupancyInfoMap.end(); iter++)
+                for (; iter != m_rowOccupancyInfoMap.end(); ++iter)
                 {
                     if ((*iter) != nullptr)
                     {
-                        if (kernelName.startsWith((*iter)->GetKernelName()))
+                        QString currentRowKernelName;
+                        currentRowKernelName.fromStdString((*iter)->GetKernelName());
+                        if (kernelName.startsWith(currentRowKernelName))
                         {
                             retVal = (*iter);
                             break;

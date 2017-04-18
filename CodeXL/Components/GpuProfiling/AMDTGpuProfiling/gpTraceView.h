@@ -26,9 +26,6 @@
 // AMDTSharedProfiling:
 #include <AMDTSharedProfiling/inc/SharedSessionWindow.h>
 
-// Backend:
-#include "CLAPIInfo.h"
-
 // Local:
 #include <AMDTGpuProfiling/gpBaseSessionView.h>
 #include <AMDTGpuProfiling/gpUIManager.h>

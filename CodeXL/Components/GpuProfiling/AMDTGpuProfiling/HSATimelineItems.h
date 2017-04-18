@@ -72,23 +72,23 @@ public:
 
     /// Gets the occupancy info for this kernel
     /// \return the occupancy info for this kernel
-    OccupancyInfo* occupancyInfo() const { return m_pOccupancyInfo; }
+    IOccupancyInfoDataHandler* occupancyInfo() const { return m_pOccupancyInfo; }
 
     /// Sets the occupancy info for this kernel
-    /// \param newOccupancyInfo the occupancy info for this kernel
-    void setOccupancyInfo(OccupancyInfo* newOccupancyInfo) { m_pOccupancyInfo = newOccupancyInfo; }
+    /// \param pNewOccupancyInfo the occupancy info for this kernel
+    void setOccupancyInfo(IOccupancyInfoDataHandler* pNewOccupancyInfo) { m_pOccupancyInfo = pNewOccupancyInfo; }
 
     /// Fill in a TimelineItemToolTip instance with a set of name/value pairs that will be displayed in the tooltip for this timeline item
     /// \param tooltip acTimelineItemToolTip instance that should get populated with name/value pairs
     virtual void tooltipItems(acTimelineItemToolTip& tooltip) const;
 
 private:
-    QString            m_strQueueHandle;    ///< the queue handle for this API
-    QString            m_strDeviceType;     ///< the device type for this API
-    QString            m_strGlobalWorkSize; ///< the global work size for this API
-    QString            m_strLocalWorkSize;  ///< the local work size for this API
-    QString            m_strOffset;         ///< the offset for this API
-    OccupancyInfo*     m_pOccupancyInfo;    ///< the occupancy info for this kernel
+    QString                         m_strQueueHandle;    ///< the queue handle for this API
+    QString                         m_strDeviceType;     ///< the device type for this API
+    QString                         m_strGlobalWorkSize; ///< the global work size for this API
+    QString                         m_strLocalWorkSize;  ///< the local work size for this API
+    QString                         m_strOffset;         ///< the offset for this API
+    IOccupancyInfoDataHandler*      m_pOccupancyInfo;    ///< the occupancy info for this kernel
 };
 
 /// HostAPITimelineItem descendant for HSA memory API items

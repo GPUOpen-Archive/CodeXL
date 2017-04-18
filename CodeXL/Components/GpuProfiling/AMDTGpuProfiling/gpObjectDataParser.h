@@ -6,14 +6,12 @@
 // Qt:
 #include <QObject>
 
-// Backend:
-#include "IParserListener.h"
-#include "IParserProgressMonitor.h"
-#include "CLAPIInfo.h"
-#include "HSAAPIInfo.h"
-#include "DX12APIInfo.h"
-#include "StackTraceAtpFile.h"
-#include "PerfMarkerAtpFile.h"
+// RCP Backend:
+#include <IParserListener.h>
+#include <IParserProgressMonitor.h>
+#include <IAtpDataHandler.h>
+
+#include "DX12Trace/DX12APIInfo.h"
 
 // Infra:
 #include <AMDTOSWrappers/Include/osFilePath.h>
@@ -26,10 +24,7 @@ class GPUSessionTreeItemData;
 //                      The parser creates and manages the data container and data access
 //                      interface for the profiled session
 // ----------------------------------------------------------------------------------
-class gpObjectDataParser : public IParserListener<CLAPIInfo>, public IParserListener<HSAAPIInfo>,
-    public IParserListener<SymbolFileEntry>,
-    IParserListener<PerfMarkerEntry>,
-    IParserListener<DX12APIInfo>, IParserListener<VKAPIInfo>, IParserProgressMonitor
+class gpObjectDataParser : IParserListener<DX12APIInfo>, IParserListener<VKAPIInfo>, IParserProgressMonitor
 {
 public:
 
@@ -54,7 +49,7 @@ public:
     /// This method is called once for each CL API in the .atp file
     /// \param pAPIInfo the current CLAPIInfo item from the parser
     /// \param[out] stopParsing flag indicating if parsing should stop after this item
-    virtual void OnParse(CLAPIInfo* pAPIInfo, bool& stopParsing);
+    void OnParse(ICLAPIInfoDataHandler* pAPIInfo, bool& stopParsing);
 
     /// IParserListener implementation for DX12 API object/timeline data in .atp file.
     /// This method is called once for each DX12 API in the .atp file
@@ -72,19 +67,19 @@ public:
     /// This method is called once for each HSA api in the .atp file
     /// \param pAPIInfo the current CLAPIInfo item from the parser
     /// \param[out] stopParsing flag indicating if parsing should stop after this item
-    virtual void OnParse(HSAAPIInfo* pAPIInfo, bool& stopParsing);
+    void OnParse(IHSAAPIInfoDataHandler* pAPIInfo, bool& stopParsing);
 
     /// IParserListener implementation for symbol data in .atp file
     /// This method is called once for each entry in the symbol section of the .atp file
     /// \param pSymFileEntry the current SymbolFileEntry item from the parser
     /// \param[out] stopParsing flag indicating if parsing should stop after this item
-    virtual void OnParse(SymbolFileEntry* pSymFileEntry, bool& stopParsing);
+    void OnParse(ISymbolFileEntryInfoDataHandler* pSymFileEntry, bool& stopParsing);
 
     /// IParserListener implementation for perf marker data in .atp file
     /// This method is called once for each entry in the perf marker section of the .atp file
     /// \param pPerfMarkerEntry the current PerfMarkerEntry item from the parser
     /// \param[out] stopParsing flag indicating if parsing should stop after this item
-    virtual void OnParse(PerfMarkerEntry* pPerfMarkerEntry, bool& stopParsing);
+    void OnParse(IPerfMarkerInfoDataHandler* pPerfMarkerEntry, bool& stopParsing);
 
     /// IParserProgressMonitor implementation for reporting progress when loading object data
     /// \param strProgressMessage the progress message to display for this progress event

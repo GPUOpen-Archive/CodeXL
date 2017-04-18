@@ -45,7 +45,7 @@
     #undef signals
     #define NEED_TO_POP_SIGNALS_MACRO
 #endif
-#include "../HSAFdnCommon/HSAFunctionDefs.h"
+#include <HSAFunctionDefs.h>
 
 #if defined (NEED_TO_POP_SIGNALS_MACRO)
     #pragma pop_macro("signals")

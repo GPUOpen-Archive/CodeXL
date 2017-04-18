@@ -1,6 +1,28 @@
 CodeXL build instructions
 ===========================
 
+## Cloning
+CodeXL has several submodules. Clone with the `--recursive` flag to download all the source code required to build. For example:
+
+```bash
+git clone --recursive https://github.com/GPUOpen-Tools/CodeXL
+```
+
+To initialize the submodules after cloning the main repository run the following commands:
+
+```bash
+git submodule init
+git submodule update
+```
+
+CodeXL uses
+* Radeon Compute Profiler for profiling OpenCL and HSA (Linux only) compute applications. See https://github.com/GPUOpen-Tools/RCP.
+* Radeon Graphics Analyzer for analyzing Shaders and OpenCL Kernels. See https://github.com/GPUOpen-Tools/RGA.
+To fetch these command line tools run the following command:
+```bash
+python fetch_dependencies.py
+```
+
 ## Windows
 
 #### Installations
@@ -8,7 +30,7 @@ CodeXL build instructions
 * Microsoft Visual Studio 2015 Community Edition or higher + Update 1
 * Windows 10 SDK Version 10.0.10586.0 from https://developer.microsoft.com/en-US/windows/downloads/windows-10-sdk
 * JDK from http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html
-  * CodeXL requires the Java JDK for CPU Profiling support of Java applications
+ * CodeXL requires the Java JDK for CPU Profiling support of Java applications
 
 
 #### Building CodeXL
@@ -58,35 +80,19 @@ CodeXL build instructions
 *  Before build please define JAVA\_HOME variable for example : export JAVA\_HOME=/opt/java/jdk1.8.0\_77
 * If JAVA\_HOME variable is not defined the build will skip the Java agent project.
 
-#### Building the HSA/ROCm Profiler
-* In order to build the HSA/ROCm profiler, the rocm-dev package needs to be installed (so that the ROCR header files are available at build time).
-* The ROCm packages are available at https://github.com/RadeonOpenCompute.  Please see the ROCm install instructions at [https://radeonopencompute.github.io/install.html](https://radeonopencompute.github.io/install.html). To build CodeXL, only the **rocm-dev** package is needed.  In order to run and profile HSA/ROCm applications, the rocm package is needed.
-* If the ROCR header files are not available on the build system, you can skip this part of the build.  See the Build Switches section below for information on how to do this.
-
 #### Building CodeXL
 * CD to local copy of /CodeXL/Util/linux/
 * Run `./buildCodeXLFullLinuxProjects`
-* CD to local copy of /CodeXL/Components/GpuProfiling/Build
-* Run `./backend_build.sh`
 
 #### Build Switches
 * all SCons general switches, like -c for clean , more info at http://scons.org/doc/HTML/scons-man.html
 * __-j__ specify the number of concurrent jobs (-j6).
-* __CXL\_build=[debug|release]__ - build type. If not stated default value is release. 
+* __CXL\_build=[debug|release]__ - build type. If not stated default value is release.
 * __CXL\_build\_verbose=1__ - verbose output
 * __CXL\_boost\_lib\_dir=[path to boost libraries]__ - override the bundled boost libraries with files in given path
 * __CXL\_boost\_include\_dir=[path to boost headers]__ - override the bundled boost headers with files in given path
 * __CXL\_hsa=[true|false]__ - define if to build HSA parts. If not stated default value is false (skip HSA)
 * __-c__ - performs a "clean" of all build targets.
-* When executing the backend\_build.sh script, the following switches are supported:
-    * __debug__: performs a debug build
-    * __skip-32bitbuild__: skips building the 32-bit binaries
-    * __skip-oclprofiler__: skips building the OpenCL profiler binaries
-    * __skip-hsaprofiler__: skips building the HSA profiler binaries. If building on a system where you don't have HSA/ROCR header files, use this switch to avoid errors due to missing header files
-    * __hsadir 'dir'__: by default, when building the HSA Profiler binaries, the build scripts will look for the HSA/ROCR headers under /opt/rocm/hsa.  You can override this location using the "hsadir" switch.
-    * __boostlibdir 'dir'__: by default, the build scripts will look for the boost libs in Common/Lib/Ext/Boost/boost_1_59_0/lib/RHEL6.  You can override the location this location using the "boostlibdir" switch.
-    * __quick__ or __incremental__: performs an incremental build (as opposed to a from-scratch build)
-    * __clean__: performs a "clean" of all build targets, removing all intermediate and final output files
 
 #### Specific build instructions Ubuntu 16.04
 * Since Ubuntu 16.04 comes with gcc 5.3, use the installed system boost libraries. example -

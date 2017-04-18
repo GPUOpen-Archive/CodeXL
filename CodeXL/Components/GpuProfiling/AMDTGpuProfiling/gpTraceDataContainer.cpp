@@ -75,14 +75,16 @@ void gpTraceDataContainer::SetAPINum(osThreadId threadId, unsigned int apiNum)
     m_apiCountMap[threadId] = apiNum;
 }
 
-ProfileSessionDataItem* gpTraceDataContainer::AddCLItem(CLAPIInfo* pAPIInfo)
+ProfileSessionDataItem* gpTraceDataContainer::AddCLItem(ICLAPIInfoDataHandler* pClApiInfo)
 {
     ProfileSessionDataItem* pRetVal = nullptr;
 
+    IAPIInfoDataHandler* pApiInfo = pClApiInfo->GetApiInfoDataHandler();
+
     // Sanity check:
-    GT_IF_WITH_ASSERT(pAPIInfo != nullptr)
+    GT_IF_WITH_ASSERT(pApiInfo != nullptr)
     {
-        osThreadId tid = pAPIInfo->m_tid;
+        osThreadId tid = pApiInfo->GetApiThreadId();
 
         // Set this thread API type
         if (!m_threadAPIType.contains(tid))
@@ -91,10 +93,10 @@ ProfileSessionDataItem* gpTraceDataContainer::AddCLItem(CLAPIInfo* pAPIInfo)
         }
 
         // Find the occupancy info for this API
-        OccupancyInfo* pOccupancyInfo = FindOccupancyInfo(pAPIInfo);
+        const IOccupancyInfoDataHandler* pOccupancyInfo = FindOccupancyInfo(pClApiInfo);
 
         // Add the requested item to the thread root
-        pRetVal = new ProfileSessionDataItem(this, pAPIInfo, pOccupancyInfo);
+        pRetVal = new ProfileSessionDataItem(this, pClApiInfo, pOccupancyInfo);
         AddItemToThread(pRetVal);
 
         // Add the item to the session items map
@@ -108,14 +110,14 @@ ProfileSessionDataItem* gpTraceDataContainer::AddCLItem(CLAPIInfo* pAPIInfo)
     return pRetVal;
 }
 
-ProfileSessionDataItem* gpTraceDataContainer::AddHSAItem(HSAAPIInfo* pAPIInfo)
+ProfileSessionDataItem* gpTraceDataContainer::AddHSAItem(IHSAAPIInfoDataHandler* pAPIInfo)
 {
     ProfileSessionDataItem* pRetVal = nullptr;
 
     // Sanity check:
     GT_IF_WITH_ASSERT(pAPIInfo != nullptr)
     {
-        osThreadId tid = pAPIInfo->m_tid;
+        osThreadId tid = pAPIInfo->GetApiInfoDataHandler()->GetApiThreadId();
 
         // Set this thread API type
         if (!m_threadAPIType.contains(tid))
@@ -318,16 +320,16 @@ ProfileSessionDataItem* gpTraceDataContainer::AddVKGPUTraceItem(VKGPUTraceInfo* 
 }
 
 
-void gpTraceDataContainer::AddPerformanceMarker(PerfMarkerEntry* pPerfMarkerEntry)
+void gpTraceDataContainer::AddPerformanceMarker(IPerfMarkerInfoDataHandler* pPerfMarkerEntry)
 {
     ProfileSessionDataItem* pRetVal = nullptr;
 
     // Sanity check:
     GT_IF_WITH_ASSERT(pPerfMarkerEntry != nullptr)
     {
-        osThreadId tid = pPerfMarkerEntry->m_tid;
+        osThreadId tid = pPerfMarkerEntry->GetPerfMarkerThreadId();
 
-        if (pPerfMarkerEntry->m_markerType == PerfMarkerEntry::PerfMarkerType_Begin)
+        if (pPerfMarkerEntry->IsBeginPerfMarkerEntry())
         {
             pRetVal = new ProfileSessionDataItem(this, pPerfMarkerEntry);
 
@@ -338,7 +340,7 @@ void gpTraceDataContainer::AddPerformanceMarker(PerfMarkerEntry* pPerfMarkerEntr
 
             m_openedMarkers.push(pRetVal);
         }
-        else if (pPerfMarkerEntry->m_markerType == PerfMarkerEntry::PerfMarkerType_End)
+        else if (pPerfMarkerEntry->IsEndPerfMarkerEntry() || pPerfMarkerEntry->IsEndExPerfMarkerEntry())
         {
             // Sanity check - we should only get here with opened markers
             GT_IF_WITH_ASSERT(m_openedMarkers.top() != nullptr)
@@ -348,7 +350,7 @@ void gpTraceDataContainer::AddPerformanceMarker(PerfMarkerEntry* pPerfMarkerEntr
                 // Sanity check:
                 GT_IF_WITH_ASSERT(pMarkerProfileItem != nullptr)
                 {
-                    pMarkerProfileItem->SetEndTime(pPerfMarkerEntry->m_timestamp);
+                    pMarkerProfileItem->SetEndTime(pPerfMarkerEntry->GetPerfMarkerTimestamp());
 
                     QPair<quint64, quint64> range;
                     range.first = pMarkerProfileItem->StartTime();
@@ -381,7 +383,7 @@ void gpTraceDataContainer::AddCLGPUItem(ProfileSessionDataItem* pAPIOwnerItem)
     }
 }
 
-void gpTraceDataContainer::AddHSAGPUItem(HSAAPIInfo* pAPIInfo)
+void gpTraceDataContainer::AddHSAGPUItem(IHSAAPIInfoDataHandler* pAPIInfo)
 {
     ProfileSessionDataItem::ProfileItemType itemType(ProfileSessionDataItem::HSA_GPU_PROFILE_ITEM);
     ProfileSessionDataItem* pNewItem = new ProfileSessionDataItem(this, pAPIInfo, itemType);
@@ -412,13 +414,15 @@ SymbolInfo* gpTraceDataContainer::GetSymbolInfo(int threadId, int callIndex)
 
     return pRetVal;
 }
-OccupancyInfo* gpTraceDataContainer::FindOccupancyInfo(CLAPIInfo* pAPIInfo)
+const IOccupancyInfoDataHandler* gpTraceDataContainer::FindOccupancyInfo(ICLAPIInfoDataHandler* pClApiInfo)
 {
-    OccupancyInfo* pRetVal = nullptr;
+    const IOccupancyInfoDataHandler* pRetVal = nullptr;
 
     // Sanity check:
-    GT_IF_WITH_ASSERT(pAPIInfo != nullptr)
+    GT_IF_WITH_ASSERT(pClApiInfo != nullptr)
     {
+        IAPIInfoDataHandler* pApiInfo = pClApiInfo->GetApiInfoDataHandler();
+
         // This is the index of the occupancy item found. If we do find the occupancy item,
         // we increase this variable, so that the next time the user will ask of occupancy data,
         // we will give him the next item
@@ -426,32 +430,34 @@ OccupancyInfo* gpTraceDataContainer::FindOccupancyInfo(CLAPIInfo* pAPIInfo)
 
         if (!m_occupancyInfoMap.isEmpty())
         {
-            const QList<OccupancyInfo*> tempInfosList = m_occupancyInfoMap[pAPIInfo->m_tid];
+            const QList<const IOccupancyInfoDataHandler*> tempInfosList = m_occupancyInfoMap[pApiInfo->GetApiThreadId()];
 
-            if (m_oclThreadOccIndexMap.contains(pAPIInfo->m_tid))
+            if (m_oclThreadOccIndexMap.contains(pApiInfo->GetApiThreadId()))
             {
-                occupancyIndex = m_oclThreadOccIndexMap[pAPIInfo->m_tid];
+                occupancyIndex = m_oclThreadOccIndexMap[pApiInfo->GetApiThreadId()];
             }
 
             QString deviceNameStr;
 
             // If this is an enqueue api
-            if ((pAPIInfo->m_Type & CL_ENQUEUE_BASE_API) == CL_ENQUEUE_BASE_API)
+            if ((pClApiInfo->GetCLApiType() & CL_ENQUEUE_BASE_API) == CL_ENQUEUE_BASE_API)
             {
-                unsigned int apiID = pAPIInfo->m_uiAPIID;
-                CLEnqueueAPI* pEnqueueApiInfo = dynamic_cast<CLEnqueueAPI*>(pAPIInfo);
+                unsigned int apiID = pClApiInfo->GetCLApiId();
+                ICLEnqueueApiInfoDataHandler* pEnqueueApiInfo;
+                pClApiInfo->IsCLEnqueueAPI(&pEnqueueApiInfo);
+
                 GT_IF_WITH_ASSERT(pEnqueueApiInfo != nullptr)
                 {
-                    quint64 gpuStart = pEnqueueApiInfo->m_ullRunning;
-                    quint64 gpuEnd = pEnqueueApiInfo->m_ullComplete;
-                    quint64 gpuQueued = pEnqueueApiInfo->m_ullQueue;
-                    quint64 gpuSubmit = pEnqueueApiInfo->m_ullSubmit;
+                    quint64 gpuStart = pEnqueueApiInfo->GetCLRunningTimestamp();
+                    quint64 gpuEnd = pEnqueueApiInfo->GetCLCompleteTimestamp();
+                    quint64 gpuQueued = pEnqueueApiInfo->GetCLQueueTimestamp();
+                    quint64 gpuSubmit = pEnqueueApiInfo->GetCLSubmitTimestamp();
 
-                    deviceNameStr = QString::fromStdString(pEnqueueApiInfo->m_strDevice);
+                    deviceNameStr = QString::fromStdString(pEnqueueApiInfo->GetCLDeviceNameString());
 
                     if ((gpuEnd < gpuStart && (apiID < CL_FUNC_TYPE_clEnqueueMapBuffer || apiID > CL_FUNC_TYPE_clEnqueueUnmapMemObject)) || gpuStart < gpuSubmit || gpuSubmit < gpuQueued)
                     {
-                        if (pEnqueueApiInfo->m_uiCMDType <= CL_COMMAND_TASK && (deviceNameStr != GPU_STR_TraceViewCpuDevice))
+                        if (pEnqueueApiInfo->GetCLCommandTypeEnum() <= CL_COMMAND_TASK && (deviceNameStr != GPU_STR_TraceViewCpuDevice))
                         {
                             // if this is a kernel dispatch without valid timestamps, on a non-CPU device, then bump the
                             // occIndex so that subsequent dispatches are matched up with the correct occupancy info
@@ -460,9 +466,9 @@ OccupancyInfo* gpTraceDataContainer::FindOccupancyInfo(CLAPIInfo* pAPIInfo)
                         }
                     }
 
-                    if ((pEnqueueApiInfo->m_Type & CL_ENQUEUE_KERNEL) == CL_ENQUEUE_KERNEL)
+                    if ((pClApiInfo->GetCLApiType() & CL_ENQUEUE_KERNEL) == CL_ENQUEUE_KERNEL)
                     {
-                        if ((occupancyIndex < tempInfosList.count()) && Util::CheckOccupancyDeviceName(tempInfosList[occupancyIndex]->GetDeviceName(), deviceNameStr))
+                        if ((occupancyIndex < tempInfosList.count()) && Util::CheckOccupancyDeviceName(QString().fromStdString(tempInfosList[occupancyIndex]->GetDeviceName()), deviceNameStr))
                         {
                             pRetVal = tempInfosList[occupancyIndex];
                             occupancyIndex++;
@@ -470,7 +476,7 @@ OccupancyInfo* gpTraceDataContainer::FindOccupancyInfo(CLAPIInfo* pAPIInfo)
                     }
 
                     // Set the thread last taken occupancy index
-                    m_oclThreadOccIndexMap[pAPIInfo->m_tid] = occupancyIndex;
+                    m_oclThreadOccIndexMap[pApiInfo->GetApiThreadId()] = occupancyIndex;
                 }
             }
 

@@ -73,6 +73,7 @@
 #include <AMDTGpuProfiling/TraceView.h>
 #include <AMDTGpuProfiling/CLAPIFilterManager.h>
 #include <AMDTGpuProfiling/gpExecutionMode.h>
+#include <Version.h>
 
 #define GPU_PROFILER_TERMINATION_TIMEOUT 2000
 
@@ -1111,7 +1112,8 @@ bool ProfileManager::GetProfilerServer(osFilePath& strServer, QString& strErrorM
 
 #endif
 
-    gtString profilerFileName = L"CodeXLGpuProfiler";
+    gtString profilerFileName;
+    profilerFileName = profilerFileName.fromASCIIString(RCP_EXE_BASE_NAME);
 
 #if AMDT_BUILD_TARGET == AMDT_LINUX_OS
 
@@ -1136,7 +1138,7 @@ bool ProfileManager::GetProfilerServer(osFilePath& strServer, QString& strErrorM
         profilerFileName.append(L"-x64");
     }
 
-    profilerFileName.append(AMDT_DEBUG_SUFFIX_W AMDT_BUILD_SUFFIX_W);
+   profilerFileName.append(AMDT_DEBUG_SUFFIX_W AMDT_BUILD_SUFFIX_W);
 
     strServer.setFileExtension(L"exe");
 #else
@@ -1648,41 +1650,49 @@ bool ProfileManager::GenerateSummaryPages(const QString& strInputAtpFile, const 
     return retVal;
 }
 
-bool ProfileManager::GenerateOccupancyPage(GPUSessionTreeItemData* pSessionData, OccupancyInfo* pOccInfo, int callIndex, QString& strErrorMessageOut)
+bool ProfileManager::GenerateOccupancyPage(GPUSessionTreeItemData* pSessionData, const IOccupancyInfoDataHandler* pOccInfo, int callIndex, QString& strErrorMessageOut)
 {
     bool retVal = false;
     osFilePath serverFile;
-
-    if (pSessionData != nullptr && pOccInfo != nullptr && GetProfilerServer(serverFile, strErrorMessageOut))
+    std::string errorMessage;
+    strErrorMessageOut = "Error";
+    if (pSessionData != nullptr && pOccInfo != nullptr)
     {
-        m_strOccParamsFile = pOccInfo->SaveToTempFile(callIndex);
+        QString sessionDirStr = QString::fromWCharArray(pSessionData->SessionDir().directoryPath().asString().asCharArray());
 
-        if (m_strOccParamsFile.trimmed().isEmpty())
+        // Append a path separator
+        wchar_t pathSeparator[2] = { 0 };
+        pathSeparator[0] = osFilePath::osPathSeparator;
+        sessionDirStr.append(QString::fromWCharArray(pathSeparator));
+
+        // Generate the path of the output file
+        m_strOutputOccHTMLPage = QString("%1%2_%3_%4_Occupancy.html")
+            .arg(sessionDirStr)
+            .arg(QString().fromStdString(pOccInfo->GetKernelName()))
+            .arg(pOccInfo->GetThreadId())
+            .arg(callIndex);
+
+        std::string outputFile = m_strOutputOccHTMLPage.toStdString();
+
+        std::vector<unsigned int>::iterator callIndexIter;
+        callIndexIter = std::find(m_kernelOccupancyChartGenerated.begin(), m_kernelOccupancyChartGenerated.end(), callIndex);
+
+        if (callIndexIter == m_kernelOccupancyChartGenerated.end())
         {
-            strErrorMessageOut = QString("Unable to call %1 with valid occupancy parameters").arg(acGTStringToQString(serverFile.asString()));
+            retVal = pOccInfo->GenerateOccupancyChart(outputFile, errorMessage);
+
+            if(retVal)
+            {
+                m_kernelOccupancyChartGenerated.push_back(callIndex);
+            }
         }
         else
         {
-            // Convert the session directory path to QString
-            QString sessionDirStr = QString::fromWCharArray(pSessionData->SessionDir().directoryPath().asString().asCharArray());
-
-            // Append a path separator
-            wchar_t pathSeparator[2] = {0};
-            pathSeparator[0] = osFilePath::osPathSeparator;
-            sessionDirStr.append(QString::fromWCharArray(pathSeparator));
-
-            // Generate the path of the output file
-            m_strOutputOccHTMLPage = QString("%1%2_%3_%4_Occupancy.html")
-                                     .arg(sessionDirStr)
-                                     .arg(pOccInfo->GetKernelName())
-                                     .arg(pOccInfo->GetThreadId())
-                                     .arg(callIndex);
-
-            gtString strArguments = L"--occupancydisplay ";
-            strArguments.appendFormattedString(L"\"%ls\"", acQStringToGTString(m_strOccParamsFile).asCharArray());
-            strArguments.appendFormattedString(L" --outputfile \"%ls\"", acQStringToGTString(m_strOutputOccHTMLPage).asCharArray());
-            retVal = LaunchProfilerServer(serverFile, strArguments, ProfileProcessMonitor::ProfileServerRunType_GenOccupancy, strErrorMessageOut);
+            retVal = true;
         }
+
+        strErrorMessageOut.fromStdString(errorMessage);
+        HandleGenOccupancyFinished(retVal ? 0 : -1);
     }
 
     return retVal;
@@ -1946,7 +1956,7 @@ void ProfileManager::HandleProfileFinished(int exitCode)
 
 void ProfileManager::HandleMissingProfileOutput(QString& strError)
 {
-    QString strProjectType = (m_pCurrentProjectSettings->m_traceOptions.m_apiToTrace == APIToTrace_OPENCL) ? "an OpenCL or a DirectCompute program" : "an HSA program";
+    QString strProjectType = (m_pCurrentProjectSettings->m_traceOptions.m_apiToTrace == APIToTrace_OPENCL) ? "an OpenCL program" : "an HSA program";
     QString strExtraReason;
     strExtraReason.clear();
 
@@ -1964,7 +1974,7 @@ void ProfileManager::HandleMissingProfileOutput(QString& strError)
     }
     else
     {
-        strProjectType += ".</li><li>The active project is an OpenCL program, but it did not enqueue any kernels.</li><li>The active project is a DirectCompute program, but you are not running as administrator. Administrator rights are required when profiling DirectCompute applications";
+        strProjectType += ".</li><li>The active project is an OpenCL program, but it did not enqueue any kernels.";
         strProjectType += ".</li><li>The active project is an OpenCL program, but it did not enqueue any kernels listed in the Profile Specific Kernels section";
     }
 

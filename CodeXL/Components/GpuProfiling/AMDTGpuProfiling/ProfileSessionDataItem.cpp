@@ -13,6 +13,10 @@
 #include <AMDTGpuProfiling/Util.h>
 #include <AMDTGpuProfiling/CLTimelineItems.h>
 
+//RCP Backend
+#include <IAtpDataHandler.h>
+#include <HSAFunctionDefs.h>
+
 // Static members initialization
 
 /// True iff InitStaticMembers was called
@@ -41,6 +45,8 @@ ProfileSessionDataItem::ProfileSessionDataItem(gpTraceDataContainer* pSessionDat
     m_tid(0),
     m_queueName(""),
     m_pApiInfo(nullptr),
+    m_pHSAApiInfoDataHandler(nullptr),
+    m_pCLApiInfoDataHandler(nullptr),
     m_sampleId(0),
     m_pSessionDataContainer(pSessionDataContainer)
 {
@@ -48,7 +54,7 @@ ProfileSessionDataItem::ProfileSessionDataItem(gpTraceDataContainer* pSessionDat
 }
 
 
-ProfileSessionDataItem::ProfileSessionDataItem(gpTraceDataContainer* pSessionDataContainer, CLAPIInfo* pApiInfo, OccupancyInfo* pOccupancyInfo) :
+ProfileSessionDataItem::ProfileSessionDataItem(gpTraceDataContainer* pSessionDataContainer, ICLAPIInfoDataHandler* pCLApiInfo, const IOccupancyInfoDataHandler* pOccupancyInfo) :
     m_pParent(nullptr),
     m_itemType(API_PROFILE_ITEM_UNKNOWN, 0),
     m_pOwnerCPUAPIItem(nullptr),
@@ -61,6 +67,8 @@ ProfileSessionDataItem::ProfileSessionDataItem(gpTraceDataContainer* pSessionDat
     m_tid(0),
     m_queueName(""),
     m_pApiInfo(nullptr),
+    m_pHSAApiInfoDataHandler(nullptr),
+    m_pCLApiInfoDataHandler(pCLApiInfo),
     m_sampleId(0),
     m_pSessionDataContainer(pSessionDataContainer)
 {
@@ -68,10 +76,12 @@ ProfileSessionDataItem::ProfileSessionDataItem(gpTraceDataContainer* pSessionDat
     m_api = APIToTrace_OPENCL;
 
     // Sanity check:
-    if (pApiInfo != nullptr)
+    if (pCLApiInfo != nullptr)
     {
         m_itemType.m_itemMainType = CL_API_PROFILE_ITEM;
-        m_itemType.m_itemSubType = pApiInfo->m_Type;
+        m_itemType.m_itemSubType = pCLApiInfo->GetCLApiType();
+
+        IAPIInfoDataHandler* pApiInfo = pCLApiInfo->GetApiInfoDataHandler();
 
         // Fill the data structure with empty strings:
         m_data.reserve(ProfileSessionDataItem::SESSION_ITEM_COLUMN_COUNT);
@@ -83,84 +93,96 @@ ProfileSessionDataItem::ProfileSessionDataItem(gpTraceDataContainer* pSessionDat
 
         if (pApiInfo != nullptr)
         {
-            if (pApiInfo->m_bHasDisplayableSeqId)
+            if (pApiInfo->IsApiSequenceIdDisplayble())
             {
-                m_itemIndex = (int)pApiInfo->m_uiDisplaySeqID;
+                m_itemIndex = static_cast<int>(pApiInfo->GetApiDisplaySequenceId());
             }
 
-            if (pApiInfo->m_uiAPIID < CL_FUNC_TYPE_Unknown)
+            if (pCLApiInfo->GetCLApiId() < CL_FUNC_TYPE_Unknown)
             {
-                m_data[ProfileSessionDataItem::SESSION_ITEM_INTERFACE_COLUMN] = CLAPIDefs::Instance()->GetOpenCLAPIString(CL_FUNC_TYPE(pApiInfo->m_uiAPIID));
+                m_data[ProfileSessionDataItem::SESSION_ITEM_INTERFACE_COLUMN] = CLAPIDefs::Instance()->GetOpenCLAPIString(CL_FUNC_TYPE(pCLApiInfo->GetCLApiType()));
             }
             else
             {
-                m_data[ProfileSessionDataItem::SESSION_ITEM_INTERFACE_COLUMN] = pApiInfo->m_strName.c_str();
+                m_data[ProfileSessionDataItem::SESSION_ITEM_INTERFACE_COLUMN] = pApiInfo->GetApiNameString().c_str();
             }
 
-            m_data[ProfileSessionDataItem::SESSION_ITEM_PARAMETERS_COLUMN] = QString::fromStdString(pApiInfo->m_ArgList);
-            m_data[ProfileSessionDataItem::SESSION_ITEM_RESULT_COLUMN] = QString::fromStdString(pApiInfo->m_strRet);
+            m_data[ProfileSessionDataItem::SESSION_ITEM_PARAMETERS_COLUMN] = QString::fromStdString(pApiInfo->GetApiArgListString());
+            m_data[ProfileSessionDataItem::SESSION_ITEM_RESULT_COLUMN] = QString::fromStdString(pApiInfo->GetApiRetString());
 
             // Set the start and end time
-            m_startTime = pApiInfo->m_ullStart;
-            m_endTime = pApiInfo->m_ullEnd;
+            m_startTime = pApiInfo->GetApiStartTime();
+            m_endTime = pApiInfo->GetApiEndTime();
 
             // removed calc of m_data[ProfileSessionDataItem::SESSION_ITEM_CPU_TIME_COLUMN] because it will be calulated on GetColumnData()
 
             // Set the thread id
-            m_tid = pApiInfo->m_tid;
-
-            m_pApiInfo = pApiInfo;
+            m_tid = pApiInfo->GetApiThreadId();
 
             // Set the device block text
             bool isEnququeMem = (m_itemType.m_itemSubType & CL_ENQUEUE_MEM) == CL_ENQUEUE_MEM;
             bool isEnququeKernel = (m_itemType.m_itemSubType & CL_ENQUEUE_KERNEL) == CL_ENQUEUE_KERNEL;
             bool isEnququeOther = (m_itemType.m_itemSubType & CL_ENQUEUE_OTHER_OPERATIONS) == CL_ENQUEUE_OTHER_OPERATIONS;
 
-            // This is an enqueue API
-            if (isEnququeKernel)
-            {
-                CLKernelAPIInfo* pKernelApiInfo = dynamic_cast<CLKernelAPIInfo*>(pApiInfo);
+            ICLEnqueueApiInfoDataHandler* pClEnqueueApiInfo;
+            pCLApiInfo->IsCLEnqueueAPI(&pClEnqueueApiInfo);
 
-                if (pKernelApiInfo != nullptr)
+            if (pClEnqueueApiInfo != nullptr)
+            {
+
+                // This is an enqueue API
+                if (isEnququeKernel)
                 {
-                    m_data[ProfileSessionDataItem::SESSION_ITEM_DEVICE_BLOCK_COLUMN] = QString::fromStdString(pKernelApiInfo->m_strKernelName);
-                }
-            }
-            else if (isEnququeMem)
-            {
-                CLMemAPIInfo* memApiInfo = dynamic_cast<CLMemAPIInfo*>(pApiInfo);
-                quint64 transferSize = memApiInfo->m_uiTransferSize;
-                QString strCmdType = QString::fromStdString(memApiInfo->m_strCMDType);
-                m_data[ProfileSessionDataItem::SESSION_ITEM_DEVICE_BLOCK_COLUMN] = CLMemTimelineItem::getDataSizeString(transferSize, 1) + " " + strCmdType.mid(11);
-            }
-            else if (isEnququeOther)
-            {
-                CLOtherEnqueueAPIInfo* pOtherEnqueueOperationsInfo = dynamic_cast<CLOtherEnqueueAPIInfo*>(pApiInfo);
-                GT_IF_WITH_ASSERT(pOtherEnqueueOperationsInfo != nullptr)
-                {
-                    QString strCmdType = QString::fromStdString(pOtherEnqueueOperationsInfo->m_strCMDType);
+                    ICLKernelApiInfoDataHandler* pKernelApiInfo;
+                    pCLApiInfo->IsCLKernelApiInfo(&pKernelApiInfo);
 
-                    QString commandName = strCmdType.replace("CL_COMMAND_", "");
-
-                    if ((m_itemType.m_itemSubType & CL_ENQUEUE_DATA_OPERATIONS) == CL_ENQUEUE_DATA_OPERATIONS)
+                    if (pKernelApiInfo != nullptr)
                     {
-                        CLDataEnqueueAPIInfo* pDataEnqueueOperationsInfo = dynamic_cast<CLDataEnqueueAPIInfo*>(pApiInfo);
-                        GT_IF_WITH_ASSERT(pDataEnqueueOperationsInfo != nullptr)
-                        {
-                            quint64 dataSize = pDataEnqueueOperationsInfo->m_uiDataSize;
-                            commandName.prepend(CLMemTimelineItem::getDataSizeString(dataSize, 1) + " ");
-                        }
+                        m_data[ProfileSessionDataItem::SESSION_ITEM_DEVICE_BLOCK_COLUMN] = QString::fromStdString(pKernelApiInfo->GetCLKernelNameString());
                     }
+                }
+                else if (isEnququeMem)
+                {
+                    ICLMemApiInfoDataHandler* pMemApiInfo;
+                    pCLApiInfo->IsCLMemoryApiInfo(&pMemApiInfo);
 
-                    m_data[ProfileSessionDataItem::SESSION_ITEM_DEVICE_BLOCK_COLUMN] = commandName;
+                    if (pMemApiInfo != nullptr)
+                    {
+                        quint64 transferSize = pMemApiInfo->GetCLMemoryTransferSize();
+                        QString strCmdType = QString::fromStdString(pClEnqueueApiInfo->GetCLCommandTypeString());
+                        m_data[ProfileSessionDataItem::SESSION_ITEM_DEVICE_BLOCK_COLUMN] = CLMemTimelineItem::getDataSizeString(transferSize, 1) + " " + strCmdType.mid(11);
+                    }
+                }
+                else if (isEnququeOther)
+                {
+                    GT_IF_WITH_ASSERT(pClEnqueueApiInfo != nullptr)
+                    {
+                        QString strCmdType = QString::fromStdString(pClEnqueueApiInfo->GetCLCommandTypeString());
 
+                        QString commandName = strCmdType.replace("CL_COMMAND_", "");
+
+                        if ((m_itemType.m_itemSubType & CL_ENQUEUE_DATA_OPERATIONS) == CL_ENQUEUE_DATA_OPERATIONS)
+                        {
+                            ICLDataEnqueueApiInfoDataHandler* pDataEnqueueOperationsInfo;
+                            pCLApiInfo->IsCLDataEnqueueApi(&pDataEnqueueOperationsInfo);
+
+                            GT_IF_WITH_ASSERT(pDataEnqueueOperationsInfo != nullptr)
+                            {
+                                quint64 dataSize = pDataEnqueueOperationsInfo->GetCLDataTransferSize();
+                                commandName.prepend(CLMemTimelineItem::getDataSizeString(dataSize, 1) + " ");
+                            }
+                        }
+
+                        m_data[ProfileSessionDataItem::SESSION_ITEM_DEVICE_BLOCK_COLUMN] = commandName;
+
+                    }
                 }
             }
         }
     }
 }
 
-ProfileSessionDataItem::ProfileSessionDataItem(gpTraceDataContainer* pSessionDataContainer, HSAAPIInfo* pApiInfo) :
+ProfileSessionDataItem::ProfileSessionDataItem(gpTraceDataContainer* pSessionDataContainer, IHSAAPIInfoDataHandler* pHSAApiInfo) :
     m_pParent(nullptr),
     m_itemType(HSA_API_PROFILE_ITEM, 0),
     m_pOwnerCPUAPIItem(nullptr),
@@ -173,11 +195,13 @@ ProfileSessionDataItem::ProfileSessionDataItem(gpTraceDataContainer* pSessionDat
     m_tid(0),
     m_queueName(""),
     m_pApiInfo(nullptr),
+    m_pHSAApiInfoDataHandler(pHSAApiInfo),
+    m_pCLApiInfoDataHandler(nullptr),
     m_sampleId(0),
     m_pSessionDataContainer(pSessionDataContainer)
 {
     // Sanity check:
-    if (pApiInfo != nullptr)
+    if (pHSAApiInfo != nullptr)
     {
         // Fill the data structure with empty strings:
         m_data.reserve(ProfileSessionDataItem::SESSION_ITEM_COLUMN_COUNT);
@@ -187,28 +211,25 @@ ProfileSessionDataItem::ProfileSessionDataItem(gpTraceDataContainer* pSessionDat
             m_data << "";
         }
 
-        if (pApiInfo != nullptr)
+        IAPIInfoDataHandler* pApiInfo = pHSAApiInfo->GetApiInfoDataHandler();
+
+        if (pApiInfo->IsApiSequenceIdDisplayble())
         {
-            if (pApiInfo->m_bHasDisplayableSeqId)
-            {
-                m_itemIndex = (int)pApiInfo->m_uiDisplaySeqID;
-            }
-
-            m_data[ProfileSessionDataItem::SESSION_ITEM_INTERFACE_COLUMN] = pApiInfo->m_strName.c_str();
-            m_data[ProfileSessionDataItem::SESSION_ITEM_PARAMETERS_COLUMN] = QString::fromStdString(pApiInfo->m_ArgList);
-            m_data[ProfileSessionDataItem::SESSION_ITEM_RESULT_COLUMN] = QString::fromStdString(pApiInfo->m_strRet);
-
-            // Set the start and end time
-            m_startTime = pApiInfo->m_ullStart;
-            m_endTime = pApiInfo->m_ullEnd;
-
-            // removed calc of m_data[ProfileSessionDataItem::SESSION_ITEM_CPU_TIME_COLUMN] because it will be calulated on GetColumnData()
-
-            // Set the thread id
-            m_tid = pApiInfo->m_tid;
-
-            m_pApiInfo = pApiInfo;
+            m_itemIndex = static_cast<int>(pApiInfo->GetApiDisplaySequenceId());
         }
+
+        m_data[ProfileSessionDataItem::SESSION_ITEM_INTERFACE_COLUMN] = pApiInfo->GetApiNameString().c_str();
+        m_data[ProfileSessionDataItem::SESSION_ITEM_PARAMETERS_COLUMN] = QString::fromStdString(pApiInfo->GetApiArgListString());
+        m_data[ProfileSessionDataItem::SESSION_ITEM_RESULT_COLUMN] = QString::fromStdString(pApiInfo->GetApiRetString());
+
+        // Set the start and end time
+        m_startTime = pApiInfo->GetApiStartTime();
+        m_endTime = pApiInfo->GetApiEndTime();
+
+        // removed calc of m_data[ProfileSessionDataItem::SESSION_ITEM_CPU_TIME_COLUMN] because it will be calulated on GetColumnData()
+
+        // Set the thread id
+        m_tid = pApiInfo->GetApiThreadId();
     }
 }
 
@@ -227,6 +248,8 @@ ProfileSessionDataItem::ProfileSessionDataItem(gpTraceDataContainer* pSessionDat
     m_tid(0),
     m_queueName(""),
     m_pApiInfo(nullptr),
+    m_pHSAApiInfoDataHandler(nullptr),
+    m_pCLApiInfoDataHandler(nullptr),
     m_sampleId(0),
     m_pSessionDataContainer(pSessionDataContainer)
 {
@@ -236,37 +259,37 @@ ProfileSessionDataItem::ProfileSessionDataItem(gpTraceDataContainer* pSessionDat
     {
         m_pApiInfo = pOwnerCPUAPIItem->m_pApiInfo;
 
-        m_startTime = m_pApiInfo->m_ullStart;
-        m_endTime = m_pApiInfo->m_ullEnd;
+        m_startTime = m_pHSAApiInfoDataHandler->GetApiInfoDataHandler()->GetApiStartTime();
+        m_endTime = m_pHSAApiInfoDataHandler->GetApiInfoDataHandler()->GetApiEndTime();
 
         if (pOwnerCPUAPIItem->m_itemType.m_itemMainType == CL_API_PROFILE_ITEM)
         {
             // Downcast the API info class
-            CLAPIInfo* pCLApiInfo = dynamic_cast<CLAPIInfo*>(m_pApiInfo);
+            ICLAPIInfoDataHandler* pCLApiInfo = m_pCLApiInfoDataHandler;
 
-            if (m_itemType.m_itemMainType == CL_GPU_PROFILE_ITEM)
+            if (m_itemType.m_itemMainType == CL_GPU_PROFILE_ITEM && nullptr != pCLApiInfo)
             {
-                bool isEnqueueMem = (pCLApiInfo->m_Type & CL_ENQUEUE_MEM) == CL_ENQUEUE_MEM;
-                bool isEnququeKernel = (pCLApiInfo->m_Type & CL_ENQUEUE_KERNEL) == CL_ENQUEUE_KERNEL;
-                bool isEnququeOther = (pCLApiInfo->m_Type & CL_ENQUEUE_OTHER_OPERATIONS) == CL_ENQUEUE_OTHER_OPERATIONS;
-                bool isEnququeData = (pCLApiInfo->m_Type & CL_ENQUEUE_DATA_OPERATIONS) == CL_ENQUEUE_DATA_OPERATIONS;
+                bool isEnqueueMem = (pCLApiInfo->GetCLApiType() & CL_ENQUEUE_MEM) == CL_ENQUEUE_MEM;
+                bool isEnququeKernel = (pCLApiInfo->GetCLApiType() & CL_ENQUEUE_KERNEL) == CL_ENQUEUE_KERNEL;
+                bool isEnququeOther = (pCLApiInfo->GetCLApiType() & CL_ENQUEUE_OTHER_OPERATIONS) == CL_ENQUEUE_OTHER_OPERATIONS;
+                bool isEnququeData = (pCLApiInfo->GetCLApiType() & CL_ENQUEUE_DATA_OPERATIONS) == CL_ENQUEUE_DATA_OPERATIONS;
 
                 // Set the GPU item type according to the owner API call type
                 if (isEnqueueMem)
                 {
-                    m_itemType.m_itemSubType = (unsigned int)GPU_MEMORY_ITEM;
+                    m_itemType.m_itemSubType = static_cast<unsigned int>(GPU_MEMORY_ITEM);
                 }
                 else if (isEnququeData)
                 {
-                    m_itemType.m_itemSubType = (unsigned int)GPU_DATA_ITEM;
+                    m_itemType.m_itemSubType = static_cast<unsigned int>(GPU_DATA_ITEM);
                 }
                 else if (isEnququeKernel)
                 {
-                    m_itemType.m_itemSubType = (unsigned int)GPU_KERNEL_ITEM;
+                    m_itemType.m_itemSubType = static_cast<unsigned int>(GPU_KERNEL_ITEM);
                 }
                 else if (isEnququeOther)
                 {
-                    m_itemType.m_itemSubType = (unsigned int)GPU_OTHER_ITEM;
+                    m_itemType.m_itemSubType = static_cast<unsigned int>(GPU_OTHER_ITEM);
                 }
                 else
                 {
@@ -277,7 +300,7 @@ ProfileSessionDataItem::ProfileSessionDataItem(gpTraceDataContainer* pSessionDat
     }
 }
 
-ProfileSessionDataItem::ProfileSessionDataItem(gpTraceDataContainer* pSessionDataContainer, HSAAPIInfo* pAPIInfo, ProfileItemType itemType) :
+ProfileSessionDataItem::ProfileSessionDataItem(gpTraceDataContainer* pSessionDataContainer, IHSAAPIInfoDataHandler* pHSAAPIInfo, ProfileItemType itemType) :
     m_pParent(nullptr),
     m_itemType(itemType),
     m_pOwnerCPUAPIItem(nullptr),
@@ -289,7 +312,8 @@ ProfileSessionDataItem::ProfileSessionDataItem(gpTraceDataContainer* pSessionDat
     m_endTime(0),
     m_tid(0),
     m_queueName(""),
-    m_pApiInfo(pAPIInfo),
+    m_pHSAApiInfoDataHandler(pHSAAPIInfo),
+    m_pCLApiInfoDataHandler(nullptr),
     m_sampleId(0),
     m_pSessionDataContainer(pSessionDataContainer)
 {
@@ -303,17 +327,19 @@ ProfileSessionDataItem::ProfileSessionDataItem(gpTraceDataContainer* pSessionDat
     m_pParent(nullptr),
     m_itemType(DX12_API_PROFILE_ITEM, 0),
     m_pOwnerCPUAPIItem(nullptr),
-m_itemIndex(-1),
-m_endIndex(-1),
-m_api(APIToTrace_Unknown),
-m_pOccupancyInfo(nullptr),
-m_startTime(0),
-m_endTime(0),
-m_tid(0),
-m_queueName(""),
-m_pApiInfo(pApiInfo),
-m_sampleId(0),
-m_pSessionDataContainer(pSessionDataContainer)
+    m_itemIndex(-1),
+    m_endIndex(-1),
+    m_api(APIToTrace_Unknown),
+    m_pOccupancyInfo(nullptr),
+    m_startTime(0),
+    m_endTime(0),
+    m_tid(0),
+    m_queueName(""),
+    m_pApiInfo(pApiInfo),
+    m_pHSAApiInfoDataHandler(nullptr),
+    m_pCLApiInfoDataHandler(nullptr),
+    m_sampleId(0),
+    m_pSessionDataContainer(pSessionDataContainer)
 {
     for (int i = 0; i < ProfileSessionDataItem::SESSION_ITEM_COLUMN_COUNT; i++)
     {
@@ -366,6 +392,8 @@ ProfileSessionDataItem::ProfileSessionDataItem(gpTraceDataContainer* pSessionDat
     m_tid(0),
     m_queueName(""),
     m_pApiInfo(pApiInfo),
+    m_pHSAApiInfoDataHandler(nullptr),
+    m_pCLApiInfoDataHandler(nullptr),
     m_sampleId(0),
     m_pSessionDataContainer(pSessionDataContainer)
 {
@@ -420,6 +448,8 @@ ProfileSessionDataItem::ProfileSessionDataItem(gpTraceDataContainer* pSessionDat
     m_tid(0),
     m_queueName(""),
     m_pApiInfo(pApiInfo),
+    m_pHSAApiInfoDataHandler(nullptr),
+    m_pCLApiInfoDataHandler(nullptr),
     m_pSessionDataContainer(pSessionDataContainer)
 {
     for (int i = 0; i < ProfileSessionDataItem::SESSION_ITEM_COLUMN_COUNT; i++)
@@ -472,6 +502,8 @@ ProfileSessionDataItem::ProfileSessionDataItem(gpTraceDataContainer* pSessionDat
     m_tid(0),
     m_queueName(""),
     m_pApiInfo(pApiInfo),
+    m_pHSAApiInfoDataHandler(nullptr),
+    m_pCLApiInfoDataHandler(nullptr),
     m_pSessionDataContainer(pSessionDataContainer)
 {
     for (int i = 0; i < ProfileSessionDataItem::SESSION_ITEM_COLUMN_COUNT; i++)
@@ -515,7 +547,7 @@ ProfileSessionDataItem::ProfileSessionDataItem(gpTraceDataContainer* pSessionDat
 }
 
 
-ProfileSessionDataItem::ProfileSessionDataItem(gpTraceDataContainer* pSessionDataContainer, PerfMarkerEntry* pMarkerEntry) :
+ProfileSessionDataItem::ProfileSessionDataItem(gpTraceDataContainer* pSessionDataContainer, IPerfMarkerInfoDataHandler* pMarkerEntry) :
     m_pParent(nullptr),
     m_itemType(PERF_MARKER_PROFILE_ITEM),
     m_pOwnerCPUAPIItem(nullptr),
@@ -528,6 +560,8 @@ ProfileSessionDataItem::ProfileSessionDataItem(gpTraceDataContainer* pSessionDat
     m_tid(0),
     m_queueName(""),
     m_pApiInfo(nullptr),
+    m_pHSAApiInfoDataHandler(nullptr),
+    m_pCLApiInfoDataHandler(nullptr),
     m_sampleId(0),
     m_pSessionDataContainer(pSessionDataContainer)
 {
@@ -540,13 +574,15 @@ ProfileSessionDataItem::ProfileSessionDataItem(gpTraceDataContainer* pSessionDat
     GT_IF_WITH_ASSERT(pMarkerEntry != nullptr)
     {
         // We should not get here with end markers (should not create a new session item, but close the old one)
-        GT_IF_WITH_ASSERT(pMarkerEntry->m_markerType == PerfMarkerEntry::PerfMarkerType_Begin)
+
+        IPerfMarkerBeginInfoDataHandler* pBeginMarkerEntry;
+
+        GT_IF_WITH_ASSERT(pMarkerEntry->IsBeginPerfMarkerEntry(&pBeginMarkerEntry))
         {
-            PerfMarkerBeginEntry* pBeginMarkerEntry = dynamic_cast<PerfMarkerBeginEntry*>(pMarkerEntry);
             GT_IF_WITH_ASSERT(pBeginMarkerEntry != nullptr)
             {
-                m_data[ProfileSessionDataItem::SESSION_ITEM_INTERFACE_COLUMN] = pBeginMarkerEntry->m_strName.c_str();
-                m_startTime = pBeginMarkerEntry->m_timestamp;
+                m_data[ProfileSessionDataItem::SESSION_ITEM_INTERFACE_COLUMN] = pBeginMarkerEntry->GetPerfMarkerBeginInfoName().c_str();
+                m_startTime = pMarkerEntry->GetPerfMarkerTimestamp();
             }
         }
     }
@@ -642,11 +678,13 @@ QString ProfileSessionDataItem::InterfacePtr() const
     if ((m_itemType.m_itemMainType == DX12_API_PROFILE_ITEM) || (m_itemType.m_itemMainType == DX12_GPU_PROFILE_ITEM))
     {
         DX12APIInfo* pDXInfo = (DX12APIInfo*)m_pApiInfo;
+
         if (pDXInfo != nullptr)
         {
             retVal = QString::fromStdString(pDXInfo->m_interfacePtrStr);
         }
     }
+
     return retVal;
 }
 
@@ -930,12 +968,11 @@ bool ProfileSessionDataItem::GetAPIFunctionID(unsigned int& apiID) const
     {
         GT_IF_WITH_ASSERT(m_pApiInfo != nullptr)
         {
-            // Downcast the API info class
-            CLAPIInfo* pCLApiInfo = dynamic_cast<CLAPIInfo*>(m_pApiInfo);
+            ICLAPIInfoDataHandler* pCLApiInfo = m_pCLApiInfoDataHandler;
             GT_IF_WITH_ASSERT(pCLApiInfo)
             {
                 // Get the API id from the CLAPIInfo
-                apiID = pCLApiInfo->m_uiAPIID;
+                apiID = pCLApiInfo->GetCLApiType();
                 retVal = true;
             }
         }
@@ -944,12 +981,11 @@ bool ProfileSessionDataItem::GetAPIFunctionID(unsigned int& apiID) const
     {
         GT_IF_WITH_ASSERT(m_pApiInfo != nullptr)
         {
-            // Downcast the API info class
-            HSAAPIInfo* pHSAApiInfo = dynamic_cast<HSAAPIInfo*>(m_pApiInfo);
+            IHSAAPIInfoDataHandler* pHSAApiInfo = m_pHSAApiInfoDataHandler;
             GT_IF_WITH_ASSERT(pHSAApiInfo)
             {
                 // Get the API id from the HSAApiInfo
-                apiID = pHSAApiInfo->m_apiID;
+                apiID = pHSAApiInfo->GetHSAApiTypeId();
                 retVal = true;
             }
         }
@@ -993,12 +1029,14 @@ bool ProfileSessionDataItem::GetEnqueueCommandType(QString& commandType) const
     bool retVal = false;
 
     // Sanity check:
-    GT_IF_WITH_ASSERT((m_pApiInfo != nullptr) && ((m_itemType.m_itemSubType & CL_ENQUEUE_BASE_API) == CL_ENQUEUE_BASE_API))
+    GT_IF_WITH_ASSERT((m_pCLApiInfoDataHandler != nullptr) && ((m_itemType.m_itemSubType & CL_ENQUEUE_BASE_API) == CL_ENQUEUE_BASE_API))
     {
-        CLEnqueueAPI* pEnqueueApiInfo = dynamic_cast<CLEnqueueAPI*>(m_pApiInfo);
+        ICLEnqueueApiInfoDataHandler* pEnqueueApiInfo;
+        m_pCLApiInfoDataHandler->IsCLEnqueueAPI(&pEnqueueApiInfo);
+
         GT_IF_WITH_ASSERT(pEnqueueApiInfo != nullptr)
         {
-            commandType = QString::fromStdString(pEnqueueApiInfo->m_strCMDType);
+            commandType = QString::fromStdString(pEnqueueApiInfo->GetCLCommandTypeString());
             retVal = true;
         }
     }
@@ -1010,15 +1048,17 @@ bool ProfileSessionDataItem::GetEnqueueCommandGPUTimes(quint64& gpuStart, quint6
     bool retVal = false;
 
     // Sanity check:
-    GT_IF_WITH_ASSERT((m_pApiInfo != nullptr) && ((m_itemType.m_itemSubType & CL_ENQUEUE_BASE_API) == CL_ENQUEUE_BASE_API))
+    GT_IF_WITH_ASSERT((m_pCLApiInfoDataHandler != nullptr) && ((m_itemType.m_itemSubType & CL_ENQUEUE_BASE_API) == CL_ENQUEUE_BASE_API))
     {
-        CLEnqueueAPI* pEnqueueApiInfo = dynamic_cast<CLEnqueueAPI*>(m_pApiInfo);
+        ICLEnqueueApiInfoDataHandler* pEnqueueApiInfo;
+        m_pCLApiInfoDataHandler->IsCLEnqueueAPI(&pEnqueueApiInfo);
+
         GT_IF_WITH_ASSERT(pEnqueueApiInfo != nullptr)
         {
-            gpuStart = pEnqueueApiInfo->m_ullRunning;
-            gpuEnd = pEnqueueApiInfo->m_ullComplete;
-            gpuQueued = pEnqueueApiInfo->m_ullQueue;
-            gpuSubmit = pEnqueueApiInfo->m_ullSubmit;
+            gpuStart = pEnqueueApiInfo->GetCLRunningTimestamp();
+            gpuEnd = pEnqueueApiInfo->GetCLCompleteTimestamp();
+            gpuQueued = pEnqueueApiInfo->GetCLQueueTimestamp();
+            gpuSubmit = pEnqueueApiInfo->GetCLSubmitTimestamp();
             retVal = true;
         }
     }
@@ -1030,13 +1070,15 @@ bool ProfileSessionDataItem::GetEnqueueCommandQueueID(unsigned int& contextID, u
     bool retVal = false;
 
     // Sanity check:
-    GT_IF_WITH_ASSERT((m_pApiInfo != nullptr) && ((m_itemType.m_itemSubType & CL_ENQUEUE_BASE_API) == CL_ENQUEUE_BASE_API))
+    GT_IF_WITH_ASSERT((m_pCLApiInfoDataHandler != nullptr) && ((m_itemType.m_itemSubType & CL_ENQUEUE_BASE_API) == CL_ENQUEUE_BASE_API))
     {
-        CLEnqueueAPI* pEnqueueApiInfo = dynamic_cast<CLEnqueueAPI*>(m_pApiInfo);
+        ICLEnqueueApiInfoDataHandler* pEnqueueApiInfo;
+        m_pCLApiInfoDataHandler->IsCLEnqueueAPI(&pEnqueueApiInfo);
+
         GT_IF_WITH_ASSERT(pEnqueueApiInfo != nullptr)
         {
-            queueID = pEnqueueApiInfo->m_uiQueueID;
-            contextID = pEnqueueApiInfo->m_uiContextID;
+            queueID = pEnqueueApiInfo->GetCLQueueId();
+            contextID = pEnqueueApiInfo->GetCLContextId();
             retVal = true;
         }
     }
@@ -1052,30 +1094,33 @@ bool ProfileSessionDataItem::GetDispatchCommandWorkSizes(QString& globalWorkSize
         // Sanity check:
         if ((m_itemType.m_itemMainType == CL_API) && ((m_itemType.m_itemSubType & CL_ENQUEUE_KERNEL) == CL_ENQUEUE_KERNEL))
         {
-            CLKernelAPIInfo* pEnqueueApiInfo = dynamic_cast<CLKernelAPIInfo*>(m_pApiInfo);
-            GT_IF_WITH_ASSERT(pEnqueueApiInfo != nullptr)
+            ICLKernelApiInfoDataHandler* pKernelEnqueueApiInfo;
+            m_pCLApiInfoDataHandler->IsCLKernelApiInfo(&pKernelEnqueueApiInfo);
+
+            GT_IF_WITH_ASSERT(pKernelEnqueueApiInfo != nullptr)
             {
-                globalWorkSize = QString::fromStdString(pEnqueueApiInfo->m_strGlobalWorkSize);
-                groupWorkSize = QString::fromStdString(pEnqueueApiInfo->m_strGroupWorkSize);
+                globalWorkSize = QString::fromStdString(pKernelEnqueueApiInfo->GetCLKernelGlobalWorkGroupSize());
+                groupWorkSize = QString::fromStdString(pKernelEnqueueApiInfo->GetCLKernelWorkGroupSize());
                 retVal = true;
             }
         }
 
         else if (m_itemType.m_itemSubType == HSA_API_PROFILE_ITEM)
         {
-            HSAAPIInfo* pHSAInfo = dynamic_cast<HSAAPIInfo*>(m_pApiInfo);
+            IHSAAPIInfoDataHandler* pHSAInfo = m_pHSAApiInfoDataHandler;
 
             // Sanity check:
             GT_IF_WITH_ASSERT(pHSAInfo != nullptr)
             {
-                if (pHSAInfo->m_apiID == HSA_API_Type_Non_API_Dispatch)
+                if (pHSAInfo->GetHSAApiTypeId() == HSA_API_Type_Non_API_Dispatch)
                 {
-                    HSADispatchInfo* pDispatchInfo = dynamic_cast<HSADispatchInfo*>(pHSAInfo);
+                    IHSADispatchApiInfoDataHandler* pHsaDispatchInfo;
+                    m_pHSAApiInfoDataHandler->IsHSADispatchApi(&pHsaDispatchInfo);
 
-                    if (pDispatchInfo != nullptr)
+                    if (pHsaDispatchInfo != nullptr)
                     {
-                        globalWorkSize = QString::fromStdString(pDispatchInfo->m_strGlobalWorkSize);
-                        groupWorkSize = QString::fromStdString(pDispatchInfo->m_strGroupWorkSize);
+                        globalWorkSize = QString::fromStdString(pHsaDispatchInfo->GetHSAGlobalWorkGroupSize());
+                        groupWorkSize = QString::fromStdString(pHsaDispatchInfo->GetHSAWorkGroupSizeString());
                         retVal = true;
                     }
                 }
@@ -1095,30 +1140,33 @@ bool ProfileSessionDataItem::GetDispatchCommandDeviceNames(QString& strQueueHand
         // Sanity check:
         if ((m_itemType.m_itemMainType == CL_API_PROFILE_ITEM) || (m_itemType.m_itemMainType == CL_GPU_PROFILE_ITEM))
         {
-            CLEnqueueAPI* pEnqueueApiInfo = dynamic_cast<CLEnqueueAPI*>(m_pApiInfo);
+            ICLEnqueueApiInfoDataHandler* pEnqueueApiInfo;
+            m_pCLApiInfoDataHandler->IsCLEnqueueAPI(&pEnqueueApiInfo);
+
             GT_IF_WITH_ASSERT(pEnqueueApiInfo != nullptr)
             {
-                strQueueHandle = QString::fromStdString(pEnqueueApiInfo->m_strCmdQHandle);
-                strContextHandle = QString::fromStdString(pEnqueueApiInfo->m_strCntxHandle);
-                deviceNameStr = QString::fromStdString(pEnqueueApiInfo->m_strDevice);
+                strQueueHandle = QString::fromStdString(pEnqueueApiInfo->GetCLCommandQueueHandleString());
+                strContextHandle = QString::fromStdString(pEnqueueApiInfo->GetCLContextHandleString());
+                deviceNameStr = QString::fromStdString(pEnqueueApiInfo->GetCLDeviceNameString());
                 retVal = true;
             }
         }
         else if (m_itemType.m_itemMainType == HSA_GPU_PROFILE_ITEM)
         {
-            HSAAPIInfo* pHSAInfo = dynamic_cast<HSAAPIInfo*>(m_pApiInfo);
+            IHSAAPIInfoDataHandler* pHSAInfo = m_pHSAApiInfoDataHandler;
 
             // Sanity check:
             GT_IF_WITH_ASSERT(pHSAInfo != nullptr)
             {
-                if (pHSAInfo->m_apiID == HSA_API_Type_Non_API_Dispatch)
+                if (pHSAInfo->GetHSAApiTypeId() == HSA_API_Type_Non_API_Dispatch)
                 {
-                    HSADispatchInfo* pDispatchInfo = dynamic_cast<HSADispatchInfo*>(m_pApiInfo);
+                    IHSADispatchApiInfoDataHandler* pHsaDispatchInfo;
+                    m_pHSAApiInfoDataHandler->IsHSADispatchApi(&pHsaDispatchInfo);
 
-                    if (pDispatchInfo != nullptr)
+                    if (pHsaDispatchInfo != nullptr)
                     {
-                        strQueueHandle = QString::fromStdString(pDispatchInfo->m_strQueueHandle);
-                        deviceNameStr = QString::fromStdString(pDispatchInfo->m_strDeviceName);
+                        strQueueHandle = QString::fromStdString(pHsaDispatchInfo->GetHSAQueueHandleString());
+                        deviceNameStr = QString::fromStdString(pHsaDispatchInfo->GetHSADeviceName());
                         retVal = true;
                     }
                 }
@@ -1136,10 +1184,12 @@ bool ProfileSessionDataItem::GetEnqueueOtherDataSize(quint64& dataSize)
     // Sanity check:
     GT_IF_WITH_ASSERT((m_pApiInfo != nullptr) && ((m_itemType.m_itemSubType & CL_ENQUEUE_DATA_OPERATIONS) == CL_ENQUEUE_DATA_OPERATIONS))
     {
-        CLDataEnqueueAPIInfo* pEnqueueApiInfo = dynamic_cast<CLDataEnqueueAPIInfo*>(m_pApiInfo);
-        GT_IF_WITH_ASSERT(pEnqueueApiInfo != nullptr)
+        ICLDataEnqueueApiInfoDataHandler* pCLDataEnqueueApiInfo;
+        m_pCLApiInfoDataHandler->IsCLDataEnqueueApi(&pCLDataEnqueueApiInfo);
+
+        GT_IF_WITH_ASSERT(pCLDataEnqueueApiInfo != nullptr)
         {
-            dataSize = pEnqueueApiInfo->m_uiDataSize;
+            dataSize = pCLDataEnqueueApiInfo->GetCLDataTransferSize();
             retVal = true;
         }
     }
@@ -1153,10 +1203,12 @@ bool ProfileSessionDataItem::GetEnqueueMemTransferSize(quint64& transferSize)
     // Sanity check:
     GT_IF_WITH_ASSERT((m_pApiInfo != nullptr) && ((m_itemType.m_itemSubType & CL_ENQUEUE_MEM) == CL_ENQUEUE_MEM))
     {
-        CLMemAPIInfo* pEnqueueApiInfo = dynamic_cast<CLMemAPIInfo*>(m_pApiInfo);
-        GT_IF_WITH_ASSERT(pEnqueueApiInfo != nullptr)
+        ICLMemApiInfoDataHandler* pCLMemApiInfo;
+        m_pCLApiInfoDataHandler->IsCLMemoryApiInfo(&pCLMemApiInfo);
+
+        GT_IF_WITH_ASSERT(pCLMemApiInfo != nullptr)
         {
-            transferSize = pEnqueueApiInfo->m_uiTransferSize;
+            transferSize = pCLMemApiInfo->GetCLMemoryTransferSize();
             retVal = true;
         }
     }
@@ -1168,17 +1220,17 @@ bool ProfileSessionDataItem::GetHSACommandGPUTimes(quint64& gpuStart, quint64& g
     bool retVal = false;
 
     // Sanity check:
-    GT_IF_WITH_ASSERT(m_pApiInfo != nullptr)
+    GT_IF_WITH_ASSERT(m_pHSAApiInfoDataHandler != nullptr)
     {
-        HSAAPIInfo* pAPIInfo = dynamic_cast<HSAAPIInfo*>(m_pApiInfo);
-        GT_IF_WITH_ASSERT((pAPIInfo != nullptr) && (pAPIInfo->m_apiID == HSA_API_Type_Non_API_Dispatch))
+        GT_IF_WITH_ASSERT((m_pHSAApiInfoDataHandler->GetHSAApiTypeId() == HSA_API_Type_Non_API_Dispatch))
         {
-            HSADispatchInfo* pDispatchInfo = dynamic_cast<HSADispatchInfo*>(pAPIInfo);
+            IHSADispatchApiInfoDataHandler* pDispatchInfo;
+            m_pHSAApiInfoDataHandler->IsHSADispatchApi(&pDispatchInfo);
 
             GT_IF_WITH_ASSERT(pDispatchInfo != nullptr)
             {
-                gpuStart = pDispatchInfo->m_ullStart;
-                gpuEnd = pDispatchInfo->m_ullEnd;
+                gpuStart = m_pHSAApiInfoDataHandler->GetApiInfoDataHandler()->GetApiStartTime();
+                gpuEnd = m_pHSAApiInfoDataHandler->GetApiInfoDataHandler()->GetApiEndTime();
                 retVal = true;
             }
         }
@@ -1194,11 +1246,13 @@ QString ProfileSessionDataItem::QueueName() const
 QString ProfileSessionDataItem::CommandListPointer() const
 {
     QString retVal;
+
     if (m_itemType.m_itemMainType == DX12_GPU_PROFILE_ITEM)
     {
         if (m_pApiInfo != nullptr)
         {
             DX12GPUTraceInfo* pAPIInfo = (DX12GPUTraceInfo*)m_pApiInfo;
+
             if (pAPIInfo != nullptr)
             {
                 retVal = QString::fromStdString(pAPIInfo->m_commandListPtrStr);
@@ -1211,6 +1265,7 @@ QString ProfileSessionDataItem::CommandListPointer() const
         if (m_pApiInfo != nullptr)
         {
             VKGPUTraceInfo* pAPIInfo = (VKGPUTraceInfo*)m_pApiInfo;
+
             if (pAPIInfo != nullptr)
             {
                 retVal = QString::fromStdString(pAPIInfo->m_commandBufferHandleStr);
@@ -1287,11 +1342,22 @@ bool ProfileSessionDataItem::GetDisplaySeqID(unsigned int& seqID) const
     bool retVal = false;
 
     // Sanity check:
-    GT_IF_WITH_ASSERT(m_pApiInfo != nullptr)
+    if (nullptr != m_pApiInfo)
     {
         seqID = m_pApiInfo->m_uiDisplaySeqID;
         retVal = true;
     }
+    else if (nullptr != m_pCLApiInfoDataHandler)
+    {
+        seqID = m_pCLApiInfoDataHandler->GetApiInfoDataHandler()->GetApiDisplaySequenceId();
+        retVal = true;
+    }
+    else if (nullptr != m_pHSAApiInfoDataHandler)
+    {
+        seqID = m_pHSAApiInfoDataHandler->GetApiInfoDataHandler()->GetApiDisplaySequenceId();
+        retVal = true;
+    }
+
     return retVal;
 }
 
@@ -1302,28 +1368,31 @@ bool ProfileSessionDataItem::GetDispatchCommandKernelName(QString& kernelNameStr
     // Sanity check:
     if ((m_pApiInfo != nullptr) && ((m_itemType.m_itemSubType & CL_ENQUEUE_KERNEL) == CL_ENQUEUE_KERNEL))
     {
-        CLKernelAPIInfo* pEnqueueApiInfo = dynamic_cast<CLKernelAPIInfo*>(m_pApiInfo);
-        GT_IF_WITH_ASSERT(pEnqueueApiInfo != nullptr)
+        ICLKernelApiInfoDataHandler* pCLKernelApiInfo;
+        m_pCLApiInfoDataHandler->IsCLKernelApiInfo(&pCLKernelApiInfo);
+
+        GT_IF_WITH_ASSERT(pCLKernelApiInfo != nullptr)
         {
-            kernelNameStr = QString::fromStdString(pEnqueueApiInfo->m_strKernelName);
+            kernelNameStr = QString::fromStdString(pCLKernelApiInfo->GetCLKernelNameString());
             retVal = true;
         }
     }
 
     else if ((m_pApiInfo != nullptr) && (m_itemType.m_itemMainType == HSA_GPU_PROFILE_ITEM))
     {
-        HSAAPIInfo* pHSAInfo = dynamic_cast<HSAAPIInfo*>(m_pApiInfo);
+        IHSAAPIInfoDataHandler* pHSAInfo = m_pHSAApiInfoDataHandler;
 
         // Sanity check:
         GT_IF_WITH_ASSERT(pHSAInfo != nullptr)
         {
-            if (pHSAInfo->m_apiID == HSA_API_Type_Non_API_Dispatch)
+            if (pHSAInfo->GetHSAApiTypeId() == HSA_API_Type_Non_API_Dispatch)
             {
-                HSADispatchInfo* pDispatchInfo = dynamic_cast<HSADispatchInfo*>(pHSAInfo);
+                IHSADispatchApiInfoDataHandler* pDispatchInfo;
+                pHSAInfo->IsHSADispatchApi(&pDispatchInfo);
 
                 if (pDispatchInfo != nullptr)
                 {
-                    kernelNameStr = QString::fromStdString(pDispatchInfo->m_strKernelName);
+                    kernelNameStr = QString::fromStdString(pDispatchInfo->GetHSAKernelName());
                     retVal = true;
                 }
             }

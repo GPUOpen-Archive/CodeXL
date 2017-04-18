@@ -31,7 +31,7 @@
 #include <AMDTApplicationFramework/Include/afProgressBarWrapper.h>
 #include <AMDTApplicationFramework/src/afUtils.h>
 
-#include "APIInfo.h"
+#include "CXLAPIInfo.h"
 #include "APITimelineItems.h"
 #include "TraceTable.h"
 #include "OccupancyInfo.h"
@@ -39,7 +39,7 @@
 #include <AMDTGpuProfiling/Util.h>
 namespace boosticl = boost::icl;
 
-TraceTableItem::TraceTableItem(const QString& strAPIPrefix, const QString& strApiName, APIInfo* pApiInfo, acTimelineItem* pTimelineItem, acTimelineItem* pDeviceBlock, OccupancyInfo* pOccupancyInfo) :
+TraceTableItem::TraceTableItem(const QString& strAPIPrefix, const QString& strApiName, IAPIInfoDataHandler* pApiInfo, acTimelineItem* pTimelineItem, acTimelineItem* pDeviceBlock, IOccupancyInfoDataHandler* pOccupancyInfo) :
     m_parent(nullptr), m_startIndex(-1), m_endIndex(-1), m_pTimelineItem(pTimelineItem), m_pDeviceBlock(pDeviceBlock), m_pOccupancyInfo(pOccupancyInfo)
 {
     // Fill the data structure with empty strings:
@@ -52,22 +52,23 @@ TraceTableItem::TraceTableItem(const QString& strAPIPrefix, const QString& strAp
 
     if (pApiInfo != nullptr)
     {
-        if (pApiInfo->m_bHasDisplayableSeqId)
+        if (pApiInfo->IsApiSequenceIdDisplayble())
         {
-            m_startIndex = (int)pApiInfo->m_uiDisplaySeqID;
+            unsigned int dispSeqId = pApiInfo->GetApiDisplaySequenceId();
+            m_startIndex = static_cast<int>(dispSeqId);
         }
 
         m_data[TraceTableModel::TRACE_INTERFACE_COLUMN] = strApiName;
-        m_data[TraceTableModel::TRACE_PARAMETERS_COLUMN] = QString::fromStdString(pApiInfo->m_ArgList);
-        m_data[TraceTableModel::TRACE_RESULT_COLUMN] = QString::fromStdString(pApiInfo->m_strRet);
+        m_data[TraceTableModel::TRACE_PARAMETERS_COLUMN] = QString::fromStdString(pApiInfo->GetApiArgListString());
+        m_data[TraceTableModel::TRACE_RESULT_COLUMN] = QString::fromStdString(pApiInfo->GetApiRetString());
 
         QString strUniqueId = strAPIPrefix;
-        strUniqueId.append('.').append(QString::number(pApiInfo->m_uiSeqID));
+        strUniqueId.append('.').append(QString::number(pApiInfo->GetApiSequenceId()));
         m_uniqueId = QVariant::fromValue(strUniqueId);
     }
 }
 
-TraceTableItem::TraceTableItem(const QString& strAPIPrefix, const QString& strMarkerName, PerfMarkerEntry* pMarkerEntry, acTimelineItem* pTimelineItem) :
+TraceTableItem::TraceTableItem(const QString& strAPIPrefix, const QString& strMarkerName, IPerfMarkerInfoDataHandler* pMarkerEntry, acTimelineItem* pTimelineItem) :
     m_parent(nullptr), m_startIndex(-1), m_endIndex(-1), m_pTimelineItem(pTimelineItem), m_pDeviceBlock(nullptr), m_pOccupancyInfo(nullptr)
 {
     // Fill the data structure with empty strings:
@@ -352,7 +353,7 @@ void TraceTableModel::SetVisualProperties(const QColor& defaultForegroundColor, 
     m_underlineFont.setUnderline(true);
 }
 
-TraceTableItem* TraceTableModel::AddTraceItem(const QString& strAPIPrefix, const QString& strApiName, APIInfo* pApiInfo, acTimelineItem* pTimelineItem, acTimelineItem* pDeviceBlock, OccupancyInfo* pOccupancyInfo)
+TraceTableItem* TraceTableModel::AddTraceItem(const QString& strAPIPrefix, const QString& strApiName, IAPIInfoDataHandler* pApiInfo, acTimelineItem* pTimelineItem, acTimelineItem* pDeviceBlock, IOccupancyInfoDataHandler* pOccupancyInfo)
 {
     TraceTableItem* pRetVal = nullptr;
 
@@ -365,17 +366,18 @@ TraceTableItem* TraceTableModel::AddTraceItem(const QString& strAPIPrefix, const
 
 
         // Get the start and end time for the current pTableItem:
-        quint64 startTime = pApiInfo->m_ullStart;
-        quint64 endTime = pApiInfo->m_ullEnd;
 
-        float cpuTimeSec = (float)(endTime - startTime) / 1000000;
+        quint64 startTime = pApiInfo->GetApiStartTime();
+        quint64 endTime = pApiInfo->GetApiEndTime();
+
+        float cpuTimeSec = static_cast<float>((endTime - startTime) / 1000000.0f);
         QVariant cpuTimeVar;
         cpuTimeVar.setValue(cpuTimeSec);
         pRetVal->SetColumnData(TRACE_CPU_TIME_COLUMN, cpuTimeVar);
 
         if (pDeviceBlock != nullptr)
         {
-            float gpuTimeSec = (float)(pDeviceBlock->endTime() - pDeviceBlock->startTime()) / 1000000;
+            float gpuTimeSec = static_cast<float>((pDeviceBlock->endTime() - pDeviceBlock->startTime()) / 1000000.0f);
             QVariant gpuTimeVar;
             gpuTimeVar.setValue(gpuTimeSec);
             pRetVal->SetColumnData(TRACE_DEVICE_TIME_COLUMN, gpuTimeVar);
@@ -416,7 +418,7 @@ TraceTableItem* TraceTableModel::AddTraceItem(const QString& strAPIPrefix, const
 }
 
 
-TraceTableItem* TraceTableModel::AddTopLevelTraceItem(const QString& strAPIPrefix, const QString& strApiName, APIInfo* pApiInfo, acTimelineItem* pTimelineItem, acTimelineItem* pDeviceBlock, OccupancyInfo* pOccupancyInfo)
+TraceTableItem* TraceTableModel::AddTopLevelTraceItem(const QString& strAPIPrefix, const QString& strApiName, IAPIInfoDataHandler* pApiInfo, acTimelineItem* pTimelineItem, acTimelineItem* pDeviceBlock, IOccupancyInfoDataHandler* pOccupancyInfo)
 {
     TraceTableItem* pRetVal = nullptr;
 
@@ -427,17 +429,17 @@ TraceTableItem* TraceTableModel::AddTopLevelTraceItem(const QString& strAPIPrefi
 
 
         // Get the start and end time for the current pTableItem:
-        quint64 startTime = pApiInfo->m_ullStart;
-        quint64 endTime = pApiInfo->m_ullEnd;
+        quint64 startTime = pApiInfo->GetApiStartTime();
+        quint64 endTime = pApiInfo->GetApiEndTime();
 
-        float cpuTimeSec = (float)(endTime - startTime) / 1000000;
+        float cpuTimeSec = static_cast<float>((endTime - startTime) / 1000000.0f);
         QVariant cpuTimeVar;
         cpuTimeVar.setValue(cpuTimeSec);
         pRetVal->SetColumnData(TRACE_CPU_TIME_COLUMN, cpuTimeVar);
 
         if (pDeviceBlock != nullptr)
         {
-            float gpuTimeSec = (float)(pDeviceBlock->endTime() - pDeviceBlock->startTime()) / 1000000;
+            float gpuTimeSec = static_cast<float>((pDeviceBlock->endTime() - pDeviceBlock->startTime()) / 1000000.0f);
             QVariant gpuTimeVar;
             gpuTimeVar.setValue(gpuTimeSec);
             pRetVal->SetColumnData(TRACE_DEVICE_TIME_COLUMN, gpuTimeVar);
@@ -450,7 +452,7 @@ TraceTableItem* TraceTableModel::AddTopLevelTraceItem(const QString& strAPIPrefi
     return pRetVal;
 }
 
-TraceTableItem* TraceTableModel::AddTraceItem(const QString& strAPIPrefix, const QString& strMarkerName, PerfMarkerEntry* pMarkerEntry)
+TraceTableItem* TraceTableModel::AddTraceItem(const QString& strAPIPrefix, const QString& strMarkerName, IPerfMarkerInfoDataHandler* pMarkerEntry)
 {
     TraceTableItem* pRetVal = nullptr;
 
@@ -490,7 +492,7 @@ TraceTableItem* TraceTableModel::CloseLastOpenedPerfMarker(acTimelineItem* pTime
 
         // Calculate the CPU time:
         quint64 cpuTime = pTimelineItem->endTime() - pTimelineItem->startTime();
-        float cpuTimeSec = (float)cpuTime / 1000000;
+        float cpuTimeSec = static_cast<float>(cpuTime / 1000000.0f);
         QVariant cpuTimeVar;
         cpuTimeVar.setValue(cpuTimeSec);
         pOpenedItem->SetColumnData(TRACE_CPU_TIME_COLUMN, cpuTimeVar);
@@ -687,17 +689,17 @@ acTimelineItem* TraceTableModel::GetDeviceBlock(const QModelIndex& index)
     return retVal;
 }
 
-OccupancyInfo* TraceTableModel::GetOccupancyItem(const QModelIndex& index)
+IOccupancyInfoDataHandler* TraceTableModel::GetOccupancyItem(const QModelIndex& index)
 {
-    OccupancyInfo* retVal = nullptr;
+    IOccupancyInfoDataHandler* pRetVal = nullptr;
 
     if (index.isValid())
     {
         TraceTableItem* childItem = static_cast<TraceTableItem*>(index.internalPointer());
-        retVal = childItem->GetOccupancyInfo();
+        pRetVal = childItem->GetOccupancyInfo();
     }
 
-    return retVal;
+    return pRetVal;
 }
 
 bool TraceTableModel::InitializeModel()
@@ -759,8 +761,15 @@ TraceTableItem* TraceTableModel::GetNextItemParent(const TraceTableItem* pNextIt
     TraceTableItem* pParent = m_pRootItem;
     GT_IF_WITH_ASSERT(pNextItemToAdd != nullptr)
     {
-        const quint64 nextItemStartTime = pNextItemToAdd->GetTimelineItem()->startTime();
-        const quint64 nextItemEndTime = pNextItemToAdd->GetTimelineItem()->endTime();
+        quint64 nextItemStartTime = pNextItemToAdd->GetTimelineItem()->startTime();
+        quint64 nextItemEndTime = pNextItemToAdd->GetTimelineItem()->endTime();
+
+        // Temporary Solution - Intervals is not feasible with same lower and upper bound
+        if(nextItemStartTime == nextItemEndTime)
+        {
+            nextItemEndTime++;
+        }
+
         const auto nextItemTimeInterval = boosticl::interval<quint64>::right_open(nextItemStartTime, nextItemEndTime);
 
         auto itr = m_markerIntervals.find(nextItemTimeInterval);

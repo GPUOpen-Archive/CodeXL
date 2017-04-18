@@ -87,7 +87,7 @@ public:
     /// \param callIndex call index
     /// \param[out] strErrorMessageOut error message if any
     /// \return True if success in generating
-    bool GenerateOccupancyPage(GPUSessionTreeItemData* pSessionData, OccupancyInfo* pOccInfo, int callIndex, QString& strErrorMessageOut);
+    bool GenerateOccupancyPage(GPUSessionTreeItemData* pSessionData, const IOccupancyInfoDataHandler* pOccInfo, int callIndex, QString& strErrorMessageOut);
 
     /// Loads the current project settings
     void LoadCurrentProjectSettings();
@@ -337,6 +337,9 @@ private:
 
     /// Static list of file extensions that should be renamed when the session is renamed
     static QList<gtString>           m_sAdditionalFileExtensionsToRename;
+
+
+    std::vector<unsigned int>        m_kernelOccupancyChartGenerated; ///< flag indicating kernel occupancy chart is generated or not
 
     /// process id of the GPU profiler
     osProcessId m_GPUProfilerProcessId;

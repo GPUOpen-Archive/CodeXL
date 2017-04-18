@@ -24,7 +24,7 @@
     #undef signals
     #define NEED_TO_POP_SIGNALS_MACRO
 #endif
-#include "../HSAFdnCommon/HSAFunctionDefs.h"
+#include <HSAFunctionDefs.h>
 #if defined (NEED_TO_POP_SIGNALS_MACRO)
     #pragma pop_macro("signals")
 #endif
@@ -34,19 +34,17 @@
 #include <AMDTOSWrappers/Include/osProcess.h>
 #include <AMDTOSWrappers/Include/osStringConstants.h>
 #include <AMDTOSAPIWrappers/Include/oaDriver.h>
+#include <AMDTAPIClasses/Include/apCLDevice.h>
 #include <ADLUtil.h>
 #include <DeviceInfoUtils.h>
 
 #include <AMDTGpuProfiling/AMDTGpuProfilerDefs.h>
 #include "CounterManager.h"
 
-// Backend headaers
-#include "CLUtils.h"
-#include "CLFunctionDefs.h"
-
 // AMDTApplicationFramework.
 #include <AMDTApplicationFramework/Include/afGlobalVariablesManager.h>
 #include <AMDTApplicationFramework/Include/afProjectManager.h>
+#include <AMDTApplicationFramework/Include/commands/afSystemInformationCommand.h>
 
 
 static const gtString s_DEVICE_ENV_VAR = L"CodeXLGPUProfilerDevice";
@@ -201,33 +199,31 @@ void CounterManager::Init(bool isRemoteSession)
         if (0 == asicInfoList.size())
         {
             // fallback path when running on systems where ADL is not available or reports no devices
-            InitRealCLFunctions();
+            afSystemInformationCommand sysInfoCmd;
+            gtPtrVector<apCLDevice*> devicesList;
+            sysInfoCmd.CollectOpenCLDevicesInformation(devicesList, true);
 
-            CLPlatformSet platformInfo;
-
-            if (CLUtils::GetPlatformInfo(platformInfo))
+            for(size_t deviceIndex = 0; deviceIndex < devicesList.size(); deviceIndex++)
             {
-                CLPlatformSet::const_iterator itPlatformInfo;
+                apCLDevice* apCLCurrentDeviceInfo = devicesList[deviceIndex];
 
-                for (itPlatformInfo = platformInfo.begin(); itPlatformInfo != platformInfo.end(); itPlatformInfo++)
+                if(nullptr != apCLCurrentDeviceInfo)
                 {
-                    std::string boardName = (*itPlatformInfo).strBoardName;
-                    std::string deviceName = (*itPlatformInfo).strDeviceName;
-                    std::vector<GDT_GfxCardInfo> cardList;
-                    if (!boardName.empty() && AMDTDeviceInfoUtils::Instance()->GetDeviceInfoMarketingName(boardName.c_str(), cardList))
+                    if(apCLCurrentDeviceInfo->deviceVendor().compareNoCase(L"Advanced Micro Devices, Inc.") == 0)
                     {
-                        for (const auto& cardInfo : cardList)
+                        std::vector<GDT_GfxCardInfo> cardList;
+                        std::string deviceName = apCLCurrentDeviceInfo->deviceName().asASCIICharArray();
+                        if (!deviceName.empty() && AMDTDeviceInfoUtils::Instance()->GetDeviceInfo(deviceName.c_str(), cardList))
                         {
-                            if (0 == deviceName.compare(cardInfo.m_szCALName))
+                            for (const auto& cardInfo : cardList)
                             {
-                                AddDeviceId(cardInfo.m_deviceID, cardInfo.m_revID);
-                                break;
+                                if (0 == deviceName.compare(cardInfo.m_szCALName))
+                                {
+                                    AddDeviceId(cardInfo.m_deviceID, cardInfo.m_revID);
+                                    break;
+                                }
                             }
                         }
-                    }
-                    else if (!deviceName.empty() && AMDTDeviceInfoUtils::Instance()->GetDeviceInfo(deviceName.c_str(), cardList))
-                    {
-                        AddDeviceId(cardList[0].m_deviceID, cardList[0].m_revID);
                     }
                 }
             }

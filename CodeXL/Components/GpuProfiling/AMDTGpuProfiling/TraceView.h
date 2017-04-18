@@ -26,15 +26,9 @@
 #include <QTabWidget>
 #include <QAbstractTableModel>
 
-// Backend header files
-#include "IParserListener.h"
-#include "IParserProgressMonitor.h"
-#include "CLAPIInfo.h"
-#include "CLAtpFile.h"
-#include "StackTraceAtpFile.h"
-#include "PerfMarkerAtpFile.h"
-#include "HSAAtpFile.h"
-#include "AnalyzerHTMLUtils.h"
+// RCP Backend header files
+#include <IAtpDataHandler.h>
+#include <IParserProgressMonitor.h>
 
 // AMDTSharedProfiling:
 #include <AMDTSharedProfiling/inc/SharedSessionWindow.h>
@@ -47,12 +41,13 @@
 #include <AMDTGpuProfiling/TraceTable.h>
 #include <AMDTGpuProfiling/ProjectSettings.h>
 #include <AMDTGpuProfiling/gpBaseSessionView.h>
+#include "ICallBackParserHandler.h"
+#include "CXLAnalyzerHTMLUtils.h"
 
 // forward declaration
 class acTimeline;
 class acTimelineBranch;
 class acTimelineItem;
-
 
 //forward declarations
 class KernelOccupancyWindow;
@@ -64,12 +59,11 @@ class SessionViewTabWidget;
 #endif
 
 /// UI for Application Trace GPUSessionTreeItemData view
-class TraceView : public gpBaseSessionView, public IParserListener<CLAPIInfo>, public IParserListener<HSAAPIInfo>, public IParserListener<SymbolFileEntry>, IParserListener<PerfMarkerEntry>, IParserProgressMonitor
+class TraceView : public gpBaseSessionView, public ICallBackParserHandler
 {
     Q_OBJECT
 
 public:
-
     /// Initializes a new instance of the TraceView class.
     /// \param parent the parent widget
     TraceView(QWidget* parent);
@@ -96,43 +90,24 @@ public:
     /// \param apiNum the number of api calls expected in the parsed atp file
     void SetAPINum(osThreadId threadId, unsigned int apiNum);
 
-    /// IParserListener implementation for CL api trace/timeline data in .atp file.
-    /// This method is called once for each CL api in the .atp file
-    /// \param pAPIInfo the current CLAPIInfo item from the parser
-    /// \param[out] stopParsing flag indicating if parsing should stop after this item
-    void OnParse(CLAPIInfo* pAPIInfo, bool& stopParsing);
 
-    /// IParserListener implementation for HSA api trace/timeline data in .atp file.
-    /// This method is called once for each HSA api in the .atp file
-    /// \param pAPIInfo the current CLAPIInfo item from the parser
-    /// \param[out] stopParsing flag indicating if parsing should stop after this item
-    void OnParse(HSAAPIInfo* pAPIInfo, bool& stopParsing);
+    void OnParseCallHandler(AtpInfoType apiType, bool& stopParsing) override;
 
-    /// IParserListener implementation for symbol data in .atp file
-    /// This method is called once for each entry in the symbol section of the .atp file
-    /// \param pSymFileEntry the current SymbolFileEntry item from the parser
-    /// \param[out] stopParsing flag indicating if parsing should stop after this item
-    void OnParse(SymbolFileEntry* pSymFileEntry, bool& stopParsing);
-
-    /// IParserListener implementation for perf marker data in .atp file
-    /// This method is called once for each entry in the perf marker section of the .atp file
-    /// \param pPerfMarkerEntry the current PerfMarkerEntry item from the parser
-    /// \param[out] stopParsing flag indicating if parsing should stop after this item
-    void OnParse(PerfMarkerEntry* pPerfMarkerEntry, bool& stopParsing);
+    void OnSetApiNumCallHandler(osThreadId threadId, unsigned int apiNum) override;
 
     /// IParserProgressMonitor implementation for reporting progress when loading trace data
     /// \param strProgressMessage the progress message to display for this progress event
     /// \param uiCurItem the index of the current item being parsed
     /// \param uiTotalItems the total number of items to be parsed
-    void OnParserProgress(const std::string& strProgressMessage, unsigned int uiCurItem, unsigned int uiTotalItems);
+    void OnParserProgressCallHandler(const std::string& strProgressMessage, unsigned int uiCurItem, unsigned int uiTotalItems) override;
 
     /// Display the requested summary type
-    /// \param summaryType - The requested summary to display on the summary page tab
+    /// \param selectedIndex - The requested summary to display on the summary page tab
     void DisplaySummaryPageType(int selectedIndex);
 
     /// Update the session folder after rename
     /// \param oldSessionFileName the session original file path
-    /// \param newSessionDirectory the session original file path after rename
+    /// \param newSessionFileName the session original file path after rename
     virtual void UpdateRenamedSession(const osFilePath& oldSessionFileName, const osFilePath& newSessionFileName);
 
 
@@ -239,7 +214,7 @@ private:
 
     /// Handle the specified CLAPIInfo instance supplied by the .atp file parser. Adds an item to the timeline and api trace list
     /// \param pApiInfo the CLAPIInfo instance to add to the trace/timeline
-    void HandleCLAPIInfo(CLAPIInfo* pApiInfo);
+    void HandleCLAPIInfo(ICLAPIInfoDataHandler* pApiInfo);
 
     /// Initializes or creates branch info for the requested queue:
     /// \param contextId the id of the context for which the branch is created
@@ -251,15 +226,15 @@ private:
 
     /// Handle the specified HSAAPIInfo instance supplied by the .atp file parser. Adds an item to the timeline and api trace list
     /// \param pApiInfo the HSAAPIInfo instance to add to the trace/timeline
-    void HandleHSAAPIInfo(HSAAPIInfo* pApiInfo);
+    void HandleHSAAPIInfo(IHSAAPIInfoDataHandler* pApiInfo);
 
     /// Handle the specified SymbolFileEntry instance supplied by the .atp file parser. Stores the symbol info for use when navigating to source
     /// \param pSymFileEntry the SymbolFileEntry instance begin added
-    void HandleSymFileEntry(SymbolFileEntry* pSymFileEntry);
+    void HandleSymFileEntry(ISymbolFileEntryInfoDataHandler* pSymFileEntry);
 
     /// Handle the specified PerfMarkerEntry instance supplied by the .atp file parser. Adds the perf markers to the timeline
     /// \param pPerfMarkerEntry the CLPerfMarkerEntry instance begin added
-    void HandlePerfMarkerEntry(PerfMarkerEntry* pPerfMarkerEntry);
+    void HandlePerfMarkerEntry(IPerfMarkerInfoDataHandler* pPerfMarkerEntry);
 
     /// After parsing is done, populate the view with the data collected by the parser
     void DoneParsingATPFile();

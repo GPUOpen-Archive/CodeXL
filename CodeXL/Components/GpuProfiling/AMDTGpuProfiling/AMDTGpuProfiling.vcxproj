@@ -25,12 +25,6 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
   </ImportGroup>
-  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <Import Project="..\..\..\..\Common\Lib\Ext\Boost\Global-Boost-2015.props" />
-  </ImportGroup>
-  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <Import Project="..\..\..\..\Common\Lib\Ext\Boost\Global-Boost-2015.props" />
-  </ImportGroup>
   <ImportGroup Label="CommonPropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="$(SolutionDir)\AMDTGpuProfiling.props" />
@@ -42,49 +36,35 @@
     <Import Project="$(COMMONDIR)\Src\DynamicLibraryModule\Global-DynamicLibraryModule.props" />
     <Import Project="$(COMMONDIR)\Lib\AMD\APPSDK\Global-OpenCL-NoLib.props" />
     <Import Project="$(AMDTCommonExt)\qcustomplot\Global-qcustomplot.props" />
+    <Import Project="..\..\..\..\Common\Lib\Ext\Boost\Global-Boost-2015.props" />
+    <Import Project="..\..\..\..\Common\Lib\AMD\RCP\Global-RCPBackend.props" />
   </ImportGroup>
   <ItemDefinitionGroup>
     <ClCompile>
-      <AdditionalIncludeDirectories>GeneratedFiles;..\Backend\Common;..\Backend\CLCommon;..\Backend\sanalyze;..\Backend\sprofile;..\Backend\HSAFdnTrace;..\Backend\CLTraceAgent;..\Backend\DX12Trace;..\Backend\VulkanTrace;..\Backend\HSAFdnCommon;$(CommonDir)\Src\HSAUtils;..\..\Graphics;$(CommonDir)$(BoostDir);..\..\..\Remote;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>GeneratedFiles;DX12Trace;VulkanTrace;$(CommonDir)\Src\HSAUtils;..\..\Graphics;$(CommonDir)$(BoostDir);..\..\..\Remote;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>QT_NO_OPENGL;AMDTGPUPROFILER_EXPORTS;USE_POINTER_SINGLETON;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">4996;4324;4189;4718</DisableSpecificWarnings>
       <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">4996;4324;4189;4718</DisableSpecificWarnings>
+      <BrowseInformation Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</BrowseInformation>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\Backend\CLCommon\CLFunctionDefs.cpp" />
-    <ClCompile Include="..\Backend\CLCommon\CLInternalFunctionDefs.cpp" />
-    <ClCompile Include="..\Backend\CLCommon\CLUtils.cpp" />
-    <ClCompile Include="..\Backend\CLTraceAgent\CLAtpFile.cpp" />
-    <ClCompile Include="..\Backend\CLCommon\CLFunctionEnumDefs.cpp" />
-    <ClCompile Include="..\Backend\CLCommon\CLPlatformInfo.cpp" />
-    <ClCompile Include="..\Backend\Common\ATPFileUtils.cpp" />
-    <ClCompile Include="..\Backend\Common\FileUtils.cpp" />
-    <ClCompile Include="..\Backend\Common\LocaleSetting.cpp" />
-    <ClCompile Include="..\Backend\Common\Logger.cpp" />
-    <ClCompile Include="..\Backend\Common\OSUtils.cpp" />
-    <ClCompile Include="..\Backend\Common\StackTraceAtpFile.cpp" />
-    <ClCompile Include="..\Backend\Common\StringUtils.cpp" />
-    <ClCompile Include="..\Backend\HSAFdnCommon\HSAFunctionDefsUtils.cpp" />
-    <ClCompile Include="..\Backend\HSAFdnTrace\HSAAtpFile.cpp" />
-    <ClCompile Include="..\Backend\DX12Trace\DX12FunctionDefs.cpp" />
-    <ClCompile Include="..\Backend\DX12Trace\DX12APIInfo.cpp" />
-    <ClCompile Include="..\Backend\DX12Trace\DX12AtpFile.cpp" />
-    <ClCompile Include="..\Backend\VulkanTrace\VulkanFunctionDefs.cpp" />
-    <ClCompile Include="..\Backend\VulkanTrace\VulkanAPIInfo.cpp" />
-    <ClCompile Include="..\Backend\VulkanTrace\VulkanAtpFile.cpp" />
-    <ClCompile Include="..\Backend\sanalyze\AnalyzerHTMLUtils.cpp" />
-    <ClCompile Include="..\Backend\sprofile\AtpFile.cpp" />
     <ClCompile Include="..\..\..\..\Common\Src\AMDTMutex\AMDTMutex.cpp" />
     <ClCompile Include="..\..\..\..\Common\Src\ADLUtil\ADLUtil.cpp" />
     <ClCompile Include="..\..\..\..\Common\Src\DeviceInfo\DeviceInfoInternal.cpp">
       <ExcludedFromBuild Condition="'$(AMDT_BUILD)'!='AMDT_INTERNAL'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\..\..\..\Common\Src\DeviceInfo\DeviceInfoUtils.cpp" />
     <ClCompile Include="..\..\..\..\Common\Src\DynamicLibraryModule\DynamicLibraryModule.cpp" />
     <ClCompile Include="..\..\..\..\Common\Src\DynamicLibraryModule\OpenCLModule.cpp" />
-    <ClCompile Include="..\Backend\sprofile\PerfMarkerAtpFile.cpp" />
     <ClCompile Include="AMDTGpuProfilerPlugin.cpp" />
+    <ClCompile Include="CXLAnalyzerHTMLUtils.cpp" />
+    <ClCompile Include="CXLAtpFile.cpp" />
+    <ClCompile Include="AtpUtils.cpp" />
+    <ClCompile Include="DX12Trace\DX12APIInfo.cpp" />
+    <ClCompile Include="DX12Trace\DX12AtpFile.cpp" />
+    <ClCompile Include="DX12Trace\DX12FunctionDefs.cpp" />
     <ClCompile Include="gpDetailedDataRibbon.cpp" />
     <ClCompile Include="gpObjectDataContainer.cpp" />
     <ClCompile Include="gpObjectDataModel.cpp" />
@@ -145,7 +125,6 @@
     <ClCompile Include="HSATimelineItems.cpp" />
     <ClCompile Include="KernelOccupancyWindow.cpp" />
     <ClCompile Include="ListViewWindow.cpp" />
-    <ClCompile Include="OccupancyInfo.cpp" />
     <ClCompile Include="OpenCLTraceSettingPage.cpp" />
     <ClCompile Include="ProfileProcessMonitor.cpp" />
     <ClCompile Include="ProfileManager.cpp" />
@@ -320,17 +299,29 @@
     <ClCompile Include="TraceTable.cpp" />
     <ClCompile Include="TraceView.cpp" />
     <ClCompile Include="Util.cpp" />
+    <ClCompile Include="VulkanTrace\VulkanAPIInfo.cpp" />
+    <ClCompile Include="VulkanTrace\VulkanAtpFile.cpp" />
+    <ClCompile Include="VulkanTrace\VulkanFunctionDefs.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\Common\Src\qcustomplot\1.3.1\qcustomplot.h" />
-    <ClInclude Include="..\Backend\DX12Trace\DX12APIInfo.h" />
-    <ClInclude Include="..\Backend\DX12Trace\DX12AtpFile.h" />
-    <ClInclude Include="..\Backend\DX12Trace\DX12FunctionDefs.h" />
-    <ClInclude Include="..\Backend\VulkanTrace\VulkanAPIInfo.h" />
-    <ClInclude Include="..\Backend\VulkanTrace\VulkanAtpFile.h" />
-    <ClInclude Include="..\Backend\VulkanTrace\VulkanFunctionDefs.h" />
     <ClInclude Include="AMDTGpuProfilerDefs.h" />
     <ClInclude Include="AMDTGpuProfilerPlugin.h" />
+    <ClInclude Include="AtpUtils.h" />
+    <ClInclude Include="CXLAnalyzerHTMLUtils.h" />
+    <ClInclude Include="CXLAPIInfo.h" />
+    <ClInclude Include="CXLAtpFile.h" />
+    <ClInclude Include="CXLBaseParser.h" />
+    <ClInclude Include="ICallBackParserHandler.h" />
+    <ClInclude Include="VulkanTrace\VulkanAPIInfo.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="VulkanTrace\VulkanAtpFile.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="VulkanTrace\VulkanFunctionDefs.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
+    </ClInclude>
     <CustomBuild Include="gpViewsCreator.h">
       <Command>"$(QTDIR)\bin\moc.exe" -DUNICODE -DWIN32 -DQT_LARGEFILE_SUPPORT -DQT_CORE_LIB -DQT_GUI_LIB "-D$(AMDT_BUILD)\." "-DAMDT_BUILD_SUFFIX=""$(AMDTBuildSuffix)""" "-DAMDT_PROJECT_SUFFIX=""$(AMDTProjectSuffix)""" -D_WINDOWS -DWIN32_LEAN_AND_MEAN -DSU_USE_NATIVE_STL -DWINVER=0x0502 -D_WIN32_WINNT=0x0502 -D_WIN32_WINDOWS=0x0502 -D_WINDLL  "-I.\GeneratedFiles" "-I$(QTDIR)\include" "-I.\GeneratedFiles\." "-I$(QTDIR)\include\qtmain" "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtGui" "-I." "%(FullPath)" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
       <Message>Moc%27ing %(Filename)%(Extension)...</Message>
@@ -368,6 +359,15 @@
       <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp;%(Outputs)</Outputs>
       <AdditionalInputs>$(QTDIR)\bin\moc.exe;%(FullPath);%(AdditionalInputs)</AdditionalInputs>
     </CustomBuild>
+    <ClInclude Include="DX12Trace\DX12APIInfo.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="DX12Trace\DX12AtpFile.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="DX12Trace\DX12FunctionDefs.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="DXTimelineItems.h" />
     <CustomBuild Include="EditNameValueDialog.h">
       <Command>"$(QTDIR)\bin\moc.exe" -DUNICODE -DWIN32 -DQT_LARGEFILE_SUPPORT -DQT_CORE_LIB -DQT_GUI_LIB "-D$(AMDT_BUILD)\." "-DAMDT_BUILD_SUFFIX=""$(AMDTBuildSuffix)""" "-DAMDT_PROJECT_SUFFIX=""$(AMDTProjectSuffix)""" -D_WINDOWS -DWIN32_LEAN_AND_MEAN -DSU_USE_NATIVE_STL -DWINVER=0x0502 -D_WIN32_WINNT=0x0502 -D_WIN32_WINDOWS=0x0502 -D_WINDLL  "-I.\GeneratedFiles" "-I$(QTDIR)\include" "-I.\GeneratedFiles\." "-I$(QTDIR)\include\qtmain" "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtGui" "-I." "%(FullPath)" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>

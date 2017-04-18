@@ -1,138 +1,138 @@
 [submodule "Common/Src/AMDTBaseTools"]
 	path = Common/Src/AMDTBaseTools
-	url = ../common-src-AMDTBaseTools.git
+	url = https://github.com/GPUOpen-Tools/common-src-AMDTBaseTools.git
 [submodule "Common/Src/AMDTOSWrappers"]
 	path = Common/Src/AMDTOSWrappers
-	url = ../common-src-AMDTOSWrappers.git
+	url = https://github.com/GPUOpen-Tools/common-src-AMDTOSWrappers.git
 [submodule "Common/Src/AMDTOSAPIWrappers"]
 	path = Common/Src/AMDTOSAPIWrappers
-	url = ../common-src-AMDTOSAPIWrappers.git
+	url = https://github.com/GPUOpen-Tools/common-src-AMDTOSAPIWrappers.git
 [submodule "Common/Src/DynamicLibraryModule"]
 	path = Common/Src/DynamicLibraryModule
-	url = ../common-src-DynamicLibraryModule.git
+	url = https://github.com/GPUOpen-Tools/common-src-DynamicLibraryModule.git
 [submodule "Common/Src/Vsprops"]
 	path = Common/Src/Vsprops
-	url = ../common-src-Vsprops.git
+	url = https://github.com/GPUOpen-Tools/common-src-Vsprops.git
 [submodule "Common/Src/TSingleton"]
 	path = Common/Src/TSingleton
-	url = ../common-src-TSingleton.git
+	url = https://github.com/GPUOpen-Tools/common-src-TSingleton.git
 [submodule "Common/Src/GPUPerfAPIUtils"]
 	path = Common/Src/GPUPerfAPIUtils
-	url = ../common-src-GPUPerfAPIUtils.git
+	url = https://github.com/GPUOpen-Tools/common-src-GPUPerfAPIUtils.git
 [submodule "Common/Src/AMDTMutex"]
 	path = Common/Src/AMDTMutex
-	url = ../common-src-AMDTMutex.git
+	url = https://github.com/GPUOpen-Tools/common-src-AMDTMutex.git
 [submodule "Common/Src/ADLUtil"]
 	path = Common/Src/ADLUtil
-	url = ../common-src-ADLUtil.git
+	url = https://github.com/GPUOpen-Tools/common-src-ADLUtil.git
 [submodule "Common/Src/DeviceInfo"]
 	path = Common/Src/DeviceInfo
-	url = ../common-src-DeviceInfo.git
+	url = https://github.com/GPUOpen-Tools/common-src-DeviceInfo.git
 [submodule "Common/Src/ACLModuleManager"]
 	path = Common/Src/ACLModuleManager
-	url = ../common-src-ACLModuleManager.git
+	url = https://github.com/GPUOpen-Tools/common-src-ACLModuleManager.git
 [submodule "Common/Src/ShaderUtils"]
 	path = Common/Src/ShaderUtils
-	url = ../common-src-ShaderUtils.git
+	url = https://github.com/GPUOpen-Tools/common-src-ShaderUtils.git
 [submodule "Common/Src/AMDTActivityLogger"]
 	path = Common/Src/AMDTActivityLogger
-	url = ../common-src-AMDTActivityLogger.git
+	url = https://github.com/GPUOpen-Tools/common-src-AMDTActivityLogger.git
 [submodule "Common/Src/AMDTAPIClasses"]
 	path = Common/Src/AMDTAPIClasses
-	url = ../common-src-AMDTAPIClasses.git
+	url = https://github.com/GPUOpen-Tools/common-src-AMDTAPIClasses.git
 [submodule "Common/Src/AMDTApplication"]
 	path = Common/Src/AMDTApplication
-	url = ../common-src-AMDTApplication.git
+	url = https://github.com/GPUOpen-Tools/common-src-AMDTApplication.git
 [submodule "Common/Src/AMDTApplicationComponents"]
 	path = Common/Src/AMDTApplicationComponents
-	url = ../common-src-AMDTApplicationComponents.git
+	url = https://github.com/GPUOpen-Tools/common-src-AMDTApplicationComponents.git
 [submodule "Common/Src/AMDTAssertionHandlers"]
 	path = Common/Src/AMDTAssertionHandlers
-	url = ../common-src-AMDTAssertionHandlers.git
+	url = https://github.com/GPUOpen-Tools/common-src-AMDTAssertionHandlers.git
 [submodule "Common/Src/AMDTInterceptor"]
 	path = Common/Src/AMDTInterceptor
-	url = ../common-src-AMDTInterceptor.git
+	url = https://github.com/GPUOpen-Tools/common-src-AMDTInterceptor.git
 [submodule "Common/Src/CElf"]
 	path = Common/Src/CElf
-	url = ../common-src-CElf.git
+	url = https://github.com/GPUOpen-Tools/common-src-CElf.git
 [submodule "Common/Src/DDS"]
 	path = Common/Src/DDS
-	url = ../common-src-DDS.git
+	url = https://github.com/GPUOpen-Tools/common-src-DDS.git
 [submodule "Common/Src/DebugHelpers"]
 	path = Common/Src/DebugHelpers
-	url = ../common-src-DebugHelpers.git
+	url = https://github.com/GPUOpen-Tools/common-src-DebugHelpers.git
 [submodule "Common/Src/Miniz"]
 	path = Common/Src/Miniz
-	url = ../common-src-Miniz.git
+	url = https://github.com/GPUOpen-Tools/common-src-Miniz.git
 [submodule "Common/Src/VersionInfo"]
 	path = Common/Src/VersionInfo
-	url = ../common-src-VersionInfo.git
+	url = https://github.com/GPUOpen-Tools/common-src-VersionInfo.git
 [submodule "Common/Src/Vulkan"]
 	path = Common/Src/Vulkan
-	url = ../common-src-Vulkan-1.0.21.1.git
+	url = https://github.com/GPUOpen-Tools/common-src-Vulkan-1.0.21.1.git
 [submodule "Common/Src/SCons"]
 	path = Common/Src/SCons
-	url = ../common-src-SCons.git
+	url = https://github.com/GPUOpen-Tools/common-src-SCons.git
 [submodule "Common/DK/Installer"]
 	path = Common/DK/Installer
-	url = ../common-dk-Installer.git
+	url = https://github.com/GPUOpen-Tools/common-dk-Installer.git
 [submodule "Common/Lib/AMD/ADL"]
 	path = Common/Lib/AMD/ADL
-	url = ../common-lib-amd-ADL.git
+	url = https://github.com/GPUOpen-Tools/common-lib-amd-ADL.git
 [submodule "Common/Lib/AMD/APPSDK"]
 	path = Common/Lib/AMD/APPSDK
-	url = ../common-lib-amd-APPSDK-3.0.git
+	url = https://github.com/GPUOpen-Tools/common-lib-amd-APPSDK-3.0.git
 [submodule "Common/Lib/Ext/GoogleTest"]
 	path = Common/Lib/Ext/GoogleTest
-	url = ../common-lib-ext-GoogleTest-1.7.git
+	url = https://github.com/GPUOpen-Tools/common-lib-ext-GoogleTest-1.7.git
 [submodule "Common/Lib/Ext/Windows-Kits"]
 	path = Common/Lib/Ext/Windows-Kits
-	url = ../common-lib-ext-WindowsKits.git
+	url = https://github.com/GPUOpen-Tools/common-lib-ext-WindowsKits.git
 [submodule "Common/Lib/Ext/Boost"]
 	path = Common/Lib/Ext/Boost
-	url = ../common-lib-ext-Boost-1.59.git
+	url = https://github.com/GPUOpen-Tools/common-lib-ext-Boost-1.59.git
 [submodule "Common/Lib/Ext/tinyxml"]
 	path = Common/Lib/Ext/tinyxml
-	url = ../common-lib-ext-tinyxml-2.6.2.git
+	url = https://github.com/GPUOpen-Tools/common-lib-ext-tinyxml-2.6.2.git
 [submodule "Common/Lib/Ext/zlib"]
 	path = Common/Lib/Ext/zlib
-	url = ../common-lib-ext-zlib-1.2.8.git
+	url = https://github.com/GPUOpen-Tools/common-lib-ext-zlib-1.2.8.git
 [submodule "Common/Lib/Ext/qcustomplot"]
 	path = Common/Lib/Ext/qcustomplot
-	url = ../common-lib-ext-qcustomplot-1.3.1.git
+	url = https://github.com/GPUOpen-Tools/common-lib-ext-qcustomplot-1.3.1.git
 [submodule "Common/Lib/Ext/Qt"]
 	path = Common/Lib/Ext/Qt
-	url = ../common-lib-ext-Qt-5.5.git
+	url = https://github.com/GPUOpen-Tools/common-lib-ext-Qt-5.5.git
 [submodule "Common/Lib/Ext/QScintilla"]
 	path = Common/Lib/Ext/QScintilla
-	url = ../common-lib-ext-QScintilla-2.8.git
+	url = https://github.com/GPUOpen-Tools/common-lib-ext-QScintilla-2.8.git
 [submodule "Common/Lib/Ext/Vulkan"]
 	path = Common/Lib/Ext/Vulkan
-	url = ../common-lib-ext-Vulkan-1.0.21.1.git
+	url = https://github.com/GPUOpen-Tools/common-lib-ext-Vulkan-1.0.21.1.git
 [submodule "Common/Lib/AMD/ACL"]
 	path = Common/Lib/AMD/ACL
-	url = ../common-lib-AMD-ACL.git
+	url = https://github.com/GPUOpen-Tools/common-lib-AMD-ACL.git
 [submodule "Common/Lib/AMD/CAL"]
 	path = Common/Lib/AMD/CAL
-	url = ../common-lib-AMD-CAL-8.95.git
+	url = https://github.com/GPUOpen-Tools/common-lib-AMD-CAL-8.95.git
 [submodule "Common/Lib/Ext/utf8cpp"]
 	path = Common/Lib/Ext/utf8cpp
-	url = ../common-lib-ext-utf8cpp.git
+	url = https://github.com/GPUOpen-Tools/common-lib-ext-utf8cpp.git
 [submodule "Common/Lib/Ext/GRLibDWARF"]
 	path = Common/Lib/Ext/GRLibDWARF
-	url = ../common-lib-ext-GRLibDWARF.git
+	url = https://github.com/GPUOpen-Tools/common-lib-ext-GRLibDWARF.git
 [submodule "Common/Lib/Ext/libpng"]
 	path = Common/Lib/Ext/libpng
-	url = ../common-lib-ext-libpng-1.6.19.git
+	url = https://github.com/GPUOpen-Tools/common-lib-ext-libpng-1.6.19.git
 [submodule "Common/Lib/Ext/mhook"]
 	path = Common/Lib/Ext/mhook
-	url = ../common-lib-ext-mhook.git
+	url = https://github.com/GPUOpen-Tools/common-lib-ext-mhook.git
 [submodule "Common/Lib/AMD/ags"]
 	path = Common/Lib/AMD/ags
-	url = ../common-lib-amd-ags-4.0.0.git
+	url = https://github.com/GPUOpen-Tools/common-lib-amd-ags-4.0.0.git
 [submodule "Common/Src/Misc"]
 	path = Common/Src/Misc
-	url = ../common-src-Misc.git
+	url = https://github.com/GPUOpen-Tools/common-src-Misc.git
 [submodule "Common/Src/HSAUtils"]
 	path = Common/Src/HSAUtils
-	url = ../common-src-HSAUtils.git
+	url = https://github.com/GPUOpen-Tools/common-src-HSAUtils.git

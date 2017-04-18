@@ -6,15 +6,16 @@
 // Infra:
 #include <AMDTBaseTools/Include/gtString.h>
 
+// Backend header files
+#include <ATPParserInterface.h>
+
 // Local:
-#include "CLAPIInfo.h"
-#include "HSAAPIInfo.h"
-#include "DX12APIInfo.h"
-#include "VulkanAPIInfo.h"
-#include "PerfMarkerAtpFile.h"
+#include "DX12Trace/DX12APIInfo.h"
+#include "VulkanTrace/VulkanAPIInfo.h"
 #include <AMDTGpuProfiling/ProjectSettings.h>
 
-class OccupancyInfo;
+class DX12APIInfo;
+//class OccupancyInfo;
 class gpTraceDataContainer;
 typedef QPair<quint64, quint64> TimeRange;
 
@@ -102,11 +103,11 @@ public:
     /// Constructor
     /// \param pApiInfo structure containing info about this CL API function(params, return val, timestamps, etc...)
     /// \param pOccupancyInfo the occupancy info for this item
-    ProfileSessionDataItem(gpTraceDataContainer* pSessionDataContainer, CLAPIInfo* pApiInfo, OccupancyInfo* pOccupancyInfo);
+    ProfileSessionDataItem(gpTraceDataContainer* pSessionDataContainer, ICLAPIInfoDataHandler* pApiInfo, const IOccupancyInfoDataHandler* pOccupancyInfo);
 
     /// Constructor
     /// \param pApiInfo structure containing info about this HSA API function (params, return val, timestamps, etc...)
-    ProfileSessionDataItem(gpTraceDataContainer* pSessionDataContainer, HSAAPIInfo* pApiInfo);
+    ProfileSessionDataItem(gpTraceDataContainer* pSessionDataContainer, IHSAAPIInfoDataHandler* pApiInfo);
 
     /// Constructor
     /// \param pApiInfo structure containing info about this DX12 API function (params, return val, timestamps, etc...)
@@ -131,11 +132,11 @@ public:
 
     /// Constructor
     /// \param pApiInfo structure containing info about this HSA API function (params, return val, timestamps, etc...)
-    ProfileSessionDataItem(gpTraceDataContainer* pSessionDataContainer, HSAAPIInfo* pApiInfo, ProfileItemType itemType);
+    ProfileSessionDataItem(gpTraceDataContainer* pSessionDataContainer, IHSAAPIInfoDataHandler* pApiInfo, ProfileItemType itemType);
 
     /// Constructor
     /// \param pMarkerEntry the object describing the performance marker
-    ProfileSessionDataItem(gpTraceDataContainer* pSessionDataContainer, PerfMarkerEntry* pMarkerEntry);
+    ProfileSessionDataItem(gpTraceDataContainer* pSessionDataContainer, IPerfMarkerInfoDataHandler* pMarkerEntry);
 
     /// Return true if one of the columns of the item matches the input string
     /// \param findExpr the string to search for
@@ -191,7 +192,7 @@ public:
     int GetRow() const;
 
     /// Return a pointer to the occupancy data
-    OccupancyInfo* GetOccupancyInfo() const { return m_pOccupancyInfo; };
+    const IOccupancyInfoDataHandler* GetOccupancyInfo() const { return m_pOccupancyInfo; };
 
     /// ----------- Data attributes common to all profile session items:
 
@@ -348,7 +349,7 @@ private:
     APIToTrace m_api;
 
     /// Occupancy info
-    OccupancyInfo* m_pOccupancyInfo;
+    const IOccupancyInfoDataHandler* m_pOccupancyInfo;
 
     /// The API start time
     /// For DX12 API functions, the units are microseconds.
@@ -366,6 +367,12 @@ private:
 
     /// Contain the structure parsed and filled by the backend
     APIInfo* m_pApiInfo;
+
+    /// HSA API Info data handler pointer
+    IHSAAPIInfoDataHandler* m_pHSAApiInfoDataHandler;
+
+    /// CL API Info data handler pointer
+    ICLAPIInfoDataHandler* m_pCLApiInfoDataHandler;
 
     /// The item sample Id (0 in case where sampleId is may not be synched)
     int m_sampleId;

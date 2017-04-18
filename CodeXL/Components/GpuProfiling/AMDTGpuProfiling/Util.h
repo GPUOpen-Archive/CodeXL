@@ -275,15 +275,10 @@ public:
     static bool GetKernelFiles(const GPUSessionTreeItemData* pSession, const QString& strKernelName, gtList<osFilePath>& kernelFiles);
 
     /// Indicates whether or not any source is available for the specified kernel
-    /// \param pSession the session whose kernel is to be checked
+    /// \param pSessionData the session whose kernel is to be checked
     /// \param strKernelName the name of the kernel to be checked
     /// \return true if any source code is available to be displayed
     static bool IsCodeAvailable(const GPUSessionTreeItemData* pSessionData, const QString& strKernelName);
-
-    /// Indicates whether or not any source is available for the specified kernel
-    /// \param pSession the session whose kernel is to be checked
-    /// \param strKernelName the name of the kernel to be checked
-    /// \return true if any source code is available to be displayed
 
     /// Checks the input filePath to see if it represents a file contained in a CodeXL sample (i.e the Teapot).
     /// If so, then it returns the full path of the source file as it would appear in an installed build.
@@ -301,23 +296,6 @@ public:
     /// \param minorVersion output minor version number
     /// \return True if succeed
     static bool ParseOccupancyFileVersionString(const QString& versionStr, int& majorVersion, int& minorVersion);
-
-    /// Load the occupancy file related to the session
-    /// \param sessionFilePath the session file path
-    /// \param table to be filled containing the occupancy info for each of the threads
-    /// \param pSessionData the session data
-    static bool LoadOccupancyFile(const osFilePath& sessionFilePath, OccupancyTable& occupancyTable, GPUSessionTreeItemData* pSessionData);
-
-    /// Parses the occupancy file line
-    /// \param line the line
-    /// \param delimiter the separator between the strings
-    /// \param table to be filled containing the occupancy info for each of the threads
-    /// \return true for success (all occupancy parameters are found in the string)
-    static bool ParseOccupancySingleLine(const QString& line, const QString& delimiter, OccupancyTable& occupancyTable);
-
-    /// Clear the occupancy table
-    /// \param occTable the table to clear
-    static void ClearOccupancyTable(OccupancyTable& occTable);
 
     /// Compares the two device names to see if they are identical or if they differ only in cases where spaces have been replaced by underscores
     /// \param strDeviceName1 the first device name

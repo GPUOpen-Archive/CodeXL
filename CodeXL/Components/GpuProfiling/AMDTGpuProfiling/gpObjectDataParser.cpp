@@ -14,15 +14,13 @@
 #include <CL/cl.h>
 
 // Backend header files
-#include "IParserListener.h"
-#include "IParserProgressMonitor.h"
-#include "CLAPIInfo.h"
-#include "CLAtpFile.h"
+#include <IParserListener.h>
+#include <IParserProgressMonitor.h>
 #include "CLAPIFilterManager.h"
 #include "CLAPIDefs.h"
 #include "CLTimelineItems.h"
-#include "DX12AtpFile.h"
-#include "VulkanAtpFile.h"
+#include "DX12Trace/DX12AtpFile.h"
+#include "VulkanTrace/VulkanAtpFile.h"
 #include "ProfileManager.h"
 
 // Infra:
@@ -34,6 +32,7 @@
 #include <AMDTGpuProfiling/gpObjectDataContainer.h>
 #include <AMDTGpuProfiling/SymbolInfo.h>
 
+//#define GP_OBJECT_VIEW_ENABLE
 #ifdef GP_OBJECT_VIEW_ENABLE
 
 #pragma message ("TODO: FA: Read this value from file")
@@ -93,15 +92,6 @@ bool gpObjectDataParser::Parse(const osFilePath& objectFilePath, GPUSessionTreeI
         Config config;
         AtpFileParser parser(fileVersion);
 
-        // add part parser for OpenCL API Object and Timestamp sections
-        CLAtpFilePart clAtpPart(config, false);
-        clAtpPart.AddProgressMonitor(this);
-        parser.AddAtpFilePart(&clAtpPart);
-
-        PerfMarkerAtpFilePart perfMarkerPart(config, false);
-        perfMarkerPart.AddProgressMonitor(this);
-        parser.AddAtpFilePart(&perfMarkerPart);
-
         DX12AtpFilePart dxFilePart(config, false);
         dxFilePart.AddProgressMonitor(this);
         parser.AddAtpFilePart(&dxFilePart);
@@ -110,8 +100,6 @@ bool gpObjectDataParser::Parse(const osFilePath& objectFilePath, GPUSessionTreeI
         vkFilePart.AddProgressMonitor(this);
         parser.AddAtpFilePart(&vkFilePart);
 
-        clAtpPart.AddListener(this);
-        perfMarkerPart.AddListener(this);
         dxFilePart.AddListener(this);
         vkFilePart.AddListener(this);
 
@@ -126,7 +114,7 @@ bool gpObjectDataParser::Parse(const osFilePath& objectFilePath, GPUSessionTreeI
             retVal = parser.Parse();
 
             bool parseWarning = false;
-            string parseWarningMsg;
+            std::string parseWarningMsg;
             parser.GetParseWarning(parseWarning, parseWarningMsg);
 
             if (!(retVal || parseWarning))
@@ -156,7 +144,7 @@ bool gpObjectDataParser::Parse(const osFilePath& objectFilePath, GPUSessionTreeI
     return retVal;
 }
 
-void gpObjectDataParser::OnParse(CLAPIInfo* pAPIInfo, bool& stopParsing)
+void gpObjectDataParser::OnParse(ICLAPIInfoDataHandler* pAPIInfo, bool& stopParsing)
 {
     // Sanity check:
     GT_IF_WITH_ASSERT(pAPIInfo != nullptr)
@@ -170,14 +158,14 @@ void gpObjectDataParser::OnParse(CLAPIInfo* pAPIInfo, bool& stopParsing)
     }
 }
 
-void gpObjectDataParser::OnParse(HSAAPIInfo* pAPIInfo, bool& stopParsing)
+void gpObjectDataParser::OnParse(IHSAAPIInfoDataHandler* pAPIInfo, bool& stopParsing)
 {
     // Sanity check:
     GT_IF_WITH_ASSERT(pAPIInfo != nullptr)
     {
         stopParsing = m_sShouldCancelExport;
 
-        if (pAPIInfo->m_apiID != HSA_API_Type_Non_API_Dispatch)
+        if (pAPIInfo->GetHSAApiTypeId() != HSA_API_Type_Non_API_Dispatch)
         {
             // Add the item to the data container
             m_pSessionDataContainer->AddHSAItem(pAPIInfo);
@@ -190,23 +178,23 @@ void gpObjectDataParser::OnParse(HSAAPIInfo* pAPIInfo, bool& stopParsing)
     }
 }
 
-void gpObjectDataParser::OnParse(SymbolFileEntry* pSymbolFileEntry, bool& stopParsing)
+void gpObjectDataParser::OnParse(ISymbolFileEntryInfoDataHandler* pSymbolFileEntry, bool& stopParsing)
 {
     stopParsing = m_sShouldCancelExport;
 
     // Sanity check
     GT_IF_WITH_ASSERT((pSymbolFileEntry != nullptr) && (m_pSessionDataContainer != nullptr))
     {
-        osThreadId threadId = pSymbolFileEntry->m_tid;
+        osThreadId threadId = pSymbolFileEntry->GetsymbolThreadId();
 
         SymbolInfo* pEntry = nullptr;
 
-        if ((pSymbolFileEntry->m_pStackEntry != nullptr) && (pSymbolFileEntry->m_pStackEntry->m_dwLineNum != (LineNum)(-1)) && (!pSymbolFileEntry->m_pStackEntry->m_strFile.empty()))
+        if ((!pSymbolFileEntry->IsStackEntryNull()) && (pSymbolFileEntry->GetLineNumber() != (LineNum)(-1)) && (!pSymbolFileEntry->GetFileNameString().empty()))
         {
-            pEntry = new SymbolInfo(QString::fromStdString(pSymbolFileEntry->m_strAPIName),
-                                    QString::fromStdString(pSymbolFileEntry->m_pStackEntry->m_strSymName),
-                                    QString::fromStdString(pSymbolFileEntry->m_pStackEntry->m_strFile),
-                                    pSymbolFileEntry->m_pStackEntry->m_dwLineNum);
+            pEntry = new SymbolInfo(QString::fromStdString(pSymbolFileEntry->GetSymbolApiName()),
+                                    QString::fromStdString(pSymbolFileEntry->GetSymbolNameString()),
+                                    QString::fromStdString(pSymbolFileEntry->GetFileNameString()),
+                                    pSymbolFileEntry->GetLineNumber());
         }
         else
         {
@@ -226,7 +214,7 @@ void gpObjectDataParser::OnParse(SymbolFileEntry* pSymbolFileEntry, bool& stopPa
     }
 }
 
-void gpObjectDataParser::OnParse(PerfMarkerEntry* pPerfMarkerEntry, bool& stopParsing)
+void gpObjectDataParser::OnParse(IPerfMarkerInfoDataHandler* pPerfMarkerEntry, bool& stopParsing)
 {
     GT_UNREFERENCED_PARAMETER(stopParsing);
     GT_UNREFERENCED_PARAMETER(pPerfMarkerEntry);

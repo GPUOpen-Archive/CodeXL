@@ -363,11 +363,11 @@ void gpTraceView::OnTableItemClick(const QModelIndex& clickedItem)
     {
         if (colIndex == ProfileSessionDataItem::SESSION_ITEM_OCCUPANCY_COLUMN)
         {
-            OccupancyInfo* pOccupancyInfo = pDataItem->GetOccupancyInfo();
+            const IOccupancyInfoDataHandler* pOccupancyInfo = pDataItem->GetOccupancyInfo();
 
             if (pOccupancyInfo != nullptr)
             {
-                m_currentDisplayedOccupancyKernel = pOccupancyInfo->GetKernelName();
+                m_currentDisplayedOccupancyKernel.fromStdString(pOccupancyInfo->GetKernelName());
 
                 // get the api index from the Index column (column 0)
                 QString strCallIndex;

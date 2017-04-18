@@ -255,6 +255,7 @@
 #define GPU_STR_TraceViewThread "Thread"
 #define GPU_STR_TraceViewHSAPerfMarker "HSAPerfMarker"
 #define GPU_STR_TraceViewQueueRow "Queue %1 - %2 (%3)"
+#define GPU_STR_HSATraceViewQueueRow "Queue %1 - Device %2 (%3)"
 #define GPU_STR_TraceViewCPUThreads "CPU Threads (%1 of %2)"
 #define GPU_STR_TraceViewCPULaterFull "CPU PROCESSING LATER FRAME/S"
 #define GPU_STR_TraceViewCPULaterShort "LATER FRAME/S"

@@ -31,6 +31,8 @@
 #include <AMDTGpuProfiling/Util.h>
 #include <AMDTGpuProfiling/gpUIManager.h>
 
+#include <IOccupancyFileInfoDataHandler.h>
+
 
 /// Store each session settings
 class AMDT_GPU_PROF_API GPUSessionTreeItemData : public SessionTreeNodeData
@@ -155,7 +157,7 @@ public:
     virtual APIToTrace GetAPIToTrace() const { return m_sessionAPIToTrace; }
 
     /// Gets occupancy table map. From thread ID to list of occupancy info
-    OccupancyTable& GetOccupancyTable() { return m_occupancyTable; }
+    const OccupancyTable& GetOccupancyTable() { return m_occupancyTable; }
 
     /// Return the session CSV file. In VS this it return the mapped file
     void GetSessionCSVFile(osFilePath& sessionCSVFile) const;
@@ -269,7 +271,6 @@ public:
     /// \param strName the session name
     /// \param strWorkingDirectory the project's working directory
     /// \param strSessionFilePath the session file path
-    /// \param strSessionOutputFile the session's output file
     /// \param strProjName project name
     /// \param isImported is the session imported
     PerformanceCounterSession(const QString& strName,

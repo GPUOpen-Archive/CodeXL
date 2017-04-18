@@ -26,6 +26,8 @@
 #include <AMDTOSWrappers/Include/osThread.h>
 #include <AMDTApplicationComponents/Include/Timeline/acTimeline.h>
 
+#include "AtpUtils.h"
+#include <HSAFunctionDefs.h>
 
 // AMDTApplicationFramework:
 #include <AMDTApplicationFramework/Include/afApplicationCommands.h>
@@ -55,6 +57,8 @@
 #include <AMDTGpuProfiling/ProfileManager.h>
 #include <AMDTGpuProfiling/SessionViewTabWidget.h>
 #include <AMDTGpuProfiling/gpViewsCreator.h>
+#include <iostream>
+#include <Version.h>
 
 
 static QList<TraceTableModel::TraceTableColIndex> s_hsaHiddenColumns = { TraceTableModel::TRACE_DEVICE_BLOCK_COLUMN, TraceTableModel::TRACE_OCCUPANCY_COLUMN, TraceTableModel::TRACE_DEVICE_TIME_COLUMN };
@@ -121,6 +125,7 @@ TraceView::~TraceView()
 
     // Remove me from the list of session windows in the session view creator:
     gpViewsCreator::Instance()->OnWindowClose(this);
+    AtpUtils::Instance()->RemoveHandlerFromCallBackHandlerList(this);
 }
 
 
@@ -155,7 +160,7 @@ bool TraceView::DisplaySession(const osFilePath& sessionFilePath, afTreeItemType
                 int thisSessionMajor = m_pCurrentSession->GetVersionMajor();
                 int thisSessionMinor = m_pCurrentSession->GetVersionMinor();
 
-                if ((thisSessionMajor > GPUPROFILER_BACKEND_MAJOR_VERSION) || (thisSessionMajor == GPUPROFILER_BACKEND_MAJOR_VERSION && thisSessionMinor > GPUPROFILER_BACKEND_MINOR_VERSION))
+                if ((thisSessionMajor > RCP_MAJOR_VERSION) || (thisSessionMajor == RCP_MAJOR_VERSION && thisSessionMinor > RCP_MINOR_VERSION))
                 {
                     // Output a message to the user
                     errorMessage = GP_Str_NewerTraceSession;
@@ -388,11 +393,11 @@ void TraceView::TraceTableMouseClickedHandler(const QModelIndex& modelIndex)
         if (modelIndex.column() == TraceTableModel::TRACE_OCCUPANCY_COLUMN)
         {
 
-            OccupancyInfo* occInfo = item->GetOccupancyInfo();
+            IOccupancyInfoDataHandler* occInfo = item->GetOccupancyInfo();
 
             if (occInfo != nullptr)
             {
-                m_strOccupancyKernelName = occInfo->GetKernelName();
+                m_strOccupancyKernelName = QString().fromStdString(occInfo->GetKernelName());
 
                 // get the api index from the Index column (column 0)
                 QString strCallIndex;
@@ -404,7 +409,7 @@ void TraceView::TraceTableMouseClickedHandler(const QModelIndex& modelIndex)
                 // if we got a valid call index, then show the occupancy view
                 if (ok)
                 {
-                    m_currentDisplayedOccupancyKernel = occInfo->GetKernelName();
+                    m_currentDisplayedOccupancyKernel = QString().fromStdString(occInfo->GetKernelName());
 
                     QString strErrorMessageOut;
                     connect(ProfileManager::Instance(), SIGNAL(OccupancyFileGenerationFinished(bool, const QString&, const QString&)), this, SLOT(OnOccupancyFileGenerationFinish(bool, const QString&, const QString&)));
@@ -454,7 +459,7 @@ void TraceView::TraceTableMouseEnteredHandler(const QModelIndex& modelIndex)
 
     if (table != nullptr)
     {
-        OccupancyInfo* occInfo = item->GetOccupancyInfo();
+        IOccupancyInfoDataHandler* occInfo = item->GetOccupancyInfo();
         acTimelineItem* deviceBlockItem = item->GetDeviceBlock();
 
         if ((occInfo != nullptr && modelIndex.column() == TraceTableModel::TRACE_OCCUPANCY_COLUMN) || (deviceBlockItem != nullptr && modelIndex.column() == TraceTableModel::TRACE_DEVICE_BLOCK_COLUMN))
@@ -923,59 +928,88 @@ acTimelineBranch* TraceView::GetHSADataTransferBranch(QString src, QString dest)
     return returnBranch;
 }
 
-
-void TraceView::OnParse(CLAPIInfo* pAPIInfo, bool& stopParsing)
+void TraceView::OnParseCallHandler(AtpInfoType apiType, bool& stopParsing)
 {
-    // Save the API type for later use:
-    m_api = APIToTrace_OPENCL;
-
-    stopParsing = CheckStopParsing(pAPIInfo->m_ullEnd);
     m_parseCallsCounter++;
+    void* pPtr;
 
-    if (!stopParsing)
+    if (!AtpUtils::Instance()->IsModuleLoaded())
     {
-        HandleCLAPIInfo(pAPIInfo);
+        AtpUtils::Instance()->LoadModule();
+    }
+
+    AtpDataHandlerFunc pAtpDataHandler_func = AtpUtils::Instance()->GetAtpDataHandlerFunc();
+
+    if (nullptr != pAtpDataHandler_func)
+    {
+        pAtpDataHandler_func(&pPtr);
+        IAtpDataHandler* pAtpDataHandler = reinterpret_cast<IAtpDataHandler*>(pPtr);
+
+        switch (apiType)
+        {
+            case OPENCL_INFO:
+            {
+                m_api = APIToTrace_OPENCL;
+                ICLAPIInfoDataHandler* clApiInfoHandler = pAtpDataHandler->GetCLApiInfoDataHnadler();
+                stopParsing = CheckStopParsing(clApiInfoHandler->GetApiInfoDataHandler()->GetApiEndTime());
+
+                if (!stopParsing)
+                {
+                    HandleCLAPIInfo(clApiInfoHandler);
+                }
+            }
+            break;
+
+            case HSA_INFO:
+            {
+                m_api = APIToTrace_HSA;
+                IHSAAPIInfoDataHandler* hsaApiInfoHandler = pAtpDataHandler->GetHSAApiInfoDataHandler();
+                stopParsing = CheckStopParsing(hsaApiInfoHandler->GetApiInfoDataHandler()->GetApiEndTime());
+
+                if (!stopParsing)
+                {
+                    HandleHSAAPIInfo(hsaApiInfoHandler);
+                }
+            }
+            break;
+
+            case PERF_MARKER_ENTRY:
+            {
+                IPerfMarkerInfoDataHandler* perMarkerApiInfoDataHandler = pAtpDataHandler->GetPerfMarkerInfoDataHandler();
+                stopParsing = CheckStopParsing(perMarkerApiInfoDataHandler->GetPerfMarkerTimestamp());
+
+                if (!stopParsing)
+                {
+                    HandlePerfMarkerEntry(perMarkerApiInfoDataHandler);
+                }
+            }
+            break;
+
+            case SYMBOL_ENTRY:
+            {
+                AGP_TODO("should check the module of pSymFileEntry and match it up to that module's APIs. This will be needed to properly support multi-module traces (i.e. traces that contain both HSA and OCL)")
+                ISymbolFileEntryInfoDataHandler* symbolFileEntryHandler = pAtpDataHandler->GetSymbolFileEntryInfoDataHandler();
+                stopParsing = CheckStopParsing(std::numeric_limits<quint64>::max());
+
+                if (!stopParsing)
+                {
+                    HandleSymFileEntry(symbolFileEntryHandler);
+                }
+            }
+            break;
+
+            default:
+                break;
+        }
     }
 }
 
-void TraceView::OnParse(HSAAPIInfo* pAPIInfo, bool& stopParsing)
+void TraceView::OnSetApiNumCallHandler(osThreadId threadId, unsigned int apiNum)
 {
-    // Save the API type for later use:
-    m_api = APIToTrace_HSA;
-
-    stopParsing = CheckStopParsing(pAPIInfo->m_ullEnd);
-    m_parseCallsCounter++;
-
-    if (!stopParsing)
-    {
-        HandleHSAAPIInfo(pAPIInfo);
-    }
+    this->SetAPINum(threadId, apiNum);
 }
 
-void TraceView::OnParse(SymbolFileEntry* pSymFileEntry, bool& stopParsing)
-{
-    AGP_TODO("should check the module of pSymFileEntry and match it up to that module's APIs. This will be needed to properly support multi-module traces (i.e. traces that contain both HSA and OCL)")
-    m_parseCallsCounter++;
-    stopParsing = CheckStopParsing(std::numeric_limits<quint64>::max());
-
-    if (!stopParsing)
-    {
-        HandleSymFileEntry(pSymFileEntry);
-    }
-}
-
-void TraceView::OnParse(PerfMarkerEntry* pPerfMarkerEntry, bool& stopParsing)
-{
-    stopParsing = CheckStopParsing(pPerfMarkerEntry->m_timestamp);
-    m_parseCallsCounter++;
-
-    if (!stopParsing)
-    {
-        HandlePerfMarkerEntry(pPerfMarkerEntry);
-    }
-}
-
-void TraceView::OnParserProgress(const std::string& strProgressMessage, unsigned int uiCurItem, unsigned int uiTotalItems)
+void TraceView::OnParserProgressCallHandler(const std::string& strProgressMessage, unsigned int uiCurItem, unsigned int uiTotalItems)
 {
     gtString localProgressMsg;
     afProgressBarWrapper& theProgressBarWrapper = afProgressBarWrapper::instance();
@@ -1049,76 +1083,40 @@ bool TraceView::LoadSessionUsingBackendParser(const osFilePath& sessionFile)
 {
     bool retVal = false;
 
-    Config config;
-    AtpFileParser parser;
-
-    // add part parser for OpenCL API Trace and Timestamp sections
-    CLAtpFilePart clAtpPart(config);
-    clAtpPart.AddProgressMonitor(this);
-    parser.AddAtpFilePart(&clAtpPart);
-
-    // add part parser for HSA API Trace and Timestamp sections
-    HSAAtpFilePart hsaAtpPart(config);
-    hsaAtpPart.AddProgressMonitor(this);
-    parser.AddAtpFilePart(&hsaAtpPart);
-
-    // add part parser for cl Stack Trace section
-    StackTraceAtpFilePart clStackPart("ocl", config);
-    clStackPart.AddProgressMonitor(this);
-    parser.AddAtpFilePart(&clStackPart);
-
-    // add part parser for hsa Stack Trace section
-    StackTraceAtpFilePart hsaStackPart("hsa", config);
-    hsaStackPart.AddProgressMonitor(this);
-    parser.AddAtpFilePart(&hsaStackPart);
-
-    PerfMarkerAtpFilePart perfMarkerPart(config);
-    perfMarkerPart.AddProgressMonitor(this);
-    parser.AddAtpFilePart(&perfMarkerPart);
-
-    clAtpPart.AddListener(this);
-    hsaAtpPart.AddListener(this);
-    clStackPart.AddListener(this);
-    hsaStackPart.AddListener(this);
-    perfMarkerPart.AddListener(this);
-
-    afApplicationCommands::instance()->StartPerformancePrintout("Parsing trace file");
-    retVal = parser.LoadFile(sessionFile.asString().asASCIICharArray());
-    retVal &= parser.Parse();
-    bool parseWarning;
-    std::string parseWarningMsg;
-    parser.GetParseWarning(parseWarning, parseWarningMsg);
-
-    if (false == retVal || true == parseWarning)
+    if (!AtpUtils::Instance()->IsModuleLoaded())
     {
-        QString parseError = QString("Error parsing %1").arg(sessionFile.asString().asASCIICharArray());
+        AtpUtils::Instance()->LoadModule();
+    }
 
-        if (parseWarning)
-        {
-            parseError.append("\n").append(QString::fromStdString(parseWarningMsg));
-        }
+    AtpParserFunc parserFunc = AtpUtils::Instance()->GetAtpParserFunctionPointer();
 
-        Util::ShowWarningBox(parseError);
+    if (nullptr != parserFunc)
+    {
+        AtpUtils::Instance()->AddToCallBackHandlerList(this);
+        std::string sessionFileAsString = sessionFile.asString().asASCIICharArray();
+        retVal = parserFunc(sessionFileAsString.c_str(), OnParse, SetApiNum, ReportProgressOnParsing);
     }
 
     return retVal;
 }
 
-void TraceView::HandleCLAPIInfo(CLAPIInfo* pApiInfo)
+
+void TraceView::HandleCLAPIInfo(ICLAPIInfoDataHandler* pClApiInfo)
 {
-    osThreadId threadId = pApiInfo->m_tid;
+    IAPIInfoDataHandler* pApiInfo = pClApiInfo->GetApiInfoDataHandler();
+    osThreadId threadId = pApiInfo->GetApiThreadId();
 
     TraceTableModel* tableModel = nullptr;
     acTimelineItem* deviceBlockItem = nullptr;
-    OccupancyInfo* occupancyInfo = nullptr;
+    IOccupancyInfoDataHandler* occupancyInfo = nullptr;
 
-    const QList<OccupancyInfo*>* pOccupancyInfosList = nullptr;
+    const QList<const IOccupancyInfoDataHandler*>* pOccupancyInfosList = nullptr;
     int nOccIndex = 0;
 
     if (m_pCurrentSession->LoadAndGetOccupancyTable().contains(threadId))
     {
         // temp member is needed to prevent class rvalue used as lvalue warning
-        const QList<OccupancyInfo*> tempInfosList = m_pCurrentSession->GetOccupancyTable()[threadId];
+        const QList<const IOccupancyInfoDataHandler*> tempInfosList = m_pCurrentSession->GetOccupancyTable()[threadId];
         pOccupancyInfosList = &tempInfosList;
 
         if (m_oclThreadOccIndexMap.contains(threadId))
@@ -1143,11 +1141,13 @@ void TraceView::HandleCLAPIInfo(CLAPIInfo* pApiInfo)
     acTimelineBranch* hostBranch = GetHostBranchForAPI(threadId, GPU_STR_TraceViewOpenCL);
     GT_ASSERT(hostBranch != nullptr);
 
-    unsigned int apiID = pApiInfo->m_uiAPIID;
+    unsigned int apiID = pClApiInfo->GetCLApiId();
+    std::string strComment = pClApiInfo->GetCLApiComment();
 
-    if (!pApiInfo->m_strComment.empty())
+    if (!strComment.empty())
     {
-        pApiInfo->m_ArgList.append(" /* ").append(pApiInfo->m_strComment).append(" */");
+        std::string argList = pApiInfo->GetApiArgListString();
+        argList.append(" /* ").append(strComment).append(" */");
     }
 
     QString apiName;
@@ -1158,11 +1158,11 @@ void TraceView::HandleCLAPIInfo(CLAPIInfo* pApiInfo)
     }
     else
     {
-        apiName = QString::fromStdString(pApiInfo->m_strName);
+        apiName = QString::fromStdString(pApiInfo->GetApiNameString());
     }
 
-    quint64 itemStartTime = pApiInfo->m_ullStart;
-    quint64 itemEndTime = pApiInfo->m_ullEnd;
+    quint64 itemStartTime = pApiInfo->GetApiStartTime();
+    quint64 itemEndTime = pApiInfo->GetApiEndTime();
 
     // check for reasonable timestamps
     GT_ASSERT((itemEndTime >= itemStartTime) && itemStartTime != 0);
@@ -1232,39 +1232,52 @@ void TraceView::HandleCLAPIInfo(CLAPIInfo* pApiInfo)
 
 #endif
 
+    unsigned int dispSequenceId = pApiInfo->GetApiDisplaySequenceId();
+
     if (apiID == CL_FUNC_TYPE_clGetEventInfo)
     {
         // don't assign an apiIndex to clGetEventInfo
-        pAPITimelineItem = new CLGetEventInfoTimelineItem(itemStartTime, itemEndTime, pApiInfo->m_uiDisplaySeqID); //TODO verify that the tooltip show the index as "after index XXX" correctly
+        pAPITimelineItem = new CLGetEventInfoTimelineItem(itemStartTime, itemEndTime, dispSequenceId); //TODO verify that the tooltip show the index as "after index XXX" correctly
     }
     else
     {
-        pAPITimelineItem = new APITimelineItem(itemStartTime, itemEndTime, pApiInfo->m_uiDisplaySeqID);
+        pAPITimelineItem = new APITimelineItem(itemStartTime, itemEndTime, dispSequenceId);
     }
 
     pAPITimelineItem->setText(apiName);
     pAPITimelineItem->setBackgroundColor(APIColorMap::Instance()->GetAPIColor(apiName, QColor(90, 90, 90)));
     pAPITimelineItem->setForegroundColor(Qt::white);
 
-    if ((pApiInfo->m_Type & CL_ENQUEUE_BASE_API) == CL_ENQUEUE_BASE_API) // this is an enqueue api
+    CLAPIType apiType = pClApiInfo->GetCLApiType();
+
+    if ((apiType & CL_ENQUEUE_BASE_API) == CL_ENQUEUE_BASE_API) // this is an enqueue api
     {
-        CLEnqueueAPI* enqueueApiInfo = dynamic_cast<CLEnqueueAPI*>(pApiInfo);
+
+        ICLEnqueueApiInfoDataHandler* enqueueApiInfo;
+        pClApiInfo->IsCLEnqueueAPI(&enqueueApiInfo);
+
         GT_IF_WITH_ASSERT(enqueueApiInfo != nullptr)
         {
-            unsigned int cmdType = enqueueApiInfo->m_uiCMDType;
-            QString strCmdType = QString::fromStdString(enqueueApiInfo->m_strCMDType);
-            quint64 gpuStart = enqueueApiInfo->m_ullRunning;
-            quint64 gpuEnd = enqueueApiInfo->m_ullComplete;
-            quint64 gpuQueued = enqueueApiInfo->m_ullQueue;
-            quint64 gpuSubmit = enqueueApiInfo->m_ullSubmit;
+            unsigned int cmdType = enqueueApiInfo->GetCLCommandTypeEnum();
+            QString strCmdType = QString::fromStdString(enqueueApiInfo->GetCLCommandTypeString());
 
-            QString strQueueHandle = QString::fromStdString(enqueueApiInfo->m_strCmdQHandle);
-            unsigned int queueId = enqueueApiInfo->m_uiQueueID;
+            quint64 gpuStart = enqueueApiInfo->GetCLRunningTimestamp();
 
-            QString strContextHandle = QString::fromStdString(enqueueApiInfo->m_strCntxHandle);
-            unsigned int contextId = enqueueApiInfo->m_uiContextID;
+            quint64 gpuEnd = enqueueApiInfo->GetCLCompleteTimestamp();
 
-            QString deviceNameStr = QString::fromStdString(enqueueApiInfo->m_strDevice);
+            quint64 gpuQueued = enqueueApiInfo->GetCLQueueTimestamp();
+
+            quint64 gpuSubmit = enqueueApiInfo->GetCLSubmitTimestamp();
+
+            QString strQueueHandle = QString::fromStdString(enqueueApiInfo->GetCLCommandQueueHandleString());
+
+            unsigned int queueId = enqueueApiInfo->GetCLQueueId();
+
+            QString strContextHandle = QString::fromStdString(enqueueApiInfo->GetCLContextHandleString());
+
+            unsigned int contextId = enqueueApiInfo->GetCLContextId();
+
+            QString deviceNameStr = QString::fromStdString(enqueueApiInfo->GetCLDeviceNameString());
 
             if ((gpuEnd < gpuStart && (apiID < CL_FUNC_TYPE_clEnqueueMapBuffer || apiID > CL_FUNC_TYPE_clEnqueueUnmapMemObject)) ||  gpuStart < gpuSubmit || gpuSubmit < gpuQueued)
             {
@@ -1281,12 +1294,15 @@ void TraceView::HandleCLAPIInfo(CLAPIInfo* pApiInfo)
                 // Get or create the branch for this queue:
                 OCLQueueBranchInfo* pBranchInfo = GetBranchInfo(contextId, queueId, strContextHandle, deviceNameStr, strQueueHandle);
 
-                if ((pApiInfo->m_Type & CL_ENQUEUE_KERNEL) == CL_ENQUEUE_KERNEL)  // TODO does CL_COMMAND_NATIVE_KERNEL need special handling here????
+                if ((apiType & CL_ENQUEUE_KERNEL) == CL_ENQUEUE_KERNEL)  // TODO does CL_COMMAND_NATIVE_KERNEL need special handling here????
                 {
-                    CLKernelAPIInfo* kernelApiInfo = dynamic_cast<CLKernelAPIInfo*>(pApiInfo);
+
+                    ICLKernelApiInfoDataHandler* kernelApiInfo;
+                    pClApiInfo->IsCLKernelApiInfo(&kernelApiInfo);
                     GT_IF_WITH_ASSERT((kernelApiInfo != nullptr) && (pBranchInfo != nullptr) && (pBranchInfo->m_pQueueBranch != nullptr))
                     {
-                        CLKernelTimelineItem* gpuItem = new CLKernelTimelineItem(gpuStart, gpuEnd, kernelApiInfo->m_uiDisplaySeqID);
+                        unsigned int displaySeqId = pApiInfo->GetApiDisplaySequenceId();
+                        CLKernelTimelineItem* gpuItem = new CLKernelTimelineItem(gpuStart, gpuEnd, displaySeqId);
 
 #ifdef SHOW_KERNEL_LAUNCH_AND_COMPLETION_LATENCY
                         m_lastDeviceItem = gpuItem;
@@ -1298,9 +1314,9 @@ void TraceView::HandleCLAPIInfo(CLAPIInfo* pApiInfo)
                         SAFE_DELETE(pAPITimelineItem);
                         pAPITimelineItem = newItem;
 
-                        gpuItem->setText(QString::fromStdString(kernelApiInfo->m_strKernelName));
-                        gpuItem->setGlobalWorkSize(QString::fromStdString(kernelApiInfo->m_strGlobalWorkSize));
-                        gpuItem->setLocalWorkSize(QString::fromStdString(kernelApiInfo->m_strGroupWorkSize));
+                        gpuItem->setText(QString::fromStdString(kernelApiInfo->GetCLKernelNameString()));
+                        gpuItem->setGlobalWorkSize(QString::fromStdString(kernelApiInfo->GetCLKernelGlobalWorkGroupSize()));
+                        gpuItem->setLocalWorkSize(QString::fromStdString(kernelApiInfo->GetCLKernelWorkGroupSize()));
                         gpuItem->setBackgroundColor(pAPITimelineItem->backgroundColor());
                         gpuItem->setForegroundColor(Qt::white);
                         gpuItem->setQueueTime(gpuQueued);
@@ -1311,38 +1327,45 @@ void TraceView::HandleCLAPIInfo(CLAPIInfo* pApiInfo)
 
                         deviceBlockItem = gpuItem;
 
-                        if (pOccupancyInfosList != nullptr)
+                        if (pOccupancyInfosList != nullptr && nOccIndex < pOccupancyInfosList->count())
                         {
-                            if ((nOccIndex < pOccupancyInfosList->count()) && Util::CheckOccupancyDeviceName((*pOccupancyInfosList)[nOccIndex]->GetDeviceName(), deviceNameStr))
+                            QString deviceName = QString().fromStdString((*pOccupancyInfosList)[nOccIndex]->GetDeviceName());
+
+                            if (Util::CheckOccupancyDeviceName(deviceName, deviceNameStr))
                             {
-                                occupancyInfo = (*pOccupancyInfosList)[nOccIndex];
+                                occupancyInfo = const_cast<IOccupancyInfoDataHandler*>((*pOccupancyInfosList)[nOccIndex]);
                                 gpuItem->setOccupancyInfo(occupancyInfo);
                                 nOccIndex++;
                             }
                         }
 
                         m_oclThreadOccIndexMap[threadId] = nOccIndex;
-
                         pBranchInfo->m_pKernelBranch->addTimelineItem(gpuItem);
 
                     }
                 }
-                else if ((pApiInfo->m_Type & CL_ENQUEUE_MEM) == CL_ENQUEUE_MEM)
+                else if ((apiType & CL_ENQUEUE_MEM) == CL_ENQUEUE_MEM)
                 {
 #ifdef SHOW_KERNEL_LAUNCH_AND_COMPLETION_LATENCY
                     m_lastDeviceItem = nullptr;
                     m_lastDeviceItemIdx = -1;
 #endif
-                    CLMemAPIInfo* memApiInfo = dynamic_cast<CLMemAPIInfo*>(pApiInfo);
+                    ICLMemApiInfoDataHandler* memApiInfo;
+                    pClApiInfo->IsCLMemoryApiInfo(&memApiInfo);
+
                     GT_IF_WITH_ASSERT((memApiInfo != nullptr) && (pBranchInfo != nullptr) && (pBranchInfo->m_pMemoryBranch != nullptr))
                     {
                         CLAPITimelineItem* gpuItem = nullptr;
 
-                        //                   if ((cmdType >= CL_COMMAND_READ_BUFFER && cmdType <= CL_COMMAND_MAP_IMAGE) || (cmdType >= CL_COMMAND_READ_BUFFER_RECT && cmdType <= CL_COMMAND_COPY_BUFFER_RECT))
-                        gpuItem = new CLMemTimelineItem(gpuStart, gpuEnd, memApiInfo->m_uiDisplaySeqID);
+                        //if ((cmdType >= CL_COMMAND_READ_BUFFER && cmdType <= CL_COMMAND_MAP_IMAGE) || (cmdType >= CL_COMMAND_READ_BUFFER_RECT && cmdType <= CL_COMMAND_COPY_BUFFER_RECT))
+                        unsigned int displaySeqId = pApiInfo->GetApiDisplaySequenceId();
+                        gpuItem = new CLMemTimelineItem(gpuStart, gpuEnd, displaySeqId);
 
-                        quint64 transferSize = memApiInfo->m_uiTransferSize;
-                        ((CLMemTimelineItem*)gpuItem)->setDataTransferSize(transferSize);
+                        quint64 transferSize;
+                        unsigned int uiTransferSize = memApiInfo->GetCLMemoryTransferSize();
+                        transferSize = static_cast<quint64>(uiTransferSize);
+
+                        (reinterpret_cast<CLMemTimelineItem*>(gpuItem))->setDataTransferSize(transferSize);
                         gpuItem->setText(CLMemTimelineItem::getDataSizeString(transferSize, 1) + " " + strCmdType.mid(11));
 
                         APITimelineItem* newItem = new DispatchAPITimelineItem(gpuItem, pAPITimelineItem);
@@ -1363,40 +1386,45 @@ void TraceView::HandleCLAPIInfo(CLAPIInfo* pApiInfo)
                         deviceBlockItem = gpuItem;
                     }
                 }
-                else if ((pApiInfo->m_Type & CL_ENQUEUE_OTHER_OPERATIONS) == CL_ENQUEUE_OTHER_OPERATIONS)
+                else if ((apiType & CL_ENQUEUE_OTHER_OPERATIONS) == CL_ENQUEUE_OTHER_OPERATIONS)
                 {
 #ifdef SHOW_KERNEL_LAUNCH_AND_COMPLETION_LATENCY
                     m_lastDeviceItem = nullptr;
                     m_lastDeviceItemIdx = -1;
 #endif
-                    CLOtherEnqueueAPIInfo* pOtherEnqueueOperationsInfo = dynamic_cast<CLOtherEnqueueAPIInfo*>(pApiInfo);
+
+                    ICLOtherEnqueueApiInfoDataHandler* pOtherEnqueueOperationsInfo;
+                    pClApiInfo->IsCLEnqueueOtherOperations(&pOtherEnqueueOperationsInfo);
+
                     GT_IF_WITH_ASSERT((pOtherEnqueueOperationsInfo != nullptr) && (pBranchInfo != nullptr) && (pBranchInfo->m_pQueueBranch != nullptr))
                     {
                         CLAPITimelineItem* gpuItem = nullptr;
 
-                        quint64 startTime = pOtherEnqueueOperationsInfo->m_ullRunning;
-                        quint64 endTime = pOtherEnqueueOperationsInfo->m_ullComplete;
+                        quint64 startTime = enqueueApiInfo->GetCLRunningTimestamp();
+                        quint64 endTime = enqueueApiInfo->GetCLCompleteTimestamp();
 
                         // Prepare the command name:
                         QString commandName = strCmdType.replace("CL_COMMAND_", "");
 
-                        if ((pApiInfo->m_Type & CL_ENQUEUE_DATA_OPERATIONS) == CL_ENQUEUE_DATA_OPERATIONS)
+                        if ((apiType & CL_ENQUEUE_DATA_OPERATIONS) == CL_ENQUEUE_DATA_OPERATIONS)
                         {
                             // if (cmdType == CL_COMMAND_FILL_IMAGE) || (cmdType == CL_COMMAND_FILL_BUFFER)) || (cmdType == CL_COMMAND_SVM_MAP) || cmdType == CL_COMMAND_SVM_UNMAP)
-                            gpuItem = new CLDataEnqueueOperationsTimelineItem(startTime, endTime, pOtherEnqueueOperationsInfo->m_uiDisplaySeqID);
+                            unsigned int displaySeqId = pApiInfo->GetApiDisplaySequenceId();
+                            gpuItem = new CLDataEnqueueOperationsTimelineItem(startTime, endTime, displaySeqId);
 
-                            CLDataEnqueueAPIInfo* pDataEnqueueOperationsInfo = dynamic_cast<CLDataEnqueueAPIInfo*>(pApiInfo);
+                            ICLDataEnqueueApiInfoDataHandler* pDataEnqueueOperationsInfo;
+                            pClApiInfo->IsCLDataEnqueueApi(&pDataEnqueueOperationsInfo);
+
                             GT_IF_WITH_ASSERT((pDataEnqueueOperationsInfo != nullptr) && (pBranchInfo != nullptr) && (pBranchInfo->m_pQueueBranch != nullptr))
                             {
-                                quint64 dataSize = pDataEnqueueOperationsInfo->m_uiDataSize;
+                                quint64 dataSize = static_cast<quint64>(pDataEnqueueOperationsInfo->GetCLDataTransferSize());
                                 static_cast<CLDataEnqueueOperationsTimelineItem*>(gpuItem)->setDataSize(dataSize);
-
                                 commandName.prepend(CLMemTimelineItem::getDataSizeString(dataSize, 1) + " ");
                             }
                         }
                         else
                         {
-                            gpuItem = new CLOtherEnqueueOperationsTimelineItem(startTime, endTime, pOtherEnqueueOperationsInfo->m_uiDisplaySeqID);
+                            gpuItem = new CLOtherEnqueueOperationsTimelineItem(startTime, endTime, pApiInfo->GetApiDisplaySequenceId());
                         }
 
                         APITimelineItem* newItem = new DispatchAPITimelineItem(gpuItem, pAPITimelineItem);
@@ -1445,15 +1473,17 @@ void TraceView::HandleCLAPIInfo(CLAPIInfo* pApiInfo)
 
 }
 
-void TraceView::HandleHSAAPIInfo(HSAAPIInfo* pApiInfo)
+void TraceView::HandleHSAAPIInfo(IHSAAPIInfoDataHandler* phsaApiInfo)
 {
-    if (pApiInfo->m_bIsAPI)
-    {
-        osThreadId threadId = pApiInfo->m_tid;
+    IAPIInfoDataHandler* pApiInfo = phsaApiInfo->GetApiInfoDataHandler();
+    HSA_API_Type apiID = phsaApiInfo->GetHSAApiTypeId();
+    osThreadId threadId = pApiInfo->GetApiThreadId();
 
+    if (phsaApiInfo->IsApi())
+    {
         TraceTableModel* tableModel = nullptr;
         acTimelineItem* deviceBlockItem = nullptr;
-        OccupancyInfo* occupancyInfo = nullptr;
+        IOccupancyInfoDataHandler* occupancyInfo = nullptr;
 
         AGP_TODO("hook up occupancy info for HSA");
         //QList<OccupancyInfo*> occInfo;
@@ -1484,45 +1514,58 @@ void TraceView::HandleHSAAPIInfo(HSAAPIInfo* pApiInfo)
         acTimelineBranch* hostBranch = GetHostBranchForAPI(threadId, GPU_STR_TraceViewHSA);
         GT_ASSERT(hostBranch != nullptr);
 
-        unsigned int apiID = pApiInfo->m_apiID;
         QString apiName;
 
         if (apiID < HSA_API_Type_Init)
         {
             //apiName = CLAPIDefs::Instance()->GetOpenCLAPIString(CL_FUNC_TYPE(apiID));  //TODO : add a HSA version....
-            apiName = QString::fromStdString(pApiInfo->m_strName);
+            apiName = QString::fromStdString(pApiInfo->GetApiNameString());
         }
         else
         {
-            apiName = QString::fromStdString(pApiInfo->m_strName);
+            apiName = QString::fromStdString(pApiInfo->GetApiNameString());
         }
 
-        quint64 itemStartTime = pApiInfo->m_ullStart;
-        quint64 itemEndTime = pApiInfo->m_ullEnd;
+        quint64 itemStartTime = pApiInfo->GetApiStartTime();
+        quint64 itemEndTime = pApiInfo->GetApiEndTime();
 
         // check for reasonable timestamps
         GT_ASSERT((itemEndTime >= itemStartTime) && itemStartTime != 0);
 
         APITimelineItem* item = nullptr;
 
-        HSAMemoryAPIInfo* pHsaMemoryAPIInfo = dynamic_cast<HSAMemoryAPIInfo*>(pApiInfo);
+        IHSAMemoryApiInfoDataHandler* pHsaMemoryAPIInfo;
+        phsaApiInfo->IsHSAMemoryApi(&pHsaMemoryAPIInfo);
 
         if (nullptr != pHsaMemoryAPIInfo)
         {
-            item = new HSAMemoryTimelineItem(itemStartTime, itemEndTime, pApiInfo->m_uiDisplaySeqID, pHsaMemoryAPIInfo->m_size);
+            unsigned int dispSeqId = pApiInfo->GetApiDisplaySequenceId();
+            size_t hsaMemorySize = pHsaMemoryAPIInfo->GetHSAMemoryApiSize();
 
-            HSAMemoryTransferAPIInfo* pHsaMemoryTransferAPIInfo = dynamic_cast<HSAMemoryTransferAPIInfo*>(pHsaMemoryAPIInfo);
+            item = new HSAMemoryTimelineItem(itemStartTime, itemEndTime, dispSeqId, hsaMemorySize);
 
-            if ((nullptr != pHsaMemoryTransferAPIInfo) && (0 != pHsaMemoryTransferAPIInfo->m_transferStartTime) && (0 != pHsaMemoryTransferAPIInfo->m_transferEndTime))
+            IHSAMemoryTransferApiInfoDataHandler* pHsaMemoryTransferAPIInfo;
+            phsaApiInfo->IsHSAMemoryTransferApi(&pHsaMemoryTransferAPIInfo);
+
+            uint64_t hsaTransferStartTime = 0;
+            uint64_t hsaTransferEndTime = 0;
+
+            if (pHsaMemoryTransferAPIInfo != nullptr)
             {
-                QString srcAgent = QString::fromStdString(pHsaMemoryTransferAPIInfo->m_strSrcAgent);
-                QString dstAgent = QString::fromStdString(pHsaMemoryTransferAPIInfo->m_strDstAgent);
+                hsaTransferStartTime = pHsaMemoryTransferAPIInfo->GetHSAMemoryTransferStartTime();
+                hsaTransferEndTime = pHsaMemoryTransferAPIInfo->GetHSAMemoryTransferEndTime();
+            }
 
-                HSAMemoryTransferTimelineItem* transferItem = new HSAMemoryTransferTimelineItem(pHsaMemoryTransferAPIInfo->m_transferStartTime, pHsaMemoryTransferAPIInfo->m_transferEndTime, pApiInfo->m_uiDisplaySeqID, pHsaMemoryTransferAPIInfo->m_size, srcAgent, dstAgent);
+            if ((nullptr != pHsaMemoryTransferAPIInfo) && (0 != hsaTransferStartTime) && (0 != hsaTransferEndTime))
+            {
+                QString srcAgent = QString::fromStdString(pHsaMemoryTransferAPIInfo->GetHSASrcAgentString());
+                QString dstAgent = QString::fromStdString(pHsaMemoryTransferAPIInfo->GetHSADestinationAgentString());
+
+                HSAMemoryTransferTimelineItem* transferItem = new HSAMemoryTransferTimelineItem(hsaTransferStartTime, hsaTransferEndTime, dispSeqId, hsaMemorySize, srcAgent, dstAgent);
                 transferItem->setHostItem(item);
                 transferItem->setBackgroundColor(APIColorMap::Instance()->GetAPIColor(apiName, QColor(90, 90, 90)));
 
-                quint64 transferSize = pHsaMemoryAPIInfo->m_size;
+                quint64 transferSize = hsaMemorySize;
                 //((CLMemTimelineItem*)gpuItem)->setDataTransferSize(transferSize);
 
                 transferItem->setText(CLMemTimelineItem::getDataSizeString(transferSize, 1) + " copy");
@@ -1555,7 +1598,8 @@ void TraceView::HandleHSAAPIInfo(HSAAPIInfo* pApiInfo)
         }
         else
         {
-            item = new APITimelineItem(itemStartTime, itemEndTime, pApiInfo->m_uiDisplaySeqID);
+            unsigned int dispSeqId = pApiInfo->GetApiDisplaySequenceId();
+            item = new APITimelineItem(itemStartTime, itemEndTime, dispSeqId);
         }
 
         if (nullptr != item)
@@ -1568,17 +1612,17 @@ void TraceView::HandleHSAAPIInfo(HSAAPIInfo* pApiInfo)
 
         item->setTraceTableItem(tableModel->AddTraceItem(GPU_STR_TraceViewHSA, apiName, pApiInfo, item, deviceBlockItem, occupancyInfo));
     }
-    else if (HSA_API_Type_Non_API_Dispatch == pApiInfo->m_apiID)
+    else if (HSA_API_Type_Non_API_Dispatch == apiID)
     {
-        HSADispatchInfo* dispatchInfo = dynamic_cast<HSADispatchInfo*>(pApiInfo);
+        IHSADispatchApiInfoDataHandler* dispatchInfo;
+        phsaApiInfo->IsHSADispatchApi(&dispatchInfo);
 
         if (dispatchInfo != nullptr)
         {
-            quint64 gpuStart = dispatchInfo->m_ullStart;
-            quint64 gpuEnd = dispatchInfo->m_ullEnd;
-
-            QString kernelNameStr = QString::fromStdString(dispatchInfo->m_strKernelName);
-            QString deviceNameStr = QString::fromStdString(dispatchInfo->m_strDeviceName);
+            quint64 gpuStart = pApiInfo->GetApiStartTime();
+            quint64 gpuEnd = pApiInfo->GetApiEndTime();
+            QString kernelNameStr = QString::fromStdString(dispatchInfo->GetHSAKernelName());
+            QString deviceNameStr = QString::fromStdString(dispatchInfo->GetHSADeviceName());
 
             if ((gpuEnd < gpuStart))
             {
@@ -1604,7 +1648,7 @@ void TraceView::HandleHSAAPIInfo(HSAAPIInfo* pApiInfo)
                     m_pHSABranch->setText(GPU_STR_TraceViewHSA);
                 }
 
-                QString handleStr = QString::fromStdString(dispatchInfo->m_strQueueHandle);
+                QString handleStr = QString::fromStdString(dispatchInfo->GetHSAQueueHandleString());
 
                 if (m_hsaQueueMap.contains(handleStr))
                 {
@@ -1622,23 +1666,23 @@ void TraceView::HandleHSAAPIInfo(HSAAPIInfo* pApiInfo)
                     }
                     else
                     {
-                        queueBranchText = QString(tr(GPU_STR_TraceViewQueueRow)).arg(dispatchInfo->m_queueIndex).arg(deviceNameStr).arg(handleStr);
+                        unsigned int hsaQueueIndex = dispatchInfo->GetHSAQueueIndex();
+                        queueBranchText = QString(tr(GPU_STR_HSATraceViewQueueRow)).arg(hsaQueueIndex).arg(handleStr).arg(deviceNameStr);
                     }
 
                     deviceBranch->setText(queueBranchText);
                     m_hsaQueueMap[handleStr] = deviceBranch;
                 }
 
-                HSADispatchTimelineItem* dispatchItem = new HSADispatchTimelineItem(gpuStart, gpuEnd, dispatchInfo->m_uiSeqID);
+                unsigned int uiSeqId = pApiInfo->GetApiSequenceId();
+                HSADispatchTimelineItem* dispatchItem = new HSADispatchTimelineItem(gpuStart, gpuEnd, uiSeqId);
 
                 dispatchItem->setText(kernelNameStr);
-
-                dispatchItem->setGlobalWorkSize(QString::fromStdString(dispatchInfo->m_strGlobalWorkSize));
-                dispatchItem->setLocalWorkSize(QString::fromStdString(dispatchInfo->m_strGroupWorkSize));
+                dispatchItem->setGlobalWorkSize(QString::fromStdString(dispatchInfo->GetHSAGlobalWorkGroupSize()));
+                dispatchItem->setLocalWorkSize(QString::fromStdString(dispatchInfo->GetHSAWorkGroupSizeString()));
                 //dispatchItem->setOffset(QString::fromStdString(dispatchInfo->m_strOffset));
                 dispatchItem->setDeviceType(deviceNameStr);
-                dispatchItem->setQueueHandle(QString::fromStdString(dispatchInfo->m_strQueueHandle));
-
+                dispatchItem->setQueueHandle(QString::fromStdString(dispatchInfo->GetHSAQueueHandleString()));
                 dispatchItem->setBackgroundColor(Qt::darkGreen);
                 dispatchItem->setForegroundColor(Qt::white);
                 //dispatchItem->setHostItem(item);
@@ -1660,27 +1704,41 @@ void TraceView::HandleHSAAPIInfo(HSAAPIInfo* pApiInfo)
     }
 }
 
-void TraceView::HandleSymFileEntry(SymbolFileEntry* pSymFileEntry)
+void TraceView::HandleSymFileEntry(ISymbolFileEntryInfoDataHandler* pSymFileEntry)
 {
     GT_IF_WITH_ASSERT(pSymFileEntry != nullptr)
     {
-        osThreadId threadId = pSymFileEntry->m_tid;
-
+        osThreadId threadId = pSymFileEntry->GetsymbolThreadId();
         SymbolInfo* entry = nullptr;
 
-        if ((pSymFileEntry->m_pStackEntry != nullptr) && (pSymFileEntry->m_pStackEntry->m_dwLineNum != (LineNum)(-1)) && (!pSymFileEntry->m_pStackEntry->m_strFile.empty()))
+        if (!pSymFileEntry->IsStackEntryNull())
         {
-            entry = new SymbolInfo(QString::fromStdString(pSymFileEntry->m_strAPIName),
-                                   QString::fromStdString(pSymFileEntry->m_pStackEntry->m_strSymName),
-                                   QString::fromStdString(pSymFileEntry->m_pStackEntry->m_strFile),
-                                   pSymFileEntry->m_pStackEntry->m_dwLineNum);
+            IStackEntryInfoDataHandler* pStackEntryInfoHandler = pSymFileEntry->GetStackEntryInfoHandler();
+            LineNum lineNumber = pStackEntryInfoHandler->GetLineNumber();
+            std::string fileName = pStackEntryInfoHandler->GetFileNameString();
+
+            if (lineNumber != static_cast<LineNum>(-1) && !fileName.empty())
+            {
+                std::string apiName;
+                pSymFileEntry->GetSymbolApiName();
+
+                std::string symbolName;
+                pStackEntryInfoHandler->GetSymbolNameString();
+
+                entry = new SymbolInfo(QString::fromStdString(apiName),
+                                       QString::fromStdString(symbolName),
+                                       QString::fromStdString(fileName),
+                                       lineNumber);
+            }
+            else
+            {
+                entry = new SymbolInfo;
+            }
         }
         else
         {
             entry = new SymbolInfo;
         }
-
-
 
         if (m_symbolTableMap.contains(threadId))
         {
@@ -1724,10 +1782,11 @@ acTimelineBranch* TraceView::GetPerfMarkerSubBranchHelper(const QString& name, a
     return ret;
 }
 
-void TraceView::HandlePerfMarkerEntry(PerfMarkerEntry* pPerfMarkerEntry)
+void TraceView::HandlePerfMarkerEntry(IPerfMarkerInfoDataHandler* pPerfMarkerEntry)
 {
     m_perfMarkersAdded = true;
-    osThreadId threadId = pPerfMarkerEntry->m_tid;
+    osThreadId threadId = pPerfMarkerEntry->GetPerfMarkerThreadId();
+
     TraceTableModel* pTableModel = nullptr;
 
     acTimelineBranch* hostBranch = GetHostBranchForAPI(threadId, "");
@@ -1747,9 +1806,11 @@ void TraceView::HandlePerfMarkerEntry(PerfMarkerEntry* pPerfMarkerEntry)
     unsigned long long startTime = 0;
     unsigned long long endTime = 0;
 
-    if (pPerfMarkerEntry->m_markerType == PerfMarkerEntry::PerfMarkerType_Begin)
+    IPerfMarkerBeginInfoDataHandler* pBeginMarkerEntry;
+
+    if (pPerfMarkerEntry->IsBeginPerfMarkerEntry(&pBeginMarkerEntry))
     {
-        PerfMarkerBeginEntry* pBeginMarkerEntry = dynamic_cast<PerfMarkerBeginEntry*>(pPerfMarkerEntry);
+
         GT_IF_WITH_ASSERT(pBeginMarkerEntry != nullptr)
         {
             if (m_branchStack.count() > 0)
@@ -1757,22 +1818,26 @@ void TraceView::HandlePerfMarkerEntry(PerfMarkerEntry* pPerfMarkerEntry)
                 hostBranch = m_branchStack.top();
             }
 
-            acTimelineBranch* branchToUse = GetPerfMarkerSubBranchHelper(QString::fromStdString(pBeginMarkerEntry->m_strGroup), hostBranch);
+            std::string markerGroup = pBeginMarkerEntry->GetPerfMarkerBeginInfoGroupName();
+            acTimelineBranch* branchToUse = GetPerfMarkerSubBranchHelper(QString::fromStdString(markerGroup), hostBranch);
 
             if (branchToUse != hostBranch)
             {
                 m_branchStack.push(branchToUse);
             }
 
-            m_titleStack.push(QString::fromStdString(pBeginMarkerEntry->m_strName));
-            m_timestampStack.push(pBeginMarkerEntry->m_timestamp);
+            std::string markerName = pBeginMarkerEntry->GetPerfMarkerBeginInfoName();
+            m_titleStack.push(QString::fromStdString(markerName));
+
+            unsigned long long markerTimestamp = pPerfMarkerEntry->GetPerfMarkerTimestamp();
+            m_timestampStack.push(markerTimestamp);
 
             // Add an item to the table:
-            TraceTableItem* pTableItem = pTableModel->AddTraceItem("Perf Marker", QString::fromStdString(pBeginMarkerEntry->m_strName), pPerfMarkerEntry);
+            TraceTableItem* pTableItem = pTableModel->AddTraceItem("Perf Marker", QString::fromStdString(markerName), pPerfMarkerEntry);
             GT_ASSERT(pTableItem != nullptr);
         }
     }
-    else if (pPerfMarkerEntry->m_markerType == PerfMarkerEntry::PerfMarkerType_End)
+    else if (pPerfMarkerEntry->IsEndPerfMarkerEntry())
     {
         if (m_timestampStack.isEmpty())
         {
@@ -1781,7 +1846,7 @@ void TraceView::HandlePerfMarkerEntry(PerfMarkerEntry* pPerfMarkerEntry)
         }
 
         startTime = m_timestampStack.pop();
-        endTime = pPerfMarkerEntry->m_timestamp;
+        endTime = pPerfMarkerEntry->GetPerfMarkerTimestamp();
 
         // Create the new time line item:
         PerfMarkerTimelineItem* pNewItem = new PerfMarkerTimelineItem(startTime, endTime);
@@ -1805,7 +1870,7 @@ void TraceView::HandlePerfMarkerEntry(PerfMarkerEntry* pPerfMarkerEntry)
             pNewItem->setTraceTableItem(pTableItem);
         }
     }
-    else if (pPerfMarkerEntry->m_markerType == PerfMarkerEntry::PerfMarkerType_EndEx)
+    else if (pPerfMarkerEntry->IsEndExPerfMarkerEntry())
     {
         if (m_timestampStack.isEmpty())
         {
@@ -1813,10 +1878,11 @@ void TraceView::HandlePerfMarkerEntry(PerfMarkerEntry* pPerfMarkerEntry)
             return;
         }
 
-        PerfMarkerEndExEntry* pEndExMarkerEntry = dynamic_cast<PerfMarkerEndExEntry*>(pPerfMarkerEntry);
+        IPerfMarkerEndExInfoDataHandler* pEndExMarkerEntry;
+        pPerfMarkerEntry->IsEndExPerfMarkerEntry(&pEndExMarkerEntry);
 
         startTime = m_timestampStack.pop();
-        endTime = pEndExMarkerEntry->m_timestamp;
+        endTime = pPerfMarkerEntry->GetPerfMarkerTimestamp();
 
         // Create the new time line item:
         PerfMarkerTimelineItem* pNewItem = new PerfMarkerTimelineItem(startTime, endTime);
@@ -1824,7 +1890,9 @@ void TraceView::HandlePerfMarkerEntry(PerfMarkerEntry* pPerfMarkerEntry)
         // Set the font and color for the perf marker item:
         pNewItem->setBackgroundColor(APIColorMap::Instance()->GetPerfMarkersColor());
         pNewItem->setForegroundColor(Qt::black);
-        pNewItem->setText(QString::fromStdString(pEndExMarkerEntry->m_strName));
+
+        std::string markerName = pEndExMarkerEntry->GetPerfMarkerEndExName();
+        pNewItem->setText(QString::fromStdString(markerName));
 
         // Remove the title that was specified from the BeginPerfMarker call
         m_titleStack.pop();
@@ -1839,7 +1907,8 @@ void TraceView::HandlePerfMarkerEntry(PerfMarkerEntry* pPerfMarkerEntry)
                 hostBranch = m_branchStack.top();
             }
 
-            currentBranch = GetPerfMarkerSubBranchHelper(QString::fromStdString(pEndExMarkerEntry->m_strGroup), hostBranch);
+            std::string markerGroup = pEndExMarkerEntry->GetPerfMarkerEndExGroupName();
+            currentBranch = GetPerfMarkerSubBranchHelper(QString::fromStdString(markerGroup), hostBranch);
             currentBranch->addTimelineItem(pNewItem);
         }
 

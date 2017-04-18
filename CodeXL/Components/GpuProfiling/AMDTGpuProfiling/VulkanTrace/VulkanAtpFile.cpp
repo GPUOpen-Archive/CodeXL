@@ -1,0 +1,559 @@
+//=====================================================================
+// Copyright (c) 2010 Advanced Micro Devices, Inc. All rights reserved.
+//
+/// \author GPU Developer Tools
+/// \file $File: //devtools/main/CodeXL/Components/GpuProfiling/Backend/CLTraceAgent/CLAtpFile.cpp $
+/// \version $Revision: #44 $
+/// \brief CL Atp File writer and parser
+//
+//=====================================================================
+// $Id: //devtools/main/CodeXL/Components/GpuProfiling/Backend/CLTraceAgent/CLAtpFile.cpp#44 $
+//
+// Last checkin:  $DateTime: 2015/09/01 08:35:05 $
+// Last edited by: $Author: salgrana $
+//=====================================================================
+//   ( C ) AMD, Inc. 2010 All rights reserved.
+//=====================================================================
+
+#include <sstream>
+#include <iostream>
+#include <fstream>
+#include <cstdio>
+#include <cstring>
+#include "VulkanAtpFile.h"
+#include <Version.h>
+#include <Defs.h>
+
+#include <AMDTOSWrappers/Include/osFilePath.h>
+#include <AMDTOSWrappers/Include/osFile.h>
+#include <AMDTOSWrappers/Include/osMachine.h>
+#include <AMDTOSWrappers/Include/osGeneralFunctions.h>
+#include <ProfilerOutputFileDefs.h>
+
+using namespace std;
+
+const static std::string s_str_apiTypeHeaderPrefix = "//API=";
+const static std::string s_str_threadIDHeaderPrefix = "//ThreadID=";
+const static std::string s_str_threadAPICountHeaderPrefix = "//ThreadAPICount=";
+
+// The Vulkan timestamps are double number. The data structures expect long long numbers, so we multiply the double timestamp by a GP_VK_TIMESTAMP_FACTOR
+// to make sure that we get integer value. In the front-end, we will perform the opposite operation
+#define GP_VK_TIMESTAMP_MILLISECONDS_TO_NANOSECONDS_FACTOR 1000000
+
+#define KILO_BYTE 1024
+#define MEGA_BYTE (KILO_BYTE * 1024)
+static const size_t s_min_vm_size_for_api_parse(100 * MEGA_BYTE);
+
+VKAtpFilePart::VKAtpFilePart(const Config& config, bool shouldReleaseMemory) : IAtpFilePart(config, shouldReleaseMemory),
+    m_currentParsedTraceType(API), m_currentParsedThreadID(0), m_currentParsedThreadAPICount(0)
+{
+#define PART_NAME "vulkan"
+    m_strPartName = PART_NAME;
+    m_sections.push_back("API=Vulkan");
+    m_sections.push_back("GPU Trace");
+    m_sections.push_back("CommandBufEventCount");
+#undef PART_NAME
+}
+
+VKAtpFilePart::~VKAtpFilePart(void)
+{
+    if (m_shouldReleaseMemory)
+    {
+        // clean up all API object
+        for (VKAPIInfoMap::iterator it = m_VKAPIInfoMap.begin(); it != m_VKAPIInfoMap.end(); it++)
+        {
+            std::vector<VKAPIInfo*>& apiList = it->second;
+
+            for (std::vector<VKAPIInfo*>::iterator listIt = apiList.begin(); listIt != apiList.end(); listIt++)
+            {
+                if ((*listIt) != NULL)
+                {
+                    delete *listIt;
+                }
+            }
+
+            apiList.clear();
+        }
+
+        m_VKAPIInfoMap.clear();
+    }
+}
+
+void VKAtpFilePart::WriteHeaderSection(SP_fileStream& sout)
+{
+    // Currently the VKAtpFilePart class is only implementing the read of the file, therefore this function is not implemented
+    GT_UNREFERENCED_PARAMETER(sout);
+}
+
+
+bool VKAtpFilePart::WriteContentSection(SP_fileStream& sout, const std::string& strTmpFilePath, const std::string& strPID)
+{
+    // Currently the VKAtpFilePart class is only implementing the read of the file, therefore this function is not implemented
+    GT_UNREFERENCED_PARAMETER(sout);
+    GT_UNREFERENCED_PARAMETER(strTmpFilePath);
+    GT_UNREFERENCED_PARAMETER(strPID);
+    return false;
+}
+
+
+bool VKAtpFilePart::ParseGPUAPICallString(const std::string& apiStr, VKGPUTraceInfo& apiInfo)
+{
+    bool retVal = false;
+
+    string temp;
+    istringstream ss(apiStr);
+
+    ss >> apiInfo.m_queueIndexStr;
+    SP_TODO("Need To Fix the logger part");
+    //CHECK_SS_ERROR(ss);
+    ss >> apiInfo.m_commandListType;
+    SP_TODO("Need To Fix the logger part");
+    //CHECK_SS_ERROR(ss);
+
+    ss >> apiInfo.m_commandBufferHandleStr;
+    SP_TODO("Need To Fix the logger part");
+    //CHECK_SS_ERROR(ss);
+
+    int intVal = 0;
+    ss >> intVal;
+    
+    SP_TODO("Need To Fix the logger part");
+    //CHECK_SS_ERROR(ss);
+    apiInfo.m_apiType = (vkAPIType)intVal;
+
+    ss >> intVal;
+    SP_TODO("Need To Fix the logger part");
+    //CHECK_SS_ERROR(ss);
+    apiInfo.m_apiId = (VkFuncId)intVal;
+
+    ss >> apiInfo.m_strName;
+    SP_TODO("Need To Fix the logger part");
+    //CHECK_SS_ERROR(ss);
+
+    // Append the strings until we close the parameters brackets
+    while ((apiInfo.m_strName.find(')') == std::string::npos) && !ss.eof())
+    {
+        ss >> temp;
+        SP_TODO("Need To Fix the logger part");
+        //CHECK_SS_ERROR(ss);
+        apiInfo.m_strName.append(temp);
+    }
+
+    // If we got here, we already closed the ')'
+    if (apiInfo.m_strName.find(')') != std::string::npos)
+    {
+        size_t argsOpenPos = apiInfo.m_strName.find('(');
+        size_t argsClosePos = apiInfo.m_strName.find(')');
+        apiInfo.m_ArgList = apiInfo.m_strName.substr(argsOpenPos + 1, argsClosePos - argsOpenPos - 1);
+        apiInfo.m_strName = apiInfo.m_strName.substr(0, argsOpenPos);
+
+        // Read the '='
+        ss >> temp;
+        SP_TODO("Need To Fix the logger part");
+        //CHECK_SS_ERROR(ss);
+
+        ss >> apiInfo.m_strRet;
+        SP_TODO("Need To Fix the logger part");
+        //CHECK_SS_ERROR(ss);
+
+        double timeStartDouble, timeEndDouble;
+        ss >> timeStartDouble;
+        SP_TODO("Need To Fix the logger part");
+        //CHECK_SS_ERROR(ss);
+        ss >> timeEndDouble;
+        SP_TODO("Need To Fix the logger part");
+        //CHECK_SS_ERROR(ss);
+
+        apiInfo.m_ullStart = ULONGLONG(timeStartDouble * GP_VK_TIMESTAMP_MILLISECONDS_TO_NANOSECONDS_FACTOR);
+        apiInfo.m_ullEnd = ULONGLONG(timeEndDouble * GP_VK_TIMESTAMP_MILLISECONDS_TO_NANOSECONDS_FACTOR);
+
+        // Checking the status is done before attempting to read 'sample id' because 
+        // the reading of 'sample id' is not critical and can fail without affecting the rest of the parsing.
+        retVal = (!ss.fail());
+
+        apiInfo.m_sampleId = 0;
+        ss >> apiInfo.m_sampleId;
+    }
+
+    return retVal;
+}
+
+bool VKAtpFilePart::ParseSectionHeaderLine(const string& line)
+{
+    // Assume that this is not a section line by default:
+    bool retVal = false;
+
+    if ((line[0] == '/') && (line[1] == '/'))
+    {
+        retVal = true;
+
+        if (line.find("//==GPU Trace==") == 0 || (line.find("//Command") == 0))
+        {
+            // Switch to GPU trace
+            m_currentParsedTraceType = GPU;
+        }
+
+        else if (line.find(s_str_apiTypeHeaderPrefix) != string::npos)
+        {
+            // Parse the API string
+            m_apiStr = line.substr(s_str_apiTypeHeaderPrefix.size(), line.size() - s_str_apiTypeHeaderPrefix.size());
+        }
+        else if (line.find(s_str_threadIDHeaderPrefix) != string::npos)
+        {
+            string threadIDStr;
+            threadIDStr = line.substr(s_str_threadIDHeaderPrefix.size(), line.size() - s_str_threadIDHeaderPrefix.size());
+            istringstream ss(threadIDStr);
+            ss >> m_currentParsedThreadID;
+            SP_TODO("Need To Fix the logger part");
+            //CHECK_SS_ERROR(ss);
+        }
+        else if (line.find(s_str_threadAPICountHeaderPrefix) != string::npos)
+        {
+            string threadIDStr;
+            threadIDStr = line.substr(s_str_threadAPICountHeaderPrefix.size(), line.size() - s_str_threadAPICountHeaderPrefix.size());
+            istringstream ss(threadIDStr);
+            ss >> m_currentParsedThreadAPICount;
+            SP_TODO("Need To Fix the logger part");
+            //CHECK_SS_ERROR(ss);
+
+            // Update the listeners with the API number for this thread
+            for (std::vector<IParserListener<VKAPIInfo>*>::iterator it = m_listenerList.begin(); it != m_listenerList.end(); it++)
+            {
+                if ((*it) != NULL)
+                {
+                    (*it)->SetAPINum(m_currentParsedThreadID, m_currentParsedThreadAPICount);
+                }
+            }
+
+        }
+    }
+
+    return retVal;
+}
+
+/// Expecting the following API call format:
+/// Type
+/// vkAPIType   VkFuncId    InterfacePtr       Interface_Call                       Args                                     = Result     StartTime       EndTime        GPUCallIndex
+/// 128         90              0x0000000000000000 NonTrackedObject_vkBeginCommandBuffer(0x00000001362066F0, 0x000000009F7DE710) = VK_SUCCESS 89349181.540584 89365867.767216 0
+bool VKAtpFilePart::ParseCPUAPICallString(const std::string& apiStr, VKAPIInfo& apiInfo)
+{
+    bool retVal = false;
+    string temp;
+    istringstream ss(apiStr);
+
+    // Get the thread ID from the saved member
+    apiInfo.m_tid = m_currentParsedThreadID;
+
+    // Get the API type
+    int intVal = 0;
+    ss >> intVal;
+    SP_TODO("Need To Fix the logger part");
+    //CHECK_SS_ERROR(ss);
+    apiInfo.m_apiType = (vkAPIType)intVal;
+
+    // Get the API ID
+    ss >> intVal;
+    SP_TODO("Need To Fix the logger part");
+    //CHECK_SS_ERROR(ss);
+    apiInfo.m_apiId = (VkFuncId)intVal;
+
+    // Get the interface name
+    ss >> apiInfo.m_interfacePtrStr;
+    SP_TODO("Need To Fix the logger part");
+    //CHECK_SS_ERROR(ss);
+
+    // Get the interface name
+    ss >> apiInfo.m_strName;
+    SP_TODO("Need To Fix the logger part");
+    //CHECK_SS_ERROR(ss);
+
+    // Append the strings until we close the parameters brackets
+    while ((apiInfo.m_strName.find(')') == std::string::npos) && !ss.eof())
+    {
+        ss >> temp;
+        SP_TODO("Need To Fix the logger part");
+        //CHECK_SS_ERROR(ss);
+        apiInfo.m_strName.append(temp);
+    }
+
+    // If we got here, we already closed the ')'
+    if (apiInfo.m_strName.find(')') != std::string::npos)
+    {
+        size_t argsOpenPos = apiInfo.m_strName.find('(');
+        size_t argsClosePos = apiInfo.m_strName.find(')');
+        apiInfo.m_ArgList = apiInfo.m_strName.substr(argsOpenPos + 1, argsClosePos - argsOpenPos - 1);
+        apiInfo.m_strName = apiInfo.m_strName.substr(0, argsOpenPos);
+
+        // Read the '='
+        ss >> temp;
+        SP_TODO("Need To Fix the logger part");
+        //CHECK_SS_ERROR(ss);
+
+        ss >> apiInfo.m_strRet;
+        SP_TODO("Need To Fix the logger part");
+        //CHECK_SS_ERROR(ss);
+
+        double timeStartDouble, timeEndDouble;
+        ss >> timeStartDouble;
+        SP_TODO("Need To Fix the logger part");
+        //CHECK_SS_ERROR(ss);
+        ss >> timeEndDouble;
+        SP_TODO("Need To Fix the logger part");
+        //CHECK_SS_ERROR(ss);
+
+        apiInfo.m_ullStart = ULONGLONG(timeStartDouble * GP_VK_TIMESTAMP_MILLISECONDS_TO_NANOSECONDS_FACTOR);
+        apiInfo.m_ullEnd = ULONGLONG(timeEndDouble * GP_VK_TIMESTAMP_MILLISECONDS_TO_NANOSECONDS_FACTOR);
+
+        ss >> apiInfo.m_sampleId;
+        SP_TODO("Need To Fix the logger part");
+        //CHECK_SS_ERROR(ss);
+
+        retVal = (!ss.fail());
+    }
+
+    return retVal;
+}
+
+bool VKAtpFilePart::Parse(std::istream& in, std::string& outErrorMsg)
+{
+    bool retVal = true;
+    int currentParsedAPI = 0;
+    ErrorMessageUpdater errorMessageUpdater(outErrorMsg, this);
+    size_t fileLineCount = 0;
+
+    do
+    {
+        if (m_shouldStopParsing)
+        {
+            break;
+        }
+
+        // Map containing the already parsed threads. When a new thread is being parsed, apiIndex should be reset
+        std::map <osThreadId, bool> threadsMap;
+        int apiIndex = -1;
+        string line;
+        bool rc = ReadLine(in, line);
+
+        while (!in.eof() && rc)
+        {
+            // Skip empty lines in the trace
+            if (!line.empty() && (line != "NODATA"))
+            {
+                //**************** Patch for FA, we don't want to crash if VM is exceeded ******************************/
+                /***************** this should be removed when we implement SqlLite based parsing solution**************/
+                SP_TODO("Remove this patch when we implement SqlLite based solution for parsing")
+                    ++fileLineCount;
+
+                //check every 1000 lines if we still got enough virtual memory
+                if (fileLineCount % 1000 == 0)
+                {
+                    gtUInt64 totalRamSizet = 0;
+                    gtUInt64 availRamSizet = 0;
+                    gtUInt64 totalPageSizet = 0;
+                    gtUInt64 availPageSizet = 0;
+                    gtUInt64 totalVirtualSizet = 0;
+                    gtUInt64 availVirtualSizet = 0;
+
+                    bool res = osGetLocalMachineMemoryInformation(totalRamSizet, availRamSizet, totalPageSizet, availPageSizet, totalVirtualSizet, availVirtualSizet);
+#if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
+                    if (res && availVirtualSizet < s_min_vm_size_for_api_parse)
+#elif AMDT_BUILD_TARGET == AMDT_LINUX_OS
+                    if (res && availPageSizet < s_min_vm_size_for_api_parse)
+#endif
+                    {
+                        m_shouldStopParsing = true;
+                        m_bWarning = false;
+                        m_strWarningMsg = outErrorMsg = "Low on Virtual Memory, stopped processing";
+                        retVal = false;
+                        break;
+                    }
+                }
+
+                bool rcParseLine = false;
+                bool isSectionHeader = ParseSectionHeaderLine(line);
+
+
+                if (isSectionHeader)
+                {
+                    currentParsedAPI = 0;
+                }
+
+                if (!isSectionHeader)
+                {
+                    // Create the API info object
+                    VKAPIInfo* pAPIInfo = nullptr;
+
+                    if (m_currentParsedTraceType == API)
+                    {
+                        pAPIInfo = new VKAPIInfo;
+                        rcParseLine = ParseCPUAPICallString(line, *pAPIInfo);
+                    }
+                    else
+                    {
+                        VKGPUTraceInfo* pGPUTraceInfo = new VKGPUTraceInfo;
+                        pAPIInfo = pGPUTraceInfo;
+                        rcParseLine = ParseGPUAPICallString(line, *pGPUTraceInfo);
+                    }
+
+                    if (rcParseLine)
+                    {
+                        // Add this thread to the map, and reset the API index if necessary
+                        if (threadsMap.find(pAPIInfo->m_tid) == threadsMap.end())
+                        {
+                            apiIndex = 0;
+                            threadsMap[pAPIInfo->m_tid] = true;
+                        }
+
+                        m_VKAPIInfoMap[pAPIInfo->m_tid].push_back(pAPIInfo);
+
+                        pAPIInfo->m_uiSeqID = apiIndex++;
+                        pAPIInfo->m_uiDisplaySeqID = apiIndex;
+                        pAPIInfo->m_bHasDisplayableSeqId = true;
+
+                        if (retVal)
+                        {
+                            for (std::vector<IParserListener<VKAPIInfo>*>::iterator it = m_listenerList.begin(); it != m_listenerList.end() && !m_shouldStopParsing; it++)
+                            {
+                                if ((*it) != nullptr)
+                                {
+                                    (*it)->OnParse(pAPIInfo, m_shouldStopParsing);
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        delete pAPIInfo;
+                    }
+
+                    // Update the progress bar
+                    ReportProgress("Parsing the frame data", currentParsedAPI++, m_currentParsedThreadAPICount);
+                }
+            }
+
+            if (m_shouldStopParsing)
+            {
+                break;
+            }
+
+            // Read the next line
+            rc = ReadLine(in, line);
+        }
+    }
+    while (!in.eof());
+
+    return retVal;
+}
+
+bool VKAtpFilePart::ParseHeader(const std::string& strKey, const std::string& strVal)
+{
+    SP_UNREFERENCED_PARAMETER(strKey);
+    SP_UNREFERENCED_PARAMETER(strVal);
+    return true;
+}
+
+void VKAtpFilePart::SaveToFile(const std::string& strTmpFilePath, const std::string& strPID)
+{
+    stringstream ss;
+
+    gtString outputFileName;
+    outputFileName = outputFileName.fromASCIIString(m_config.strOutputFile.c_str());
+    osFilePath outputFilePath(outputFileName);
+    gtString fileNameExtension;
+    outputFilePath.getFileExtension(fileNameExtension);
+    std::string strExtension = fileNameExtension.asASCIICharArray();
+    //std::string strExtension = FileUtils::GetFileExtension(m_config.strOutputFile);
+
+    if (strExtension != TRACE_EXT)
+    {
+        if (strExtension == OCCUPANCY_EXT || strExtension == PERF_COUNTER_EXT)
+        {
+            // strip .csv or .occupancy and append .atp
+            /*string strBaseFileName = FileUtils::GetBaseFileName(m_config.strOutputFile);*/
+            gtString outputFileBaseFileName;
+            outputFilePath.getFileName(outputFileBaseFileName);
+            std::string strBaseFileName = outputFileBaseFileName.asASCIICharArray();
+            ss << strBaseFileName << "." << TRACE_EXT;
+        }
+        else
+        {
+            // append .atp
+            ss << m_config.strOutputFile << "." << TRACE_EXT;
+        }
+    }
+    else
+    {
+        // use original name
+        ss << m_config.strOutputFile;
+    }
+
+    string strOutputFile = ss.str();
+
+    SP_fileStream fout(strOutputFile.c_str());
+
+    if (fout.fail())
+    {
+        cout << "Failed to write to file " << strOutputFile << endl;
+        return;
+    }
+
+    fout << FILE_HEADER_TRACE_FILE_VERSION << EQUAL_SIGN_STR << RCP_MAJOR_VERSION_STR << "." << RCP_MINOR_VERSION_STR << endl;
+    fout << FILE_HEADER_PROFILER_VERSION << EQUAL_SIGN_STR << RCP_MAJOR_VERSION_STR << "." << RCP_MINOR_VERSION_STR << "." << RCP_BUILD_NUMBER_STR << endl;
+    fout << FILE_HEADER_APPLICATION << EQUAL_SIGN_STR << m_config.strInjectedApp.asUTF8CharArray() << endl;
+    fout << FILE_HEADER_APPLICATION_ARGS << EQUAL_SIGN_STR << m_config.strInjectedAppArgs.asUTF8CharArray() << endl;
+    fout << FILE_HEADER_WORKING_DIRECTORY << EQUAL_SIGN_STR << m_config.strWorkingDirectory.asUTF8CharArray() << endl;
+
+    if (m_config.mapEnvVars.size() > 0)
+    {
+        fout << FILE_HEADER_FULL_ENVIRONMENT << "=" << (m_config.bFullEnvBlock  ? "True" : "False") << endl;
+
+        for (EnvVarMap::const_iterator it = m_config.mapEnvVars.begin(); it != m_config.mapEnvVars.end(); ++it)
+        {
+            fout << FILE_HEADER_ENV_VAR << "=" << (it->first).asUTF8CharArray() << "=" << (it->second).asUTF8CharArray() << endl;
+        }
+    }
+
+    fout << FILE_HEADER_USER_TIMER << "=" << (m_config.bUserTimer ? "True" : "False") << endl;
+
+    auto OSVersion = []()->std::string
+    {
+        std::string retVal;
+
+        int majorVersion = 0;
+        int minorVersion = 0;
+        int buildNumber = 0;
+        gtString osVersionName;
+
+        bool success = osGetOperatingSystemVersionString(osVersionName);
+
+        if (success)
+        {
+            std::stringstream osInfo(std::stringstream::in | std::stringstream::out);
+            osInfo.clear();
+
+            osInfo << osVersionName.asUTF8CharArray();
+
+            success = osGetOperatingSystemVersionNumber(majorVersion, minorVersion, buildNumber);
+
+            if (success)
+            {
+                osInfo << " " << "Build " << majorVersion << "." << minorVersion << "." << buildNumber;
+            }
+
+            retVal = osInfo.str();
+        }
+        else
+        {
+            retVal.clear();
+        }
+
+        return retVal;
+    };
+
+    fout << FILE_HEADER_OS_VERSION << "=" << OSVersion().c_str() << endl;
+    fout << FILE_HEADER_DISPLAY_NAME << "=" << m_config.strSessionName.c_str() << endl;
+
+    WriteHeaderSection(fout);
+    WriteContentSection(fout, strTmpFilePath, strPID);
+    fout.close();
+}

@@ -366,14 +366,14 @@ void GPUSessionWindow::CellContentClicked(const QModelIndex& index)
             QModelIndex kernelColIndex = m_pControl->ItemModel()->index(index.row(), 0);
             bool rc = GetKernelNameFromTV(kernelName, kernelColIndex);
             GT_ASSERT(rc);
-            OccupancyInfo* occupancyInfo = m_pControl->GetOccupancyForRow(index.row(), kernelName);
+            const IOccupancyInfoDataHandler* occupancyInfo = m_pControl->GetOccupancyForRow(index.row(), kernelName);
 
             if (!occupancyInfo)
             {
                 return;
             }
 
-            m_currentDisplayedOccupancyKernel = occupancyInfo->GetKernelName();
+            m_currentDisplayedOccupancyKernel = QString().fromStdString(occupancyInfo->GetKernelName());
             QTableView* pPcTable = m_pControl->GetTableView();
             int columnCount = pPcTable->model()->columnCount();
             int callIndexColIndex = -1;
