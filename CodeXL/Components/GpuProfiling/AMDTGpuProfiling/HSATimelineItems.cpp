@@ -19,7 +19,7 @@
 
 
 HSADispatchTimelineItem::HSADispatchTimelineItem(quint64 startTime, quint64 endTime, int apiIndex)
-    : HostAPITimelineItem(startTime, endTime, apiIndex), m_pOccupancyInfo(NULL)
+    : HostAPITimelineItem(startTime, endTime, apiIndex), m_pOccupancyInfo(nullptr)
 {
 }
 

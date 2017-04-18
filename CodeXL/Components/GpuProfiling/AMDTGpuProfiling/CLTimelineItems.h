@@ -19,6 +19,7 @@
 #include "APITimelineItems.h"
 
 #include "OccupancyInfo.h"
+#include <IOccupancyInfoDataHandler.h>
 
 
 /// HostAPITimelineItem descendant for OpenCL API items
@@ -119,20 +120,20 @@ public:
 
     /// Gets the occupancy info for this kernel
     /// \return the occupancy info for this kernel
-    OccupancyInfo* occupancyInfo() const { return m_pOccupancyInfo; }
+    IOccupancyInfoDataHandler* occupancyInfo() const { return m_pOccupancyInfo; }
 
     /// Sets the occupancy info for this kernel
     /// \param newOccupancyInfo the occupancy info for this kernel
-    void setOccupancyInfo(OccupancyInfo* newOccupancyInfo) { m_pOccupancyInfo = newOccupancyInfo; }
+    void setOccupancyInfo(IOccupancyInfoDataHandler* newOccupancyInfo) { m_pOccupancyInfo = newOccupancyInfo; }
 
     /// Fill in a TimelineItemToolTip instance with a set of name/value pairs that will be displayed in the tooltip for this timeline item
     /// \param tooltip qcTimelineItemToolTip instance that should get populated with name/value pairs
     virtual void tooltipItems(acTimelineItemToolTip& tooltip) const;
 
 private:
-    QString        m_strGlobalWorkSize; ///< the global work size for this API
-    QString        m_strLocalWorkSize;  ///< the local work size for this API
-    OccupancyInfo* m_pOccupancyInfo;    ///< the occupancy info for this kernel
+    QString                     m_strGlobalWorkSize; ///< the global work size for this API
+    QString                     m_strLocalWorkSize;  ///< the local work size for this API
+    IOccupancyInfoDataHandler*  m_pOccupancyInfo;    ///< the occupancy info for this kernel
 };
 
 /// CLAPITimelineItem descendant for data transfer API items

@@ -6,16 +6,15 @@
 // Qt:
 #include <QObject>
 
-// Backend:
-#include "IParserListener.h"
-#include "IParserProgressMonitor.h"
-#include "CLAPIInfo.h"
-#include "HSAAPIInfo.h"
-#include "DX12APIInfo.h"
-#include "VulkanAPIInfo.h"
-#include "StackTraceAtpFile.h"
-#include "HSAAtpFile.h"
-#include "PerfMarkerAtpFile.h"
+// RCP Backend:
+#include <IParserListener.h>
+#include <IParserProgressMonitor.h>
+#include <IAtpDataHandler.h>
+
+#include "DX12Trace/DX12APIInfo.h"
+#include "VulkanTrace/VulkanAPIInfo.h"
+
+
 
 // Infra:
 #include <AMDTOSWrappers/Include/osFilePath.h>
@@ -28,9 +27,7 @@ class GPUSessionTreeItemData;
 //                      The parser creates and manages the data container and data access
 //                      interface for the profiled session
 // ----------------------------------------------------------------------------------
-class gpTraceDataParser : public IParserListener<CLAPIInfo>, public IParserListener<HSAAPIInfo>,
-    public IParserListener<SymbolFileEntry>, IParserListener<PerfMarkerEntry>,
-    IParserListener<DX12APIInfo>, IParserListener<VKAPIInfo>, IParserProgressMonitor
+class gpTraceDataParser : public IParserListener<DX12APIInfo>, IParserListener<VKAPIInfo>, IParserProgressMonitor
 {
 public:
 
@@ -49,49 +46,49 @@ public:
 
     /// IParserListener overrides
     /// Sets the session API calls count
-    virtual void SetAPINum(osThreadId threadId, unsigned int apiNum);
+    virtual void SetAPINum(osThreadId threadId, unsigned int apiNum) override;
 
     /// IParserListener implementation for CL API trace/timeline data in .atp file.
     /// This method is called once for each CL API in the .atp file
     /// \param pAPIInfo the current CLAPIInfo item from the parser
     /// \param[out] stopParsing flag indicating if parsing should stop after this item
-    virtual void OnParse(CLAPIInfo* pAPIInfo, bool& stopParsing);
+    void OnParse(ICLAPIInfoDataHandler* pAPIInfo, bool& stopParsing);
 
     /// IParserListener implementation for DX12 API trace/timeline data in .atp file.
     /// This method is called once for each DX12 API in the .atp file
     /// \param pAPIInfo the current DX12APIInfo item from the parser
     /// \param[out] stopParsing flag indicating if parsing should stop after this item
-    virtual void OnParse(DX12APIInfo* pAPIInfo, bool& stopParsing);
+    virtual void OnParse(DX12APIInfo* pAPIInfo, bool& stopParsing) override;
 
     /// IParserListener implementation for Vulkan API trace/timeline data in .atp file.
     /// This method is called once for each Vulkan API in the .atp file
     /// \param pAPIInfo the current VKAPIInfo item from the parser
     /// \param[out] stopParsing flag indicating if parsing should stop after this item
-    virtual void OnParse(VKAPIInfo* pAPIInfo, bool& stopParsing);
+    virtual void OnParse(VKAPIInfo* pAPIInfo, bool& stopParsing) override;
 
     /// IParserListener implementation for HSA api trace/timeline data in .atp file.
     /// This method is called once for each HSA api in the .atp file
     /// \param pAPIInfo the current CLAPIInfo item from the parser
     /// \param[out] stopParsing flag indicating if parsing should stop after this item
-    virtual void OnParse(HSAAPIInfo* pAPIInfo, bool& stopParsing);
+    void OnParse(IHSAAPIInfoDataHandler* pAPIInfo, bool& stopParsing);
 
     /// IParserListener implementation for symbol data in .atp file
     /// This method is called once for each entry in the symbol section of the .atp file
     /// \param pSymFileEntry the current SymbolFileEntry item from the parser
     /// \param[out] stopParsing flag indicating if parsing should stop after this item
-    virtual void OnParse(SymbolFileEntry* pSymFileEntry, bool& stopParsing);
+    void OnParse(ISymbolFileEntryInfoDataHandler* pSymFileEntry, bool& stopParsing);
 
     /// IParserListener implementation for perf marker data in .atp file
     /// This method is called once for each entry in the perf marker section of the .atp file
     /// \param pPerfMarkerEntry the current PerfMarkerEntry item from the parser
     /// \param[out] stopParsing flag indicating if parsing should stop after this item
-    virtual void OnParse(PerfMarkerEntry* pPerfMarkerEntry, bool& stopParsing);
+    void OnParse(IPerfMarkerInfoDataHandler* pPerfMarkerEntry, bool& stopParsing);
 
     /// IParserProgressMonitor implementation for reporting progress when loading trace data
     /// \param strProgressMessage the progress message to display for this progress event
     /// \param uiCurItem the index of the current item being parsed
     /// \param uiTotalItems the total number of items to be parsed
-    void OnParserProgress(const std::string& strProgressMessage, unsigned int uiCurItem, unsigned int uiTotalItems);
+    void OnParserProgress(const std::string& strProgressMessage, unsigned int uiCurItem, unsigned int uiTotalItems) override;
 
     /// Load the kernel occupancy data, and store the occupancy info object into the data container
     bool LoadOccupancyFile();

@@ -83,7 +83,7 @@ public :
     /// \param rowIndex the row
     /// \param kernelName the kernel name for which to get the occupancy for
     /// \return the occupancy info for the specified row
-    OccupancyInfo* GetOccupancyForRow(int rowIndex, const QString& kernelName) const;
+    const IOccupancyInfoDataHandler* GetOccupancyForRow(int rowIndex, const QString& kernelName) const;
 
     /// Gets the column index of the occupancy column
     /// \return the column index of the occupancy column
@@ -135,7 +135,7 @@ private:
     QToolBar*                 m_perfCounterToolBar;             ///< ToolBar to show performance counter options
     QCheckBox*                m_showZeroColumnCB;               ///< Shows Zero Column CheckBox
 
-    QMap<int, OccupancyInfo*> m_rowOccupancyInfoMap;            ///< Map of row to occupancy info
+    QMap<int, const IOccupancyInfoDataHandler*> m_rowOccupancyInfoMap;            ///< Map of row to occupancy info
 
     static QMap<QWidget*, bool>      m_sessionControlsMap;      ///< Map of sessions
 };

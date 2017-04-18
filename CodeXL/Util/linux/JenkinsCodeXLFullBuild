@@ -25,9 +25,10 @@ AMD_BRANCH_PART=
 AMD_BRANCH_ROOT=${AMD_PERFORCE_ROOT}/${AMD_BRANCH_PART}
 AMD_WS_LINUX_UTIL_DIR=${AMD_BRANCH_ROOT}/CodeXL/Util/linux
 CODEXL_HELP_FOLDER=${AMD_BRANCH_ROOT}/CodeXL/Help
+CODEXL_COMMON_DIR=${AMD_PERFORCE_ROOT}/Common/
 
 # Set Java_Home locally
-export JAVA_HOME=/opt/java/jdk1.8.0_77 
+export JAVA_HOME=/opt/java/jdk1.8.0_77
 
 # NOTE: This is used by buildCodeXLFullLinuxProjects
 export AMD_CODEXL=$AMD_BRANCH_ROOT/CodeXL
@@ -35,7 +36,7 @@ export AMD_OUTPUT=$AMD_BRANCH_ROOT/
 
 # Version Number stuff
 VERSION_MAJOR=2
-VERSION_MINOR=4
+VERSION_MINOR=3
 VERSION_BUILD=0
 # VERSION_UPDATE=0
 VERSIONINFO_FILE=${AMD_CODEXL}/../Common/Src/VersionInfo/VersionInfo.h
@@ -83,44 +84,6 @@ RunTheBuild()
     BUILD_RELEASE_RC=$?
     echo "========== Timing end: `date` =============================================="
     checkforerror
-
-    GPUPROFILER_BACKEND_BUILD=${AMD_BRANCH_ROOT}/CodeXL/Components/GpuProfiling/Build
-    GPUPROFILER_BACKEND_BUILD_SCRIPT=${GPUPROFILER_BACKEND_BUILD}/backend_build.sh
-
-    GPUP_BUILD_OPTS="bldnum ${VERSION_BUILD}"
-    if [ ${BUILDTYPE} = "INTERNAL" ]
-    then
-       GPUP_BUILD_OPTS=$GPUP_BUILD_OPTS" build-internal-only"
-    fi
-
-    GPUP_BUILD_INCREMENTAL=
-    if [ ${IS_SCRATCH_BUILD} -eq 0 ]
-    then
-        GPUP_BUILD_INCREMENTAL="incremental"
-    fi
-    echo ""
-    echo "========== Timing start: `date` ============================================"
-    echo "Building: sh ${GPUPROFILER_BACKEND_BUILD_SCRIPT} ${GPUP_BUILD_OPTS} ${GPUP_BUILD_INCREMENTAL}"
-    sh ${GPUPROFILER_BACKEND_BUILD_SCRIPT} ${GPUP_BUILD_OPTS} ${GPUP_BUILD_INCREMENTAL}
-    GPUP_BUILD_RC=$?
-    echo "========== Timing end: `date` =============================================="
-
-    NUM_ERRORS=`expr ${NUM_ERRORS} + ${BUILD_RELEASE_RC} + ${GPUP_BUILD_RC}`
-    if [ ${BUILD_RELEASE_RC} -ne 0 -o ${GPUP_BUILD_RC} -ne 0 ]
-    then
-        echo "*** ERROR ***"
-        echo "*** The GPU Profiler backend build had ${GPUP_BUILD_RC} errors ***"
-        if [ ${GPUP_BUILD_RC} -ne 0 ]
-        then
-            echo "***    Check ${GPUPROFILER_BACKEND_BUILD}/GpuProfilerBackend_Build.log for errors ***"
-        fi
-
-
-        echo "*** The release build had ${BUILD_RELEASE_RC} errors ***"
-    else
-	echo "Build succeeded"
-    fi
-
 }
 
 checkforerror()
@@ -354,13 +317,13 @@ PackageTheBuild()
 		cp -f Output_x86_64/release/bin/platforms/libqxcb.so                              ${PKG_NAME}/platforms
 
 		mkdir -p ${PKG_NAME}/SDK/CXLActivityLogger/bin/x86
-		cp -f Output_x86_64/release/bin/CXLActivityLogger/bin/x86/libCXLActivityLogger.so ${PKG_NAME}/SDK/CXLActivityLogger/bin/x86/
+		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RCP/CXLActivityLogger/bin/x86/libCXLActivityLogger.so ${PKG_NAME}/SDK/CXLActivityLogger/bin/x86/
 		mkdir -p ${PKG_NAME}/SDK/CXLActivityLogger/bin/x86_64
-		cp -f Output_x86_64/release/bin/CXLActivityLogger/bin/x86_64/libCXLActivityLogger.so ${PKG_NAME}/SDK/CXLActivityLogger/bin/x86_64/
+		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RCP/CXLActivityLogger/bin/x86_64/libCXLActivityLogger.so ${PKG_NAME}/SDK/CXLActivityLogger/bin/x86_64/
 		mkdir -p ${PKG_NAME}/SDK/CXLActivityLogger/doc
-		cp -f Output_x86_64/release/bin//CXLActivityLogger/doc/AMDTActivityLogger.pdf ${PKG_NAME}/SDK/CXLActivityLogger/doc/
+		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RCP/CXLActivityLogger/doc/AMDTActivityLogger.pdf ${PKG_NAME}/SDK/CXLActivityLogger/doc/
 		mkdir -p ${PKG_NAME}/SDK/CXLActivityLogger/include
-		cp -f Output_x86_64/release/bin/CXLActivityLogger/include/CXLActivityLogger.h ${PKG_NAME}/SDK/CXLActivityLogger/include/
+		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RCP/CXLActivityLogger/include/CXLActivityLogger.h ${PKG_NAME}/SDK/CXLActivityLogger/include/
 
 		mkdir -p ${PKG_NAME}/Data
 		cp ${AMD_CODEXL}/../CodeXL/Data/Public/VersionSettings.xml ${PKG_NAME}/Data
@@ -1063,13 +1026,13 @@ PackageTheBuild()
 		cp -f Output_x86_64/release/bin/Images/WarningIconYellow.png                ${PKG_NAME}/Images/
 		cp -f Output_x86_64/release/bin/Images/WarningIconYellowSmall.png           ${PKG_NAME}/Images/
 		mkdir -p ${PKG_NAME}/jqPlot
-		cp -f Output_x86_64/release/bin/jqPlot/excanvas.min.js						  ${PKG_NAME}/jqPlot/
-		cp -f Output_x86_64/release/bin/jqPlot/jqplot.canvasAxisLabelRenderer.min.js    ${PKG_NAME}/jqPlot/
-		cp -f Output_x86_64/release/bin/jqPlot/jqplot.canvasTextRenderer.min.js         ${PKG_NAME}/jqPlot/
-		cp -f Output_x86_64/release/bin/jqPlot/jqplot.highlighter.min.js                ${PKG_NAME}/jqPlot/
-		cp -f Output_x86_64/release/bin/jqPlot/jquery.jqplot.min.css                    ${PKG_NAME}/jqPlot/
-		cp -f Output_x86_64/release/bin/jqPlot/jquery.jqplot.min.js                     ${PKG_NAME}/jqPlot/
-		cp -f Output_x86_64/release/bin/jqPlot/jquery.min.js                            ${PKG_NAME}/jqPlot/
+		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RCP/jqPlot/excanvas.min.js						  ${PKG_NAME}/jqPlot/
+		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RCP/jqPlot/jqplot.canvasAxisLabelRenderer.min.js    ${PKG_NAME}/jqPlot/
+		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RCP/jqPlot/jqplot.canvasTextRenderer.min.js         ${PKG_NAME}/jqPlot/
+		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RCP/jqPlot/jqplot.highlighter.min.js                ${PKG_NAME}/jqPlot/
+		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RCP/jqPlot/jquery.jqplot.min.css                    ${PKG_NAME}/jqPlot/
+		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RCP/jqPlot/jquery.jqplot.min.js                     ${PKG_NAME}/jqPlot/
+		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RCP/jqPlot/jquery.min.js                            ${PKG_NAME}/jqPlot/
 		mkdir -p ${PKG_NAME}/Legal
 		cp -f Output_x86_64/release/bin/Legal/Boost_Software_License.txt                       ${PKG_NAME}/Legal/
 		cp -f Output_x86_64/release/bin/Legal/Public/CodeXLEndUserLicenseAgreement-Linux.htm 	 ${PKG_NAME}/Legal
@@ -1087,26 +1050,26 @@ PackageTheBuild()
 		mkdir -p ${PKG_NAME}/webhelp
 		cp -drf Output_x86_64/release/bin/webhelp/*	${PKG_NAME}/webhelp
 
-		cp -f Output_x86_64/release/bin/libCXLGpuProfilerCLOccupancyAgent32.so         ${PKG_NAME}
-		cp -f Output_x86_64/release/bin/libCXLGpuProfilerCLProfileAgent32.so           ${PKG_NAME}
-		cp -f Output_x86_64/release/bin/libCXLGpuProfilerCLTraceAgent32.so             ${PKG_NAME}
-		cp -f Output_x86_64/release/bin/libGPUPerfAPICL32.so                            ${PKG_NAME}
-		cp -f Output_x86_64/release/bin/libGPUPerfAPICounters32.so                      ${PKG_NAME}
-		cp -f Output_x86_64/release/bin/libCXLGpuProfilerPreloadXInitThreads32.so      ${PKG_NAME}
-		cp -f Output_x86_64/release/bin/CodeXLGpuProfiler32                             ${PKG_NAME}
-		cp -f Output_x86_64/release/bin/CodeXLGpuProfilerRun32                          ${PKG_NAME}
+		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RCP/bin/libRCPCLOccupancyAgent32.so         ${PKG_NAME}
+		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RCP/bin/libRCPCLProfileAgent32.so           ${PKG_NAME}
+		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RCP/bin/libRCPCLTraceAgent32.so             ${PKG_NAME}
+		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RCP/bin/libRCPPreloadXInitThreads32.so      ${PKG_NAME}
+		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RCP/bin/rcprof32                            ${PKG_NAME}
+		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RCP/bin/libGPUPerfAPICL32.so                ${PKG_NAME}
+		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RCP/bin/libGPUPerfAPICounters32.so          ${PKG_NAME}
+		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RCP/bin/libRCPProfileDataParser32.so        ${PKG_NAME}
 
-		cp -f Output_x86_64/release/bin/libCXLGpuProfilerCLOccupancyAgent.so        ${PKG_NAME}
-		cp -f Output_x86_64/release/bin/libCXLGpuProfilerCLProfileAgent.so          ${PKG_NAME}
-		cp -f Output_x86_64/release/bin/libCXLGpuProfilerCLTraceAgent.so            ${PKG_NAME}
-		cp -f Output_x86_64/release/bin/libCXLGpuProfilerHSAProfileAgent.so         ${PKG_NAME}
-		cp -f Output_x86_64/release/bin/libCXLGpuProfilerHSATraceAgent.so           ${PKG_NAME}
-		cp -f Output_x86_64/release/bin/libGPUPerfAPICL.so                           ${PKG_NAME}
-		cp -f Output_x86_64/release/bin/libGPUPerfAPICounters.so                     ${PKG_NAME}
-		cp -f Output_x86_64/release/bin/libGPUPerfAPIHSA.so                          ${PKG_NAME}
-		cp -f Output_x86_64/release/bin/libCXLGpuProfilerPreloadXInitThreads.so     ${PKG_NAME}
-		cp -f Output_x86_64/release/bin/CodeXLGpuProfiler                            ${PKG_NAME}
-		cp -f Output_x86_64/release/bin/CodeXLGpuProfilerRun                         ${PKG_NAME}
+		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RCP/bin/libRCPCLOccupancyAgent.so        ${PKG_NAME}
+		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RCP/bin/libRCPCLProfileAgent.so          ${PKG_NAME}
+		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RCP/bin/libRCPCLTraceAgent.so            ${PKG_NAME}
+		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RCP/bin/libRCPHSAProfileAgent.so         ${PKG_NAME}
+		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RCP/bin/libRCPHSATraceAgent.so           ${PKG_NAME}
+		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RCP/bin/libRCPPreloadXInitThreads.so     ${PKG_NAME}
+		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RCP/bin/rcprof                           ${PKG_NAME}
+		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RCP/bin/libGPUPerfAPICL.so               ${PKG_NAME}
+		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RCP/bin/libGPUPerfAPICounters.so         ${PKG_NAME}
+		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RCP/bin/libGPUPerfAPIHSA.so              ${PKG_NAME}
+		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RCP/bin/libRCPProfileDataParser.so       ${PKG_NAME}
    
     cp -f Output_x86_64/release/bin/CXLGraphicsServer                            ${PKG_NAME}
     cp -f Output_x86_64/release/bin/CXLGraphicsServerPlayer                      ${PKG_NAME}
@@ -1116,10 +1079,12 @@ PackageTheBuild()
     cp -f Output_x86_64/release/bin/Plugins/libCXLGraphicsServerVulkan.json      ${PKG_NAME}/Plugins
     cp -f Output_x86_64/release/bin/Plugins/libVulkanEnv.so                      ${PKG_NAME}/Plugins
 		
-		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/Vulkan/rev_1_0_0/Release/lnx64/amdspv               ${PKG_NAME}
-		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/Vulkan/rev_1_0_0/Release/lnx64/spvgen.so            ${PKG_NAME}
-		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/OpenGL/VirtualContext/Release/lnx64/VirtualContext  ${PKG_NAME}
-		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/ShaderAnalysis/Linux/x64/shae                       ${PKG_NAME}
+		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RGA/bin/amdspv               ${PKG_NAME}
+		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RGA/bin/spvgen.so            ${PKG_NAME}
+		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RGA/bin/VirtualContext       ${PKG_NAME}
+		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RGA/bin/shae                 ${PKG_NAME}
+		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RGA/bin/rga                  ${PKG_NAME}
+		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RGA/bin/rga-bin              ${PKG_NAME}
 
 		mkdir -p ${PKG_NAME}/SDK/CXLPowerProfile/inc
 		cp -f ${AMD_CODEXL}/../Common/Src/AMDTCommonHeaders/AMDTDefinitions.h									${PKG_NAME}/SDK/CXLPowerProfile/inc
@@ -1324,13 +1289,13 @@ PackageTheBuild()
 		cp -f Output_x86_64/release/bin/platforms/libqxcb.so                              ${PKG_NAME}/platforms
 
 		mkdir -p ${PKG_NAME}/SDK/CXLActivityLogger/bin/x86
-		cp -f Output_x86_64/release/bin/CXLActivityLogger/bin/x86/libCXLActivityLogger.so ${PKG_NAME}/SDK/CXLActivityLogger/bin/x86/
+		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RCP/CXLActivityLogger/bin/x86/libCXLActivityLogger.so ${PKG_NAME}/SDK/CXLActivityLogger/bin/x86/
 		mkdir -p ${PKG_NAME}/SDK/CXLActivityLogger/bin/x86_64
-		cp -f Output_x86_64/release/bin/CXLActivityLogger/bin/x86_64/libCXLActivityLogger.so ${PKG_NAME}/SDK/CXLActivityLogger/bin/x86_64/
+		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RCP/CXLActivityLogger/bin/x86_64/libCXLActivityLogger.so ${PKG_NAME}/SDK/CXLActivityLogger/bin/x86_64/
 		mkdir -p ${PKG_NAME}/SDK/CXLActivityLogger/doc
-		cp -f Output_x86_64/release/bin/CXLActivityLogger/doc/AMDTActivityLogger.pdf ${PKG_NAME}/SDK/CXLActivityLogger/doc/
+		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RCP/CXLActivityLogger/doc/AMDTActivityLogger.pdf ${PKG_NAME}/SDK/CXLActivityLogger/doc/
 		mkdir -p ${PKG_NAME}/SDK/CXLActivityLogger/include
-		cp -f Output_x86_64/release/bin/CXLActivityLogger/include/CXLActivityLogger.h ${PKG_NAME}/SDK/CXLActivityLogger/include/
+		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RCP/CXLActivityLogger/include/CXLActivityLogger.h ${PKG_NAME}/SDK/CXLActivityLogger/include/
 
 		mkdir -p ${PKG_NAME}/Data
 		cp ${AMD_CODEXL}/../CodeXL/Data/Internal/VersionSettings.xml ${PKG_NAME}/Data
@@ -2052,13 +2017,13 @@ PackageTheBuild()
 		cp -f Output_x86_64/release/bin/Images/WarningIconYellow.png                ${PKG_NAME}/Images/
 		cp -f Output_x86_64/release/bin/Images/WarningIconYellowSmall.png           ${PKG_NAME}/Images/
 		mkdir -p ${PKG_NAME}/jqPlot
-		cp -f Output_x86_64/release/bin/jqPlot/excanvas.min.js						  ${PKG_NAME}/jqPlot/
-		cp -f Output_x86_64/release/bin/jqPlot/jqplot.canvasAxisLabelRenderer.min.js    ${PKG_NAME}/jqPlot/
-		cp -f Output_x86_64/release/bin/jqPlot/jqplot.canvasTextRenderer.min.js         ${PKG_NAME}/jqPlot/
-		cp -f Output_x86_64/release/bin/jqPlot/jqplot.highlighter.min.js                ${PKG_NAME}/jqPlot/
-		cp -f Output_x86_64/release/bin/jqPlot/jquery.jqplot.min.css                    ${PKG_NAME}/jqPlot/
-		cp -f Output_x86_64/release/bin/jqPlot/jquery.jqplot.min.js                     ${PKG_NAME}/jqPlot/
-		cp -f Output_x86_64/release/bin/jqPlot/jquery.min.js                            ${PKG_NAME}/jqPlot/
+		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RCP/jqPlot/excanvas.min.js						   ${PKG_NAME}/jqPlot/
+		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RCP/jqPlot/jqplot.canvasAxisLabelRenderer.min.js    ${PKG_NAME}/jqPlot/
+		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RCP/jqPlot/jqplot.canvasTextRenderer.min.js         ${PKG_NAME}/jqPlot/
+		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RCP/jqPlot/jqplot.highlighter.min.js                ${PKG_NAME}/jqPlot/
+		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RCP/jqPlot/jquery.jqplot.min.css                    ${PKG_NAME}/jqPlot/
+		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RCP/jqPlot/jquery.jqplot.min.js                     ${PKG_NAME}/jqPlot/
+		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RCP/jqPlot/jquery.min.js                            ${PKG_NAME}/jqPlot/
 		mkdir -p ${PKG_NAME}/Legal
 		cp -f Output_x86_64/release/bin/Legal/Boost_Software_License.txt                       ${PKG_NAME}/Legal/
 		cp -f Output_x86_64/release/bin/Legal/Public/CodeXLEndUserLicenseAgreement-Linux.htm 	 ${PKG_NAME}/Legal
@@ -2076,32 +2041,26 @@ PackageTheBuild()
 		mkdir -p ${PKG_NAME}/webhelp
 		cp -drf Output_x86_64/release/bin/webhelp/*	${PKG_NAME}/webhelp
 
-		cp -f Output_x86_64/release/bin/libCXLGpuProfilerCLOccupancyAgent32.so         ${PKG_NAME}
-		cp -f Output_x86_64/release/bin/libCXLGpuProfilerCLProfileAgent32.so           ${PKG_NAME}
-		cp -f Output_x86_64/release/bin/libCXLGpuProfilerCLTraceAgent32.so             ${PKG_NAME}
-		cp -f Output_x86_64/release/bin/libCXLGpuProfilerCLThreadTraceAgent32-Internal.so       ${PKG_NAME}
-		cp -f Output_x86_64/release/bin/libGPUThreadTrace32-Internal.so                         ${PKG_NAME}
-		cp -f Output_x86_64/release/bin/libPerformanceExperimentFile32-Internal.so              ${PKG_NAME}
-		cp -f Output_x86_64/release/bin/libGPUPerfAPICL32.so                           ${PKG_NAME}
-		cp -f Output_x86_64/release/bin/libGPUPerfAPICounters32.so                     ${PKG_NAME}
-		cp -f Output_x86_64/release/bin/libCXLGpuProfilerPreloadXInitThreads32.so      ${PKG_NAME}
-		cp -f Output_x86_64/release/bin/CodeXLGpuProfiler32                            ${PKG_NAME}
-		cp -f Output_x86_64/release/bin/CodeXLGpuProfilerRun32                         ${PKG_NAME}
+		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RCP/bin/libRCPCLOccupancyAgent32.so         ${PKG_NAME}
+		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RCP/bin/libRCPCLProfileAgent32.so           ${PKG_NAME}
+		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RCP/bin/libRCPCLTraceAgent32.so             ${PKG_NAME}		
+#		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RCP/bin/libPerformanceExperimentFile32-Internal.so              ${PKG_NAME}
+		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RCP/bin/libRCPPreloadXInitThreads32.so      ${PKG_NAME}
+		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RCP/bin/rcprof32                            ${PKG_NAME}
+		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RCP/bin/libGPUPerfAPICL32.so                ${PKG_NAME}
+		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RCP/bin/libGPUPerfAPICounters32.so          ${PKG_NAME}
 
-		cp -f Output_x86_64/release/bin/libCXLGpuProfilerCLOccupancyAgent.so        ${PKG_NAME}
-		cp -f Output_x86_64/release/bin/libCXLGpuProfilerCLProfileAgent.so          ${PKG_NAME}
-		cp -f Output_x86_64/release/bin/libCXLGpuProfilerCLTraceAgent.so            ${PKG_NAME}
-		cp -f Output_x86_64/release/bin/libCXLGpuProfilerCLThreadTraceAgent-Internal.so      ${PKG_NAME}
-		cp -f Output_x86_64/release/bin/libGPUThreadTrace-Internal.so                        ${PKG_NAME}
-		cp -f Output_x86_64/release/bin/libPerformanceExperimentFile-Internal.so             ${PKG_NAME}
-		cp -f Output_x86_64/release/bin/libCXLGpuProfilerHSAProfileAgent.so         ${PKG_NAME}
-		cp -f Output_x86_64/release/bin/libCXLGpuProfilerHSATraceAgent.so           ${PKG_NAME}
-		cp -f Output_x86_64/release/bin/libGPUPerfAPICL.so                          ${PKG_NAME}
-		cp -f Output_x86_64/release/bin/libGPUPerfAPICounters.so                    ${PKG_NAME}
-		cp -f Output_x86_64/release/bin/libGPUPerfAPIHSA.so                         ${PKG_NAME}
-		cp -f Output_x86_64/release/bin/libCXLGpuProfilerPreloadXInitThreads.so     ${PKG_NAME}
-		cp -f Output_x86_64/release/bin/CodeXLGpuProfiler                           ${PKG_NAME}
-		cp -f Output_x86_64/release/bin/CodeXLGpuProfilerRun                        ${PKG_NAME}
+		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RCP/bin/libRCPCLOccupancyAgent.so           ${PKG_NAME}
+		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RCP/bin/libRCPCLProfileAgent.so             ${PKG_NAME}
+		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RCP/bin/libRCPCLTraceAgent.so               ${PKG_NAME}
+#       cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RCP/bin/libPerformanceExperimentFile-Internal.so             ${PKG_NAME}
+		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RCP/bin/libRCPHSAProfileAgent.so            ${PKG_NAME}
+		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RCP/bin/libRCPHSATraceAgent.so              ${PKG_NAME}
+		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RCP/bin/libRCPPreloadXInitThreads.so        ${PKG_NAME}
+		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RCP/bin/rcprof                              ${PKG_NAME}
+		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RCP/bin/libGPUPerfAPICL.so                  ${PKG_NAME}
+		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RCP/bin/libGPUPerfAPICounters.so            ${PKG_NAME}
+		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RCP/bin/libGPUPerfAPIHSA.so                 ${PKG_NAME}
 
     mkdir -p ${PKG_NAME}/Plugins
     cp -f Output_x86_64/release/bin/Plugins/libCXLGraphicsServerVulkan.so        ${PKG_NAME}/Plugins
@@ -3029,36 +2988,37 @@ PackageTheBuild()
 		mkdir -p ${PKG_NAME}/webhelp
 		cp -drf Output_x86_64/release/bin/webhelp/*	${PKG_NAME}/webhelp
 
-		cp -f Output_x86_64/release/bin/libCXLGpuProfilerCLOccupancyAgent32.so         ${PKG_NAME}
-		cp -f Output_x86_64/release/bin/libCXLGpuProfilerCLProfileAgent32.so           ${PKG_NAME}
-		cp -f Output_x86_64/release/bin/libCXLGpuProfilerCLTraceAgent32.so             ${PKG_NAME}
-		cp -f Output_x86_64/release/bin/libGPUPerfAPICL32.so                            ${PKG_NAME}
-		cp -f Output_x86_64/release/bin/libGPUPerfAPICounters32.so                      ${PKG_NAME}
-		cp -f Output_x86_64/release/bin/libCXLGpuProfilerPreloadXInitThreads32.so      ${PKG_NAME}
-		cp -f Output_x86_64/release/bin/CodeXLGpuProfiler32                             ${PKG_NAME}
-		cp -f Output_x86_64/release/bin/CodeXLGpuProfilerRun32                          ${PKG_NAME}
+		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RCP/bin/libRCPCLOccupancyAgent32.so         ${PKG_NAME}
+		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RCP/bin/libRCPCLProfileAgent32.so           ${PKG_NAME}
+		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RCP/bin/libRCPCLTraceAgent32.so             ${PKG_NAME}		
+		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RCP/bin/libRCPPreloadXInitThreads32.so      ${PKG_NAME}
+		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RCP/bin/rcprof32                             ${PKG_NAME}		
+		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RCP/bin/libGPUPerfAPICL32.so                            ${PKG_NAME}
+		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RCP/bin/libGPUPerfAPICounters32.so                      ${PKG_NAME}
 
-		cp -f Output_x86_64/release/bin/libCXLGpuProfilerCLOccupancyAgent.so        ${PKG_NAME}
-		cp -f Output_x86_64/release/bin/libCXLGpuProfilerCLProfileAgent.so          ${PKG_NAME}
-		cp -f Output_x86_64/release/bin/libCXLGpuProfilerCLTraceAgent.so            ${PKG_NAME}
-		cp -f Output_x86_64/release/bin/libCXLGpuProfilerHSAProfileAgent.so         ${PKG_NAME}
-		cp -f Output_x86_64/release/bin/libCXLGpuProfilerHSATraceAgent.so           ${PKG_NAME}
-		cp -f Output_x86_64/release/bin/libGPUPerfAPICL.so                           ${PKG_NAME}
-		cp -f Output_x86_64/release/bin/libGPUPerfAPICounters.so                     ${PKG_NAME}
-		cp -f Output_x86_64/release/bin/libGPUPerfAPIHSA.so                          ${PKG_NAME}
-		cp -f Output_x86_64/release/bin/libCXLGpuProfilerPreloadXInitThreads.so     ${PKG_NAME}
-		cp -f Output_x86_64/release/bin/CodeXLGpuProfiler                            ${PKG_NAME}
-		cp -f Output_x86_64/release/bin/CodeXLGpuProfilerRun                         ${PKG_NAME}
+		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RCP/bin/libRCPCLOccupancyAgent.so        ${PKG_NAME}
+		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RCP/bin/libRCPCLProfileAgent.so          ${PKG_NAME}
+		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RCP/bin/libRCPCLTraceAgent.so            ${PKG_NAME}
+		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RCP/bin/libRCPHSAProfileAgent.so         ${PKG_NAME}
+		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RCP/bin/libRCPHSATraceAgent.so           ${PKG_NAME}
+		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RCP/bin/libRCPPreloadXInitThreads.so     ${PKG_NAME}
+		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RCP/bin/rcprof                            ${PKG_NAME}
+		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RCP/bin/libGPUPerfAPICL.so                           ${PKG_NAME}
+		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RCP/bin/libGPUPerfAPICounters.so                     ${PKG_NAME}
+		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RCP/bin/libGPUPerfAPIHSA.so                          ${PKG_NAME}
+		
 
     mkdir -p ${PKG_NAME}/Plugins
     cp -f Output_x86_64/release/bin/Plugins/libCXLGraphicsServerVulkan.so        ${PKG_NAME}/Plugins
     cp -f Output_x86_64/release/bin/Plugins/libCXLGraphicsServerVulkan.json      ${PKG_NAME}/Plugins
     cp -f Output_x86_64/release/bin/Plugins/libVulkanEnv.so                      ${PKG_NAME}/Plugins
 
-		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/Vulkan/rev_1_0_0/Release/lnx64/amdspv               ${PKG_NAME}
-		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/Vulkan/rev_1_0_0/Release/lnx64/spvgen.so            ${PKG_NAME}
-		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/OpenGL/VirtualContext/Release/lnx64/VirtualContext  ${PKG_NAME}
-		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/ShaderAnalysis/Linux/x64/shae                       ${PKG_NAME}
+		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RGA/bin/amdspv               ${PKG_NAME}
+		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RGA/bin/spvgen.so            ${PKG_NAME}
+		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RGA/bin/VirtualContext       ${PKG_NAME}
+		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RGA/bin/shae                 ${PKG_NAME}
+		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RGA/bin/rga                  ${PKG_NAME}
+		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RGA/bin/rga-bin              ${PKG_NAME}
 
 		mkdir -p ${PKG_NAME}/SDK/CXLPowerProfile/inc
 		cp -f ${AMD_CODEXL}/../Common/Src/AMDTCommonHeaders/AMDTDefinitions.h									${PKG_NAME}/SDK/CXLPowerProfile/inc

@@ -23,7 +23,7 @@
 #include <QtCore>
 
 #include "CLSummarizer.h"
-#include "AnalyzerHTMLUtils.h"
+#include "CXLAnalyzerHTMLUtils.h"
 #include "Session.h"
 
 // need to undef Bool after all includes so the moc will compile in Linux

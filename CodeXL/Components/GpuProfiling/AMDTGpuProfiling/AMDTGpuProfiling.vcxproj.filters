@@ -25,14 +25,14 @@
     <Filter Include="Common Source">
       <UniqueIdentifier>{5d5eb0de-6159-455c-8b17-8f1411d64ea7}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Backend Source">
-      <UniqueIdentifier>{c3e06029-e24d-413a-86a6-48b16074e41f}</UniqueIdentifier>
-    </Filter>
     <Filter Include="GeneratedFiles\moc_Win32Debug">
       <UniqueIdentifier>{532e5c11-3580-4742-9237-f00d86899026}</UniqueIdentifier>
     </Filter>
     <Filter Include="GeneratedFiles\moc_Win32Release">
       <UniqueIdentifier>{335bef39-c616-4d51-94aa-01a979a11963}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Backend">
+      <UniqueIdentifier>{925cc0e2-1efa-4db3-b9b0-5cc8a95a043b}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -49,9 +49,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Session.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="OccupancyInfo.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="gpViewsCreator.cpp">
@@ -168,24 +165,6 @@
     <ClCompile Include="HSATimelineItems.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\Backend\sprofile\AtpFile.cpp">
-      <Filter>Backend Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Backend\CLTraceAgent\CLAtpFile.cpp">
-      <Filter>Backend Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Backend\Common\FileUtils.cpp">
-      <Filter>Backend Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Backend\Common\LocaleSetting.cpp">
-      <Filter>Backend Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Backend\Common\OSUtils.cpp">
-      <Filter>Backend Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Backend\Common\StringUtils.cpp">
-      <Filter>Backend Source</Filter>
-    </ClCompile>
     <ClCompile Include="APITimelineItems.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -291,53 +270,8 @@
     <ClCompile Include="tmp\moc_Win32Release\moc_TraceView.cpp">
       <Filter>GeneratedFiles\moc_Win32Release</Filter>
     </ClCompile>
-    <ClCompile Include="..\Backend\CLCommon\CLFunctionDefs.cpp">
-      <Filter>Backend Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Backend\CLCommon\CLFunctionEnumDefs.cpp">
-      <Filter>Backend Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Backend\CLCommon\CLInternalFunctionDefs.cpp">
-      <Filter>Backend Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Backend\CLCommon\CLPlatformInfo.cpp">
-      <Filter>Backend Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Backend\CLCommon\CLUtils.cpp">
-      <Filter>Backend Source</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\..\Common\Src\AMDTMutex\AMDTMutex.cpp">
       <Filter>Common Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Backend\HSAFdnTrace\HSAAtpFile.cpp">
-      <Filter>Backend Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Backend\DX12Trace\DX12FunctionDefs.cpp">
-      <Filter>Backend Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Backend\DX12Trace\DX12APIInfo.cpp">
-      <Filter>Backend Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Backend\DX12Trace\DX12AtpFile.cpp">
-      <Filter>Backend Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Backend\VulkanTrace\VulkanFunctionDefs.cpp">
-      <Filter>Backend Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Backend\VulkanTrace\VulkanAPIInfo.cpp">
-      <Filter>Backend Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Backend\VulkanTrace\VulkanAtpFile.cpp">
-      <Filter>Backend Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Backend\Common\StackTraceAtpFile.cpp">
-      <Filter>Backend Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Backend\sprofile\PerfMarkerAtpFile.cpp">
-      <Filter>Backend Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Backend\Common\ATPFileUtils.cpp">
-      <Filter>Backend Source</Filter>
     </ClCompile>
     <ClCompile Include="gpProjectSettingsExtension.cpp">
       <Filter>Source Files</Filter>
@@ -486,12 +420,6 @@
     <ClCompile Include="gpTraceModels.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\Backend\Common\Logger.cpp">
-      <Filter>Backend Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Backend\sanalyze\AnalyzerHTMLUtils.cpp">
-      <Filter>Backend Source</Filter>
-    </ClCompile>
     <ClCompile Include="gpCountersSelectionDialog.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -519,9 +447,6 @@
     <ClCompile Include="..\..\..\..\Common\Src\DeviceInfo\DeviceInfoInternal.cpp">
       <Filter>Common Source</Filter>
     </ClCompile>
-    <ClCompile Include="..\Backend\HSAFdnCommon\HSAFunctionDefsUtils.cpp">
-      <Filter>Backend Source</Filter>
-    </ClCompile>
     <ClCompile Include="gpRibbonDataCalculator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -548,6 +473,33 @@
     </ClCompile>
     <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gpObjectModels.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DX12Trace\DX12APIInfo.cpp">
+      <Filter>Backend</Filter>
+    </ClCompile>
+    <ClCompile Include="DX12Trace\DX12AtpFile.cpp">
+      <Filter>Backend</Filter>
+    </ClCompile>
+    <ClCompile Include="DX12Trace\DX12FunctionDefs.cpp">
+      <Filter>Backend</Filter>
+    </ClCompile>
+    <ClCompile Include="VulkanTrace\VulkanAPIInfo.cpp">
+      <Filter>Backend</Filter>
+    </ClCompile>
+    <ClCompile Include="VulkanTrace\VulkanAtpFile.cpp">
+      <Filter>Backend</Filter>
+    </ClCompile>
+    <ClCompile Include="VulkanTrace\VulkanFunctionDefs.cpp">
+      <Filter>Backend</Filter>
+    </ClCompile>
+    <ClCompile Include="AtpUtils.cpp">
+      <Filter>Backend</Filter>
+    </ClCompile>
+    <ClCompile Include="CXLAtpFile.cpp">
+      <Filter>Backend</Filter>
+    </ClCompile>
+    <ClCompile Include="CXLAnalyzerHTMLUtils.cpp">
+      <Filter>Backend</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -674,24 +626,6 @@
     <ClInclude Include="gpTreeHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\Backend\DX12Trace\DX12APIInfo.h">
-      <Filter>Backend Source</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Backend\DX12Trace\DX12AtpFile.h">
-      <Filter>Backend Source</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Backend\DX12Trace\DX12FunctionDefs.h">
-      <Filter>Backend Source</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Backend\VulkanTrace\VulkanAPIInfo.h">
-      <Filter>Backend Source</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Backend\VulkanTrace\VulkanAtpFile.h">
-      <Filter>Backend Source</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Backend\VulkanTrace\VulkanFunctionDefs.h">
-      <Filter>Backend Source</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\..\Common\Src\qcustomplot\1.3.1\qcustomplot.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -715,6 +649,42 @@
     </ClInclude>
     <ClInclude Include="gpObjectDataParser.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DX12Trace\DX12APIInfo.h">
+      <Filter>Backend</Filter>
+    </ClInclude>
+    <ClInclude Include="DX12Trace\DX12AtpFile.h">
+      <Filter>Backend</Filter>
+    </ClInclude>
+    <ClInclude Include="DX12Trace\DX12FunctionDefs.h">
+      <Filter>Backend</Filter>
+    </ClInclude>
+    <ClInclude Include="VulkanTrace\VulkanAPIInfo.h">
+      <Filter>Backend</Filter>
+    </ClInclude>
+    <ClInclude Include="VulkanTrace\VulkanAtpFile.h">
+      <Filter>Backend</Filter>
+    </ClInclude>
+    <ClInclude Include="VulkanTrace\VulkanFunctionDefs.h">
+      <Filter>Backend</Filter>
+    </ClInclude>
+    <ClInclude Include="AtpUtils.h">
+      <Filter>Backend</Filter>
+    </ClInclude>
+    <ClInclude Include="ICallBackParserHandler.h">
+      <Filter>Backend</Filter>
+    </ClInclude>
+    <ClInclude Include="CXLAtpFile.h">
+      <Filter>Backend</Filter>
+    </ClInclude>
+    <ClInclude Include="CXLAPIInfo.h">
+      <Filter>Backend</Filter>
+    </ClInclude>
+    <ClInclude Include="CXLBaseParser.h">
+      <Filter>Backend</Filter>
+    </ClInclude>
+    <ClInclude Include="CXLAnalyzerHTMLUtils.h">
+      <Filter>Backend</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

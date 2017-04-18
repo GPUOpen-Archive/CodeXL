@@ -35,6 +35,12 @@
     <Import Project="$(CommonDir)\Src\DynamicLibraryModule\Global-DynamicLibraryModule.props" />
     <Import Project="$(CommonDir)\Lib\AMD\APPSDK\Global-OpenCL-NoLib.props" />
   </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="..\..\..\Common\Lib\AMD\RCP\Global-RCPBackend.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="..\..\..\Common\Lib\AMD\RCP\Global-RCPBackend.props" />
+  </ImportGroup>
   <ItemDefinitionGroup>
     <Midl>
       <AdditionalOptions>-ms_ext -c_ext -no_format_opt</AdditionalOptions>

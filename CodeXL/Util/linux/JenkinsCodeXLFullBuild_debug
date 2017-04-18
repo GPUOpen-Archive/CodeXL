@@ -21,10 +21,14 @@
 #
 
 AMD_PERFORCE_ROOT=$WORKSPACE
-AMD_BRANCH_PART=main
+AMD_BRANCH_PART=
 AMD_BRANCH_ROOT=${AMD_PERFORCE_ROOT}/${AMD_BRANCH_PART}
 AMD_WS_LINUX_UTIL_DIR=${AMD_BRANCH_ROOT}/CodeXL/Util/linux
 CODEXL_HELP_FOLDER=${AMD_BRANCH_ROOT}/CodeXL/Help
+CODEXL_COMMON_DIR=${AMD_PERFORCE_ROOT}/Common/
+
+# Set Java_Home locally
+export JAVA_HOME=/opt/java/jdk1.8.0_121
 
 # NOTE: This is used by buildCodeXLFullLinuxProjects
 export AMD_CODEXL=$AMD_BRANCH_ROOT/CodeXL
@@ -71,37 +75,15 @@ RunTheBuild()
     BUILD_DEBUG_RC=$?
     echo "========== Timing end: `date` =============================================="
 
-    GPUPROFILER_BACKEND_BUILD=${AMD_BRANCH_ROOT}/CodeXL/Components/GpuProfiling/Build
-    GPUPROFILER_BACKEND_BUILD_SCRIPT=${GPUPROFILER_BACKEND_BUILD}/backend_build.sh
-
-    GPUP_BUILD_OPTS="bldnum ${VERSION_BUILD} workspace ${AMD_PERFORCE_ROOT} build-internal release-root ${AMD_BRANCH_PART}"
-    GPUP_BUILD_INCREMENTAL=
-    if [ ${IS_SCRATCH_BUILD} -eq 0 ]
-    then
-        GPUP_BUILD_INCREMENTAL="incremental"
-    fi
+    # BUILD DEBUG x86 when the version is non-zero
+    BUILD_OPTS="x86 --debug=time -j ${NCPUS} CXL_build=debug CXL_arch=${ARCHTYPE} CXL_build_conf=${BUILDTYPE}"
     echo ""
     echo "========== Timing start: `date` ============================================"
-    echo "Building: sh ${GPUPROFILER_BACKEND_BUILD_SCRIPT} ${GPUP_BUILD_OPTS} ${GPUP_BUILD_INCREMENTAL}"
-    sh ${GPUPROFILER_BACKEND_BUILD_SCRIPT} ${GPUP_BUILD_OPTS} ${GPUP_BUILD_INCREMENTAL}
-    GPUP_BUILD_RC=$?
+    echo "Building: sh $AMD_WS_LINUX_UTIL_DIR/buildCodeXLFullLinuxProjects ${BUILD_OPTS}"
+    sh $AMD_WS_LINUX_UTIL_DIR/buildCodeXLFullLinuxProjects ${BUILD_OPTS} > ${WORKSPACE}/CodeXL-Linux_x86_release.log 2>&1
+    BUILD_RELEASE_RC=$?
     echo "========== Timing end: `date` =============================================="
-
-    NUM_ERRORS=`expr ${NUM_ERRORS} + ${BUILD_DEBUG_RC} + ${GPUP_BUILD_RC}`
-    if [ ${BUILD_DEBUG_RC} -ne 0 -o ${GPUP_BUILD_RC} -ne 0 ]
-    then
-        echo "*** ERROR ***"
-        echo "*** The GPU Profiler backend build had ${GPUP_BUILD_RC} errors ***"
-        if [ ${GPUP_BUILD_RC} -ne 0 ]
-        then
-            echo "***    Check ${GPUPROFILER_BACKEND_BUILD}/GpuProfilerBackend_Build.log for errors ***"
-        fi
-
-        echo "*** The debug build had ${BUILD_DEBUG_RC} errors ***"
-        
-    else
-	echo "Build succeeded"
-    fi
+    checkforerror
 
 }
 

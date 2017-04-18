@@ -161,7 +161,7 @@ QString CLAPITimelineItem::getDataSizeString(quint64 dataSizeInBytes, int precis
 }
 
 CLKernelTimelineItem::CLKernelTimelineItem(quint64 startTime, quint64 endTime, int apiIndex)
-    : CLAPITimelineItem(startTime, endTime, apiIndex) , m_pOccupancyInfo(NULL)
+    : CLAPITimelineItem(startTime, endTime, apiIndex) , m_pOccupancyInfo(nullptr)
 {
 }
 

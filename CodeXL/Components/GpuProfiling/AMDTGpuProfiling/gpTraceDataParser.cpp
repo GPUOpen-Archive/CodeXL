@@ -15,13 +15,11 @@
 // Backend header files
 #include "IParserListener.h"
 #include "IParserProgressMonitor.h"
-#include "CLAPIInfo.h"
-#include "CLAtpFile.h"
 #include "CLAPIFilterManager.h"
 #include "CLAPIDefs.h"
 #include "CLTimelineItems.h"
-#include "DX12AtpFile.h"
-#include "VulkanAtpFile.h"
+#include "DX12Trace/DX12AtpFile.h"
+#include "VulkanTrace/VulkanAtpFile.h"
 #include "ProfileManager.h"
 
 // Infra:
@@ -32,6 +30,7 @@
 #include <AMDTGpuProfiling/gpTraceDataParser.h>
 #include <AMDTGpuProfiling/gpTraceDataContainer.h>
 #include <AMDTGpuProfiling/SymbolInfo.h>
+#include "AtpUtils.h"
 
 #pragma message ("TODO: FA: Read this value from file")
 #define GP_ATP_FILE_VERSION 0
@@ -96,30 +95,6 @@ bool gpTraceDataParser::Parse(const osFilePath& traceFilePath, GPUSessionTreeIte
         Config config;
         AtpFileParser parser(fileVersion);
 
-        // add part parser for OpenCL API Trace and Timestamp sections
-        CLAtpFilePart clAtpPart(config, false);
-        clAtpPart.AddProgressMonitor(this);
-        parser.AddAtpFilePart(&clAtpPart);
-
-        // add part parser for HSA API Trace and Timestamp sections
-        HSAAtpFilePart hsaAtpPart(config);
-        hsaAtpPart.AddProgressMonitor(this);
-        parser.AddAtpFilePart(&hsaAtpPart);
-
-        // add part parser for cl Stack Trace section
-        StackTraceAtpFilePart clStackPart("ocl", config, false);
-        clStackPart.AddProgressMonitor(this);
-        parser.AddAtpFilePart(&clStackPart);
-
-        // add part parser for hsa Stack Trace section
-        StackTraceAtpFilePart hsaStackPart("hsa", config, false);
-        hsaStackPart.AddProgressMonitor(this);
-        parser.AddAtpFilePart(&hsaStackPart);
-
-        PerfMarkerAtpFilePart perfMarkerPart(config, false);
-        perfMarkerPart.AddProgressMonitor(this);
-        parser.AddAtpFilePart(&perfMarkerPart);
-
         DX12AtpFilePart dxFilePart(config, false);
         dxFilePart.AddProgressMonitor(this);
         parser.AddAtpFilePart(&dxFilePart);
@@ -128,11 +103,6 @@ bool gpTraceDataParser::Parse(const osFilePath& traceFilePath, GPUSessionTreeIte
         vkFilePart.AddProgressMonitor(this);
         parser.AddAtpFilePart(&vkFilePart);
 
-        clAtpPart.AddListener(this);
-        hsaAtpPart.AddListener(this);
-        clStackPart.AddListener(this);
-        hsaStackPart.AddListener(this);
-        perfMarkerPart.AddListener(this);
         dxFilePart.AddListener(this);
         vkFilePart.AddListener(this);
 
@@ -176,10 +146,9 @@ bool gpTraceDataParser::Parse(const osFilePath& traceFilePath, GPUSessionTreeIte
     }
 
     return retVal;
-
 }
 
-void gpTraceDataParser::OnParse(CLAPIInfo* pAPIInfo, bool& stopParsing)
+void gpTraceDataParser::OnParse(ICLAPIInfoDataHandler* pAPIInfo, bool& stopParsing)
 {
     // Sanity check:
     GT_IF_WITH_ASSERT(pAPIInfo != nullptr)
@@ -193,7 +162,7 @@ void gpTraceDataParser::OnParse(CLAPIInfo* pAPIInfo, bool& stopParsing)
         GT_IF_WITH_ASSERT(pAPIItem != nullptr)
         {
             // For enqueue memory objects, added a GPU item
-            bool isEnquque = (pAPIInfo->m_Type & CL_ENQUEUE_BASE_API) == CL_ENQUEUE_BASE_API;
+            bool isEnquque = (pAPIInfo->GetCLApiType() & CL_ENQUEUE_BASE_API) == CL_ENQUEUE_BASE_API;
 
             if (isEnquque)
             {
@@ -210,7 +179,7 @@ void gpTraceDataParser::OnParse(CLAPIInfo* pAPIInfo, bool& stopParsing)
 }
 
 
-void gpTraceDataParser::OnParse(HSAAPIInfo* pAPIInfo, bool& stopParsing)
+void gpTraceDataParser::OnParse(IHSAAPIInfoDataHandler* pAPIInfo, bool& stopParsing)
 {
     // Sanity check:
     GT_IF_WITH_ASSERT(pAPIInfo != nullptr)
@@ -218,7 +187,7 @@ void gpTraceDataParser::OnParse(HSAAPIInfo* pAPIInfo, bool& stopParsing)
         stopParsing = m_sShouldCancelParsing;
 
         // For dispatch API function, add a GPU item
-        if (pAPIInfo->m_apiID == HSA_API_Type_Non_API_Dispatch)
+        if (pAPIInfo->GetHSAApiTypeId() == HSA_API_Type_Non_API_Dispatch)
         {
             // Enqueue API functions have a matching GPU item
             m_pSessionDataContainer->AddHSAGPUItem(pAPIInfo);
@@ -236,23 +205,25 @@ void gpTraceDataParser::OnParse(HSAAPIInfo* pAPIInfo, bool& stopParsing)
     }
 }
 
-void gpTraceDataParser::OnParse(SymbolFileEntry* pSymbolFileEntry, bool& stopParsing)
+void gpTraceDataParser::OnParse(ISymbolFileEntryInfoDataHandler* pSymbolFileEntry, bool& stopParsing)
 {
     stopParsing = m_sShouldCancelParsing;
 
     // Sanity check
     GT_IF_WITH_ASSERT((pSymbolFileEntry != nullptr) && (m_pSessionDataContainer != nullptr))
     {
-        osThreadId threadId = pSymbolFileEntry->m_tid;
+        osThreadId threadId = pSymbolFileEntry->GetsymbolThreadId();
 
         SymbolInfo* pEntry = nullptr;
 
-        if ((pSymbolFileEntry->m_pStackEntry != nullptr) && (pSymbolFileEntry->m_pStackEntry->m_dwLineNum != (LineNum)(-1)) && (!pSymbolFileEntry->m_pStackEntry->m_strFile.empty()))
+        IStackEntryInfoDataHandler* pStackEntryInfoHandler = pSymbolFileEntry->GetStackEntryInfoHandler();
+
+        if (!pSymbolFileEntry->IsStackEntryNull() && (pStackEntryInfoHandler->GetLineNumber() != (LineNum)(-1)) && (!pStackEntryInfoHandler->GetFileNameString().empty()))
         {
-            pEntry = new SymbolInfo(QString::fromStdString(pSymbolFileEntry->m_strAPIName),
-                                    QString::fromStdString(pSymbolFileEntry->m_pStackEntry->m_strSymName),
-                                    QString::fromStdString(pSymbolFileEntry->m_pStackEntry->m_strFile),
-                                    pSymbolFileEntry->m_pStackEntry->m_dwLineNum);
+            pEntry = new SymbolInfo(QString::fromStdString(pSymbolFileEntry->GetSymbolApiName()),
+                                    QString::fromStdString(pStackEntryInfoHandler->GetSymbolNameString()),
+                                    QString::fromStdString(pStackEntryInfoHandler->GetFileNameString()),
+                                    pStackEntryInfoHandler->GetLineNumber());
         }
         else
         {
@@ -274,7 +245,7 @@ void gpTraceDataParser::OnParse(SymbolFileEntry* pSymbolFileEntry, bool& stopPar
     }
 }
 
-void gpTraceDataParser::OnParse(PerfMarkerEntry* pPerfMarkerEntry, bool& stopParsing)
+void gpTraceDataParser::OnParse(IPerfMarkerInfoDataHandler* pPerfMarkerEntry, bool& stopParsing)
 {
     GT_UNREFERENCED_PARAMETER(stopParsing);
 
@@ -362,10 +333,44 @@ bool gpTraceDataParser::LoadOccupancyFile()
         {
             m_isExecutingOccupancyFileLoad = true;
 
-            // Load the occupancy file
-            retVal = Util::LoadOccupancyFile(m_traceFilePath, m_pSessionDataContainer->m_occupancyInfoMap, m_pSessionItemData);
+            void* pPtr;
 
-            m_isOccupancyFileLoaded = retVal;
+            if (!AtpUtils::Instance()->IsModuleLoaded())
+            {
+                AtpUtils::Instance()->LoadModule();
+            }
+
+            AtpDataHandlerFunc pAtpDataHandler_func = AtpUtils::Instance()->GetAtpDataHandlerFunc();
+            IOccupancyFileInfoDataHandler* occupancyFileDataInfo = nullptr;
+            if (nullptr != pAtpDataHandler_func)
+            {
+                pAtpDataHandler_func(&pPtr);
+                IAtpDataHandler* pAtpDataHandler = reinterpret_cast<IAtpDataHandler*>(pPtr);
+                std::string occupancyFile = m_traceFilePath.asString().asASCIICharArray();
+                occupancyFileDataInfo = pAtpDataHandler->GetOccupancyFileInfoDataHandler(occupancyFile);
+                m_isOccupancyFileLoaded = occupancyFileDataInfo->ParseOccupancyFile(occupancyFile);
+            }
+
+            if (m_isOccupancyFileLoaded)
+            {
+                std::map<osThreadId, KernelCount> occupancyThreads = occupancyFileDataInfo->GetKernelCountByThreadId();
+
+                for (std::map<osThreadId, KernelCount>::iterator occupancyThreadIter = occupancyThreads.begin(); occupancyThreadIter != occupancyThreads.end(); ++occupancyThreadIter)
+                {
+                    QList<const IOccupancyInfoDataHandler*> occupancyInfoList;
+                    std::vector<const IOccupancyInfoDataHandler*> tempVector;
+                    tempVector = occupancyFileDataInfo->GetOccupancyInfoByThreadId(occupancyThreadIter->first);
+
+                    for (std::vector<const IOccupancyInfoDataHandler*>::iterator occupancyInfoIter = tempVector.begin(); occupancyInfoIter != tempVector.end(); ++occupancyInfoIter)
+                    {
+                        occupancyInfoList.push_back(*occupancyInfoIter);
+                    }
+
+                    m_pSessionDataContainer->m_occupancyInfoMap.insert(occupancyThreadIter->first, occupancyInfoList);
+                }
+            }
+
+            retVal = m_isOccupancyFileLoaded;
 
         }
     }

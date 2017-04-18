@@ -26,7 +26,7 @@
 
 #include <TSingleton.h>
 
-#include "CLFunctionEnumDefs.h"
+#include <CLFunctionEnumDefs.h>
 
 /// Group IDs for OpenCL APIs
 enum CLAPIGroup

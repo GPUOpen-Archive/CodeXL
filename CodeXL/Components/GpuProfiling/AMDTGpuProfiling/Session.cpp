@@ -27,15 +27,13 @@
 #include <AMDTApplicationFramework/Include/afAppStringConstants.h>
 #include <AMDTApplicationFramework/Include/afProgressBarWrapper.h>
 
-// Backend header files
-#include "Defs.h"
-
 // Local:
 #include <AMDTGpuProfiling/gpExecutionMode.h>
 #include <AMDTGpuProfiling/gpStringConstants.h>
 #include <AMDTGpuProfiling/gpViewsCreator.h>
 #include <AMDTGpuProfiling/Session.h>
 #include <AMDTGpuProfiling/ProfileManager.h>
+#include "AtpUtils.h"
 
 static int allocCounter = 0;
 
@@ -109,7 +107,6 @@ GPUSessionTreeItemData::GPUSessionTreeItemData(const GPUSessionTreeItemData& oth
 
 GPUSessionTreeItemData::~GPUSessionTreeItemData()
 {
-    Util::ClearOccupancyTable(m_occupancyTable);
 }
 
 
@@ -524,7 +521,6 @@ bool GPUSessionTreeItemData::UpdateDisplayNameInOutputFile(const QString& displa
 
 void GPUSessionTreeItemData::FlushData()
 {
-    Util::ClearOccupancyTable(m_occupancyTable);
     m_occupancyFileIsLoaded = false;
 }
 
@@ -589,9 +585,50 @@ const OccupancyTable& GPUSessionTreeItemData::LoadAndGetOccupancyTable()
     {
         if (!m_occupancyFileIsLoaded)
         {
-            Util::LoadOccupancyFile(m_pParentData->m_filePath, m_occupancyTable, this);
-            m_occupancyFileIsLoaded = true;
+            if (!AtpUtils::Instance()->IsModuleLoaded())
+            {
+                AtpUtils::Instance()->LoadModule();
+            }
 
+            void* pPtr;
+            AtpDataHandlerFunc pAtpDataHandler_func = AtpUtils::Instance()->GetAtpDataHandlerFunc();
+            IOccupancyFileInfoDataHandler* occupancyFileDataInfo = nullptr;
+
+            if (nullptr != pAtpDataHandler_func)
+            {
+                pAtpDataHandler_func(&pPtr);
+                IAtpDataHandler* pApDataHandler = reinterpret_cast<IAtpDataHandler*>(pPtr);
+                m_occupancyFile.fromStdString(std::string(m_pParentData->m_filePath.asString().asASCIICharArray()));
+                std::string occupancyFile = m_occupancyFile.toStdString();
+
+                occupancyFileDataInfo = pApDataHandler->GetOccupancyFileInfoDataHandler(occupancyFile);
+
+                if (nullptr != occupancyFileDataInfo)
+                {
+                    m_occupancyFileIsLoaded = occupancyFileDataInfo->ParseOccupancyFile(occupancyFile);
+                }
+
+                m_occupancyFileIsLoaded = occupancyFileDataInfo->ParseOccupancyFile(occupancyFile);
+            }
+
+            if (m_occupancyFileIsLoaded)
+            {
+                std::map<osThreadId, KernelCount> occupancyThreads = occupancyFileDataInfo->GetKernelCountByThreadId();
+
+                for (std::map<osThreadId, KernelCount>::iterator occupancyThreadIter = occupancyThreads.begin(); occupancyThreadIter != occupancyThreads.end(); ++occupancyThreadIter)
+                {
+                    QList<const IOccupancyInfoDataHandler*> occupancyInfoList;
+                    std::vector<const IOccupancyInfoDataHandler*> tempVector;
+                    tempVector = occupancyFileDataInfo->GetOccupancyInfoByThreadId(occupancyThreadIter->first);
+
+                    for (std::vector<const IOccupancyInfoDataHandler*>::iterator occupancyInfoIter = tempVector.begin(); occupancyInfoIter != tempVector.end(); ++occupancyInfoIter)
+                    {
+                        occupancyInfoList.push_back(*occupancyInfoIter);
+                    }
+
+                    m_occupancyTable.insert(occupancyThreadIter->first, occupancyInfoList);
+                }
+            }
         }
     }
     return m_occupancyTable;

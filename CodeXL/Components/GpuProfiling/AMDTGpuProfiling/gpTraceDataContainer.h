@@ -15,11 +15,7 @@
 #include <QStack>
 
 // Backend:
-#include "CLAPIInfo.h"
-#include "HSAAPIInfo.h"
-#include "DX12APIInfo.h"
-#include "PerfMarkerAtpFile.h"
-
+#include "DX12Trace/DX12APIInfo.h"
 
 // Local:
 #include <AMDTGpuProfiling/OccupancyInfo.h>
@@ -80,7 +76,7 @@ public:
     /// Add an OpenCL API item:
     /// \param the CLAPIInfo class describing the OpenCL item to add
     /// \return the created API item
-    ProfileSessionDataItem* AddCLItem(CLAPIInfo* pAPIInfo);
+    ProfileSessionDataItem* AddCLItem(ICLAPIInfoDataHandler* pAPIInfo);
 
     /// pThreadItem the thread new item
     void AddItemToThread(ProfileSessionDataItem* pThreadItem);
@@ -88,7 +84,7 @@ public:
     /// Add an HSA API item:
     /// \param the HSAAPIInfo class describing the OpenCL item to add
     /// \return the created API item
-    ProfileSessionDataItem* AddHSAItem(HSAAPIInfo* pAPIInfo);
+    ProfileSessionDataItem* AddHSAItem(IHSAAPIInfoDataHandler* pAPIInfo);
 
     /// Add a DX12 API item:
     /// \param the DX12APIInfo class describing the DX12 item to add
@@ -116,16 +112,16 @@ public:
 
     /// Add an HSA GPU item:
     /// \param pAPIInfo the API info for the HSA dispatch API call
-    void AddHSAGPUItem(HSAAPIInfo* pAPIInfo);
+    void AddHSAGPUItem(IHSAAPIInfoDataHandler* pAPIInfo);
 
     /// Add a performance marker object to the data container
     /// \param pPerfMarkerEntry the performance marker information
-    void AddPerformanceMarker(PerfMarkerEntry* pPerfMarkerEntry);
+    void AddPerformanceMarker(IPerfMarkerInfoDataHandler* pPerfMarkerEntry);
 
     /// Find the occupancy info for the requested API
     /// \param pAPIInfo the API info for which the occupancy is needed
     /// \return matching OccupancyInfo or null
-    OccupancyInfo* FindOccupancyInfo(CLAPIInfo* pAPIInfo);
+    const IOccupancyInfoDataHandler* FindOccupancyInfo(ICLAPIInfoDataHandler* pAPIInfo);
 
     /// Finds the symbol info for the API specified by threadId and callIndex
     /// \param threadId the thread Id of the API

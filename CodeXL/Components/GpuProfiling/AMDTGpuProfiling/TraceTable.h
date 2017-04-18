@@ -33,11 +33,11 @@
 // boost
 #include <boost/icl/split_interval_map.hpp>
 
+//BackEnd
+#include <ATPParserInterface.h>
+
 // forward declarations
 class acTimelineItem;
-class APIInfo;
-class PerfMarkerEntry;
-class OccupancyInfo;
 
 /// Class to hold the item data for the API Trace table model
 class TraceTableItem
@@ -50,14 +50,14 @@ public:
     /// \param pTimelineItem the timeline item that corresponds to this trace item
     /// \param pDeviceBlock the device block timeline item that corresponds to this trace item (can be NULL)
     /// \param pOccupancyInfo the occupancy info that corresponds to this trace item (can be NULL)
-    TraceTableItem(const QString& strAPIPrefix, const QString& strApiName, APIInfo* pApiInfo, acTimelineItem* pTimelineItem, acTimelineItem* pDeviceBlock, OccupancyInfo* pOccupancyInfo);
+    TraceTableItem(const QString& strAPIPrefix, const QString& strApiName, IAPIInfoDataHandler* pApiInfo, acTimelineItem* pTimelineItem, acTimelineItem* pDeviceBlock, IOccupancyInfoDataHandler* pOccupancyInfo);
 
     /// Initializes a new instance of the TraceTableItem class
     /// \param strAPIPrefix an API-specific prefix used (along with the sequence id) to uniquely identify each trace item (i.e. "OpenCL" or "HSA")
     /// \param strMarkerName the name of the marker for this item
     /// \param pMarkerEntry structure containing info about this marker
     /// \param pTimelineItem the timeline item that corresponds to this trace item
-    TraceTableItem(const QString& strAPIPrefix, const QString& strMarkerName, PerfMarkerEntry* pMarkerEntry, acTimelineItem* pTimelineItem);
+    TraceTableItem(const QString& strAPIPrefix, const QString& strMarkerName, IPerfMarkerInfoDataHandler* pMarkerEntry, acTimelineItem* pTimelineItem);
 
     /// Destructor
     virtual ~TraceTableItem();
@@ -114,7 +114,7 @@ public:
 
     /// Gets the occupancy info associated with this item (can be null)
     /// \return the occupancy info associated with this item
-    OccupancyInfo* GetOccupancyInfo() const { return m_pOccupancyInfo; }
+    IOccupancyInfoDataHandler* GetOccupancyInfo() const { return m_pOccupancyInfo; }
 
     /// Gets the index of this item within its parent
     /// \return the index of this item within its parent
@@ -152,7 +152,7 @@ private:
     int m_endIndex;                     ///< The item end index (-1 in case where index is irelevant)
     acTimelineItem* m_pTimelineItem;    ///< the timeline item for this trace table item
     acTimelineItem* m_pDeviceBlock;     ///< the device block for this trace table item (can be null)
-    OccupancyInfo* m_pOccupancyInfo;    ///< the occupancy info for this trace table item (can be null)
+    IOccupancyInfoDataHandler* m_pOccupancyInfo;    ///< the occupancy info for this trace table item (can be null)
     QVariant m_uniqueId;                ///< the unique id of the item.  This is returned from the model data for the Qt::UserRole
 };
 
@@ -242,7 +242,7 @@ public:
     /// \param pDeviceBlock the device block for the api, can be NULL
     /// \param pOccupancyInfo the occupancy info for the api, can be NULL
     /// \return the TraceTableItem instance added to the model
-    TraceTableItem* AddTraceItem(const QString& strAPIPrefix, const QString& strApiName, APIInfo* pApiInfo, acTimelineItem* pTimelineItem, acTimelineItem* pDeviceBlock, OccupancyInfo* pOccupancyInfo);
+    TraceTableItem* AddTraceItem(const QString& strAPIPrefix, const QString& strApiName, IAPIInfoDataHandler* pApiInfo, acTimelineItem* pTimelineItem, acTimelineItem* pDeviceBlock, IOccupancyInfoDataHandler* pOccupancyInfo);
 
     /// Adds a top level item to the trace items table:
     /// \param strAPIPrefix an API-specific prefix used to uniquely identify each trace item
@@ -252,13 +252,13 @@ public:
     /// \param pDeviceBlock the device block for the api, can be NULL
     /// \param pOccupancyInfo the occupancy info for the api, can be NULL
     /// \return the TraceTableItem instance added to the model
-    TraceTableItem* AddTopLevelTraceItem(const QString& strAPIPrefix, const QString& strApiName, APIInfo* pApiInfo, acTimelineItem* pTimelineItem, acTimelineItem* pDeviceBlock, OccupancyInfo* pOccupancyInfo);
+    TraceTableItem* AddTopLevelTraceItem(const QString& strAPIPrefix, const QString& strApiName, IAPIInfoDataHandler* pApiInfo, acTimelineItem* pTimelineItem, acTimelineItem* pDeviceBlock, IOccupancyInfoDataHandler* pOccupancyInfo);
 
     /// Adds a perf marker item to the maps of trace items (this map will later be added to the model, in InitializeModel)
     /// \param strAPIPrefix an API-specific prefix used to uniquely identify each trace item
     /// \param strMarkerName the name of the marker
     /// \param pMarkerEntry struct containing info for the marker
-    TraceTableItem* AddTraceItem(const QString& strAPIPrefix, const QString& strMarkerName, PerfMarkerEntry* pMarkerEntry);
+    TraceTableItem* AddTraceItem(const QString& strAPIPrefix, const QString& strMarkerName, IPerfMarkerInfoDataHandler* pMarkerEntry);
 
     /// Gets the device block data for the specified row
     /// \param rowIndex the index of the row
@@ -268,7 +268,7 @@ public:
     /// Gets the occupancy data for the specified row
     /// \param rowIndex the index of the row
     /// \return the occupancy info
-    OccupancyInfo* GetOccupancyItem(const QModelIndex& index);
+    IOccupancyInfoDataHandler* GetOccupancyItem(const QModelIndex& index);
 
     /// Closing the last opened perf marker item:
     /// \param pTimelineItem the timeline item that matches the requested perf marker item

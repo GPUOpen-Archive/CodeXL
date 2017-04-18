@@ -53,14 +53,14 @@ void gpObjectDataContainer::SetAPINum(osThreadId threadId, unsigned int apiNum)
     m_apiCountMap[threadId] = apiNum;
 }
 
-ProfileSessionDataItem* gpObjectDataContainer::AddCLItem(CLAPIInfo* pAPIInfo)
+ProfileSessionDataItem* gpObjectDataContainer::AddCLItem(ICLAPIInfoDataHandler* pAPIInfo)
 {
     ProfileSessionDataItem* pRetVal = nullptr;
 
     // Sanity check:
     GT_IF_WITH_ASSERT(pAPIInfo != nullptr)
     {
-        osThreadId tid = pAPIInfo->m_tid;
+        osThreadId tid = pAPIInfo->GetApiThreadId();
 
         // Set this thread API type
         if (!m_threadAPIType.contains(tid))
@@ -72,14 +72,14 @@ ProfileSessionDataItem* gpObjectDataContainer::AddCLItem(CLAPIInfo* pAPIInfo)
     return pRetVal;
 }
 
-ProfileSessionDataItem* gpObjectDataContainer::AddHSAItem(HSAAPIInfo* pAPIInfo)
+ProfileSessionDataItem* gpObjectDataContainer::AddHSAItem(IHSAAPIInfoDataHandler* pAPIInfo)
 {
     ProfileSessionDataItem* pRetVal = nullptr;
 
     // Sanity check:
     GT_IF_WITH_ASSERT(pAPIInfo != nullptr)
     {
-        osThreadId tid = pAPIInfo->m_tid;
+        osThreadId tid = pAPIInfo->GetApiThreadId();
 
         // Set this thread API type
         if (!m_threadAPIType.contains(tid))
