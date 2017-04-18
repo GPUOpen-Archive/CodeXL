@@ -23,39 +23,10 @@
 
 // Definitions.
 #if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
-
-    #if AMDT_BUILD_CONFIGURATION == AMDT_DEBUG_BUILD
-
-        #if AMDT_BUILD_ACCESS == AMDT_PUBLIC_ACCESS
-            const std::string ANALYZER_CLI_WIN_X86 = "CodeXLAnalyzer-d.exe";
-            const std::string ANALYZER_CLI_WIN_X64 = "CodeXLAnalyzer-x64-d.exe";
-        #elif AMDT_BUILD_ACCESS == AMDT_NDA_ACCESS
-            const std::string ANALYZER_CLI_WIN_X86 = "CodeXLAnalyzer-d-nda.exe";
-            const std::string ANALYZER_CLI_WIN_X64 = "CodeXLAnalyzer-x64-d-nda.exe";
-        #elif AMDT_BUILD_ACCESS == AMDT_INTERNAL_ACCESS
-            const std::string ANALYZER_CLI_WIN_X86 = "CodeXLAnalyzer-d-internal.exe";
-            const std::string ANALYZER_CLI_WIN_X64 = "CodeXLAnalyzer-x64-d-internal.exe";
-        #else
-            #error Unknown build access
-        #endif
-
-    #else
-
-        #if AMDT_BUILD_ACCESS == AMDT_PUBLIC_ACCESS
-            const std::string ANALYZER_CLI_WIN_X86 = "CodeXLAnalyzer.exe";
-            const std::string ANALYZER_CLI_WIN_X64 = "CodeXLAnalyzer-x64.exe";
-        #elif AMDT_BUILD_ACCESS == AMDT_NDA_ACCESS
-            const std::string ANALYZER_CLI_WIN_X86 = "CodeXLAnalyzer-nda.exe";
-            const std::string ANALYZER_CLI_WIN_X64 = "CodeXLAnalyzer-x64-nda.exe";
-        #elif AMDT_BUILD_ACCESS == AMDT_INTERNAL_ACCESS
-            const std::string ANALYZER_CLI_WIN_X86 = "CodeXLAnalyzer-internal.exe";
-            const std::string ANALYZER_CLI_WIN_X64 = "CodeXLAnalyzer-x64-internal.exe";
-        #else
-            #error Unknown build access
-        #endif
-    #endif // AMDT_DEBUG_BUILD
+    const std::string ANALYZER_CLI_WIN_X86 = "x86\\rga.exe";
+    const std::string ANALYZER_CLI_WIN_X64 = "x64\\rga.exe";
 #else
-    const std::string ANALYZER_CLI_LINUX_X64 = "CodeXLAnalyzer-bin";
+    const std::string ANALYZER_CLI_LINUX_X64 = "rga";
 #endif
 
 const std::string KA_STR_CL_CLI_CMD_PREFIX = "-s cl";
@@ -130,7 +101,7 @@ static std::string GenerateOptions(const BuildType buildType, kaPipelineShaders 
     return outputStream.str();
 }
 
-#ifdef _WIN32
+
 
 // Splits a given string to sub-elements according to the given delimiter.
 static void split(const std::string& s, char delim, std::vector<std::string>& elems)
@@ -144,6 +115,8 @@ static void split(const std::string& s, char delim, std::vector<std::string>& el
         elems.push_back(item);
     }
 }
+
+#ifdef _WIN32
 
 // Splits the user-defined list of macros into pairs of key-value strings.
 static bool ExtractDxCompilerDefines(const QString& userDefines,
@@ -252,7 +225,7 @@ static std::string GenerateKernelOptions()
     return outputStream.str();
 }
 
-static std::string GetCliExecutableName(AnalyzerBuildArchitecture& bitness)
+static std::string GetCliExecutableName(const AnalyzerBuildArchitecture& bitness)
 {
     std::stringstream outputStream;
     const gtString OS_PATH_SEPRATOR(osFilePath::osPathSeparator);
@@ -453,7 +426,16 @@ static std::string GenerateCLICommandForMultipleDevices(AnalyzerBuildArchitectur
 static bool ExecAndGrabOutput(const char* cmd, const bool& shouldBeCancelled, std::string& cmdOutput)
 {
     bool ret = true;
-    bool isBuildCancelled = kaBackendManager::instance().IsBuildCancelled();
+    bool isBuildCancelled = false;
+    static bool isFirstCall = true;
+    if (!isFirstCall)
+    {
+        isBuildCancelled = kaBackendManager::instance().IsBuildCancelled();
+    }
+    else
+    {
+        isFirstCall = false;
+    }
 
     if (!isBuildCancelled)
     {
@@ -828,5 +810,28 @@ bool LaunchRenderSessionForDevice(const BuildType buildType, AnalyzerBuildArchit
     return retVal;
 }
 
+bool GetOpenCLDevices(std::set<std::string>& devices)
+{
+    bool ret = false;
+    bool shouldCancel = false;
+    devices.clear();
+    std::stringstream commandLine;
+    commandLine << GetCliExecutableName(AnalyzerBuildArchitecture::kaBuildArch32_bit).c_str();
+    commandLine << " -s cl -l";
+    std::string cliOutput;
+    ExecAndGrabOutput(commandLine.str().c_str(), shouldCancel, cliOutput);
+    
+    if (!cliOutput.empty())
+    {
+        std::vector<std::string> deviceNames;
+        split(cliOutput, '\n', deviceNames);
+        for(const std::string& deviceName : deviceNames)
+        {
+            devices.insert(deviceName);
+        }
+    }
+    ret = !devices.empty();
+    return ret;
+}
 
 

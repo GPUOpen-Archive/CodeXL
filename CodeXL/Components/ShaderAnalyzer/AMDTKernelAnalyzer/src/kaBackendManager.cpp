@@ -67,7 +67,7 @@
 #include <AMDTKernelAnalyzer/src/kaDataAnalyzerFunctions.h>
 #include <AMDTKernelAnalyzer/src/kaProjectDataManager.h>
 #include <AMDTKernelAnalyzer/src/kaCliLauncher.h>
-#include <AMDTKernelAnalyzerCLI/src/kcCliStringConstants.h>
+#include <AMDTKernelAnalyzer/Include/kcCliStringConstants.h>
 #include <AMDTKernelAnalyzer/src/kaUtils.h>
 
 // Backend.
