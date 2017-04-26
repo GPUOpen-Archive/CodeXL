@@ -3,7 +3,7 @@
 
 <!--     
     Analyze L1 data access and DTLB behavior using event-based profiling
-    Date: 16 Aug 2017
+    Date: 18 Apr 2017
     Version: 1.0
     Processor: AMD family 17h
     Copyright (c) 2017 Advanced Micro Devices, Inc. All rights reserved.
@@ -13,6 +13,12 @@
 
   <ebp name="Investigate Data Access" mux_period="1">
 
+    <event select="C0" mask="00" os="T" user="T" count="250000"></event>
+    <event select="40" mask="00" os="T" user="T" count="250000"></event>
+    <event select="41" mask="1F" os="T" user="T" count="25000"></event>
+    <event select="43" mask="7F" os="T" user="T" count="25000"></event>
+    <event select="45" mask="FF" os="T" user="T" count="25000"></event>
+    <event select="47" mask="00" os="T" user="T" count="25000"></event>
 
     <tool_tip>Analyze data access and DTLB behavior</tool_tip>
 
