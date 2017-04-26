@@ -3,7 +3,7 @@
 
 <!--     
     Analyze branch/near return prediction using event-based profiling
-    Date: 16 Jan 2017
+    Date: 18 Apr 2017
     Version: 1.0
     Processor: AMD family 17h
     Copyright (c) 2017 Advanced Micro Devices, Inc. All rights reserved.
@@ -13,6 +13,13 @@
 
   <ebp name="Investigate Branching" mux_period="1">
 
+    <event select="C0" mask="00" os="T" user="T" count="250000"></event>
+    <event select="C2" mask="00" os="T" user="T" count="25000"></event>
+    <event select="C3" mask="00" os="T" user="T" count="25000"></event>
+    <event select="C4" mask="00" os="T" user="T" count="25000"></event>
+    <event select="C8" mask="00" os="T" user="T" count="25000"></event>
+    <event select="C9" mask="00" os="T" user="T" count="25000"></event>
+    <event select="CA" mask="00" os="T" user="T" count="25000"></event>
 
     <tool_tip>Find mispredicted branches/near returns</tool_tip>
 
