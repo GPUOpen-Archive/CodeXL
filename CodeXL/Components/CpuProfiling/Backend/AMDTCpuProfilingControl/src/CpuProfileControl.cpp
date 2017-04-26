@@ -1725,7 +1725,8 @@ HRESULT fnGetPredefinedProfilesAvailable(/*out*/ bool& isPredefinedProfilesAvail
     isPredefinedProfilesAvailable = true;
     osCpuid cpuInfo;
 
-    if ((cpuInfo.getFamily() == FAMILY_ZN) && (cpuInfo.getModel() <= 0xf))
+    // Disable for Ryzen (only if stepping <= 1)
+    if ((cpuInfo.getFamily() == FAMILY_ZN) && (cpuInfo.getModel() <= 0xf) && (cpuInfo.getStepping() <= 1))
     {
         isPredefinedProfilesAvailable = false;
     }
