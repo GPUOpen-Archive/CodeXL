@@ -2511,7 +2511,10 @@ AMDTResult AMDTEnableProcessProfiling()
     {
         if ((false == g_sysInfo.m_isPlatformWithSmu) || (false == g_sysInfo.m_smuTable.m_info[0].m_isAccessible))
         {
-            ret = AMDT_WARN_PROCESS_PROFILE_NOT_SUPPORTED;
+            if (0x17 != g_sysInfo.m_family)
+            {
+                ret = AMDT_WARN_PROCESS_PROFILE_NOT_SUPPORTED;
+            }
         }
     }
 

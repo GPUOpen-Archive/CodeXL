@@ -89,6 +89,7 @@ enum HardwareType
     GDT_ELLESMERE,
     GDT_BAFFIN,
     GDT_ZEPPELIN,
+    GDT_POLARIS12,
     GDT_LAST,                   ///< last
     GDT_INVALID = 0xFFFFFFFF
 };

@@ -27,7 +27,6 @@
 #include <stdio.h>
 static AMDTInt32 g_isSmtEnable = -1;
 AMDTPwrProfileAttributeList g_attributeList;
-fpPwrCheckFamily17 g_fpPwrCheckFamily17 = nullptr;
 
 // ReadPciAddress : PCIe Device address read
 bool ReadPciAddress(AMDTUInt32 bus,
@@ -163,15 +162,6 @@ AMDTUInt32 GetSupportedTargetPlatformId()
             idx = PLATFORM_MULLINS;
         }
     }
-    else
-    {
-        if (nullptr != g_fpPwrCheckFamily17)
-        {
-            idx = g_fpPwrCheckFamily17(family, model);
-        }
-    }
-
-#if 0
     else if (0x17 == family)
     {
         if (model <= 0x0F)
@@ -181,7 +171,6 @@ AMDTUInt32 GetSupportedTargetPlatformId()
         }
     }
 
-#endif
     return idx;
 }
 
@@ -597,6 +586,26 @@ AMDTInt32 PwrGetProcessId(void)
     return pId;
 }
 
+// PwrGetZeppelinCef: Zeppelin Core effective frequency
+AMDTFloat64 PwrGetZeppelinCef(AMDTUInt64 pstate)
+{
+    return (AMDTFloat64)((AMDTFloat64)(pstate & ZEPLIN_CPUFID_MASK) /
+                         (AMDTFloat64)((pstate & ZEPLIN_CPUDID_MASK) >> ZEPLIN_CPUDID_BITSHIFT) * 200); // in MHz
+
+}
+
+// PwrGetEnergyUnit
+void PwrGetEnergyUnit(AMDTUInt32* pUnit)
+{
+    ACCESS_MSR msr;
+    msr.isReadAccess = true;
+    msr.regId = RAPL_PWR_UNIT_ADDR;
+    AccessMSRAddress(&msr);
+
+    *pUnit = static_cast<AMDTUInt8>((msr.data & 0x1F00) >> 8) ? static_cast<AMDTUInt8>((msr.data & 0x1F00) >> 8) : ZEPPELIN_ENERGY_VAL;
+    //m_zepPwrUnit.m_timeUnit = static_cast<AMDTUInt8>((msr.data & 0xF0000) >> 16) ? static_cast<AMDTUInt8>((msr.data & 0xF0000) >> 16) : ZEPPELIN_TIME_VAL;
+    //m_zepPwrUnit.m_pwrUnit = static_cast<AMDTUInt8>(msr.data & 0xF) ? static_cast<AMDTUInt8>(msr.data & 0xF) : ZEPPELIN_POWER_VAL;
+}
 AMDTUInt32 PwrGetCoreCntFromOS()
 {
     AMDTUInt32 coreCnt = 0;

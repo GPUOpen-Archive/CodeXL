@@ -57,8 +57,6 @@ PwrSupportedCounterMap g_supportedCounterMap;
 
 fpFillSmuInternal g_fpFillSmuInternal = nullptr;
 fpGetCountersInternal g_fpGetSmuCountersInternal = nullptr;
-fpGetCountersInternal g_fpGetZeppelinCountersInternal = nullptr;
-
 
 bool GetAvailableSmuList(SmuList* pList);
 
@@ -106,6 +104,19 @@ AMDTPwrCounterBasicInfo g_CounterDgpuSmu7_0[] =
 */
 typedef void* ProfileControlHandle;
 
+
+// Zeppelin Node specific Counters- PID, TID, pstate, cef, node temperature
+AMDTPwrCounterBasicInfo g_zeppelinNodeCounters[] =
+{
+#include "ZeppelinNodeCounterList.h"
+};
+
+// PwrGetZeppelinCounters: Get Smu9 counters
+AMDTUInt32 PwrGetZeppelinCounters(AMDTPwrCounterBasicInfo** pCouters)
+{
+    *pCouters = g_zeppelinNodeCounters;
+    return sizeof(g_zeppelinNodeCounters) / sizeof(AMDTPwrCounterBasicInfo);
+}
 
 //AMDTPwrProfileInitialize-This will set up the power profiling driver for your profile .
 AMDTResult PwrProfileInitialize(
@@ -1231,7 +1242,7 @@ bool GetAvailableSmuList(SmuList* pList)
                     if (nullptr != g_fpFillSmuInternal)
                     {
                         g_fpFillSmuInternal(&pList->m_info[smuCnt].m_access);
-			smuAccessible = true;
+		                smuAccessible = true;
                     }
                 }
 
@@ -1647,12 +1658,9 @@ AMDTResult PwrGetSupportedCounters(CounterMap** pList)
         {
             if (PLATFORM_ZEPPELIN == sysInfo.m_platformId)
             {
-                if (nullptr != g_fpGetZeppelinCountersInternal)
-                {
-                    AMDTPwrCounterBasicInfo* pCounters = nullptr;
-                    counterCnt = g_fpGetZeppelinCountersInternal(&pCounters);;
-                    PwrFillSupportedCounters(pCounters, counterCnt, &sysInfo, 0, &clientId, 0);
-                }
+                AMDTPwrCounterBasicInfo* pCounters = nullptr;
+                counterCnt = PwrGetZeppelinCounters(&pCounters);;
+                PwrFillSupportedCounters(pCounters, counterCnt, &sysInfo, 0, &clientId, 0);
             }
             else
             {

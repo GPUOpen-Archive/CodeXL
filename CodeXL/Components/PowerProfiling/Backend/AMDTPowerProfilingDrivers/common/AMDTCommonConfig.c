@@ -33,6 +33,9 @@
 #endif
 static bool g_smuAccessOk = true;
 
+#define RETIRED_PERFORMACE_CNT 0xC00000E9
+#define ACTUAL_PERFORMANCE_FREQ_CLOCK_CNT 0xC00000E8
+
 // FillSmuAccessData: Fill the smu structure based on SMU type
 bool FillSmuAccessData(SmuList* srcList, SmuList* destList)
 {
@@ -185,16 +188,21 @@ void ConfigureSmu(SmuList* pList, bool isOn)
 
 }
 
+// PwrReadZpIpcData: Get MSR based Zepplin IPC data
+void PwrReadZpIpcData(uint64* pData)
+{
+    pData[PMC_EVENT_RETIRED_MICRO_OPS] = HelpReadMsr64(RETIRED_PERFORMACE_CNT);
+    pData[PMC_EVENT_CPU_CYCLE_NOT_HALTED] = HelpReadMsr64(ACTUAL_PERFORMANCE_FREQ_CLOCK_CNT);
+}
+
+// PwrGetIpcData: Get Ipc data based on platform
 void PwrGetIpcData(PmcCounters* pSrc, uint64* pData)
 {
-#ifdef AMDT_INTERNAL_COUNTERS
-
     if (PLATFORM_ZEPPELIN == HelpPwrGetTargetPlatformId())
     {
         PwrReadZpIpcData(pData);
     }
     else
-#endif
     {
         ReadPmcCounterData(pSrc, pData);
         ResetPMCCounters(pSrc);

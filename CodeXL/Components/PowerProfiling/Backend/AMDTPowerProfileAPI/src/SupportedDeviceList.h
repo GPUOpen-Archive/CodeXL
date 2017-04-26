@@ -135,8 +135,9 @@ PciDeviceInfo g_deviceTable[PWR_MAX_DEVICE_LIST_SIZE] =
     { GDT_BAFFIN, 0x67EB, DEVICE_TYPE_DGPU, "Baffin", "AMD Radeon Series", "Baffin", SMU_IPVERSION_7_1 },
     { GDT_BAFFIN, 0x67EF, DEVICE_TYPE_DGPU, "Baffin", "AMD Radeon Series", "Baffin", SMU_IPVERSION_7_1 },
     { GDT_BAFFIN, 0x67FF, DEVICE_TYPE_DGPU, "Baffin", "AMD Radeon Series", "Baffin", SMU_IPVERSION_7_1 },
+    { GDT_POLARIS12, 0x699F, DEVICE_TYPE_DGPU, "Polaris12", "AMD Radeon RX 500   Series", "Polaris12", SMU_IPVERSION_7_1 },
 
-	// Reserved
+    // Reserved
     { GDT_INVALID, 0xFFFF, DEVICE_TYPE_OTHERS, "Reserver", "Reserved", "", SMU_IPVERSION_INVALID},
     { GDT_INVALID, 0xFFFF, DEVICE_TYPE_OTHERS, "Reserver", "Reserved", "", SMU_IPVERSION_INVALID},
     { GDT_INVALID, 0xFFFF, DEVICE_TYPE_OTHERS, "Reserver", "Reserved", "", SMU_IPVERSION_INVALID},

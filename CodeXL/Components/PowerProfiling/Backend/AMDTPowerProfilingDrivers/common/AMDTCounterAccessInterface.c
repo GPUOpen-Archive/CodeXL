@@ -307,7 +307,6 @@ bool CollectNodeCounters(CoreData* pCoreCfg, uint32* pLength)
                     offset += sizeof(uint32);
                     break;
                 }
-#ifdef AMDT_INTERNAL_COUNTERS
 
                 case COUNTERID_CORE_ENERGY:
                 {
@@ -336,7 +335,6 @@ bool CollectNodeCounters(CoreData* pCoreCfg, uint32* pLength)
                     break;
                 }
 
-#endif
                 default:
                     break;
             }
@@ -421,7 +419,6 @@ void PwrReadInitialValues(uint32 coreId)
         }
 
         msr.isReadAccess = true;
-#ifdef AMDT_INTERNAL_COUNTERS
         msr.regId = CORE_ENERGY_STAT_ADDR;
         HelpAccessMSRAddress(&msr);
         prevCoreEnergy[coreId] = msr.data;
@@ -435,7 +432,6 @@ void PwrReadInitialValues(uint32 coreId)
             HelpAccessMSRAddress(&msr);
             prevPkgEnergy = msr.data;
         }
-#endif
     }
 }
 
