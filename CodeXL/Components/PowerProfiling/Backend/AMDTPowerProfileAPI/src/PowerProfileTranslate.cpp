@@ -36,9 +36,6 @@ std::list <ProcessName> g_processNames;
 MemoryPool g_transPool;
 
 fpDecodeSmuInternal g_fpDecodeSmuInternal = nullptr;
-fpPwrGetEnergyUnit g_fpPwrGetEnergyUnit = nullptr;
-fpPwrGetZeppelinCef g_fpPwrGetZeppelinCef = nullptr;
-
 
 void PwrResetRecordData(AMDTPwrProcessedDataRecord& data)
 {
@@ -242,10 +239,7 @@ AMDTResult PowerProfileTranslate::InitPowerTranslate(const wchar_t* pFileName, A
 
     if (PLATFORM_ZEPPELIN == GetSupportedTargetPlatformId())
     {
-        if (nullptr != g_fpPwrGetEnergyUnit)
-        {
-            g_fpPwrGetEnergyUnit(&m_energyUnit);
-        }
+        PwrGetEnergyUnit(&m_energyUnit);
     }
 
     // Reset Ipc storage
@@ -1311,10 +1305,7 @@ AMDTUInt32 PowerProfileTranslate::DecodeNodeCounters(PwrCounterDecodeInfo* pDeco
 
                 if (PLATFORM_ZEPPELIN == m_platformId)
                 {
-                    if (nullptr != g_fpPwrGetZeppelinCef)
-                    {
-                        pStateFreq = g_fpPwrGetZeppelinCef(pState);
-                    }
+                    pStateFreq = PwrGetZeppelinCef(pState);
                 }
                 else
                 {

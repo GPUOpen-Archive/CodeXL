@@ -66,6 +66,17 @@ enum
 #define CPU_BASE_FAMILY_MASK    0x00000F00
 #define CPU_EXT_FAMILY_MASK     0x0FF00000
 #define CPU_EXT_MODEL_MASK      0x000F0000
+
+//Zeppelin specific defintion
+#define ZEPLIN_CPUDID_MASK  0x3F00ULL
+#define ZEPLIN_CPUFID_MASK  0xFFULL
+#define ZEPLIN_CPUDID_BITSHIFT 8
+
+#define ZEPPELIN_POWER_VAL 0x3
+#define ZEPPELIN_ENERGY_VAL 0x10
+#define ZEPPELIN_TIME_VAL  0xA
+#define RAPL_PWR_UNIT_ADDR 0xC0010299
+
 typedef union _ExtendedPciAddressSpace
 {
     // \brief The elements that make up a PCI address in PCI config space
@@ -206,6 +217,12 @@ AMDTUInt32 PwrGetPhysicalCores(void);
 
 // Get Process Id
 AMDTInt32 PwrGetProcessId(void);
+
+// PwrGetZeppelinCef: Zeppelin Core effective frequency
+AMDTFloat64 PwrGetZeppelinCef(AMDTUInt64 pstate);
+
+// PwrGetEnergyUnit
+void PwrGetEnergyUnit(AMDTUInt32* pUnit);
 
 #endif //_POWERPROFILEHELPER_H_
 
