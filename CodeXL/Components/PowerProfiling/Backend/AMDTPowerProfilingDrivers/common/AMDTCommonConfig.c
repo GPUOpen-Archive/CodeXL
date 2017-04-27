@@ -191,20 +191,11 @@ void ConfigureSmu(SmuList* pList, bool isOn)
 // PwrReadZpIpcData: Get MSR based Zepplin IPC data
 void PwrReadZpIpcData(uint64* pData)
 {
-    ACCESS_MSR msr;
-    msr.isReadAccess = true;
-    msr.regId = RETIRED_PERFORMACE_CNT;
-
-    HelpAccessMSRAddress(&msr);
-    pData[PMC_EVENT_RETIRED_MICRO_OPS] = msr.data;
-
-    msr.isReadAccess = true;
-    msr.regId = ACTUAL_PERFORMANCE_FREQ_CLOCK_CNT;
-    HelpAccessMSRAddress(&msr);
-    pData[PMC_EVENT_CPU_CYCLE_NOT_HALTED] = msr.data;
-
+    pData[PMC_EVENT_RETIRED_MICRO_OPS] = HelpReadMsr64(RETIRED_PERFORMACE_CNT);
+    pData[PMC_EVENT_CPU_CYCLE_NOT_HALTED] = HelpReadMsr64(ACTUAL_PERFORMANCE_FREQ_CLOCK_CNT);
 }
 
+// PwrGetIpcData: Get Ipc data based on platform
 void PwrGetIpcData(PmcCounters* pSrc, uint64* pData)
 {
     if (PLATFORM_ZEPPELIN == HelpPwrGetTargetPlatformId())
