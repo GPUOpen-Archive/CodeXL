@@ -189,7 +189,7 @@ void ConfigureSmu(SmuList* pList, bool isOn)
 }
 
 // PwrReadZpIpcData: Get MSR based Zepplin IPC data
-void PwrReadZpIpcData(uint32* pData)
+void PwrReadZpIpcData(uint64* pData)
 {
     ACCESS_MSR msr;
     msr.isReadAccess = true;
