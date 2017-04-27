@@ -205,7 +205,7 @@ void PwrReadZpIpcData(uint32* pData)
 
 }
 
-void PwrGetIpcData(PmcCounters* pSrc, uint32* pData)
+void PwrGetIpcData(PmcCounters* pSrc, uint64* pData)
 {
     if (PLATFORM_ZEPPELIN == HelpPwrGetTargetPlatformId())
     {
