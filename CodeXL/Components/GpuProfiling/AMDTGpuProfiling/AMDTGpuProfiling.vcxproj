@@ -47,6 +47,9 @@
       <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">4996;4324;4189;4718</DisableSpecificWarnings>
       <BrowseInformation Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</BrowseInformation>
     </ClCompile>
+    <PostBuildEvent>
+      <Command>$(SolutionDir)\rcp_copy.bat $(Configuration)</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\Common\Src\AMDTMutex\AMDTMutex.cpp" />
