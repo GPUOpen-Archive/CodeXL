@@ -14,18 +14,18 @@ if sys.version_info[0] >= 3:
 if isPython3OrAbove:
 	import urllib.request
 
-# key = Jenkins artifact link
+# key = GitHub release link
 # value = location
 downloadMappingWin = {
     "https://github.com/GPUOpen-Tools/RGA/releases/download/1.0.0.0/rga-windows-x64-1.0.zip" : "./Common/Lib/AMD/RGA/x64",
-	"https://github.com/GPUOpen-Tools/RGA/releases/download/1.0.0.0/rga-windows-x86-1.0.zip" : "./Common/Lib/AMD/RGA/x86",
-    "http://bdclin64-gdt-jenkins:8080/view/GPU%20Profiling/job/RadeonComputeProfiler/6313/artifact/RCP/Build/RCPProfileDataParser.2017-04-06-v5.0.6313.zip" : "./Common/Lib/AMD/RCP",
-    "http://bdclin64-gdt-jenkins:8080/view/GPU%20Profiling/job/RadeonComputeProfiler/6313/artifact/RCP/Build/RadeonComputeProfiler.2017-04-06-v5.0.6313.zip" : "./Common/Lib/AMD/RCP"
+    "https://github.com/GPUOpen-Tools/RGA/releases/download/1.0.0.0/rga-windows-x86-1.0.zip" : "./Common/Lib/AMD/RGA/x86",
+    "https://github.com/GPUOpen-Tools/RCP/releases/download/v5.0preview/RadeonComputeProfiler.2017-04-27-v5.0.6372.zip" : "./Common/Lib/AMD/RCP",
+    "https://github.com/GPUOpen-Tools/RCP/releases/download/v5.0preview/RCPProfileDataParser.2017-04-27-v5.0.6372.zip" : "./Common/Lib/AMD/RCP"
 }
 downloadMappingLin = {
     "https://github.com/GPUOpen-Tools/RGA/releases/download/1.0.0.0/rga-linux-1.0.tgz" : "./Common/Lib/AMD/RGA",
-    "http://bdclin64-gdt-jenkins:8080/view/GPU%20Profiling/job/RadeonComputeProfiler-Linux/6223/artifact/RCP/Build/Linux/RadeonComputeProfiler-v5.0.6223.tgz" : "./Common/Lib/AMD/RCP",
-    "http://bdclin64-gdt-jenkins:8080/view/GPU%20Profiling/job/RadeonComputeProfiler-Linux/6223/artifact/RCP/Build/Linux/RCPProfileDataParser-v5.0.6223.tgz" : "./Common/Lib/AMD/RCP"
+    "https://github.com/GPUOpen-Tools/RCP/releases/download/v5.0preview/RadeonComputeProfiler-v5.0.6292.tgz" : "./Common/Lib/AMD/RCP",
+    "https://github.com/GPUOpen-Tools/RCP/releases/download/v5.0preview/RCPProfileDataParser-v5.0.6292.tgz" : "./Common/Lib/AMD/RCP"
 }
 
 # to allow the script to be run from anywhere - not just the cwd - store the absolute path to the script file
