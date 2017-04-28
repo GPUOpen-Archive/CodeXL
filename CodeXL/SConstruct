@@ -489,25 +489,14 @@ CXL_env.Depends(GpuProfilingPlugins , FrameworkComponents)
 #
 
 KernelAnalyzer = []
-KernelAnalyzerBackend_Obj = SConscript('Components/ShaderAnalyzer/AMDTBackEnd/SConscript', variant_dir=obj_variant_dir+'/AMDTBackEnd', duplicate=0)
-CXL_env.Depends(KernelAnalyzerBackend_Obj, 
-                OSWrappers_Obj
-                + BaseTools_Obj)
-KernelAnalyzer += KernelAnalyzerBackend_Obj
 
 KernelAnalyzerFrontEnd_Obj = SConscript('Components/ShaderAnalyzer/AMDTKernelAnalyzer/SConscript', variant_dir=obj_variant_dir+'/AMDTKernelAnalyzer', duplicate=1)
 CXL_env.Depends(KernelAnalyzerFrontEnd_Obj, 
                 BaseTools_Obj
                 + OSWrappers_Obj
 		+ APIClasses_Obj
-		+ AppFramework_Obj
-		+ KernelAnalyzerBackend_Obj)
+		+ AppFramework_Obj)
 KernelAnalyzer += KernelAnalyzerFrontEnd_Obj
-
-KernelAnalyzerCLI_Obj = SConscript('Components/ShaderAnalyzer/AMDTKernelAnalyzerCLI/SConscript', variant_dir=obj_variant_dir+'/AMDTKernelAnalyzerCLI', duplicate=1)
-CXL_env.Depends(KernelAnalyzerCLI_Obj, 
-                KernelAnalyzerBackend_Obj)
-KernelAnalyzer += KernelAnalyzerCLI_Obj
 
 ############################################
 #
@@ -670,9 +659,7 @@ Alias( target='AMDTPowerProfiling'   , source=(AMDTPowerProfiling_Obj))
 Alias( target='AMDTGraphicsServerInterface'   , source=(GpuProfGraphics_Obj))
 Alias( target='AMDTGpuProfiling'   , source=(GpuProf_Obj))
 #KernelAnalyzer
-Alias( target='AMDTBackEnd'   , source=(KernelAnalyzerBackend_Obj))
 Alias( target='AMDTKernelAnalyzer'   , source=(KernelAnalyzerFrontEnd_Obj))
-Alias( target='AMDTKernelAnalyzerCLI'   , source=(KernelAnalyzerCLI_Obj))
 #GPSBackend
 Alias( target='APICommon'   ,source=(GPSAPICommon_Obj))
 Alias( target='VulkanServer'   ,source=(VulkanServer))
