@@ -20,12 +20,6 @@ UseQScintilla(GPUProf_env)
 UseQt4(GPUProf_env)
 UseQCustomPlot(GPUProf_env)
 
-CXL_lib_common_amd_deps = (
-    'GPUPerfAPI',
-)
-
-initCommonLibAmd (GPUProf_env, CXL_lib_common_amd_deps) 
-
 GPUProf_env.Append( LIBS=
 [
     'CXLRemoteClient',
