@@ -294,3 +294,7 @@ CodeXL/Components/GpuProfiling/Non-OpenSource
 CodeXL/Components/PowerProfiling/Backend/AMDTPowerProfilingDrivers/common/*.o
 CodeXL/Components/PowerProfiling/Backend/AMDTPowerProfilingDrivers/common/*.o.cmd
 CodeXL/Components/PowerProfiling/Backend/AMDTPowerProfilingDrivers/Linux/CodeXLPwrProfDriverSource.tar.gz
+
+# RCP
+Common/Lib/AMD/RCP/RCPProfileDataParser
+Common/Lib/AMD/RCP/RadeonComputeProfiler
