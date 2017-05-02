@@ -950,7 +950,7 @@ void TraceView::OnParseCallHandler(AtpInfoType apiType, bool& stopParsing)
             case OPENCL_INFO:
             {
                 m_api = APIToTrace_OPENCL;
-                ICLAPIInfoDataHandler* clApiInfoHandler = pAtpDataHandler->GetCLApiInfoDataHnadler();
+                ICLAPIInfoDataHandler* clApiInfoHandler = pAtpDataHandler->GetCLApiInfoDataHandler();
                 stopParsing = CheckStopParsing(clApiInfoHandler->GetApiInfoDataHandler()->GetApiEndTime());
 
                 if (!stopParsing)
