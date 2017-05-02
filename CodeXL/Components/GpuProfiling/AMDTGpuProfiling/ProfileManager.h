@@ -328,7 +328,6 @@ private:
     QString                           m_strImportedSessionName; ///< used to store session name when generating summary pages asynchronously
     QString                           m_strImportedFileName;    ///< used to store file name when generating summary pages asynchronously
 
-    QString                           m_strOccParamsFile;       ///< used to store occupancy params file name when generating occupancy HTML page asynchronously
     QString                           m_strOutputOccHTMLPage;   ///< used to store the name of the HTML file when generating occupancy HTML page asynchronously
     QString                           m_strRemoteProfilingError;///< used to the error message for errors which occur during asynchronous remote profiling
 
@@ -339,7 +338,7 @@ private:
     static QList<gtString>           m_sAdditionalFileExtensionsToRename;
 
 
-    std::vector<unsigned int>        m_kernelOccupancyChartGenerated; ///< flag indicating kernel occupancy chart is generated or not
+    std::map<ExplorerSessionId, std::vector<unsigned int> > m_kernelOccupancyChartGenerated; ///< flag indicating kernel occupancy chart is generated or not
 
     /// process id of the GPU profiler
     osProcessId m_GPUProfilerProcessId;
