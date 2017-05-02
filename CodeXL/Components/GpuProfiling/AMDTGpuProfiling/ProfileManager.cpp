@@ -1123,7 +1123,7 @@ bool ProfileManager::GetProfilerServer(osFilePath& strServer, QString& strErrorM
     }
 
 #if (AMDT_BUILD_CONFIGURATION == AMDT_DEBUG_BUILD)
-    profilerFileName.append(L"-d");
+//    profilerFileName.append(L"-d");
 #endif
 
     if (Util::IsInternalBuild())
@@ -1674,16 +1674,22 @@ bool ProfileManager::GenerateOccupancyPage(GPUSessionTreeItemData* pSessionData,
 
         std::string outputFile = m_strOutputOccHTMLPage.toStdString();
 
-        std::vector<unsigned int>::iterator callIndexIter;
-        callIndexIter = std::find(m_kernelOccupancyChartGenerated.begin(), m_kernelOccupancyChartGenerated.end(), callIndex);
+        bool occChartGenerated = false;
 
-        if (callIndexIter == m_kernelOccupancyChartGenerated.end())
+        if (m_kernelOccupancyChartGenerated.find(pSessionData->m_sessionId) != m_kernelOccupancyChartGenerated.end())
+        {
+            std::vector<unsigned int>::iterator callIndexIter;
+            callIndexIter = std::find(m_kernelOccupancyChartGenerated[pSessionData->m_sessionId].begin(), m_kernelOccupancyChartGenerated[pSessionData->m_sessionId].end(), callIndex);
+            occChartGenerated = callIndexIter == m_kernelOccupancyChartGenerated[pSessionData->m_sessionId].end();
+        }
+
+        if (!occChartGenerated)
         {
             retVal = pOccInfo->GenerateOccupancyChart(outputFile, errorMessage);
 
             if(retVal)
             {
-                m_kernelOccupancyChartGenerated.push_back(callIndex);
+                m_kernelOccupancyChartGenerated[pSessionData->m_sessionId].push_back(callIndex);
             }
         }
         else
