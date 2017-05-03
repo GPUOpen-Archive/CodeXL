@@ -1680,7 +1680,7 @@ bool ProfileManager::GenerateOccupancyPage(GPUSessionTreeItemData* pSessionData,
         {
             std::vector<unsigned int>::iterator callIndexIter;
             callIndexIter = std::find(m_kernelOccupancyChartGenerated[pSessionData->m_sessionId].begin(), m_kernelOccupancyChartGenerated[pSessionData->m_sessionId].end(), callIndex);
-            occChartGenerated = callIndexIter == m_kernelOccupancyChartGenerated[pSessionData->m_sessionId].end();
+            occChartGenerated = callIndexIter != m_kernelOccupancyChartGenerated[pSessionData->m_sessionId].end();
         }
 
         if (!occChartGenerated)
