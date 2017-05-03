@@ -96,7 +96,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;GLEW_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;GLEW_STATIC;USE_POINTER_SINGLETON;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>.;./Include/Common;$(CommonDir)\Src\ShaderUtils;$(CommonDir)\Src\ShaderUtils\DX10;$(CommonDir)\Src\ShaderUtils\DX11;$(CommonDir)\DX10ASM;$(CommonDir)\src\ACLModuleManager;..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -105,7 +105,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(AMDTModuleType)'=='Dynamic'">
     <ClCompile>
-      <PreprocessorDefinitions>AMDTBACKEND_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>AMDTBACKEND_EXPORTS;USE_POINTER_SINGLETON;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
     </ClCompile>
     <Link>
@@ -123,7 +123,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(AMDTModuleType)'=='Static'">
     <ClCompile>
-      <PreprocessorDefinitions>AMDTANALYSISBACKEND_STATIC;AMDTOSAPIWRAPPERS_STATIC;AMDTOSWRAPPERS_STATIC;AMDTBASETOOLS_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>AMDTANALYSISBACKEND_STATIC;AMDTOSAPIWRAPPERS_STATIC;AMDTOSWRAPPERS_STATIC;AMDTBASETOOLS_STATIC;USE_POINTER_SINGLETON;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Lib>
       <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
@@ -135,7 +135,7 @@
   <ItemDefinitionGroup Condition="'$(AMDTConfiguration)'=='Debug'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;USE_POINTER_SINGLETON;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
     </ClCompile>
     <ResourceCompile>
@@ -147,7 +147,7 @@
     <ClCompile>
       <Optimization>MaxSpeed</Optimization>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
-      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;USE_POINTER_SINGLETON;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <FunctionLevelLinking>true</FunctionLevelLinking>
     </ClCompile>
