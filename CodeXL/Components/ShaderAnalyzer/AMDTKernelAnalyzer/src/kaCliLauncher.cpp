@@ -26,7 +26,7 @@
     const std::string ANALYZER_CLI_WIN_X86 = "x86\\rga.exe";
     const std::string ANALYZER_CLI_WIN_X64 = "x64\\rga.exe";
 #else
-    const std::string ANALYZER_CLI_LINUX_X64 = "rga";
+    const std::string ANALYZER_CLI_LINUX_X64 = "rga-bin";
 #endif
 
 const std::string KA_STR_CL_CLI_CMD_PREFIX = "-s cl";
