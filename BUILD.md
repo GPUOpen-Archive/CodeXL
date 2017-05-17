@@ -20,7 +20,7 @@ CodeXL uses
 * Radeon Graphics Analyzer for analyzing Shaders and OpenCL Kernels. See https://github.com/GPUOpen-Tools/RGA.
 To fetch these command line tools run the following command:
 ```bash
-python fetch_dependencies.py
+python CodeXL/Scripts/FetchDependencies.py
 ```
 
 ## Windows
