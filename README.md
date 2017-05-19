@@ -50,7 +50,7 @@ LGPL (Copyright ©1991, 1999 Free Software Foundation, Inc.  51 Franklin Street,
 * [CR]LunarG, Inc. is Copyright © 2015 LunarG, Inc.
 * jqPlot is copyright © 2009-2011 Chris Leonello.
 * glew - The OpenGL Extension Wrangler Library is Copyright © 2002-2007, Milan Ikits <milan ikits[]ieee org>, Copyright © 2002-2007, Marcelo E. Magallon <mmagallo[]debian org>, Copyright © 2002, Lev Povalahev, All rights reserved.
-* lgplib is Copyright © 1994-1998, Thomas G. Lane., Copyright © 1991-2013, Thomas G. Lane, Guido Vollbeding. 
+* jpglib is Copyright © 1994-1998, Thomas G. Lane., Copyright © 1991-2013, Thomas G. Lane, Guido Vollbeding. 
 * LibDwarf (BSD) is Copyright © 2007 John Birrell (jb@freebsd.org),  Copyright © 2010 Kai Wang,  All rights reserved.
 * libpng is Copyright © 1998-2014 Glenn Randers-Pehrson, (Version 0.96 Copyright © 1996, 1997 Andreas Dilger) (Version 0.88 Copyright © 1995, 1996 Guy Eric Schalnat, Group 42, Inc.).
 * QScintilla is Copyright © 2005 by Riverbank Computing Limited <info@riverbankcomputing.co.uk>.
