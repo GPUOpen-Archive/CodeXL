@@ -28,7 +28,7 @@ void SetApiNum(osThreadId threadId, unsigned int apiNum);
 /// \param[in] strProgressMessage message of the progress
 /// \param[in] uiCurItem index of the current item
 /// \param[in] uiTotalItems total number of the API count
-void ReportProgressOnParsing(const std::string& strProgressMessage, unsigned int uiCurItem, unsigned int uiTotalItems);
+void ReportProgressOnParsing(const char* strProgressMessage, unsigned int uiCurItem, unsigned int uiTotalItems);
 
 
 /// Helper Class to handle ATP file parsing for CodeXL
@@ -67,7 +67,7 @@ public:
     /// \param[in] strProgressMessage message of the progress
     /// \param[in] uiCurItem index of the current item
     /// \param[in] uiTotalItems total number of the API count
-    void OnReportProgress(const std::string& strProgressMessage, unsigned int uiCurItem, unsigned int uiTotalItems);
+    void OnReportProgress(const char* strProgressMessage, unsigned int uiCurItem, unsigned int uiTotalItems);
 
     /// Get the AtpParserFunctionPointer
     /// \return function pointer of the AtpParserFunc from the library

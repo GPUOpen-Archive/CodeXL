@@ -99,7 +99,7 @@ public:
     /// \param strProgressMessage the progress message to display for this progress event
     /// \param uiCurItem the index of the current item being parsed
     /// \param uiTotalItems the total number of items to be parsed
-    void OnParserProgressCallHandler(const std::string& strProgressMessage, unsigned int uiCurItem, unsigned int uiTotalItems) override;
+    void OnParserProgressCallHandler(const char* strProgressMessage, unsigned int uiCurItem, unsigned int uiTotalItems) override;
 
     /// Display the requested summary type
     /// \param selectedIndex - The requested summary to display on the summary page tab

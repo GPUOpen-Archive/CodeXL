@@ -1009,12 +1009,12 @@ void TraceView::OnSetApiNumCallHandler(osThreadId threadId, unsigned int apiNum)
     this->SetAPINum(threadId, apiNum);
 }
 
-void TraceView::OnParserProgressCallHandler(const std::string& strProgressMessage, unsigned int uiCurItem, unsigned int uiTotalItems)
+void TraceView::OnParserProgressCallHandler(const char* strProgressMessage, unsigned int uiCurItem, unsigned int uiTotalItems)
 {
     gtString localProgressMsg;
     afProgressBarWrapper& theProgressBarWrapper = afProgressBarWrapper::instance();
 
-    localProgressMsg.fromASCIIString(strProgressMessage.c_str());
+    localProgressMsg.fromASCIIString(strProgressMessage);
 
     // If this is the first item we're reporting to the progress indicator, or if the
     // progress dialog is not shown (was hidden by some other stage of the load?)
@@ -1025,11 +1025,14 @@ void TraceView::OnParserProgressCallHandler(const std::string& strProgressMessag
         theProgressBarWrapper.setProgressText(localProgressMsg);
 
         // Store the message displayed on the progress dialog for later comparison to avoid unnecessary updates
-        m_currentProgressMessage = strProgressMessage;
+        if (nullptr != strProgressMessage)
+        {
+            m_currentProgressMessage = strProgressMessage;
+        }
     }
 
     // Update the progress message only if it has changed
-    if (m_currentProgressMessage != strProgressMessage)
+    if (nullptr != strProgressMessage && m_currentProgressMessage != strProgressMessage)
     {
         theProgressBarWrapper.setProgressText(localProgressMsg);
         m_currentProgressMessage = strProgressMessage;
@@ -1095,6 +1098,7 @@ bool TraceView::LoadSessionUsingBackendParser(const osFilePath& sessionFile)
         AtpUtils::Instance()->AddToCallBackHandlerList(this);
         std::string sessionFileAsString = sessionFile.asString().asASCIICharArray();
         retVal = parserFunc(sessionFileAsString.c_str(), OnParse, SetApiNum, ReportProgressOnParsing);
+        AtpUtils::Instance()->RemoveHandlerFromCallBackHandlerList(this);
     }
 
     return retVal;
@@ -1329,7 +1333,8 @@ void TraceView::HandleCLAPIInfo(ICLAPIInfoDataHandler* pClApiInfo)
 
                         if (pOccupancyInfosList != nullptr && nOccIndex < pOccupancyInfosList->count())
                         {
-                            QString deviceName = QString().fromStdString((*pOccupancyInfosList)[nOccIndex]->GetDeviceName());
+                            std::string tempString((*pOccupancyInfosList)[nOccIndex]->GetDeviceName());
+                            QString deviceName = QString().fromStdString(tempString);
 
                             if (Util::CheckOccupancyDeviceName(deviceName, deviceNameStr))
                             {

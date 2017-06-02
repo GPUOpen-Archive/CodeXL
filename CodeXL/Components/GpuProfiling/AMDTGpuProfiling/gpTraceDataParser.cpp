@@ -218,7 +218,7 @@ void gpTraceDataParser::OnParse(ISymbolFileEntryInfoDataHandler* pSymbolFileEntr
 
         IStackEntryInfoDataHandler* pStackEntryInfoHandler = pSymbolFileEntry->GetStackEntryInfoHandler();
 
-        if (!pSymbolFileEntry->IsStackEntryNull() && (pStackEntryInfoHandler->GetLineNumber() != (LineNum)(-1)) && (!pStackEntryInfoHandler->GetFileNameString().empty()))
+        if (!pSymbolFileEntry->IsStackEntryNull() && (pStackEntryInfoHandler->GetLineNumber() != (LineNum)(-1)) && (!pStackEntryInfoHandler->GetFileNameString()))
         {
             pEntry = new SymbolInfo(QString::fromStdString(pSymbolFileEntry->GetSymbolApiName()),
                                     QString::fromStdString(pStackEntryInfoHandler->GetSymbolNameString()),
@@ -347,26 +347,30 @@ bool gpTraceDataParser::LoadOccupancyFile()
                 pAtpDataHandler_func(&pPtr);
                 IAtpDataHandler* pAtpDataHandler = reinterpret_cast<IAtpDataHandler*>(pPtr);
                 std::string occupancyFile = m_traceFilePath.asString().asASCIICharArray();
-                occupancyFileDataInfo = pAtpDataHandler->GetOccupancyFileInfoDataHandler(occupancyFile);
-                m_isOccupancyFileLoaded = occupancyFileDataInfo->ParseOccupancyFile(occupancyFile);
+                occupancyFileDataInfo = pAtpDataHandler->GetOccupancyFileInfoDataHandler(occupancyFile.c_str());
+                m_isOccupancyFileLoaded = occupancyFileDataInfo->ParseOccupancyFile(occupancyFile.c_str());
             }
 
             if (m_isOccupancyFileLoaded)
             {
-                std::map<osThreadId, KernelCount> occupancyThreads = occupancyFileDataInfo->GetKernelCountByThreadId();
+                osThreadId* osThreadIds;
+                unsigned int threadCount;
+                occupancyFileDataInfo->GetOccupancyThreads(&osThreadIds, threadCount);
 
-                for (std::map<osThreadId, KernelCount>::iterator occupancyThreadIter = occupancyThreads.begin(); occupancyThreadIter != occupancyThreads.end(); ++occupancyThreadIter)
+                for (unsigned int i = 0; i < threadCount; i++)
                 {
+                    const IOccupancyInfoDataHandler* occupancyInfo;
+                    unsigned int kernelCount;
+                    occupancyFileDataInfo->GetKernelCountByThreadId(osThreadIds[i], kernelCount);
                     QList<const IOccupancyInfoDataHandler*> occupancyInfoList;
-                    std::vector<const IOccupancyInfoDataHandler*> tempVector;
-                    tempVector = occupancyFileDataInfo->GetOccupancyInfoByThreadId(occupancyThreadIter->first);
 
-                    for (std::vector<const IOccupancyInfoDataHandler*>::iterator occupancyInfoIter = tempVector.begin(); occupancyInfoIter != tempVector.end(); ++occupancyInfoIter)
+                    for (unsigned int j = 0; j < kernelCount; j++)
                     {
-                        occupancyInfoList.push_back(*occupancyInfoIter);
+                        occupancyInfo = occupancyFileDataInfo->GetOccupancyInfoDataHandler(osThreadIds[i], j);
+                        occupancyInfoList.push_back(occupancyInfo);
                     }
 
-                    m_pSessionDataContainer->m_occupancyInfoMap.insert(occupancyThreadIter->first, occupancyInfoList);
+                    m_pSessionDataContainer->m_occupancyInfoMap.insert(osThreadIds[i], occupancyInfoList);
                 }
             }
 

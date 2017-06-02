@@ -28,7 +28,7 @@ public:
     /// \param[in] strProgressMessage message of the progress
     /// \param[in] uiCurItem index of the current item
     /// \param[in] uiTotalItems total number of the API count
-    virtual void OnParserProgressCallHandler(const std::string& strProgressMessage, unsigned int uiCurItem, unsigned int uiTotalItems) = 0;
+    virtual void OnParserProgressCallHandler(const char* strProgressMessage, unsigned int uiCurItem, unsigned int uiTotalItems) = 0;
 
     /// Destructor
     virtual ~ICallBackParserHandler() {};

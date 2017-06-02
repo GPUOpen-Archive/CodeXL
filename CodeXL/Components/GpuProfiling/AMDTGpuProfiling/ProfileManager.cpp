@@ -1658,7 +1658,7 @@ bool ProfileManager::GenerateOccupancyPage(GPUSessionTreeItemData* pSessionData,
 {
     bool retVal = false;
     osFilePath serverFile;
-    std::string errorMessage;
+    char* errorMessage = nullptr;
     strErrorMessageOut = "Error";
     if (pSessionData != nullptr && pOccInfo != nullptr)
     {
@@ -1689,7 +1689,7 @@ bool ProfileManager::GenerateOccupancyPage(GPUSessionTreeItemData* pSessionData,
 
         if (!occChartGenerated)
         {
-            retVal = pOccInfo->GenerateOccupancyChart(outputFile, errorMessage);
+            retVal = pOccInfo->GenerateOccupancyChart(outputFile.c_str(), &errorMessage);
 
             if(retVal)
             {

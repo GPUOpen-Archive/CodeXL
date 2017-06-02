@@ -19,7 +19,7 @@ void SetApiNum(osThreadId threadId, unsigned int apiNum)
     AtpUtils::Instance()->OnSetApiNumCallBackHandler(threadId, apiNum);
 }
 
-void ReportProgressOnParsing(const std::string& strProgressMessage, unsigned int uiCurItem, unsigned int uiTotalItems)
+void ReportProgressOnParsing(const char* strProgressMessage, unsigned int uiCurItem, unsigned int uiTotalItems)
 {
     AtpUtils::Instance()->OnReportProgress(strProgressMessage, uiCurItem, uiTotalItems);
 }
@@ -90,7 +90,7 @@ void AtpUtils::OnSetApiNumCallBackHandler(osThreadId osthreadId, unsigned int ap
     }
 }
 
-void AtpUtils::OnReportProgress(const std::string& strProgressMessage, unsigned int uiCurItem, unsigned int uiTotalItems)
+void AtpUtils::OnReportProgress(const char* strProgressMessage, unsigned int uiCurItem, unsigned int uiTotalItems)
 {
     for (std::vector<ICallBackParserHandler*>::iterator iter = m_ParserHandlerList.begin(); iter != m_ParserHandlerList.end(); ++iter)
     {

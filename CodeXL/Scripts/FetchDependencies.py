@@ -19,13 +19,15 @@ if isPython3OrAbove:
 downloadMappingWin = {
     "https://github.com/GPUOpen-Tools/RGA/releases/download/1.0.0.0/rga-windows-x64-1.0.zip" : "../../Common/Lib/AMD/RGA/x64",
     "https://github.com/GPUOpen-Tools/RGA/releases/download/1.0.0.0/rga-windows-x86-1.0.zip" : "../../Common/Lib/AMD/RGA/x86",
-    "https://github.com/GPUOpen-Tools/RCP/releases/download/v5.0preview/RadeonComputeProfiler.2017-05-02-v5.0.6383.zip" : "../../Common/Lib/AMD/RCP",
-    "https://github.com/GPUOpen-Tools/RCP/releases/download/v5.0preview/RCPProfileDataParser.2017-05-02-v5.0.6383.zip" : "../../Common/Lib/AMD/RCP"
+    # Below RCP artifact links are only for internal uses and it should not be merged to GitHub master branch
+    "http://bdclin64-gdt-jenkins:8080/view/GPU%20Profiling/job/RadeonComputeProfiler/lastSuccessfulBuild/artifact/RCP/Build/RadeonComputeProfiler.2017-06-02-v5.1.6423.zip" : "../../Common/Lib/AMD/RCP",
+    "http://bdclin64-gdt-jenkins:8080/view/GPU%20Profiling/job/RadeonComputeProfiler/lastSuccessfulBuild/artifact/RCP/Build/RCPProfileDataParser.2017-06-02-v5.1.6423.zip" : "../../Common/Lib/AMD/RCP"
 }
 downloadMappingLin = {
     "https://github.com/GPUOpen-Tools/RGA/releases/download/1.0.0.0/rga-linux-1.0.tgz" : "../../Common/Lib/AMD/RGA",
-    "https://github.com/GPUOpen-Tools/RCP/releases/download/v5.0preview/RadeonComputeProfiler-v5.0.6304.tgz" : "../../Common/Lib/AMD/RCP",
-    "https://github.com/GPUOpen-Tools/RCP/releases/download/v5.0preview/RCPProfileDataParser-v5.0.6304.tgz" : "../../Common/Lib/AMD/RCP"
+    # Below RCP artifact links are only for internal uses and it should not be merged to GitHub master branch
+    "http://bdclin64-gdt-jenkins:8080/view/GPU%20Profiling/job/RadeonComputeProfiler-Linux/6356/artifact/RCP/Build/Linux/RadeonComputeProfiler-v5.1.6356.tgz" : "../../Common/Lib/AMD/RCP",
+    "http://bdclin64-gdt-jenkins:8080/view/GPU%20Profiling/job/RadeonComputeProfiler-Linux/6356/artifact/RCP/Build/Linux/RCPProfileDataParser-v5.1.6356.tgz" : "../../Common/Lib/AMD/RCP"
 }
 
 # to allow the script to be run from anywhere - not just the cwd - store the absolute path to the script file
