@@ -1192,7 +1192,16 @@ bool ProfileManager::LaunchProfilerServer(const osFilePath& strServer, const gtS
         strServerLaunchMsg.append(strOptions);
         OS_OUTPUT_DEBUG_LOG(strServerLaunchMsg.asCharArray(), OS_DEBUG_LOG_DEBUG);
 
-        if (osLaunchSuspendedProcess(strServer, strOptions, workDir, m_GPUProfilerProcessId, processHandle, threadHandle, false))
+        AdditionalProcessParams* additionalParams = nullptr;
+
+#ifdef _WIN32
+        WindowsProcessAdditionalParameter windowsParam;
+        windowsParam.m_bCreateNewProcessWithGroup = false;
+        additionalParams = &windowsParam;
+#endif
+
+        if (osLaunchSuspendedProcess(strServer, strOptions, workDir, m_GPUProfilerProcessId,
+                                     processHandle, threadHandle, false, false, true, additionalParams))
         {
             // Create a process monitor:
             ProfileProcessMonitor* pNewMonitor = new ProfileProcessMonitor(m_GPUProfilerProcessId, runType);
