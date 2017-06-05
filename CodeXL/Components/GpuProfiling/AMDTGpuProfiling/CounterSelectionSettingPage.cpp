@@ -727,49 +727,61 @@ void CounterSelectionSettingWindow::InitializeCounterTreeView(bool isRemoteSessi
     m_pCounterListTW->clear();
     int numFamiliesSupported = 0;
 
-    bool bVISupported = false;
-    bool bCISupported = false;
-    bool bSISupported = false;
+    bool bGfx9Supported = false;
+    bool bGfx8Supported = false;
+    bool bGfx7Supported = false;
+    bool bGfx6Supported = false;
 
-    if (isRemoteSession || CounterManager::Instance()->IsHardwareFamilySupported(VOLCANIC_ISLANDS_FAMILY))
+    if (isRemoteSession || CounterManager::Instance()->IsHardwareFamilySupported(GFX9_FAMILY))
     {
         numFamiliesSupported++;
-        bVISupported = true;
+        bGfx9Supported = true;
     }
 
-    if (isRemoteSession || CounterManager::Instance()->IsHardwareFamilySupported(SEA_ISLANDS_FAMILY))
+    if (isRemoteSession || CounterManager::Instance()->IsHardwareFamilySupported(GFX8_FAMILY))
     {
         numFamiliesSupported++;
-        bCISupported = true;
+        bGfx8Supported = true;
     }
 
-    if (isRemoteSession || CounterManager::Instance()->IsHardwareFamilySupported(SOUTHERN_ISLANDS_FAMILY))
+    if (isRemoteSession || CounterManager::Instance()->IsHardwareFamilySupported(GFX7_FAMILY))
     {
         numFamiliesSupported++;
-        bSISupported = true;
+        bGfx7Supported = true;
+    }
+
+    if (isRemoteSession || CounterManager::Instance()->IsHardwareFamilySupported(GFX6_FAMILY))
+    {
+        numFamiliesSupported++;
+        bGfx6Supported = true;
     }
 
     m_singleHardwareFamily = numFamiliesSupported == 1;
 
     // Log the supported hardware families on the machine:
     gtString message;
-    message.appendFormattedString(L"Supported HW families: VI: %d, CI: %d, SI: %d", bVISupported, bCISupported, bSISupported);
+    message.appendFormattedString(L"Supported HW families: GFX9: %d, GFX8: %d, GFX6: %d, GFX6: %d", bGfx9Supported, bGfx8Supported, bGfx7Supported, bGfx6Supported);
     OS_OUTPUT_DEBUG_LOG(message.asCharArray(), OS_DEBUG_LOG_INFO);
 
 
-    if (bVISupported)
+    if (bGfx9Supported)
     {
-        AddFamilyToTree(VOLCANIC_ISLANDS_FAMILY);
+        AddFamilyToTree(GFX9_FAMILY);
     }
 
-    if (bCISupported)
+    if (bGfx8Supported)
     {
-        AddFamilyToTree(SEA_ISLANDS_FAMILY);
+        AddFamilyToTree(GFX8_FAMILY);
     }
 
-    if (bSISupported)
+    if (bGfx7Supported)
     {
-        AddFamilyToTree(SOUTHERN_ISLANDS_FAMILY);
+        AddFamilyToTree(GFX7_FAMILY);
+    }
+
+    if (bGfx6Supported)
+    {
+        AddFamilyToTree(GFX6_FAMILY);
     }
 
     m_pCounterListTW->blockSignals(false);

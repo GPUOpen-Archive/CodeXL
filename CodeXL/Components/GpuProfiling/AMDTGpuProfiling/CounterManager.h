@@ -42,14 +42,17 @@ enum HardwareFamily
     /// Unassigned hardware
     NA_HARDWARE_FAMILY = 0x0,
 
-    /// Southern Islands hardware
-    SOUTHERN_ISLANDS_FAMILY = 0x1,
+    /// GFX6 hardware
+    GFX6_FAMILY = 0x1,
 
-    /// Sea Islands hardware
-    SEA_ISLANDS_FAMILY = 0x2,
+    /// GFX7 hardware
+    GFX7_FAMILY = 0x2,
 
-    /// Volcanic Islands hardware
-    VOLCANIC_ISLANDS_FAMILY = 0x4
+    /// GFX8 hardware
+    GFX8_FAMILY = 0x4,
+
+    /// GFX9 hardware
+    GFX9_FAMILY = 0x8
 };
 
 /// A singleton class to manage the counter settings
@@ -181,15 +184,18 @@ public:
     bool IsDummyDevicesAdded() const { return m_isDummyDevicesAdded; }
 
 private:
-    static const QString ms_SI_FAMILY_ENV_VAR_VALUE;  ///< string constant for the "CodeXLGPUProfilerHardwareFamily" env var value for southern islands
-    static const QString ms_CI_FAMILY_ENV_VAR_VALUE;  ///< string constant for the "CodeXLGPUProfilerHardwareFamily" env var value for sea islands
-    static const QString ms_VI_FAMILY_ENV_VAR_VALUE;  ///< string constant for the "CodeXLGPUProfilerHardwareFamily" env var value for volcanic islands
-    static const QString ms_SI_FAMILY_NAME;           ///< string constant for the southern islands hardware family name
-    static const QString ms_CI_FAMILY_NAME;           ///< string constant for the sea islands hardware family name
-    static const QString ms_VI_FAMILY_NAME;           ///< string constant for the volcanic islands hardware family name
-    static const int     ms_SI_PLACEHOLDER_DEVICE_ID; ///< placeholder device id for a southern islands device
-    static const int     ms_CI_PLACEHOLDER_DEVICE_ID; ///< placeholder device id for a sea islands device
-    static const int     ms_VI_PLACEHOLDER_DEVICE_ID; ///< placeholder device id for a volcanic islands device
+    static const QString ms_GFX6_FAMILY_ENV_VAR_VALUE;  ///< string constant for the "CodeXLGPUProfilerHardwareFamily" env var value for GFX6
+    static const QString ms_GFX7_FAMILY_ENV_VAR_VALUE;  ///< string constant for the "CodeXLGPUProfilerHardwareFamily" env var value for GFX7
+    static const QString ms_GFX8_FAMILY_ENV_VAR_VALUE;  ///< string constant for the "CodeXLGPUProfilerHardwareFamily" env var value for GFX8
+    static const QString ms_GFX9_FAMILY_ENV_VAR_VALUE;  ///< string constant for the "CodeXLGPUProfilerHardwareFamily" env var value for GFX9
+    static const QString ms_GFX6_FAMILY_NAME;           ///< string constant for the GFX6 hardware family name
+    static const QString ms_GFX7_FAMILY_NAME;           ///< string constant for the GFX7 hardware family name
+    static const QString ms_GFX8_FAMILY_NAME;           ///< string constant for the GFX8 hardware family name
+    static const QString ms_GFX9_FAMILY_NAME;           ///< string constant for the GFX9 hardware family name
+    static const int     ms_GFX6_PLACEHOLDER_DEVICE_ID; ///< placeholder device id for a GFX6 device
+    static const int     ms_GFX7_PLACEHOLDER_DEVICE_ID; ///< placeholder device id for a GFX7 device
+    static const int     ms_GFX8_PLACEHOLDER_DEVICE_ID; ///< placeholder device id for a GFX8 device
+    static const int     ms_GFX9_PLACEHOLDER_DEVICE_ID; ///< placeholder device id for a GFX9 device
     static const int     ms_UNSPECIFIED_REV_ID;       ///< unspecified device revision id
     static const int     ms_AMD_VENDOR_ID;            ///< AMD vendor id
 
