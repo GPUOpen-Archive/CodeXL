@@ -92,6 +92,13 @@ VISOP2Instruction::OP ParserSISOP2::GetVISOP2Op(Instruction::instruction32bit he
     }
 }
 
+G9SOP2Instruction::OP ParserSISOP2::GetG9SOP2Op(Instruction::instruction32bit hexInstruction)
+{
+    EXTRACT_INSTRUCTION32_FIELD(hexInstruction, G9, SOP2, op, OP, 23);
+
+    return (op > G9SOP2Instruction::S_ILLEGAL ? G9SOP2Instruction::S_ILLEGAL : op);
+}
+
 SOP2Instruction::SDST ParserSISOP2::GetSDST(Instruction::instruction32bit hexInstruction, unsigned int& ridx)
 {
     EXTRACT_INSTRUCTION32_FIELD(hexInstruction, SI, SOP2, sdst, SDST, 16);
@@ -114,6 +121,7 @@ SOP2Instruction::SDST ParserSISOP2::GetSDST(Instruction::instruction32bit hexIns
 
 ParserSI::kaStatus ParserSISOP2::Parse(GDT_HW_GENERATION hwGen, Instruction::instruction32bit hexInstruction, Instruction*& instruction, bool isLiteral32b, uint32_t literal32b, int iLabel, int iGotoLabel)
 {
+    ParserSI::kaStatus status = ParserSI::Status_SUCCESS;
     unsigned int ridx0 = 0, ridx1 = 0, sdstRidx = 0;
     SOP2Instruction::SSRC ssrc0 = GetSSRC(hexInstruction, ridx0, 0);
     SOP2Instruction::SSRC ssrc1 = GetSSRC(hexInstruction, ridx1, 1);
@@ -124,14 +132,22 @@ ParserSI::kaStatus ParserSISOP2::Parse(GDT_HW_GENERATION hwGen, Instruction::ins
         SISOP2Instruction::OP op = GetSISOP2Op(hexInstruction);
         instruction = new SISOP2Instruction(ssrc0, ssrc1, sdst, op, ridx0, ridx1, sdstRidx, isLiteral32b, literal32b, iLabel, iGotoLabel);
     }
-    else
+    else if (hwGen == GDT_HW_GENERATION_VOLCANICISLAND)
     {
         VISOP2Instruction::OP op = GetVISOP2Op(hexInstruction);
         instruction = new VISOP2Instruction(ssrc0, ssrc1, sdst, op, ridx0, ridx1, sdstRidx, isLiteral32b, literal32b, iLabel, iGotoLabel);
     }
+    else if (hwGen == GDT_HW_GENERATION_GFX9)
+    {
+        G9SOP2Instruction::OP op = GetG9SOP2Op(hexInstruction);
+        instruction = new G9SOP2Instruction(ssrc0, ssrc1, sdst, op, ridx0, ridx1, sdstRidx, isLiteral32b, literal32b, iLabel, iGotoLabel);
+    }
+    else
+    {
+        status = ParserSI::Status_UnexpectedHWGeneration;
+    }
 
-
-    return ParserSI::Status_SUCCESS;
+    return status;
 }
 
 ParserSI::kaStatus ParserSISOP2::Parse(GDT_HW_GENERATION, Instruction::instruction64bit, Instruction*&, int , int)

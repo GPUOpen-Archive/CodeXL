@@ -63,13 +63,20 @@ const int NO_LABEL = -1;
     X(ConstFloatNeg_4_0,in) \
     X(LiteralConst,in)
 
-#define EXTRACT_INSTRUCTION32_FIELD(hexInstruction,genName, insName,fieldVar,fieldName,fieldOffset) \
-    genName##insName##Instruction::fieldName fieldVar = \
-                                                        static_cast<genName##insName##Instruction::fieldName>((hexInstruction & static_cast<Instruction::instruction32bit>(insName##Mask_##fieldName)) >> fieldOffset);
+#define INSTRUCTION_FIELD(hexInstruction, insName, fieldName, fieldOffset) \
+            ((hexInstruction & insName##Mask_##fieldName) >> fieldOffset)
+
+#define INSTRUCTION32_FIELD(hexInstruction, insName, fieldName, fieldOffset) \
+            ((hexInstruction & static_cast<Instruction::instruction32bit>(insName##Mask_##fieldName)) >> fieldOffset)
+
+#define INSTRUCTION64_FIELD(hexInstruction, insName, fieldName, fieldOffset) \
+            ((hexInstruction & (static_cast<Instruction::instruction64bit>(insName##Mask_##fieldName) << 32)) >> fieldOffset)
+
+#define EXTRACT_INSTRUCTION32_FIELD(hexInstruction,genName,insName,fieldVar,fieldName,fieldOffset) \
+    genName##insName##Instruction::fieldName fieldVar = static_cast<genName##insName##Instruction::fieldName>(INSTRUCTION32_FIELD(hexInstruction, insName, fieldName, fieldOffset));
 
 #define EXTRACT_INSTRUCTION64_FIELD(hexInstruction,insName,fieldVar,fieldName,fieldOffset) \
-    insName##Instruction::fieldName fieldVar = \
-                                               static_cast<insName##Instruction::fieldName>((hexInstruction & (static_cast<Instruction::instruction64bit>(insName##Mask_##fieldName) << 32)) >> fieldOffset);
+    insName##Instruction::fieldName fieldVar = static_cast<insName##Instruction::fieldName>(INSTRUCTION64_FIELD(hexInstruction, insName, fieldName, fieldOffset));
 
 #define RETURN_EXTRACT_INSTRUCTION(fieldVar) \
     return fieldVar
@@ -103,6 +110,7 @@ const int NO_LABEL = -1;
             InstructionSet_MIMG,
             InstructionSet_EXP,
             InstructionSet_SMEM, // VI Only, was SMRD
+            InstructionSet_FLAT
         };
 
         /// Instruction`s format kinds

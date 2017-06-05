@@ -88,6 +88,11 @@ private:
     /// \returns                   An OP.
     static VIDSInstruction::OP GetVIDSOp(Instruction::instruction64bit);
 
+    /// Get the OP [25:18]
+    /// \param[in]  hexInstruction  The 64 bit hexadecimal instruction.
+    /// \returns                   An OP.
+    static G9DSInstruction::OP GetG9DSOp(Instruction::instruction64bit);
+
     /// Get the ADDR [39:32]
     /// \param[in]  hexInstruction  The 64 bit hexadecimal instruction.
     /// \returns                   An ADDR.

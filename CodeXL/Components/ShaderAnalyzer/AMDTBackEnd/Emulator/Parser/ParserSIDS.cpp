@@ -72,6 +72,15 @@ ParserSIDS::GetVIDSOp(Instruction::instruction64bit hexInstruction)
         return op;
     }
 }
+
+G9DSInstruction::OP
+ParserSIDS::GetG9DSOp(Instruction::instruction64bit hexInstruction)
+{
+    EXTRACT_INSTRUCTION32_FIELD(hexInstruction, G9, DS, op, OP, 18);
+
+    return (op < G9DSInstruction::ds_Ilegal ? op : G9DSInstruction::ds_Ilegal);
+}
+
 DSInstruction::ADDR
 ParserSIDS::GetADDR(Instruction::instruction64bit hexInstruction)
 {
@@ -111,6 +120,7 @@ ParserSIDS::GetVDST(Instruction::instruction64bit hexInstruction)
 ParserSI::kaStatus
 ParserSIDS::Parse(GDT_HW_GENERATION hwGen, Instruction::instruction64bit hexInstruction, Instruction*& instruction, int iLabel /*=NO_LABEL*/ , int iGotoLabel /*=NO_LABEL*/)
 {
+    ParserSI::kaStatus status = ParserSI::Status_SUCCESS;
     DSInstruction::OFFSET offset0 = GetOffset(hexInstruction, 0);
     DSInstruction::OFFSET offset1 = GetOffset(hexInstruction, 1);
     DSInstruction::GDS gds = GetGDS(hexInstruction);
@@ -124,10 +134,19 @@ ParserSIDS::Parse(GDT_HW_GENERATION hwGen, Instruction::instruction64bit hexInst
         SIDSInstruction::OP op = GetSIDSOp(hexInstruction);
         instruction = new SIDSInstruction(offset0, offset1, gds, op, addr, data0, data1, vdst, iLabel, iGotoLabel);
     }
-    else
+    else if (hwGen == GDT_HW_GENERATION_VOLCANICISLAND)
     {
         VIDSInstruction::OP op = GetVIDSOp(hexInstruction);
         instruction = new VIDSInstruction(offset0, offset1, gds, op, addr, data0, data1, vdst, iLabel, iGotoLabel);
+    }
+    else if (hwGen == GDT_HW_GENERATION_GFX9)
+    {
+        G9DSInstruction::OP op = GetG9DSOp(hexInstruction);
+        instruction = new G9DSInstruction(offset0, offset1, gds, op, addr, data0, data1, vdst, iLabel, iGotoLabel);
+    }
+    else
+    {
+        status = ParserSI::Status_UnexpectedHWGeneration;
     }
 
     return ParserSI::Status_SUCCESS;

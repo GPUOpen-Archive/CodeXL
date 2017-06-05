@@ -21,20 +21,22 @@ public:
     /// Selector for the Instruction Type
     enum Encoding
     {
-        Encoding_VOP1 = 0x0000003F, // [31:25] enum(7) Must be 0 1 1 1 1 1 1.
-        Encoding_VOP2 = 0x00000000, // [31]    enum(1) Must be 0.
-        Encoding_VOP3 = 0x00000034, // [31:26] enum(6) Must be 1 1 0 1 0 0. (VOP3a)
-        Encoding_VOPC = 0x0000003E, // [31:25] enum(7) 0 1 1 1 1 1 0. // Single Vector Compare Operations
+        Encoding_VOP1  = 0x0000003F, // [31:25] enum(7) Must be 0 1 1 1 1 1 1.
+        Encoding_VOP2  = 0x00000000, // [31]    enum(1) Must be 0.
+        Encoding_VOP3  = 0x00000034, // [31:26] enum(6) Must be 1 1 0 1 0 0. (VOP3a)
+        Encoding_VOPC  = 0x0000003E, // [31:25] enum(7) 0 1 1 1 1 1 0. // Single Vector Compare Operations
+        Encoding_VOP3P = 0x000001A7, // [31:23] Must be  1 1 0 1 0 0 1 1 1.
         Encoding_Illegal
     };
 
     /// VOP Instruction`s encodeing masks
     enum VOPMask
     {
-        VOPMask_VOP1 = 0x0000003F << 25, // [31:25] enum(7) Must be 0 1 1 1 1 1 1.
-        VOPMask_VOP2 = 0x00000000 << 31, // [31]    enum(1) Must be 0.
-        VOPMask_VOP3 = 0x00000034 << 26, // [31:26] enum(6) Must be 1 1 0 1 0 0.
-        VOPMask_VOPC = 0x0000003E << 25, // [31:25] enum(7) 0 1 1 1 1 1 0.
+        VOPMask_VOP1  = 0x0000003F << 25, // [31:25] enum(7) Must be 0 1 1 1 1 1 1.
+        VOPMask_VOP2  = 0x00000000 << 31, // [31]    enum(1) Must be 0.
+        VOPMask_VOP3  = 0x00000034 << 26, // [31:26] enum(6) Must be 1 1 0 1 0 0.
+        VOPMask_VOPC  = 0x0000003E << 25, // [31:25] enum(7) 0 1 1 1 1 1 0.
+        VOPMask_VOP3P = 0x000001A7 << 23,
         VOP_UNDEFINE,
     };
 
@@ -2233,6 +2235,431 @@ private:
 
     /// VOP operation.
     VOPC_OP m_op;
+
+    //Instruction Type
+    Encoding m_instructionEncoding;
+};
+
+
+// VOP1 instructions for VEGA (GFX9)
+class G9VOP1Instruction : public VOPInstruction
+{
+public:
+
+    enum VOP1_OP
+    {
+        v_nop                = 0,
+        v_mov_b32            = 1,
+        v_readfirstlane_b32  = 2,
+        v_cvt_i32_f64        = 3,
+        v_cvt_f64_i32        = 4,
+        v_cvt_f32_i32        = 5,
+        v_cvt_f32_u32        = 6,
+        v_cvt_u32_f32        = 7,
+        v_cvt_i32_f32        = 8,
+        v_mov_fed_b32        = 9,
+        v_cvt_f16_f32        = 10,
+        v_cvt_f32_f16        = 11,
+        v_cvt_rpi_i32_f32    = 12,
+        v_cvt_flr_i32_f32    = 13,
+        v_cvt_off_f32_i4     = 14,
+        v_cvt_f32_f64        = 15,
+        v_cvt_f64_f32        = 16,
+        v_cvt_f32_ubyte0     = 17,
+        v_cvt_f32_ubyte1     = 18,
+        v_cvt_f32_ubyte2     = 19,
+        v_cvt_f32_ubyte3     = 20,
+        v_cvt_u32_f64        = 21,
+        v_cvt_f64_u32        = 22,
+        v_trunc_f64          = 23,
+        v_ceil_f64           = 24,
+        v_rndne_f64          = 25,
+        v_floor_f64          = 26,
+        v_fract_f32          = 27,
+        v_trunc_f32          = 28,
+        v_ceil_f32           = 29,
+        v_rndne_f32          = 30,
+        v_floor_f32          = 31,
+        v_exp_f32            = 32,
+        v_log_f32            = 33,
+        v_rcp_f32            = 34,
+        v_rcp_iflag_f32      = 35,
+        v_rsq_f32            = 36,
+        v_rcp_f64            = 37,
+        v_rsq_f64            = 38,
+        v_sqrt_f32           = 39,
+        v_sqrt_f64           = 40,
+        v_sin_f32            = 41,
+        v_cos_f32            = 42,
+        v_not_b32            = 43,
+        v_bfrev_b32          = 44,
+        v_ffbh_u32           = 45,
+        v_ffbl_b32           = 46,
+        v_ffbh_i32           = 47,
+        v_frexp_exp_i32_f64  = 48,
+        v_frexp_mant_f64     = 49,
+        v_fract_f64          = 50,
+        v_frexp_exp_i32_f32  = 51,
+        v_frexp_mant_f32     = 52,
+        v_clrexcp            = 53,
+        v_screen_partition_4se_b32 = 55,
+        v_cvt_f16_u16        = 57,
+        v_cvt_f16_i16        = 58,
+        v_cvt_u16_f16        = 59,
+        v_cvt_i16_f16        = 60,
+        v_rcp_f16            = 61,
+        v_sqrt_f16           = 62,
+        v_rsq_f16            = 63,
+        v_log_f16            = 64,
+        v_exp_f16            = 65,
+        v_frexp_mant_f16     = 66,
+        v_frexp_exp_i16_f16  = 67,
+        v_floor_f16          = 68,
+        v_ceil_f16           = 69,
+        v_trunc_f16          = 70,
+        v_rndne_f16          = 71,
+        v_fract_f16          = 72,
+        v_sin_f16            = 73,
+        v_cos_f16            = 74,
+        v_exp_legacy_f32     = 75,
+        v_log_legacy_f32     = 76,
+        v_cvt_norm_i16_f16   = 77,
+        v_cvt_norm_u16_f16   = 78,
+        v_sat_pk_u8_i16      = 79,
+        v_swap_b32           = 81,
+        /// Illegal
+        v_ILLEGAL            = 82,
+    };
+
+
+    /// -----------------------------------------------------------------------------------------------
+    G9VOP1Instruction(unsigned int instructionWidth, Encoding instructionEncoding, VOP1_OP op, int iLabel, int iGotoLabel)
+        : VOPInstruction(instructionWidth, InstructionSet_VOP1, iLabel, iGotoLabel), m_op(op), m_instructionEncoding(instructionEncoding) { }
+    /// -----------------------------------------------------------------------------------------------
+
+    ~G9VOP1Instruction() {}
+
+    /// Get the OP
+    VOP1_OP GetOp() const { return m_op; }
+
+    // return the instruction encoding
+    Encoding GetInstructionType() const { return m_instructionEncoding; }
+
+private:
+
+    /// VOP operation.
+    VOP1_OP m_op;
+
+    //Instruction Type
+    Encoding m_instructionEncoding;
+
+//    int GetInstructionClockCount()
+//    {
+//        int iRet = 4;
+//        return iRet;
+//    }
+};
+
+
+// VOP2 instructions for VEGA (GFX9)
+class G9VOP2Instruction : public VOPInstruction
+{
+public:
+    enum VOP2_OP
+    {
+        v_cndmask_b32      = 0,
+        v_add_f32          = 1,
+        v_sub_f32          = 2,
+        v_subrev_f32       = 3,
+        v_mul_legacy_f32   = 4,
+        v_mul_f32          = 5,
+        v_mul_i32_i24      = 6,
+        v_mul_hi_i32_i24   = 7,
+        v_mul_u32_u24      = 8,
+        v_mul_hi_u32_u24   = 9,
+        v_min_f32          = 10,
+        v_max_f32          = 11,
+        v_min_i32          = 12,
+        v_max_i32          = 13,
+        v_min_u32          = 14,
+        v_max_u32          = 15,
+        v_lshrrev_b32      = 16,
+        v_ashrrev_i32      = 17,
+        v_lshlrev_b32      = 18,
+        v_and_b32          = 19,
+        v_or_b32           = 20,
+        v_xor_b32          = 21,
+        v_mac_f32          = 22,
+        v_madmk_f32        = 23,
+        v_madak_f32        = 24,
+        v_add_co_u32       = 25,
+        v_sub_co_u32       = 26,
+        v_subrev_co_u32    = 27,
+        v_addc_co_u32      = 28,
+        v_subb_co_u32      = 29,
+        v_subbrev_co_u32   = 30,
+        v_add_f16          = 31,
+        v_sub_f16          = 32,
+        v_subrev_f16       = 33,
+        v_mul_f16          = 34,
+        v_mac_f16          = 35,
+        v_madmk_f16        = 36,
+        v_madak_f16        = 37,
+        v_add_u16          = 38,
+        v_sub_u16          = 39,
+        v_subrev_u16       = 40,
+        v_mul_lo_u16       = 41,
+        v_lshlrev_b16      = 42,
+        v_lshrrev_b16      = 43,
+        v_ashrrev_i16      = 44,
+        v_max_f16          = 45,
+        v_min_f16          = 46,
+        v_max_u16          = 47,
+        v_max_i16          = 48,
+        v_min_u16          = 49,
+        v_min_i16          = 50,
+        v_ldexp_f16        = 51,
+        v_add_u32          = 52,
+        v_sub_u32          = 53,
+        v_subrev_u32       = 54,
+        /// Illegal
+        v_ILLEGAL          = 55
+    };
+
+
+    /// -----------------------------------------------------------------------------------------------
+    G9VOP2Instruction(unsigned int instructionWidth, Encoding instructionEncoding, VOP2_OP op, int iLabel, int iGotoLabel)
+        : VOPInstruction(instructionWidth, InstructionSet_VOP2, iLabel, iGotoLabel), m_op(op), m_instructionEncoding(instructionEncoding)
+    {
+        m_HwGen = GDT_HW_GENERATION_GFX9;
+    }
+    /// -----------------------------------------------------------------------------------------------
+
+    ~G9VOP2Instruction() {}
+
+    /// Get the OP
+    VOP2_OP GetOp() const { return m_op; }
+
+    // return the instruction encoding
+    Encoding GetInstructionType() const { return m_instructionEncoding; }
+
+    int GetInstructionClockCount()
+    {
+        int iRet = 4;
+        return iRet;
+    }
+
+private:
+
+    /// VOP operation.
+    VOP2_OP m_op;
+
+    //Instruction Type
+    Encoding m_instructionEncoding;
+};
+
+
+// VOP3 for VEGA (GFX9)
+class G9VOP3Instruction : public VOPInstruction
+{
+public:
+
+    enum VOP3_OP
+    {
+        v_mad_legacy_f32      = 448,
+        v_mad_f32             = 449,
+        v_mad_i32_i24         = 450,
+        v_mad_u32_u24         = 451,
+        v_cubeid_f32          = 452,
+        v_cubesc_f32          = 453,
+        v_cubetc_f32          = 454,
+        v_cubema_f32          = 455,
+        v_bfe_u32             = 456,
+        v_bfe_i32             = 457,
+        v_bfi_b32             = 458,
+        v_fma_f32             = 459,
+        v_fma_f64             = 460,
+        v_lerp_u8             = 461,
+        v_alignbit_b32        = 462,
+        v_alignbyte_b32       = 463,
+        v_min3_f32            = 464,
+        v_min3_i32            = 465,
+        v_min3_u32            = 466,
+        v_max3_f32            = 467,
+        v_max3_i32            = 468,
+        v_max3_u32            = 469,
+        v_med3_f32            = 470,
+        v_med3_i32            = 471,
+        v_med3_u32            = 472,
+        v_sad_u8              = 473,
+        v_sad_hi_u8           = 474,
+        v_sad_u16             = 475,
+        v_sad_u32             = 476,
+        v_cvt_pk_u8_f32       = 477,
+        v_div_fixup_f32       = 478,
+        v_div_fixup_f64       = 479,
+        v_div_scale_f32       = 480,
+        v_div_scale_f64       = 481,
+        v_div_fmas_f32        = 482,
+        v_div_fmas_f64        = 483,
+        v_msad_u8             = 484,
+        v_qsad_pk_u16_u8      = 485,
+        v_mqsad_pk_u16_u8     = 486,
+        v_mqsad_u32_u8        = 487,
+        v_mad_u64_u32         = 488,
+        v_mad_i64_i32         = 489,
+        v_mad_legacy_f16      = 490,
+        v_mad_legacy_u16      = 491,
+        v_mad_legacy_i16      = 492,
+        v_perm_b32            = 493,
+        v_fma_legacy_f16      = 494,
+        v_div_fixup_legacy_f16  = 495,
+        v_cvt_pkaccum_u8_f32  = 496,
+        v_mad_u32_u16         = 497,
+        v_mad_i32_i16         = 498,
+        v_xad_u32             = 499,
+        v_min3_f16            = 500,
+        v_min3_i16            = 501,
+        v_min3_u16            = 502,
+        v_max3_f16            = 503,
+        v_max3_i16            = 504,
+        v_max3_u16            = 505,
+        v_med3_f16            = 506,
+        v_med3_i16            = 507,
+        v_med3_u16            = 508,
+        v_lshl_add_b32        = 509,
+        v_add_lshl_b32        = 510,
+        v_add3_u32            = 511,
+        v_lshl_or_b32         = 512,
+        v_and_or_b32          = 513,
+        v_or3_b32             = 514,
+        v_mad_f16             = 515,
+        v_mad_u16             = 516,
+        v_mad_i16             = 517,
+        v_fma_f16             = 518,
+        v_div_fixup_f16       = 519,
+        v_interp_p1_f32       = 624,
+        v_interp_p2_f32       = 625,
+        v_interp_mov_f32      = 626,
+        v_interp_p1ll_f16     = 628,
+        v_interp_p1lv_f16     = 629,
+        v_interp_p2_legacy_f16  = 630,
+        v_interp_p2_f16       = 631,
+        v_add_f64             = 640,
+        v_mul_f64             = 641,
+        v_min_f64             = 642,
+        v_max_f64             = 643,
+        v_ldexp_f64          = 644,
+        v_mul_lo_u32         = 645,
+        v_mul_hi_u32         = 646,
+        v_mul_hi_i32         = 647,
+        v_ldexp_f32          = 648,
+        v_readlane_b32       = 649,
+        v_writelane_b32      = 650,
+        v_bcnt_u32_b32       = 651,
+        v_mbcnt_lo_u32_b32   = 652,
+        v_mbcnt_hi_u32_b32   = 653,
+        v_lshlrev_b64        = 655,
+        v_lshrrev_b64        = 656,
+        v_ashrrev_i64        = 657,
+        v_trig_preop_f64     = 658,
+        v_bfm_b32            = 659,
+        v_cvt_pknorm_i16_f32 = 660,
+        v_cvt_pknorm_u16_f32 = 661,
+        v_cvt_pkrtz_f16_f32  = 662,
+        v_cvt_pk_u16_u32     = 663,
+        v_cvt_pk_i16_i32     = 664,
+        v_cvt_pknorm_i16_f16 = 665,
+        v_cvt_pknorm_u16_f16 = 666,
+        v_readlane_regrd_b32 = 667,
+        v_add_i32            = 668,
+        v_sub_i32            = 669,
+        v_add_i16            = 670,
+        v_sub_i16            = 671,
+        v_pack_b32_f16       = 672,
+        /// Illegal
+        v_ILLEGAL            = 673
+    } ;// end VOP3
+
+    /// -----------------------------------------------------------------------------------------------
+    G9VOP3Instruction(unsigned int instructionWidth, Encoding instructionEncoding, VOP3_OP op, int iLabel, int iGotoLabel)
+        : VOPInstruction(instructionWidth, InstructionSet_VOP3, iLabel, iGotoLabel), m_op(op), m_instructionEncoding(instructionEncoding)
+    {
+        m_HwGen = GDT_HW_GENERATION_GFX9;
+    }
+    /// -----------------------------------------------------------------------------------------------
+
+    ~G9VOP3Instruction() {}
+
+    /// Get the OP
+    VOP3_OP GetOp() const { return m_op; }
+
+    // return the instruction encoding
+    Encoding GetInstructionType() const { return m_instructionEncoding; }
+
+private:
+
+    /// VOP operation.
+    VOP3_OP m_op;
+
+    //Instruction Type
+    Encoding m_instructionEncoding;
+};
+
+
+// VOP3 for VEGA (GFX9)
+class G9VOP3PInstruction : public VOPInstruction
+{
+public:
+
+    enum VOP3P_OP
+    {
+        v_pk_mad_i16         = 0,
+        v_pk_mul_lo_u16      = 1,
+        v_pk_add_i16         = 2,
+        v_pk_sub_i16         = 3,
+        v_pk_lshlrev_b16_i16 = 4,
+        v_pk_lshrrev_b16_i16 = 5,
+        v_pk_ashrrev_b16_i16 = 6,
+        v_pk_max_i16         = 7,
+        v_pk_min_i16         = 8,
+        v_pk_mad_u16         = 9,
+        v_pk_add_u16         = 10,
+        v_pk_sub_u16         = 11,
+        v_pk_max_u16         = 12,
+        v_pk_min_u16         = 13,
+        v_pk_fma_f16         = 14,
+        v_pk_add_f16         = 15,
+        v_pk_mul_f16         = 16,
+        v_pk_min_f16         = 17,
+        v_pk_max_f16         = 18,
+        v_mad_mix_f32        = 32,
+        v_mad_mixlo_f16      = 33,
+        v_mad_mixhi_f15      = 34,
+        /// Illegal
+        v_ILLEGAL            = 35
+    } ;// end VOP3P
+
+    /// -----------------------------------------------------------------------------------------------
+    G9VOP3PInstruction(unsigned int instructionWidth, Encoding instructionEncoding, VOP3P_OP op, int iLabel, int iGotoLabel)
+        : VOPInstruction(instructionWidth, InstructionSet_VOP3, iLabel, iGotoLabel), m_op(op), m_instructionEncoding(instructionEncoding)
+    {
+        m_HwGen = GDT_HW_GENERATION_GFX9;
+    }
+    /// -----------------------------------------------------------------------------------------------
+
+    ~G9VOP3PInstruction() {}
+
+    /// Get the OP
+    VOP3P_OP GetOp() const { return m_op; }
+
+    // return the instruction encoding
+    Encoding GetInstructionType() const { return m_instructionEncoding; }
+
+private:
+
+    /// VOP operation.
+    VOP3P_OP m_op;
 
     //Instruction Type
     Encoding m_instructionEncoding;

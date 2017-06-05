@@ -149,6 +149,7 @@ void Instruction::SetUpHybridPerfTables()
         m_s_hybridDevicePerfTable[VOP2_NO_HW_IMPL_V_ASHRREV_I32] = 4;
         m_s_hybridDevicePerfTable[VOP2_NO_HW_IMPL_V_LSHLREV_B32] = 4;
         m_s_hybridDevicePerfTable[VOP1_V_MOV_B32] = 4;
+        m_s_hybridDevicePerfTable[VOP2_V_MOV_FED_B32] = 4;
         m_s_hybridDevicePerfTable[VOP1_V_NOT_B32] = 4;
         m_s_hybridDevicePerfTable[VOP1_V_CVT_F32_I32] = 4;
         m_s_hybridDevicePerfTable[VOP1_V_CVT_F32_U32] = 4;
@@ -502,6 +503,7 @@ void Instruction::SetUpHalfDevicesPerfTables()
     m_s_halfDevicePerfTable[VOP2_NO_HW_IMPL_V_ASHRREV_I32] = 4;
     m_s_halfDevicePerfTable[VOP2_NO_HW_IMPL_V_LSHLREV_B32] = 4;
     m_s_halfDevicePerfTable[VOP1_V_MOV_B32] = 4;
+    m_s_halfDevicePerfTable[VOP2_V_MOV_FED_B32] = 4;
     m_s_halfDevicePerfTable[VOP1_V_NOT_B32] = 4;
     m_s_halfDevicePerfTable[VOP1_V_CVT_F32_I32] = 4;
     m_s_halfDevicePerfTable[VOP1_V_CVT_F32_U32] = 4;
@@ -996,6 +998,7 @@ void Instruction::SetUpQuarterDevicesPerfTables()
     m_s_quarterDevicePerfTable[VOP2_NO_HW_IMPL_V_ASHRREV_I32] = 4;
     m_s_quarterDevicePerfTable[VOP2_NO_HW_IMPL_V_LSHLREV_B32] = 4;
     m_s_quarterDevicePerfTable[VOP1_V_MOV_B32] = 4;
+    m_s_quarterDevicePerfTable[VOP2_V_MOV_FED_B32] = 4;
     m_s_quarterDevicePerfTable[VOP1_V_NOT_B32] = 4;
     m_s_quarterDevicePerfTable[VOP1_V_CVT_F32_I32] = 4;
     m_s_quarterDevicePerfTable[VOP1_V_CVT_F32_U32] = 4;
