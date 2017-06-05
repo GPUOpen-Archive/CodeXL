@@ -131,19 +131,24 @@ int SessionControl::PopulateColumnHeaders(const QStringList& headerItems, bool i
         bool isPercentage = false;
         QString strCounterDesc;
 
-        if (!counterFound && CounterManager::Instance()->IsHardwareFamilySupported(VOLCANIC_ISLANDS_FAMILY))
+        if (!counterFound && CounterManager::Instance()->IsHardwareFamilySupported(GFX9_FAMILY))
         {
-            counterFound = CounterManager::Instance()->IsCounterTypePercentage(VOLCANIC_ISLANDS_FAMILY, headerNameWithoutPassString, isPercentage);
+            counterFound = CounterManager::Instance()->IsCounterTypePercentage(GFX9_FAMILY, headerNameWithoutPassString, isPercentage);
         }
 
-        if (!counterFound && CounterManager::Instance()->IsHardwareFamilySupported(SEA_ISLANDS_FAMILY))
+        if (!counterFound && CounterManager::Instance()->IsHardwareFamilySupported(GFX8_FAMILY))
         {
-            counterFound = CounterManager::Instance()->IsCounterTypePercentage(SEA_ISLANDS_FAMILY, headerNameWithoutPassString, isPercentage);
+            counterFound = CounterManager::Instance()->IsCounterTypePercentage(GFX8_FAMILY, headerNameWithoutPassString, isPercentage);
         }
 
-        if (!counterFound && CounterManager::Instance()->IsHardwareFamilySupported(SOUTHERN_ISLANDS_FAMILY))
+        if (!counterFound && CounterManager::Instance()->IsHardwareFamilySupported(GFX7_FAMILY))
         {
-            counterFound = CounterManager::Instance()->IsCounterTypePercentage(SOUTHERN_ISLANDS_FAMILY, headerNameWithoutPassString, isPercentage);
+            counterFound = CounterManager::Instance()->IsCounterTypePercentage(GFX7_FAMILY, headerNameWithoutPassString, isPercentage);
+        }
+
+        if (!counterFound && CounterManager::Instance()->IsHardwareFamilySupported(GFX6_FAMILY))
+        {
+            counterFound = CounterManager::Instance()->IsCounterTypePercentage(GFX6_FAMILY, headerNameWithoutPassString, isPercentage);
         }
 
         // check non-hardware counters (SC stats, etc.)
@@ -478,19 +483,24 @@ void SessionControl::AssignTooltips(QTableView* tableView)
         bool descriptionFound = false;
         QString strCounterDesc;
 
-        if (!descriptionFound && CounterManager::Instance()->IsHardwareFamilySupported(VOLCANIC_ISLANDS_FAMILY))
+        if (!descriptionFound && CounterManager::Instance()->IsHardwareFamilySupported(GFX9_FAMILY))
         {
-            descriptionFound = CounterManager::Instance()->GetCounterDesc(VOLCANIC_ISLANDS_FAMILY, header, strCounterDesc);
+            descriptionFound = CounterManager::Instance()->GetCounterDesc(GFX9_FAMILY, header, strCounterDesc);
         }
 
-        if (!descriptionFound && CounterManager::Instance()->IsHardwareFamilySupported(SEA_ISLANDS_FAMILY))
+        if (!descriptionFound && CounterManager::Instance()->IsHardwareFamilySupported(GFX8_FAMILY))
         {
-            descriptionFound = CounterManager::Instance()->GetCounterDesc(SEA_ISLANDS_FAMILY, header, strCounterDesc);
+            descriptionFound = CounterManager::Instance()->GetCounterDesc(GFX8_FAMILY, header, strCounterDesc);
         }
 
-        if (!descriptionFound && CounterManager::Instance()->IsHardwareFamilySupported(SOUTHERN_ISLANDS_FAMILY))
+        if (!descriptionFound && CounterManager::Instance()->IsHardwareFamilySupported(GFX7_FAMILY))
         {
-            descriptionFound = CounterManager::Instance()->GetCounterDesc(SOUTHERN_ISLANDS_FAMILY, header, strCounterDesc);
+            descriptionFound = CounterManager::Instance()->GetCounterDesc(GFX7_FAMILY, header, strCounterDesc);
+        }
+
+        if (!descriptionFound && CounterManager::Instance()->IsHardwareFamilySupported(GFX6_FAMILY))
+        {
+            descriptionFound = CounterManager::Instance()->GetCounterDesc(GFX6_FAMILY, header, strCounterDesc);
         }
 
         // check non-hardware counters (SC stats, etc.)

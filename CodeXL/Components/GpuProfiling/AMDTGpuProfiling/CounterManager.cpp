@@ -50,13 +50,15 @@
 static const gtString s_DEVICE_ENV_VAR = L"CodeXLGPUProfilerDevice";
 static const gtString s_HW_FAMILY_ENV_VAR = L"CodeXLGPUProfilerHardwareFamily";
 
-const QString CounterManager::ms_SI_FAMILY_ENV_VAR_VALUE = "SouthernIslands";
-const QString CounterManager::ms_CI_FAMILY_ENV_VAR_VALUE = "SeaIslands";
-const QString CounterManager::ms_VI_FAMILY_ENV_VAR_VALUE = "VolcanicIslands";
+const QString CounterManager::ms_GFX6_FAMILY_ENV_VAR_VALUE = "GFX6";
+const QString CounterManager::ms_GFX7_FAMILY_ENV_VAR_VALUE = "GFX7";
+const QString CounterManager::ms_GFX8_FAMILY_ENV_VAR_VALUE = "GFX8";
+const QString CounterManager::ms_GFX9_FAMILY_ENV_VAR_VALUE = "GFX9";
 
-const int CounterManager::ms_SI_PLACEHOLDER_DEVICE_ID = 0x6798; // a Tahiti device
-const int CounterManager::ms_CI_PLACEHOLDER_DEVICE_ID = 0x6650; // a Bonaire device
-const int CounterManager::ms_VI_PLACEHOLDER_DEVICE_ID = 0x6900; // an Iceland device
+const int CounterManager::ms_GFX6_PLACEHOLDER_DEVICE_ID = 0x6798; // a Tahiti device
+const int CounterManager::ms_GFX7_PLACEHOLDER_DEVICE_ID = 0x6650; // a Bonaire device
+const int CounterManager::ms_GFX8_PLACEHOLDER_DEVICE_ID = 0x6900; // an Iceland device
+const int CounterManager::ms_GFX9_PLACEHOLDER_DEVICE_ID = 0x6860; // a Vega device
 
 const int CounterManager::ms_UNSPECIFIED_REV_ID = 0;
 
@@ -124,7 +126,7 @@ void CounterManager::FreeResources(bool isReleaseModulesRequired)
 // Configure the object's state to the current context (remote or local session).
 void CounterManager::Init(bool isRemoteSession)
 {
-    const char* ALL_AVAILABLE_DEVICES_ENV_VAR_VAL = "SouthernIslands;SeaIslands;VolcanicIslands";
+    const char* ALL_AVAILABLE_DEVICES_ENV_VAR_VAL = "GFX6;GFX7;GFX8;GFX9";
     gtString envVarValue;
     QString counterEnvVar = "";
 
@@ -155,9 +157,10 @@ void CounterManager::Init(bool isRemoteSession)
     // available counters are set per the installed hardware, but can be overridden by
     // setting the CodeXLGPUProfilerHardwareFamily environment variable to (multiple
     // values can be specified using a semi-colon separated list):
-    // "SouthernIslands" --> southernIslandsHardwareFamily
-    // "SeaIslands"      --> seaIslandsHardwareFamily
-    // "VolcanicIslands" --> volcanicIslandsHardwareFamily
+    // "GFX6" --> gfx6HardwareFamily
+    // "GFX7" --> gfx7HardwareFamily
+    // "GFX8" --> gfx8HardwareFamily
+    // "GFX9" --> gfx9HardwareFamily
     if (counterEnvVar.isEmpty())
     {
         if (osGetCurrentProcessEnvVariableValue(s_HW_FAMILY_ENV_VAR, envVarValue))
@@ -167,17 +170,21 @@ void CounterManager::Init(bool isRemoteSession)
 
             foreach (QString supportedFamily, supportedFamilies)
             {
-                if (supportedFamily == ms_VI_FAMILY_ENV_VAR_VALUE)
+                if (supportedFamily == ms_GFX9_FAMILY_ENV_VAR_VALUE)
                 {
-                    AddDeviceIdToFamily(VOLCANIC_ISLANDS_FAMILY, ms_VI_PLACEHOLDER_DEVICE_ID, ms_UNSPECIFIED_REV_ID);
+                    AddDeviceIdToFamily(GFX9_FAMILY, ms_GFX9_PLACEHOLDER_DEVICE_ID, ms_UNSPECIFIED_REV_ID);
                 }
-                else if (supportedFamily == ms_SI_FAMILY_ENV_VAR_VALUE)
+                if (supportedFamily == ms_GFX8_FAMILY_ENV_VAR_VALUE)
                 {
-                    AddDeviceIdToFamily(SOUTHERN_ISLANDS_FAMILY, ms_SI_PLACEHOLDER_DEVICE_ID, ms_UNSPECIFIED_REV_ID);
+                    AddDeviceIdToFamily(GFX8_FAMILY, ms_GFX8_PLACEHOLDER_DEVICE_ID, ms_UNSPECIFIED_REV_ID);
                 }
-                else if (supportedFamily == ms_CI_FAMILY_ENV_VAR_VALUE)
+                else if (supportedFamily == ms_GFX7_FAMILY_ENV_VAR_VALUE)
                 {
-                    AddDeviceIdToFamily(SEA_ISLANDS_FAMILY, ms_CI_PLACEHOLDER_DEVICE_ID, ms_UNSPECIFIED_REV_ID);
+                    AddDeviceIdToFamily(GFX7_FAMILY, ms_GFX7_PLACEHOLDER_DEVICE_ID, ms_UNSPECIFIED_REV_ID);
+                }
+                else if (supportedFamily == ms_GFX6_FAMILY_ENV_VAR_VALUE)
+                {
+                    AddDeviceIdToFamily(GFX6_FAMILY, ms_GFX6_PLACEHOLDER_DEVICE_ID, ms_UNSPECIFIED_REV_ID);
                 }
             }
         }
@@ -248,22 +255,28 @@ void CounterManager::Init(bool isRemoteSession)
         m_isDummyDevicesAdded = true;
 
         // if hardware device is not recognized, then enable all hardware families, and add one device from each family
-        if (!m_availableDevices.contains(SOUTHERN_ISLANDS_FAMILY))
+        if (!m_availableDevices.contains(GFX6_FAMILY))
         {
-            AddDeviceIdToFamily(SOUTHERN_ISLANDS_FAMILY, ms_SI_PLACEHOLDER_DEVICE_ID, ms_UNSPECIFIED_REV_ID);
-            m_dummyDeviceAdded.append(SOUTHERN_ISLANDS_FAMILY);
+            AddDeviceIdToFamily(GFX6_FAMILY, ms_GFX6_PLACEHOLDER_DEVICE_ID, ms_UNSPECIFIED_REV_ID);
+            m_dummyDeviceAdded.append(GFX6_FAMILY);
         }
 
-        if (!m_availableDevices.contains(SEA_ISLANDS_FAMILY))
+        if (!m_availableDevices.contains(GFX7_FAMILY))
         {
-            AddDeviceIdToFamily(SEA_ISLANDS_FAMILY, ms_CI_PLACEHOLDER_DEVICE_ID, ms_UNSPECIFIED_REV_ID);
-            m_dummyDeviceAdded.append(SEA_ISLANDS_FAMILY);
+            AddDeviceIdToFamily(GFX7_FAMILY, ms_GFX7_PLACEHOLDER_DEVICE_ID, ms_UNSPECIFIED_REV_ID);
+            m_dummyDeviceAdded.append(GFX7_FAMILY);
         }
 
-        if (!m_availableDevices.contains(VOLCANIC_ISLANDS_FAMILY))
+        if (!m_availableDevices.contains(GFX8_FAMILY))
         {
-            AddDeviceIdToFamily(VOLCANIC_ISLANDS_FAMILY, ms_VI_PLACEHOLDER_DEVICE_ID, ms_UNSPECIFIED_REV_ID);
-            m_dummyDeviceAdded.append(VOLCANIC_ISLANDS_FAMILY);
+            AddDeviceIdToFamily(GFX8_FAMILY, ms_GFX8_PLACEHOLDER_DEVICE_ID, ms_UNSPECIFIED_REV_ID);
+            m_dummyDeviceAdded.append(GFX8_FAMILY);
+        }
+
+        if (!m_availableDevices.contains(GFX9_FAMILY))
+        {
+            AddDeviceIdToFamily(GFX9_FAMILY, ms_GFX9_PLACEHOLDER_DEVICE_ID, ms_UNSPECIFIED_REV_ID);
+            m_dummyDeviceAdded.append(GFX9_FAMILY);
         }
     }
 
@@ -355,15 +368,19 @@ void CounterManager::AddDeviceId(int deviceId, int revId)
         switch (gfxCardInfo.m_generation)
         {
             case GDT_HW_GENERATION_SOUTHERNISLAND:
-                AddDeviceIdToFamily(SOUTHERN_ISLANDS_FAMILY, deviceId, revId);
+                AddDeviceIdToFamily(GFX6_FAMILY, deviceId, revId);
                 break;
 
             case GDT_HW_GENERATION_SEAISLAND:
-                AddDeviceIdToFamily(SEA_ISLANDS_FAMILY, deviceId, revId);
+                AddDeviceIdToFamily(GFX7_FAMILY, deviceId, revId);
                 break;
 
             case GDT_HW_GENERATION_VOLCANICISLAND:
-                AddDeviceIdToFamily(VOLCANIC_ISLANDS_FAMILY, deviceId, revId);
+                AddDeviceIdToFamily(GFX8_FAMILY, deviceId, revId);
+                break;
+
+            case GDT_HW_GENERATION_GFX9:
+                AddDeviceIdToFamily(GFX9_FAMILY, deviceId, revId);
                 break;
 
             default:
@@ -694,39 +711,51 @@ void CounterManager::SetupCounterData()
         GPA_ICounterAccessor* pCounterAccessor;
         GPA_ICounterScheduler* pCounterScheduler;
 
-        if (m_availableDevices.contains(VOLCANIC_ISLANDS_FAMILY) && m_availableDevices[VOLCANIC_ISLANDS_FAMILY].count() > 0)
+        if (m_availableDevices.contains(GFX9_FAMILY) && m_availableDevices[GFX9_FAMILY].count() > 0)
         {
-            if (m_gpa_GetAvailableCountersFuncPtr(GPA_API_OPENCL, ms_AMD_VENDOR_ID, m_availableDevices[VOLCANIC_ISLANDS_FAMILY][0].m_deviceID, m_availableDevices[VOLCANIC_ISLANDS_FAMILY][0].m_revID, &pCounterAccessor, &pCounterScheduler) == GPA_STATUS_OK)
+            if (m_gpa_GetAvailableCountersFuncPtr(GPA_API_OPENCL, ms_AMD_VENDOR_ID, m_availableDevices[GFX9_FAMILY][0].m_deviceID, m_availableDevices[GFX9_FAMILY][0].m_revID, &pCounterAccessor, &pCounterScheduler) == GPA_STATUS_OK)
             {
-                GetCounterInfoFromAccessor(VOLCANIC_ISLANDS_FAMILY, pCounterAccessor);
+                GetCounterInfoFromAccessor(GFX9_FAMILY, pCounterAccessor);
             }
             else
             {
-                Util::LogError("Unable to get counter data for VOLCANIC_ISLANDS_FAMILY");
+                Util::LogError("Unable to get counter data for GFX9_FAMILY");
             }
         }
 
-        if (m_availableDevices.contains(SEA_ISLANDS_FAMILY) && m_availableDevices[SEA_ISLANDS_FAMILY].count() > 0)
+        if (m_availableDevices.contains(GFX8_FAMILY) && m_availableDevices[GFX8_FAMILY].count() > 0)
         {
-            if (m_gpa_GetAvailableCountersFuncPtr(GPA_API_OPENCL, ms_AMD_VENDOR_ID, m_availableDevices[SEA_ISLANDS_FAMILY][0].m_deviceID, m_availableDevices[SEA_ISLANDS_FAMILY][0].m_revID, &pCounterAccessor, &pCounterScheduler) == GPA_STATUS_OK)
+            if (m_gpa_GetAvailableCountersFuncPtr(GPA_API_OPENCL, ms_AMD_VENDOR_ID, m_availableDevices[GFX8_FAMILY][0].m_deviceID, m_availableDevices[GFX8_FAMILY][0].m_revID, &pCounterAccessor, &pCounterScheduler) == GPA_STATUS_OK)
             {
-                GetCounterInfoFromAccessor(SEA_ISLANDS_FAMILY, pCounterAccessor);
+                GetCounterInfoFromAccessor(GFX8_FAMILY, pCounterAccessor);
             }
             else
             {
-                Util::LogError("Unable to get counter data for SEA_ISLANDS_FAMILY");
+                Util::LogError("Unable to get counter data for GFX8_FAMILY");
             }
         }
 
-        if (m_availableDevices.contains(SOUTHERN_ISLANDS_FAMILY) && m_availableDevices[SOUTHERN_ISLANDS_FAMILY].count() > 0)
+        if (m_availableDevices.contains(GFX7_FAMILY) && m_availableDevices[GFX7_FAMILY].count() > 0)
         {
-            if (m_gpa_GetAvailableCountersFuncPtr(GPA_API_OPENCL, ms_AMD_VENDOR_ID, m_availableDevices[SOUTHERN_ISLANDS_FAMILY][0].m_deviceID, m_availableDevices[SOUTHERN_ISLANDS_FAMILY][0].m_revID, &pCounterAccessor, &pCounterScheduler) == GPA_STATUS_OK)
+            if (m_gpa_GetAvailableCountersFuncPtr(GPA_API_OPENCL, ms_AMD_VENDOR_ID, m_availableDevices[GFX7_FAMILY][0].m_deviceID, m_availableDevices[GFX7_FAMILY][0].m_revID, &pCounterAccessor, &pCounterScheduler) == GPA_STATUS_OK)
             {
-                GetCounterInfoFromAccessor(SOUTHERN_ISLANDS_FAMILY, pCounterAccessor);
+                GetCounterInfoFromAccessor(GFX7_FAMILY, pCounterAccessor);
             }
             else
             {
-                Util::LogError("Unable to get counter data for SOUTHERN_ISLANDS_FAMILY");
+                Util::LogError("Unable to get counter data for GFX7_FAMILY");
+            }
+        }
+
+        if (m_availableDevices.contains(GFX6_FAMILY) && m_availableDevices[GFX6_FAMILY].count() > 0)
+        {
+            if (m_gpa_GetAvailableCountersFuncPtr(GPA_API_OPENCL, ms_AMD_VENDOR_ID, m_availableDevices[GFX6_FAMILY][0].m_deviceID, m_availableDevices[GFX6_FAMILY][0].m_revID, &pCounterAccessor, &pCounterScheduler) == GPA_STATUS_OK)
+            {
+                GetCounterInfoFromAccessor(GFX6_FAMILY, pCounterAccessor);
+            }
+            else
+            {
+                Util::LogError("Unable to get counter data for GFX6_FAMILY");
             }
         }
     }
@@ -882,16 +911,20 @@ bool CounterManager::GetHardwareFamilyDisplayName(HardwareFamily hardwareFamily,
 
     switch (hardwareFamily)
     {
-        case SOUTHERN_ISLANDS_FAMILY:
+        case GFX6_FAMILY:
             generation = GDT_HW_GENERATION_SOUTHERNISLAND;
             break;
 
-        case SEA_ISLANDS_FAMILY:
+        case GFX7_FAMILY:
             generation = GDT_HW_GENERATION_SEAISLAND;
             break;
 
-        case VOLCANIC_ISLANDS_FAMILY:
+        case GFX8_FAMILY:
             generation = GDT_HW_GENERATION_VOLCANICISLAND;
+            break;
+
+        case GFX9_FAMILY:
+            generation = GDT_HW_GENERATION_GFX9;
             break;
 
         default:
