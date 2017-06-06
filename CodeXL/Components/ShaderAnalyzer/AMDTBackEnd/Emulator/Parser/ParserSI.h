@@ -35,7 +35,8 @@ public:
     {
         Status_SUCCESS,
         Status_32BitInstructionNotSupported,
-        Status_64BitInstructionNotSupported
+        Status_64BitInstructionNotSupported,
+        Status_UnexpectedHWGeneration
     };
 
     /// SI instruction`s encoding mask
@@ -82,7 +83,7 @@ public:
         /// bits [31:26] - (1 1 1 1 0 0)
         InstructionEncoding_MIMG =  0x0000003C << 26,
         /// InstructionEncodingMask_5bit
-        /// bits [31:23] - (1 1 0 0 0)
+        /// bits [31:27] - (1 1 0 0 0)
         InstructionEncoding_SMRD = 0x00000018 << 27,
         /// InstructionEncodingMask_4bit
         /// bits [31:28] - (1 0 1 1)
@@ -94,10 +95,12 @@ public:
         /// bits [31:31] - (0)
         InstructionEncoding_VOP2 = 0x00000000 << 31,
 
-        ///bits [31:26] - (1 1 0 0 0 0)
+        /// bits [31:26] - (1 1 0 0 0 0)
         VIInstructionEncoding_SMEM = 0x00000030 << 26,
-        ///bits [31:26] - (1 1 0 1 0 1)
+        /// bits [31:26] - (1 1 0 1 0 1)
         VIInstructionEncoding_VINTRP = 0x00000035 << 26,
+        /// bits [31:26] - (1 1 0 1 1 1)
+        VIInstructionEncoding_FLAT = 0x00000037 << 26,
 
         InstructionEncoding_ILLEGAL
     };

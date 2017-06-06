@@ -73,14 +73,21 @@ VISOP1Instruction::OP ParserSISOP1::GetVISOP1Op(Instruction::instruction32bit he
 {
     EXTRACT_INSTRUCTION32_FIELD(hexInstruction, VI, SOP1, op, OP, 8);
 
-    if ((op < VISOP1Instruction::s_Illeagal))
+    if (op >= VISOP1Instruction::s_Illegal)
     {
-        return VISOP1Instruction::s_Illeagal;
+        return VISOP1Instruction::s_Illegal;
     }
     else
     {
         return op;
     }
+}
+
+G9SOP1Instruction::OP ParserSISOP1::GetG9SOP1Op(Instruction::instruction32bit hexInstruction)
+{
+    EXTRACT_INSTRUCTION32_FIELD(hexInstruction, G9, SOP1, op, OP, 8);
+
+    return (op < G9SOP1Instruction::s_Illegal ? op : G9SOP1Instruction::s_Illegal);
 }
 
 SOP1Instruction::SDST ParserSISOP1::GetSDST(Instruction::instruction32bit hexInstruction, unsigned int& ridx)
@@ -105,6 +112,7 @@ SOP1Instruction::SDST ParserSISOP1::GetSDST(Instruction::instruction32bit hexIns
 
 ParserSI::kaStatus ParserSISOP1::Parse(GDT_HW_GENERATION hwGen, Instruction::instruction32bit hexInstruction, Instruction*& instruction, bool, uint32_t, int iLabel /*=NO_LABEL*/ , int iGotoLabel /*=NO_LABEL*/)
 {
+    ParserSI::kaStatus status = ParserSI::Status_SUCCESS;
     unsigned int ridx0 = 0, sdstRidx1 = 0;
     SOP1Instruction::SSRC ssrc0 = GetSSRC0(hexInstruction, ridx0);
     SOP1Instruction::SDST sdst = GetSDST(hexInstruction, sdstRidx1);
@@ -114,14 +122,22 @@ ParserSI::kaStatus ParserSISOP1::Parse(GDT_HW_GENERATION hwGen, Instruction::ins
         SISOP1Instruction::OP op = GetSISOP1Op(hexInstruction);
         instruction = new SISOP1Instruction(ssrc0, op, sdst, ridx0, sdstRidx1, iLabel, iGotoLabel);
     }
-    else
+    else if (hwGen == GDT_HW_GENERATION_VOLCANICISLAND)
     {
         VISOP1Instruction::OP op = GetVISOP1Op(hexInstruction);
         instruction = new VISOP1Instruction(ssrc0, op, sdst, ridx0, sdstRidx1, iLabel, iGotoLabel);
     }
+    else if (hwGen == GDT_HW_GENERATION_GFX9)
+    {
+        G9SOP1Instruction::OP op = GetG9SOP1Op(hexInstruction);
+        instruction = new G9SOP1Instruction(ssrc0, op, sdst, ridx0, sdstRidx1, iLabel, iGotoLabel);
+    }
+    else
+    {
+        status = ParserSI::Status_UnexpectedHWGeneration;
+    }
 
-
-    return ParserSI::Status_SUCCESS;
+    return status;
 }
 
 ParserSI::kaStatus ParserSISOP1::Parse(GDT_HW_GENERATION, Instruction::instruction64bit, Instruction*&, int/* iLabel =NO_LABEL*/ , int /*iGotoLabel =NO_LABEL*/)

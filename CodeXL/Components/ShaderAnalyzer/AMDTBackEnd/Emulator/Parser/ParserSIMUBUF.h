@@ -120,6 +120,12 @@ private:
     /// \returns           s        An OP.
     static VIMUBUFInstruction::OP GetVIOpMUBUF(Instruction::instruction64bit hexInstruction, Instruction::InstructionCategory& instKind);
 
+    /// Get the OP     [18:16]
+    /// \param[in]  hexInstruction  The 64 bit hexadecimal instruction.
+    /// \instruction[out]  instKind  The instruction`s kind (could be VectorMemoryRead or VectorMemoryWrite or Atomics).
+    /// \returns           s        An OP.
+    static G9MUBUFInstruction::OP GetG9OpMUBUF(Instruction::instruction64bit hexInstruction, Instruction::InstructionCategory& instKind);
+
     /// Get the VADDR  [39:32]
     /// \param[in]  hexInstruction  The 64 bit hexadecimal instruction.
     /// \returns                   An VADDR.

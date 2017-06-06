@@ -129,6 +129,35 @@ ParserSIMUBUF::GetVIOpMUBUF(Instruction::instruction64bit hexInstruction, Instru
     }
 }
 
+G9MUBUFInstruction::OP
+ParserSIMUBUF::GetG9OpMUBUF(Instruction::instruction64bit hexInstruction, Instruction::InstructionCategory& instKind)
+{
+    EXTRACT_INSTRUCTION32_FIELD(hexInstruction, G9, MUBUF, op, OP, 18);
+
+    if ((op >= G9MUBUFInstruction::buffer_load_format_x && op <= G9MUBUFInstruction::buffer_load_format_xyzw) ||
+        (op >= G9MUBUFInstruction::buffer_load_format_d16_x && op <= G9MUBUFInstruction::buffer_load_format_d16_xyzw) ||
+        (op >= G9MUBUFInstruction::buffer_load_ubyte && op <= G9MUBUFInstruction::buffer_load_dwordx4) ||
+        (op >= G9MUBUFInstruction:: buffer_load_ubyte_d16 && op <= G9MUBUFInstruction::buffer_load_format_d16_hi_x))
+    {
+        instKind = Instruction::VectorMemoryRead;
+    }
+    else if ((op >= G9MUBUFInstruction::buffer_store_format_x && op <= G9MUBUFInstruction::buffer_store_format_xyzw) ||
+             (op >= G9MUBUFInstruction::buffer_store_format_d16_x && op <= G9MUBUFInstruction::buffer_store_format_d16_xyzw) ||
+             (op >= G9MUBUFInstruction::buffer_store_byte && op <= G9MUBUFInstruction::buffer_store_dwordx4) ||
+             (op >= G9MUBUFInstruction::buffer_store_format_d16_hi_x && op <= G9MUBUFInstruction::buffer_wbinvl1_vol))
+
+    {
+        instKind = Instruction::VectorMemoryWrite;
+    }
+    else if (op >= G9MUBUFInstruction::buffer_atomic_swap && op <= G9MUBUFInstruction::buffer_atomic_dec_x2)
+    {
+        instKind = Instruction::Atomics;
+    }
+
+    return (op < G9MUBUFInstruction::buffer_Illegal ? op : G9MUBUFInstruction::buffer_Illegal);
+}
+
+
 MUBUFInstruction::VADDR
 ParserSIMUBUF::GetVADDR(Instruction::instruction64bit hexInstruction)
 {
@@ -205,6 +234,7 @@ ParserSIMUBUF::GetSOFFSET(Instruction::instruction64bit hexInstruction, unsigned
 ParserSI::kaStatus
 ParserSIMUBUF::Parse(GDT_HW_GENERATION hwGen, Instruction::instruction64bit hexInstruction, Instruction*& instruction, int iLabel /*=NO_LABEL*/ , int iGotoLabel /*=NO_LABEL*/)
 {
+    ParserSI::kaStatus status = ParserSI::Status_SUCCESS;
     Instruction::InstructionCategory instKind = Instruction::VectorMemoryRead;
     unsigned int ridx = 0;
     MUBUFInstruction::OFFSET offset = GetOFFSET(hexInstruction);
@@ -226,15 +256,24 @@ ParserSIMUBUF::Parse(GDT_HW_GENERATION hwGen, Instruction::instruction64bit hexI
         instruction = new SIMUBUFInstruction(offset, offen, idxen, glc, addr64, lds, op, vaddr, vdata, srsrc, slc,
                                              tfe, soffset, ridx, instKind, iLabel, iGotoLabel);
     }
-    else
+    else if (hwGen == GDT_HW_GENERATION_VOLCANICISLAND)
     {
         VIMUBUFInstruction::OP op = GetVIOpMUBUF(hexInstruction, instKind);
         instruction = new VIMUBUFInstruction(offset, offen, idxen, glc, addr64, lds, op, vaddr, vdata, srsrc, slc,
                                              tfe, soffset, ridx, instKind, iLabel, iGotoLabel);
     }
+    else if (hwGen == GDT_HW_GENERATION_GFX9)
+    {
+        G9MUBUFInstruction::OP op = GetG9OpMUBUF(hexInstruction, instKind);
+        instruction = new G9MUBUFInstruction(offset, offen, idxen, glc, addr64, lds, op, vaddr, vdata, srsrc, slc,
+                                             tfe, soffset, ridx, instKind, iLabel, iGotoLabel);
+    }
+    else
+    {
+        status = ParserSI::Status_UnexpectedHWGeneration;
+    }
 
-
-    return ParserSI::Status_SUCCESS;
+    return status;
 }
 
 ParserSI::kaStatus

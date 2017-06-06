@@ -295,5 +295,85 @@ private:
     OP m_op;
 
 };
+
+
+// SOP2 instructions for VEGA (GFX9)
+class G9SOP2Instruction : public SOP2Instruction
+{
+public:
+    /// Selector for the SOP2 Instruction
+    enum OP
+    {
+        s_add_u32         = 0 ,
+        s_sub_u32         = 1 ,
+        s_add_i32         = 2 ,
+        s_sub_i32         = 3 ,
+        s_addc_u32        = 4 ,
+        s_subb_u32        = 5 ,
+        s_min_i32         = 6 ,
+        s_min_u32         = 7 ,
+        s_max_i32         = 8 ,
+        s_max_u32         = 9 ,
+        s_cselect_b32     = 10,
+        s_cselect_b64     = 11,
+        s_and_b32         = 12,
+        s_and_b64         = 13,
+        s_or_b32          = 14,
+        s_or_b64          = 15,
+        s_xor_b32         = 16,
+        s_xor_b64         = 17,
+        s_andn2_b32       = 18,
+        s_andn2_b64       = 19,
+        s_orn2_b32        = 20,
+        s_orn2_b64        = 21,
+        s_nand_b32        = 22,
+        s_nand_b64        = 23,
+        s_nor_b32         = 24,
+        s_nor_b64         = 25,
+        s_xnor_b32        = 26,
+        s_xnor_b64        = 27,
+        s_lshl_b32        = 28,
+        s_lshl_b64        = 29,
+        s_lshr_b32        = 30,
+        s_lshr_b64        = 31,
+        s_ashr_i32        = 32,
+        s_ashr_i64        = 33,
+        s_bfm_b32         = 34,
+        s_bfm_b64         = 35,
+        s_mul_i32         = 36,
+        s_bfe_u32         = 37,
+        s_bfe_i32         = 38,
+        s_bfe_u64         = 39,
+        s_bfe_i64         = 40,
+        s_cbranch_g_fork  = 41,
+        s_absdiff_i32     = 42,
+        s_rfe_restore_b64 = 43,
+        s_mul_hi_u32      = 44,
+        s_mul_hi_i32      = 45,
+        s_lshl1_add_u32   = 46,
+        s_lshl2_add_u32   = 47,
+        s_lshl3_add_u32   = 48,
+        s_lshl4_add_u32   = 49,
+        s_pack_ll_b32_b16 = 50,
+        s_pack_lh_b32_b16 = 51,
+        s_pack_hh_b32_b16 = 52,
+        /// Illegal
+        S_ILLEGAL         = 53,
+    };
+
+    /// Get the OP [29:23]
+    OP GetOp() const { return m_op; }
+
+    /// ctor
+    G9SOP2Instruction(SSRC ssrc0, SSRC ssrc1, SDST sdst, OP op, unsigned int sridx0, unsigned int sridx1, unsigned int sdstRidx, bool isLiteral32bit = false, uint32_t literal32bit = 0, int iLabel = NO_LABEL, int iGotoLabel = NO_LABEL): SOP2Instruction(ssrc0, ssrc1, sdst, sridx0, sridx1, sdstRidx, isLiteral32bit, literal32bit, iLabel, iGotoLabel), m_op(op)
+    {
+        m_HwGen = GDT_HW_GENERATION_GFX9;
+    }
+
+private:
+    /// SOPC operation.
+    OP m_op;
+};
+
 #endif //__SOP2INSTRUCTION_H
 

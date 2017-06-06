@@ -71,6 +71,11 @@ private:
     /// \returns                   An OP.
     static VISOP1Instruction::OP GetVISOP1Op(Instruction::instruction32bit hexInstruction);
 
+    /// Get SOPC instruction`s OP field.
+    /// \param[in]  hexInstruction  The 32 bit hexadecimal instruction.
+    /// \returns                   An OP.
+    static G9SOP1Instruction::OP GetG9SOP1Op(Instruction::instruction32bit hexInstruction);
+
     /// Get SOP1 instruction`s SDST field.
     /// \param[in]  hexInstruction  The 32 bit hexadecimal instruction.
     /// \param[in]  ridx           register value ,relevant only if SSRC is ScalarGPR or SSRC ScalarTtmp.
