@@ -25,7 +25,35 @@ HSADispatchTimelineItem::HSADispatchTimelineItem(quint64 startTime, quint64 endT
 
 void HSADispatchTimelineItem::tooltipItems(acTimelineItemToolTip& tooltip) const
 {
-    tooltip.add(tr("Name"), m_strText);
+    std::string KernelNameString = m_strText.toStdString();
+    std::string tempString;
+
+    for (std::string::const_iterator it = KernelNameString.begin(); it != KernelNameString.end(); ++it)
+    {
+        if ((*it) == '<')
+        {
+            tempString.append("&lt;");
+        }
+        else if ((*it) == '>')
+        {
+            tempString.append("&gt;");
+        }
+        else if ((*it) == '#')
+        {
+            tempString.append("&#35;");
+        }
+        else if ((*it) == '&')
+        {
+            tempString.append("&amp;");
+        }
+        else
+        {
+            tempString.push_back(*it);
+        }
+    }
+
+    QString kernelName(QString::fromStdString(tempString));
+    tooltip.add(tr("Name"), kernelName);
     tooltip.add(tr("Device"), m_strDeviceType);
 
     acTimeline* timeline = m_pParentBranch->parentTimeline();
