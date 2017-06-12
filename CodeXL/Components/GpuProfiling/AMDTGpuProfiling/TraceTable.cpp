@@ -37,6 +37,7 @@
 #include "OccupancyInfo.h"
 #include "APIColorMap.h"
 #include <AMDTGpuProfiling/Util.h>
+
 namespace boosticl = boost::icl;
 
 TraceTableItem::TraceTableItem(const QString& strAPIPrefix, const QString& strApiName, IAPIInfoDataHandler* pApiInfo, acTimelineItem* pTimelineItem, acTimelineItem* pDeviceBlock, IOccupancyInfoDataHandler* pOccupancyInfo) :
@@ -337,6 +338,9 @@ TraceTableModel::TraceTableModel(QObject* parent) : QAbstractItemModel(parent), 
 
 TraceTableModel::~TraceTableModel()
 {
+    m_apiCallsTraceItemsMap.clear();
+    m_perfMarkersTraceItemsMap.clear();
+    m_perfmarkerList.clear();
     SAFE_DELETE(m_pRootItem);
 }
 
@@ -469,11 +473,6 @@ TraceTableItem* TraceTableModel::AddTraceItem(const QString& strAPIPrefix, const
             pParent = m_openedPerfMarkerItemsStack.top();
         }
 
-        if (pParent != nullptr)
-        {
-            pParent->InsertChild(0, pRetVal);
-        }
-
         m_openedPerfMarkerItemsStack.push_back(pRetVal);
     }
 
@@ -483,6 +482,17 @@ TraceTableItem* TraceTableModel::AddTraceItem(const QString& strAPIPrefix, const
 TraceTableItem* TraceTableModel::CloseLastOpenedPerfMarker(acTimelineItem* pTimelineItem)
 {
     TraceTableItem* pOpenedItem = m_openedPerfMarkerItemsStack.pop();
+
+    Marker marker;
+    marker.m_pPerfMarkerItem = pOpenedItem;
+
+    if (!m_openedPerfMarkerItemsStack.empty())
+    {
+        marker.m_pParentMarker = m_openedPerfMarkerItemsStack.top();
+    }
+
+    m_perfmarkerList.push_back(marker);
+
     GT_IF_WITH_ASSERT(pOpenedItem != nullptr)
     {
         // Set the timeline pTableItem:
@@ -702,6 +712,46 @@ IOccupancyInfoDataHandler* TraceTableModel::GetOccupancyItem(const QModelIndex& 
     return pRetVal;
 }
 
+bool TraceTableItemComparer(TraceTableItem* pFirst, TraceTableItem* pSecond)
+{
+    if (pFirst->m_itemType == API && pSecond->m_itemType == PERFMARKER)
+    {
+        // API - PERFMARKER
+        if (pFirst->GetTimelineItem()->endTime() <= pSecond->GetTimelineItem()->startTime())
+        {
+            return true;
+        }
+    }
+
+    if (pFirst->m_itemType == PERFMARKER && pSecond->m_itemType == API)
+    {
+        // PERFMARKER - API
+        if (pFirst->GetTimelineItem()->startTime() <= pSecond->GetTimelineItem()->startTime() &&
+            pFirst->GetTimelineItem()->endTime() >= pSecond->GetTimelineItem()->endTime())
+        {
+            return true;
+        }
+    }
+
+    if (pFirst->m_itemType == PERFMARKER && pSecond->m_itemType == PERFMARKER)
+    {
+        // PERFMARKER - PERFMARKER
+        if (pFirst->GetTimelineItem()->startTime() <= pSecond->GetTimelineItem()->startTime() &&
+            pFirst->GetTimelineItem()->endTime() >= pSecond->GetTimelineItem()->endTime())
+        {
+            return true;
+        }
+    }
+
+    // Other Cases
+    if (pFirst->GetTimelineItem()->endTime() <= pSecond->GetTimelineItem()->startTime())
+    {
+        return true;
+    }
+
+    return false;
+}
+
 bool TraceTableModel::InitializeModel()
 {
     bool retVal = false;
@@ -725,11 +775,28 @@ bool TraceTableModel::InitializeModel()
         afProgressBarWrapper::instance().setProgressText(GPU_STR_TraceViewLoadingTraceTableItemsProgress);
 
         // Go over the API items and the markers item, and add them to the table:
-        while ((apiIter != apiIterEnd) || (markersIter != markersIterEnd))
+        std::vector<TraceTableItem*> leftTraceTableItemList;
+
+        for (auto itr = m_apiCallsTraceItemsMap.begin(); itr != m_apiCallsTraceItemsMap.end(); ++itr)
+        {
+            itr->second->m_itemType = API;
+            leftTraceTableItemList.push_back(itr->second);
+        }
+
+        for (auto itr = m_perfMarkersTraceItemsMap.begin(); itr != m_perfMarkersTraceItemsMap.end(); ++itr)
+        {
+            itr.value()->m_itemType = PERFMARKER;
+            leftTraceTableItemList.push_back(itr.value());
+        }
+
+        std::sort(leftTraceTableItemList.begin(), leftTraceTableItemList.end(), TraceTableItemComparer);
+        unsigned int listIndx = 0;
+
+        while (listIndx < leftTraceTableItemList.size())
         {
             /// calculate next item and advance iterator
-            TraceTableItem* pNextItemToAdd = CalculateNextTraceTableItem(markersIter, markersIterEnd, apiIter, apiIterEnd);
-            TraceTableItem* pParent = GetNextItemParent(pNextItemToAdd);
+            TraceTableItem* pNextItemToAdd = leftTraceTableItemList[listIndx];
+            TraceTableItem* pParent = GetNextItemParent(pNextItemToAdd, pNextItemToAdd->m_itemType);
             GT_IF_WITH_ASSERT(pParent != nullptr)
             {
                 // Add the child to the appropriate parent:
@@ -742,6 +809,7 @@ bool TraceTableModel::InitializeModel()
 
                 afProgressBarWrapper::instance().incrementProgressBar();
             }
+            listIndx++;
         }
 
         m_apiCallsTraceItemsMap.clear();
@@ -754,10 +822,10 @@ bool TraceTableModel::InitializeModel()
     return retVal;
 }
 /// returns items parent , by default it's a root item,unless overlapping marker item is found
-TraceTableItem* TraceTableModel::GetNextItemParent(const TraceTableItem* pNextItemToAdd) const
+TraceTableItem* TraceTableModel::GetNextItemParent(const TraceTableItem* pNextItemToAdd, const TraceTableItemType& itemType) const
 {
-    //// Look for the right parent for this item:
-    /// By default all items are immediate children of the root node
+    // Look for the right parent for this item:
+    // By default all items are immediate children of the root node
     TraceTableItem* pParent = m_pRootItem;
     GT_IF_WITH_ASSERT(pNextItemToAdd != nullptr)
     {
@@ -765,72 +833,91 @@ TraceTableItem* TraceTableModel::GetNextItemParent(const TraceTableItem* pNextIt
         quint64 nextItemEndTime = pNextItemToAdd->GetTimelineItem()->endTime();
 
         // Temporary Solution - Intervals is not feasible with same lower and upper bound
-        if(nextItemStartTime == nextItemEndTime)
+        if (nextItemStartTime == nextItemEndTime)
         {
             nextItemEndTime++;
         }
 
-        const auto nextItemTimeInterval = boosticl::interval<quint64>::right_open(nextItemStartTime, nextItemEndTime);
-
-        auto itr = m_markerIntervals.find(nextItemTimeInterval);
-
-        if (itr != m_markerIntervals.end())
+        if (itemType == API)
         {
-            auto pMarker = itr->second;
+            const auto nextItemTimeInterval = boosticl::interval<quint64>::right_open(nextItemStartTime, nextItemEndTime);
 
-            //check if next item we're adding overlapped by the found marker , if so make it next item parent
-            if (pMarker != pNextItemToAdd &&
-                pMarker->GetTimelineItem() != nullptr &&
-                pMarker->GetTimelineItem()->startTime() <= nextItemStartTime &&
-                pMarker->GetTimelineItem()->endTime() >= nextItemEndTime)
+            auto itr = m_markerIntervals.find(nextItemTimeInterval);
+
+            if (itr != m_markerIntervals.end())
             {
-                pParent = pMarker;
+                auto pMarker = itr->second;
+
+                //check if next item we're adding overlapped by the found marker , if so make it next item parent
+                if (pMarker != pNextItemToAdd)
+                {
+                    if (pMarker->GetTimelineItem() != nullptr &&
+                        pMarker->GetTimelineItem()->startTime() <= nextItemStartTime &&
+                        pMarker->GetTimelineItem()->endTime() >= nextItemEndTime)
+                    {
+                        pParent = pMarker;
+                    }
+                }
+            }
+        }
+        else
+        {
+            for (std::vector<Marker>::const_iterator it = m_perfmarkerList.begin();
+                 it != m_perfmarkerList.end(); ++it)
+            {
+                if (pNextItemToAdd == it->m_pPerfMarkerItem && nullptr != it->m_pParentMarker)
+                {
+                    pParent = it->m_pParentMarker;
+                }
             }
         }
     }
+
     return pParent;
 }
 
 /// calculates next item and advance one of iterators - marker or api iterator
 TraceTableItem* TraceTableModel::CalculateNextTraceTableItem(PerfMarkersMapItr& markersIter, const PerfMarkersMapItr& markersIterEnd,
-                                                             ApiCallsTraceMapItr& apiIter, const ApiCallsTraceMapItr& apiIterEnd) const
+                                                             ApiCallsTraceMapItr& apiIter, const ApiCallsTraceMapItr& apiIterEnd, TraceTableItemType& itemType) const
 {
     TraceTableItem* pNextItemToAdd = nullptr;
     TraceTableItem* pCurrentAPI = (apiIter != apiIterEnd) ? apiIter->second : nullptr;
     TraceTableItem* pCurrentMarker = (markersIter != markersIterEnd) ? markersIter.value() : nullptr;
 
-    //no more markers --> api is next item
-    if ((pCurrentAPI != nullptr) && (pCurrentMarker == nullptr))
-    {
-        pNextItemToAdd = pCurrentAPI;
-        apiIter++;
-    }
-    // no more api's --> marker is the next item
-    else if ((pCurrentAPI == nullptr) && (pCurrentMarker != nullptr))
-    {
-        pNextItemToAdd = pCurrentMarker;
-        markersIter++;
-    }
-    //choose by start time
-    else
-    {
-        // We have both next API and markers. Compare the start time to decide which of them should be added next:
-        quint64 apiStart = pCurrentAPI->GetTimelineItem()->startTime();
-        quint64 markerStart = markersIter.key().first;
+    quint64 currentApiStartTime = 0u;
+    quint64 currentMarkerStartTime = 0u;
 
-        // Next item should be an API item:
-        if (apiStart <= markerStart)
-        {
-            pNextItemToAdd = pCurrentAPI;
-            apiIter++;
-        }
+    if (nullptr != pCurrentAPI)
+    {
+        currentApiStartTime = pCurrentAPI->GetTimelineItem()->startTime();
+    }
 
-        // Next one should be a marker item:
-        else
+    if (nullptr != pCurrentMarker)
+    {
+        currentMarkerStartTime = pCurrentMarker->GetTimelineItem()->startTime();
+    }
+
+    // There are some markers which are not yet added
+    if (nullptr != pCurrentMarker)
+    {
+        if (currentMarkerStartTime <= currentApiStartTime)
         {
             pNextItemToAdd = pCurrentMarker;
-            markersIter++;
+            itemType = PERFMARKER;
+            ++markersIter;
         }
+        else
+        {
+            pNextItemToAdd = pCurrentAPI;
+            itemType = API;
+            ++apiIter;
+        }
+    }
+    else if (nullptr != pCurrentAPI)
+    {
+        pNextItemToAdd = pCurrentAPI;
+        itemType = API;
+        ++apiIter;
     }
 
     return pNextItemToAdd;

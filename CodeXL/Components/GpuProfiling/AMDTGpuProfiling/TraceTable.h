@@ -39,6 +39,13 @@
 // forward declarations
 class acTimelineItem;
 
+/// enum for trace table item types
+enum TraceTableItemType
+{
+    API,            ///< API Item
+    PERFMARKER      ///< Perfmarker Item
+};
+
 /// Class to hold the item data for the API Trace table model
 class TraceTableItem
 {
@@ -137,6 +144,9 @@ public:
     /// \param strMarkerName the new marker name for the item
     void UpdateMarkerName(const QString& strMarkerName);
 
+    /// type of the trace table item
+    TraceTableItemType m_itemType;
+
 private:
     /// Disable copy constructor
     TraceTableItem(const TraceTableItem&);
@@ -228,7 +238,6 @@ public:
     /// \param defaultForegroundColor the default color used for items in the table
     /// \param linkColor the color to use for painting hyper-links
     /// \param font the font used in the table
-    /// \param filteredColumns list of columns that should not be displayed
     void SetVisualProperties(const QColor& defaultForegroundColor, const QColor& linkColor, const QFont& font);
 
     /// Build the list of headers that should be displayed:
@@ -261,12 +270,12 @@ public:
     TraceTableItem* AddTraceItem(const QString& strAPIPrefix, const QString& strMarkerName, IPerfMarkerInfoDataHandler* pMarkerEntry);
 
     /// Gets the device block data for the specified row
-    /// \param rowIndex the index of the row
+    /// \param index the index of the row
     /// \return the timeline item representing the device block
     acTimelineItem* GetDeviceBlock(const QModelIndex& index);
 
     /// Gets the occupancy data for the specified row
-    /// \param rowIndex the index of the row
+    /// \param index the index of the row
     /// \return the occupancy info
     IOccupancyInfoDataHandler* GetOccupancyItem(const QModelIndex& index);
 
@@ -287,7 +296,7 @@ public:
     /// \param apiNum the api calls number for this thread
     void SetAPICallsNumber(unsigned int apiNum);
 
-    // get the number of Api Calls Trace Items to be set
+    /// get the number of Api Calls Trace Items to be set
     int GetReservedApiCallsTraceItems() const {return m_reservedApiCallsTraceItems;}
 
     /// Export the model data to a CSV file
@@ -307,6 +316,7 @@ private:
 
     ///Methods
 private:
+
     /// This method :
     /// 1. calculates next TraceTableItem to be connected with its parent during table initialization
     /// 2. advances input api and markers  iterators
@@ -316,13 +326,16 @@ private:
     /// \param apiIterEnd api end iterator
     /// \return TraceTableItem* pointer to next TraceTableItem that shall be connected to it's parent  root or  marker
     TraceTableItem* CalculateNextTraceTableItem(PerfMarkersMapItr& markersIter, const PerfMarkersMapItr& markersIterEnd,
-                                                ApiCallsTraceMapItr& apiIter, const ApiCallsTraceMapItr& apiIterEnd) const;
+                                                ApiCallsTraceMapItr& apiIter, const ApiCallsTraceMapItr& apiIterEnd, TraceTableItemType& itemType) const;
+
+
     /// This method returns items parent , by default it's a root item,unless time overlapping marker item is found
     /// \param pNextItemToAdd item for which parent needs to be found
     /// \return TraceTableItem* pointer to parent for a given item
-    TraceTableItem* GetNextItemParent(const TraceTableItem* pNextItemToAdd) const;
+    TraceTableItem* GetNextItemParent(const TraceTableItem* pNextItemToAdd, const TraceTableItemType& itemType) const;
 
 private:
+
     QStringList                m_headerData;             ///< the header data for this model
     TraceTableItem*            m_pRootItem;              ///< the root item of the trace table (tree)
     QColor                     m_defaultForegroundColor; ///< the default foreground (font) color for this model
@@ -335,13 +348,33 @@ private:
     /// Maps containing the API call trace items:
     std::map<quint64, TraceTableItem*> m_apiCallsTraceItemsMap;
 
-    // number of reserved items for m_apiCallsTraceItemsMap -
+    /// number of reserved items for m_apiCallsTraceItemsMap -
     int m_reservedApiCallsTraceItems;
 
     /// Maps containing the perf markers trace items:
     QMap<TimeRange, TraceTableItem*> m_perfMarkersTraceItemsMap;
+
+
     /// holds all markers sorted by their time range intervals
     boost::icl::split_interval_map<quint64, TraceTableItem*, boost::icl::partial_absorber, std::less, boost::icl::inplace_max> m_markerIntervals;
+
+    /// structure for holding marker information
+    struct Marker
+    {
+        /// pointer to the marker
+        TraceTableItem* m_pPerfMarkerItem;
+
+        /// pointer to the parent of the marker
+        TraceTableItem* m_pParentMarker;
+
+        /// Constructor
+        Marker() : m_pPerfMarkerItem(nullptr),
+            m_pParentMarker(nullptr)
+        {}
+    };
+
+    /// list of the perf markers
+    std::vector<Marker> m_perfmarkerList;
 
     /// Was the model initialized already?
     bool m_isInitialized;
