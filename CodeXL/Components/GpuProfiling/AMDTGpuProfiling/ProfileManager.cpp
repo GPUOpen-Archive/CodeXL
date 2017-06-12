@@ -1701,7 +1701,10 @@ bool ProfileManager::GenerateOccupancyPage(GPUSessionTreeItemData* pSessionData,
             retVal = true;
         }
 
-        strErrorMessageOut.fromStdString(errorMessage);
+        if (nullptr != errorMessage)
+        {
+            strErrorMessageOut.fromStdString(errorMessage);
+        }
         HandleGenOccupancyFinished(retVal ? 0 : -1);
     }
 
