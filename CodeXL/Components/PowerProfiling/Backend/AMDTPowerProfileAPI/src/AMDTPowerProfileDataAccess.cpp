@@ -258,7 +258,7 @@ AMDTResult GetCummulativePidProfDataInstatant(AMDTUInt32* pPIDCount,
     else
     {
         AMDTUInt32 count = 0;
-        memset(g_pidInfo, 0, sizeof(AMDTUInt32) * MAX_PID_CNT);
+        memset(g_pidInfo, 0, sizeof(AMDTPwrProcessInfo) * MAX_PID_CNT);
 
         for (AMDTUInt32 idx = 0; idx < entries; ++idx)
         {
