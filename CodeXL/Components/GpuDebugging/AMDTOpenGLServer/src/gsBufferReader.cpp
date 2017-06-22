@@ -85,7 +85,7 @@ void gsBufferReader::unbindFBO()
         pglBindFrameBuffer(GL_READ_FRAMEBUFFER, 0);
         SU_AFTER_EXECUTING_REAL_FUNCTION(ap_glBindFramebuffer);
     }
-    else if (pglBindFrameBuffer != NULL)
+    else if (pglBindFrameBufferEXT != NULL)
     {
         SU_BEFORE_EXECUTING_REAL_FUNCTION(ap_glBindFramebufferEXT);
         pglBindFrameBufferEXT(GL_FRAMEBUFFER_EXT, 0);
