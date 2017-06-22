@@ -1737,7 +1737,7 @@ int ClrProfCallBack::RecursiveMakeDir(wchar_t* dir)
     wchar_t temp_dir[FILENAME_MAX];
     wchar_t* next_dir = dir;
 
-    memset(temp_dir, 0, FILENAME_MAX);
+    memset(temp_dir, 0, FILENAME_MAX * sizeof(wchar_t));
 
     while ((next_dir = wcschr(next_dir, L'\\')) != NULL)
     {
