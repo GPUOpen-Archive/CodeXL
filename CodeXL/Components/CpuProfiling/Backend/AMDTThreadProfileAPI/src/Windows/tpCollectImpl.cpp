@@ -111,7 +111,7 @@ AMDTResult tpCollectImpl::tpClear()
     }
 
     m_callstack = false;
-    memset(m_logFilePath, 0, TP_MAX_ETL_PATH_LEN);
+    memset(m_logFilePath, 0, TP_MAX_ETL_PATH_LEN * sizeof(wchar_t));
     m_sessionHandle = 0;
     m_tpState = AMDT_THREAD_PROFILE_STATE_UNINITIALIZED;
 
@@ -157,7 +157,7 @@ bool tpCollectImpl::tpGetUndocAPI()
 
 AMDTResult tpCollectImpl::tpInitialize()
 {
-    memset(m_logFilePath, 0, TP_MAX_ETL_PATH_LEN);
+    memset(m_logFilePath, 0, TP_MAX_ETL_PATH_LEN * sizeof(wchar_t));
 
     return AMDT_STATUS_OK;
 }
