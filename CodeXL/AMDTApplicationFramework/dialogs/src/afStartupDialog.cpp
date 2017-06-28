@@ -248,18 +248,9 @@ afStartupDialog::afStartupDialog(QWidget* pParent)
     QString bgStr = QString("QDialog{background-color:#%1;}").arg(acGetSystemDefaultBackgroundColorAsHexQString());
     setStyleSheet(bgStr);
 
-    // Check if the analyze mode should be enabled:
-    bool isAnalyzeEnabled = true;
-    unsigned int installedComponentsBitmask = afGlobalVariablesManager::instance().InstalledAMDComponentsBitmask();
-
-    if (!((installedComponentsBitmask & AF_AMD_GPU_COMPONENT) && (installedComponentsBitmask & AF_AMD_CATALYST_COMPONENT)))
-    {
-        isAnalyzeEnabled = false;
-    }
-
-    pAnalyzeLabel->setEnabled(isAnalyzeEnabled);
-    m_pAnalyzeNewCLFile->setEnabled(isAnalyzeEnabled);
-    m_pAnalyzeAddCLFile->setEnabled(isAnalyzeEnabled);
+    pAnalyzeLabel->setEnabled(true);
+    m_pAnalyzeNewCLFile->setEnabled(true);
+    m_pAnalyzeAddCLFile->setEnabled(true);
 }
 
 afStartupDialog::~afStartupDialog()

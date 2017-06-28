@@ -63,6 +63,7 @@ ParserSI::InstructionEncoding ParserSI::GetInstructionEncoding(Instruction::inst
         case InstructionEncoding_MIMG:
         case VIInstructionEncoding_SMEM:
         case VIInstructionEncoding_VINTRP:
+        case VIInstructionEncoding_FLAT:
             return static_cast<InstructionEncoding>(instructionEncoding);
 
         default:

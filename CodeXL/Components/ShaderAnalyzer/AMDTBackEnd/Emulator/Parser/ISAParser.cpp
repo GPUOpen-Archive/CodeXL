@@ -38,6 +38,7 @@
 #include "ParserSIMIMG.h"
 #include "ParserSIEXP.h"
 #include "ParserSIVOP.h"
+#include "ParserFLAT.h"
 
 // *** INTERNALLY-LINKED AUXILIARY FUNCTIONS - BEGIN ***
 
@@ -165,6 +166,7 @@ ParserISA::ParserISA(ParserSI::LoggingCallBackFuncP logFunc) : m_sgprs(0), m_vgp
     m_parsersSI[Instruction::InstructionSet_MIMG] = new ParserSIMIMG();
     m_parsersSI[Instruction::InstructionSet_EXP] = new ParserSIEXP();
     m_parsersSI[Instruction::InstructionSet_VOP] = new ParserSIVOP();
+    m_parsersSI[Instruction::InstructionSet_FLAT] = new ParserFLAT();
 }
 
 ParserISA::~ParserISA()
@@ -183,6 +185,7 @@ ParserISA::~ParserISA()
     delete m_parsersSI[Instruction::InstructionSet_MIMG];
     delete m_parsersSI[Instruction::InstructionSet_EXP];
     delete m_parsersSI[Instruction::InstructionSet_VOP];
+    delete m_parsersSI[Instruction::InstructionSet_FLAT];
 }
 
 bool ParserISA::Parse(const std::string& isaLine, GDT_HW_GENERATION asicGen,
@@ -303,6 +306,10 @@ bool ParserISA::Parse(const std::string& isaLine, GDT_HW_GENERATION asicGen,
             m_parsersSI[Instruction::InstructionSet_SMRD]->Parse(asicGen, hexInstruction, pInstruction, iLabel, iGotoLabel);
             break;
 
+        case ParserSI::VIInstructionEncoding_FLAT:
+            m_parsersSI[Instruction::InstructionSet_FLAT]->Parse(asicGen, hexInstruction, pInstruction, iLabel, iGotoLabel);
+            break;
+
         default:
             break;
     }
@@ -369,31 +376,43 @@ bool ParserISA::ParseForSize(const std::string& isa)
     ResetInstsCounters();
     boost::regex codeLenInByteEx("([[:blank:]]*codeLenInByte[[:blank:]]*=[[:blank:]]*)([[:digit:]]*)");
     boost::regex codeLenInByteNI("([[:blank:]]*CodeLen[[:blank:]]*=[[:blank:]]*)([[:digit:]]*)");
+    // v_add_u32     v1, s[2:3], v0, s0    // 000000000130: D1190201 00000100   <--- 64-bit instruction
+    // v_mov_b32     v0, 0                 // 000000000138: 7E000280            <--- 32-bit instruction
+    boost::regex instAnnotation("//[[:blank:]]*[[:xdigit:]]{12}:[[:blank:]]*([[:xdigit:]]{8})([[:blank:]]+[[:xdigit:]]{8}){0,1}");
 
     std::istringstream isaStream(isa);
     boost::smatch matchInst;
     std::string isaLine;
+    int  isaSize = 0;
 
-    while (getline(isaStream, isaLine) && !retVal)
+    while (getline(isaStream, isaLine))
     {
-        std::string::const_iterator isaLineStart = isaLine.begin();
-        std::string::const_iterator isaLineEnd = isaLine.end();
-
-        if (boost::regex_search(isaLineStart, isaLineEnd, matchInst, codeLenInByteEx))
+        if (boost::regex_search(isaLine, matchInst, codeLenInByteEx))
         {
             std::string codeLenText(matchInst[2].first, matchInst[2].second);
             m_CodeLen = atoi(codeLenText.c_str());
-
             retVal = true;
+            break;
         }
-
-        if (boost::regex_search(isaLineStart, isaLineEnd, matchInst, codeLenInByteNI))
+        else if (boost::regex_search(isaLine, matchInst, codeLenInByteNI))
         {
             std::string codeLenText(matchInst[2].first, matchInst[2].second);
             m_CodeLen = atoi(codeLenText.c_str());
-
+            retVal = true;
+            break;
+        }
+        else if (boost::regex_search(isaLine, matchInst, instAnnotation))
+        {
+            // Count size of instructions "manually" if ISA size is not provided by disassembler.
+            int  instSize = matchInst[(int) matchInst.size() - 1].matched ? 8 : 4;
+            isaSize += instSize;
             retVal = true;
         }
+    }
+
+    if (retVal && isaSize != 0)
+    {
+        m_CodeLen = isaSize;
     }
 
     return retVal;

@@ -46,12 +46,6 @@
     #define KA_STR_GL_BUILD_WARNING_OLDDRIVER L"Offline build of GLSL shaders is fully supported as of Catalyst driver version 15.30.\nInstalled driver release: %ls. It is recommended to update to the latest driver version."
 #endif // (AMDT_BUILD_TARGET == AMDT_WINDOWS_OS)
 
-
-// Family names:
-#define KA_STR_familyNameSICards " (HD7000 / HD8000 series)"
-#define KA_STR_familyNameCICards " (HD8000 / Rx 200 / 300 series)"
-#define KA_STR_familyNameVICards " (Rx 200 / 300 / Fury series)"
-
 // Analyze mode:
 #define KA_STR_executionMode L"Analyze Mode"
 #define KA_STR_executionModeMenu L"&Analyze Mode"

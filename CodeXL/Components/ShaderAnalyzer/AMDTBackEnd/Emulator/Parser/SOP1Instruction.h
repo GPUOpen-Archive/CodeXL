@@ -277,7 +277,7 @@ public:
         s_abs_i32 = 48,
         s_mov_fed_b32 = 49,
         s_set_gpr_idx_idx = 50,
-        s_Illeagal = 51,
+        s_Illegal = 51,
     };
 
     /// Get the OP [15:8]
@@ -292,6 +292,85 @@ private:
     /// SOP1 operation.
     OP m_op;
 
+};
+
+
+// SOP1 instructions for VEGA (GFX9)
+class G9SOP1Instruction : public SOP1Instruction
+{
+public:
+    /// Selector for the SOP1 Instruction
+    enum OP
+    {
+        s_mov_b32            = 0,
+        s_mov_b64            = 1,
+        s_cmov_b32           = 2,
+        s_cmov_b64           = 3,
+        s_not_b32            = 4,
+        s_not_b64            = 5,
+        s_wqm_b32            = 6,
+        s_wqm_b64            = 7,
+        s_brev_b32           = 8,
+        s_brev_b64           = 9,
+        s_bcnt0_i32_b32      = 10,
+        s_bcnt0_i32_b64      = 11,
+        s_bcnt1_i32_b32      = 12,
+        s_bcnt1_i32_b64      = 13,
+        s_ff0_i32_b32        = 14,
+        s_ff0_i32_b64        = 15,
+        s_ff1_i32_b32        = 16,
+        s_ff1_i32_b64        = 17,
+        s_flbit_i32_b32      = 18,
+        s_flbit_i32_b64      = 19,
+        s_flbit_i32          = 20,
+        s_flbit_i32_i64      = 21,
+        s_sext_i32_i8        = 22,
+        s_sext_i32_i16       = 23,
+        s_bitset0_b32        = 24,
+        s_bitset0_b64        = 25,
+        s_bitset1_b32        = 26,
+        s_bitset1_b64        = 27,
+        s_getpc_b64          = 28,
+        s_setpc_b64          = 29,
+        s_swappc_b64         = 30,
+        s_rfe_b64            = 31,
+        s_and_saveexec_b64   = 32,
+        s_or_saveexec_b64    = 33,
+        s_xor_saveexec_b64   = 34,
+        s_andn2_saveexec_b64 = 35,
+        s_orn2_saveexec_b64  = 36,
+        s_nand_saveexec_b64  = 37,
+        s_nor_saveexec_b64   = 38,
+        s_xnor_saveexec_b64  = 39,
+        s_quadmask_b32       = 40,
+        s_quadmask_b64       = 41,
+        s_movrels_b32        = 42,
+        s_movrels_b64        = 43,
+        s_movreld_b32        = 44,
+        s_movreld_b64        = 45,
+        s_cbranch_join       = 46,
+        s_abs_i32            = 48,
+        s_mov_fed_b32        = 49,
+        s_set_gpr_idx_idx    = 50,
+        s_andn1_saveexec_b64 = 51,
+        s_orn1_saveexec_b64  = 52,
+        s_andn1_wrexec_b64   = 53,
+        s_andn2_wrexec_b64   = 54,
+        s_bitreplicate_b64_b32 = 55,
+        s_Illegal            = 56,
+    };
+
+    /// Get the OP [15:8]
+    OP GetOp() const { return m_op; }
+
+    /// ctor
+    G9SOP1Instruction(SSRC ssrc0, OP op, SDST sdst, unsigned int sridx0, unsigned int sdstRidx, int iLabel, int iGotoLabel): SOP1Instruction(ssrc0, sdst, sridx0, sdstRidx, iLabel, iGotoLabel), m_op(op)
+    {
+        m_HwGen = GDT_HW_GENERATION_GFX9;
+    }
+private:
+    /// SOP1 operation.
+    OP m_op;
 };
 
 #endif //__SOP1INSTRUCTION_H

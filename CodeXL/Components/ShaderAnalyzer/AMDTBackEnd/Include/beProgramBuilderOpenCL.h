@@ -8,7 +8,7 @@
 #include "beProgramBuilder.h"
 
 #ifdef _WIN32
-    #include <DXXModule.h>
+#include <DXXModule.h>
 #endif
 
 #include <CALModule.h>
@@ -17,9 +17,9 @@
 #include <ACLModule.h>
 
 #ifdef _WIN32
-    #pragma warning(push)
-    #pragma warning(disable : 4127)
-    #pragma warning(disable : 4251)
+#pragma warning(push)
+#pragma warning(disable : 4127)
+#pragma warning(disable : 4251)
 #endif
 
 using namespace std;
@@ -141,7 +141,7 @@ public:
     /// \returns               a status.
     /// If a Log stream is available, some failures may be diagnosed.
     virtual beKA::beStatus Compile(const std::string& programSource, const OpenCLOptions& oclOptions, const std::string& sourceCodeFullPathName,
-                                   const std::vector<std::string>* pSourcePath, int& numOfSuccessfulBuilds);
+        const std::vector<std::string>* pSourcePath, int& numOfSuccessfulBuilds);
 
     /// Get a set of available devices.
     /// \param[out] a container to hold the set of device names.
@@ -180,6 +180,9 @@ public:
     /// Retrieves the names of the supported public devices, as exposed
     /// by the OpenCL runtime.
     void GetSupportedPublicDevices(std::set<std::string>& devices) const;
+
+    /// Retrieves all of the supported target devices.
+    bool GetAllGraphicsCards(std::vector<GDT_GfxCardInfo>& cardList, std::set<std::string>& uniqueNamesOfPublishedDevices);
 
 protected:
     /// ctor.
@@ -220,7 +223,7 @@ private:
 
     // this is the internal version of the CompileOpenCL- here we actually do the compilation for a specific device
     beKA::beStatus CompileOpenCLInternal(const std::string& sourceCodeFullPathName, const std::string& programSource, const OpenCLOptions& oclOptions,
-                                         cl_device_id requestedDeviceId, cl_program& program, std::string& definesAndOptions, int iCompilationNo, std::string& errString);
+        cl_device_id requestedDeviceId, cl_program& program, std::string& definesAndOptions, int iCompilationNo, std::string& errString);
 
     /// Get a binary for an OpenCL Kernel using the opencl program
     /// \param[in]  program    The built program

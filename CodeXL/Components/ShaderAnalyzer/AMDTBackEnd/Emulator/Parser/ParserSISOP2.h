@@ -79,6 +79,11 @@ private:
     /// \param[in]  hexInstruction  The 32 bit hexadecimal instruction.
     /// \returns                   An OP.
     static VISOP2Instruction::OP GetVISOP2Op(Instruction::instruction32bit hexInstruction);
+
+    /// Get SOP2 instruction`s OP field.
+    /// \param[in]  hexInstruction  The 32 bit hexadecimal instruction.
+    /// \returns                   An OP.
+    static G9SOP2Instruction::OP GetG9SOP2Op(Instruction::instruction32bit hexInstruction);
 };
 
 #endif //__PARSERSISOP2_H

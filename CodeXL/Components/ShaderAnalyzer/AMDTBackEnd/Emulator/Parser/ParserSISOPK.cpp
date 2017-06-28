@@ -80,6 +80,13 @@ VISOPKInstruction::OP ParserSISOPK::GetVISOPKOp(Instruction::instruction32bit he
     }
 }
 
+G9SOPKInstruction::OP ParserSISOPK::GetG9SOPKOp(Instruction::instruction32bit hexInstruction)
+{
+    EXTRACT_INSTRUCTION32_FIELD(hexInstruction, G9, SOPK, op, OP, 23);
+
+    return (op < G9SOPKInstruction::S_ILLEGAL ? op : G9SOPKInstruction::S_ILLEGAL);
+}
+
 SOPKInstruction::SDST ParserSISOPK::GetSDST(Instruction::instruction32bit hexInstruction, unsigned int& ridx)
 {
     EXTRACT_INSTRUCTION32_FIELD(hexInstruction, SI, SOPK, sdst, SDST, 16);
@@ -102,22 +109,37 @@ SOPKInstruction::SDST ParserSISOPK::GetSDST(Instruction::instruction32bit hexIns
 
 ParserSI::kaStatus ParserSISOPK::Parse(GDT_HW_GENERATION hwGen, Instruction::instruction32bit hexInstruction, Instruction*& instruction, bool , uint32_t, int iLabel /*=NO_LABEL*/ , int iGotoLabel /*=NO_LABEL*/)
 {
+    kaStatus status = Status_SUCCESS;
     unsigned int simm16Ridx = 0, sdstRidx = 0;
     SOPKInstruction::SIMM16 simm16 = GetSIMM16(hexInstruction, simm16Ridx);
     SOPKInstruction::SDST sdst = GetSDST(hexInstruction, sdstRidx);
 
-    if ((hwGen == GDT_HW_GENERATION_SEAISLAND) || (hwGen == GDT_HW_GENERATION_SOUTHERNISLAND))
+    switch (hwGen)
     {
-        SISOPKInstruction::OP op = GetSISOPKOp(hexInstruction);
-        instruction = new SISOPKInstruction(simm16, op, sdst, simm16Ridx, sdstRidx, iLabel, iGotoLabel);
-    }
-    else
-    {
-        VISOPKInstruction::OP op = GetVISOPKOp(hexInstruction);
-        instruction = new VISOPKInstruction(simm16, op, sdst, simm16Ridx, sdstRidx, iLabel, iGotoLabel);
+        case GDT_HW_GENERATION_SEAISLAND:
+        case GDT_HW_GENERATION_SOUTHERNISLAND:
+        {
+            SISOPKInstruction::OP op = GetSISOPKOp(hexInstruction);
+            instruction = new SISOPKInstruction(simm16, op, sdst, simm16Ridx, sdstRidx, iLabel, iGotoLabel);
+            break;
+        }
+        case GDT_HW_GENERATION_VOLCANICISLAND:
+        {
+            VISOPKInstruction::OP op = GetVISOPKOp(hexInstruction);
+            instruction = new VISOPKInstruction(simm16, op, sdst, simm16Ridx, sdstRidx, iLabel, iGotoLabel);
+            break;
+        }
+        case GDT_HW_GENERATION_GFX9:
+        {
+            G9SOPKInstruction::OP op = GetG9SOPKOp(hexInstruction);
+            instruction = new G9SOPKInstruction(simm16, op, sdst, simm16Ridx, sdstRidx, iLabel, iGotoLabel);
+            break;
+        }
+        default:
+            status = Status_UnexpectedHWGeneration;
     }
 
-    return ParserSI::Status_SUCCESS;
+    return status;
 }
 
 ParserSI::kaStatus ParserSISOPK::Parse(GDT_HW_GENERATION, Instruction::instruction64bit, Instruction*&, int /*iLabel =NO_LABEL*/ , int /*iGotoLabel =NO_LABEL*/)

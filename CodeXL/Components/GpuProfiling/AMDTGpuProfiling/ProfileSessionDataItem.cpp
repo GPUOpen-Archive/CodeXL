@@ -104,7 +104,7 @@ ProfileSessionDataItem::ProfileSessionDataItem(gpTraceDataContainer* pSessionDat
             }
             else
             {
-                m_data[ProfileSessionDataItem::SESSION_ITEM_INTERFACE_COLUMN] = pApiInfo->GetApiNameString().c_str();
+                m_data[ProfileSessionDataItem::SESSION_ITEM_INTERFACE_COLUMN] = pApiInfo->GetApiNameString();
             }
 
             m_data[ProfileSessionDataItem::SESSION_ITEM_PARAMETERS_COLUMN] = QString::fromStdString(pApiInfo->GetApiArgListString());
@@ -218,7 +218,7 @@ ProfileSessionDataItem::ProfileSessionDataItem(gpTraceDataContainer* pSessionDat
             m_itemIndex = static_cast<int>(pApiInfo->GetApiDisplaySequenceId());
         }
 
-        m_data[ProfileSessionDataItem::SESSION_ITEM_INTERFACE_COLUMN] = pApiInfo->GetApiNameString().c_str();
+        m_data[ProfileSessionDataItem::SESSION_ITEM_INTERFACE_COLUMN] = pApiInfo->GetApiNameString();
         m_data[ProfileSessionDataItem::SESSION_ITEM_PARAMETERS_COLUMN] = QString::fromStdString(pApiInfo->GetApiArgListString());
         m_data[ProfileSessionDataItem::SESSION_ITEM_RESULT_COLUMN] = QString::fromStdString(pApiInfo->GetApiRetString());
 
@@ -581,7 +581,7 @@ ProfileSessionDataItem::ProfileSessionDataItem(gpTraceDataContainer* pSessionDat
         {
             GT_IF_WITH_ASSERT(pBeginMarkerEntry != nullptr)
             {
-                m_data[ProfileSessionDataItem::SESSION_ITEM_INTERFACE_COLUMN] = pBeginMarkerEntry->GetPerfMarkerBeginInfoName().c_str();
+                m_data[ProfileSessionDataItem::SESSION_ITEM_INTERFACE_COLUMN] = pBeginMarkerEntry->GetPerfMarkerBeginInfoName();
                 m_startTime = pMarkerEntry->GetPerfMarkerTimestamp();
             }
         }

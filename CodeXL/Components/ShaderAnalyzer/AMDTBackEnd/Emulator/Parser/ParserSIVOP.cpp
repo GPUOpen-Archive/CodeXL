@@ -35,7 +35,7 @@ ParserSIVOP::Parse(GDT_HW_GENERATION hwGen, Instruction::instruction32bit hexIns
             retStatus = ParserSI::Status_SUCCESS;
         }
     }
-    else
+    else if (hwGen == GDT_HW_GENERATION_VOLCANICISLAND)
     {
         if (VOPInstruction::Encoding_VOP1 == encoding)
         {
@@ -63,6 +63,38 @@ ParserSIVOP::Parse(GDT_HW_GENERATION hwGen, Instruction::instruction32bit hexIns
             retStatus = ParserSI::Status_SUCCESS;
         }
     }
+    else if (hwGen == GDT_HW_GENERATION_GFX9)
+    {
+        if (VOPInstruction::Encoding_VOP1 == encoding)
+        {
+            uint64_t hexInstTem = hexInstruction << 15;
+            hexInstTem = hexInstTem >> 24;
+            G9VOP1Instruction::VOP1_OP op1 = static_cast<G9VOP1Instruction::VOP1_OP>(hexInstTem);
+            instruction = new G9VOP1Instruction(32, encoding, op1, iLabel, iGotoLabel);
+            retStatus = ParserSI::Status_SUCCESS;
+        }
+        else if (VOPInstruction::Encoding_VOP2 == encoding)
+        {
+            uint64_t hexInstTem = hexInstruction << 15;
+            hexInstTem = hexInstTem >> 24;
+            G9VOP2Instruction::VOP2_OP op2 = static_cast<G9VOP2Instruction::VOP2_OP>(hexInstTem);
+            instruction = new G9VOP2Instruction(32, encoding, op2, iLabel, iGotoLabel);
+            retStatus = ParserSI::Status_SUCCESS;
+        }
+
+        else if (VOPInstruction::Encoding_VOPC == encoding)
+        {
+            uint64_t hexInstTem = hexInstruction << 15;
+            hexInstTem = hexInstTem >> 24;
+            VIVOPCInstruction::VOPC_OP opc = static_cast<VIVOPCInstruction::VOPC_OP>(hexInstTem);
+            instruction = new VIVOPCInstruction(32, encoding, opc, iLabel, iGotoLabel);
+            retStatus = ParserSI::Status_SUCCESS;
+        }
+    }
+    else
+    {
+        retStatus = ParserSI::Status_UnexpectedHWGeneration;
+    }
 
     return retStatus;
 }
@@ -70,19 +102,41 @@ ParserSIVOP::Parse(GDT_HW_GENERATION hwGen, Instruction::instruction32bit hexIns
 ParserSI::kaStatus
 ParserSIVOP::Parse(GDT_HW_GENERATION hwGen, Instruction::instruction64bit hexInstruction, Instruction*& instruction, int iLabel /*=NO_LABEL*/ , int iGotoLabel /*=NO_LABEL*/)
 {
-    (void)(hwGen); // Unreferenced parameter
-
     kaStatus retStatus =   ParserSI::Status_64BitInstructionNotSupported;
     VOPInstruction::Encoding encoding = GetInstructionType(hexInstruction);
 
-
-    if (VOPInstruction::Encoding_VOP3 == encoding)
+    if (hwGen == GDT_HW_GENERATION_SEAISLAND || hwGen == GDT_HW_GENERATION_SOUTHERNISLAND || hwGen == GDT_HW_GENERATION_VOLCANICISLAND)
     {
-        uint64_t hexInstTem = hexInstruction << 15;
-        hexInstTem = hexInstTem >> 24;
-        SIVOP3Instruction::VOP3_OP op3 = static_cast<SIVOP3Instruction::VOP3_OP>(hexInstTem);
-        instruction = new SIVOP3Instruction(64, encoding, op3, iLabel, iGotoLabel);
-        retStatus =  ParserSI::Status_SUCCESS;
+        if (VOPInstruction::Encoding_VOP3 == encoding)
+        {
+            uint64_t hexInstTem = hexInstruction << 15;
+            hexInstTem = hexInstTem >> 24;
+            SIVOP3Instruction::VOP3_OP op3 = static_cast<SIVOP3Instruction::VOP3_OP>(hexInstTem);
+            instruction = new SIVOP3Instruction(64, encoding, op3, iLabel, iGotoLabel);
+            retStatus =  ParserSI::Status_SUCCESS;
+        }
+    }
+    else if (hwGen == GDT_HW_GENERATION_GFX9)
+    {
+        if (VOPInstruction::Encoding_VOP3P == encoding)
+        {
+            uint64_t hexInstTem = (hexInstruction >> 16) & 0x7F;
+            G9VOP3Instruction::VOP3_OP op3 = static_cast<G9VOP3Instruction::VOP3_OP>(hexInstTem);
+            instruction = new G9VOP3Instruction(64, encoding, op3, iLabel, iGotoLabel);
+            retStatus =  ParserSI::Status_SUCCESS;
+        }
+        else if (VOPInstruction::Encoding_VOP3 == encoding)
+        {
+            uint64_t hexInstTem = hexInstruction << 15;
+            hexInstTem = hexInstTem >> 24;
+            G9VOP3Instruction::VOP3_OP op3 = static_cast<G9VOP3Instruction::VOP3_OP>(hexInstTem);
+            instruction = new G9VOP3Instruction(64, encoding, op3, iLabel, iGotoLabel);
+            retStatus =  ParserSI::Status_SUCCESS;
+        }
+    }
+    else
+    {
+        retStatus = ParserSI::Status_UnexpectedHWGeneration;
     }
 
     return retStatus;
@@ -115,8 +169,7 @@ ParserSIVOP::GetInstructionType(Instruction::instruction32bit hexInstruction)
 VOPInstruction::Encoding
 ParserSIVOP::GetInstructionType(Instruction::instruction64bit hexInstruction)
 {
-    auto mask = VOPInstruction::VOPMask_VOP3 & 0xffffffffULL;
-    if ((hexInstruction & mask) >> 26 == VOPInstruction::Encoding_VOP3)
+    if ((hexInstruction && VOPInstruction::VOPMask_VOP3) >> 26 == VOPInstruction::Encoding_VOP3)
     {
         return VOPInstruction::Encoding_VOP3;
     }

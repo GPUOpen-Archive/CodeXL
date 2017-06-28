@@ -204,5 +204,53 @@ private:
 
 
 };
+
+// VEGA (GFX9)
+class G9SOPKInstruction : public SOPKInstruction
+{
+public:
+    enum OP
+    {
+        s_movk_i32         = 0,
+        s_cmovk_i32        = 1,
+        s_cmpk_eq_i32      = 2,
+        s_cmpk_lg_i32      = 3,
+        s_cmpk_gt_i32      = 4,
+        s_cmpk_ge_i32      = 5,
+        s_cmpk_lt_i32      = 6,
+        s_cmpk_le_i32      = 7,
+        s_cmpk_eq_u32      = 8,
+        s_cmpk_lg_u32      = 9,
+        s_cmpk_gt_u32      = 10,
+        s_cmpk_ge_u32      = 11,
+        s_cmpk_lt_u32      = 12,
+        s_cmpk_le_u32      = 13,
+        s_addk_i32         = 14,
+        s_mulk_i32         = 15,
+        s_cbranch_i_fork   = 16,
+        s_getreg_b32       = 17,
+        s_setreg_b32       = 18,
+        s_getreg_regrd_b32 = 19,
+        s_setreg_imm32_b32 = 20,
+        s_call_b64         = 21,
+        /// Illegal
+        S_ILLEGAL          = 22
+    };
+
+    /// Get the OP [27:23]
+    OP GetOp() const { return m_op; }
+
+    /// ctor
+    G9SOPKInstruction(SIMM16 simm16, OP op, SDST sdst, unsigned int simm16Ridx, unsigned int sdstRidx, int iLabel, int iGotoLabel)
+        : SOPKInstruction(simm16, sdst, simm16Ridx, sdstRidx, iLabel, iGotoLabel), m_op(op)
+    {
+        m_HwGen = GDT_HW_GENERATION_GFX9;
+    }
+
+private:
+    /// SOPK operation.
+    OP m_op;
+};
+
 #endif //__SOPKINSTRUCTION_H
 

@@ -303,16 +303,7 @@ kaBackendManager::kaBackendManager() : m_firstTimeRun(true), m_isInBuild(false),
     m_pBoost = new kaBackEndSmartPointers;
     m_pBackend = Backend::Instance();
 
-    bool isCatalystInstalled = false;
-    int driverError = OA_DRIVER_UNKNOWN;
-    gtString driverVersion = oaGetDriverVersion(driverError);
-
-    if (driverError != OA_DRIVER_NOT_FOUND)
-    {
-        isCatalystInstalled = true;
-    }
-
-    if (isCatalystInstalled && m_pBackend != nullptr && m_pBackend->Initialize(BuiltProgramKind_OpenCL, backendMessageCallback))
+    if (m_pBackend != nullptr && m_pBackend->Initialize(BuiltProgramKind_OpenCL, backendMessageCallback))
     {
         std::set<string> devices;
 
@@ -490,9 +481,10 @@ beKA::beStatus kaBackendManager::getASICsTreeList(beKA::DeviceTableKind kind,
 
                 if (nullptr != pOpenCLBuilder)
                 {
-                    ret = pOpenCLBuilder->GetDeviceTable(deviceTable);
+                    std::set<std::string> uniqueNames;
+                    bool isOk = pOpenCLBuilder->GetAllGraphicsCards(deviceTable, uniqueNames);
 
-                    if (ret == beKA::beStatus_SUCCESS)
+                    if (isOk)
                     {
                         ret = makeASICsStringList(deviceTable, includeCPU, &m_deviceNameMaketNameMapCL, nullptr, pStrListOut);
                     }
@@ -572,30 +564,16 @@ beKA::beStatus kaBackendManager::makeASICsStringList(const std::vector<GDT_GfxCa
                 }
             }
 
-            switch (gen)
+            if (gen == GDT_HW_GENERATION_SOUTHERNISLAND || gen == GDT_HW_GENERATION_SEAISLAND ||
+                gen == GDT_HW_GENERATION_VOLCANICISLAND || gen == GDT_HW_GENERATION_GFX9)
             {
-                // It is very important that the depth passed to encodeData() matches the hierarchy.
-                // All fields are set to checked by default.
-                case GDT_HW_GENERATION_SOUTHERNISLAND:
-                    str = QString(sHwGenDisplayName.c_str()) + QString(KA_STR_familyNameSICards);
-                    myList.push_back(CheckableTreeItem::encodeData(str, isGCN, 1));
-                    break;
-
-                case GDT_HW_GENERATION_SEAISLAND:
-                    str = QString(sHwGenDisplayName.c_str()) + QString(KA_STR_familyNameCICards);
-                    myList.push_back(CheckableTreeItem::encodeData(str, isGCN, 1));
-                    break;
-
-                case GDT_HW_GENERATION_VOLCANICISLAND:
-                    str = QString(sHwGenDisplayName.c_str()) + QString(KA_STR_familyNameVICards);
-                    myList.push_back(CheckableTreeItem::encodeData(str, isGCN, 1));
-                    break;
-
-                default:
-                    // You must have a new hardware generation.
-                    // Add code...
-                    assert(false);
-                    break;
+                str = QString(sHwGenDisplayName.c_str());
+                myList.push_back(CheckableTreeItem::encodeData(str, isGCN, 1));
+            }
+            else
+            {
+                // An unknown family.
+                assert(false);
             }
         }
 

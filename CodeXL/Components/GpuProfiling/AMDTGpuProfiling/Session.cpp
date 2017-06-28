@@ -601,32 +601,36 @@ const OccupancyTable& GPUSessionTreeItemData::LoadAndGetOccupancyTable()
                 m_occupancyFile.fromStdString(std::string(m_pParentData->m_filePath.asString().asASCIICharArray()));
                 std::string occupancyFile = m_occupancyFile.toStdString();
 
-                occupancyFileDataInfo = pApDataHandler->GetOccupancyFileInfoDataHandler(occupancyFile);
+                occupancyFileDataInfo = pApDataHandler->GetOccupancyFileInfoDataHandler(occupancyFile.c_str());
 
                 if (nullptr != occupancyFileDataInfo)
                 {
-                    m_occupancyFileIsLoaded = occupancyFileDataInfo->ParseOccupancyFile(occupancyFile);
+                    m_occupancyFileIsLoaded = occupancyFileDataInfo->ParseOccupancyFile(occupancyFile.c_str());
                 }
 
-                m_occupancyFileIsLoaded = occupancyFileDataInfo->ParseOccupancyFile(occupancyFile);
+                m_occupancyFileIsLoaded = occupancyFileDataInfo->ParseOccupancyFile(occupancyFile.c_str());
             }
 
             if (m_occupancyFileIsLoaded)
             {
-                std::map<osThreadId, KernelCount> occupancyThreads = occupancyFileDataInfo->GetKernelCountByThreadId();
+                osThreadId* osThreadIds;
+                unsigned int threadCount;
+                occupancyFileDataInfo->GetOccupancyThreads(&osThreadIds, threadCount);
 
-                for (std::map<osThreadId, KernelCount>::iterator occupancyThreadIter = occupancyThreads.begin(); occupancyThreadIter != occupancyThreads.end(); ++occupancyThreadIter)
+                for (unsigned int i = 0; i < threadCount; i++)
                 {
+                    const IOccupancyInfoDataHandler* occupancyInfo;
+                    unsigned int kernelCount;
+                    occupancyFileDataInfo->GetKernelCountByThreadId(osThreadIds[i], kernelCount);
                     QList<const IOccupancyInfoDataHandler*> occupancyInfoList;
-                    std::vector<const IOccupancyInfoDataHandler*> tempVector;
-                    tempVector = occupancyFileDataInfo->GetOccupancyInfoByThreadId(occupancyThreadIter->first);
 
-                    for (std::vector<const IOccupancyInfoDataHandler*>::iterator occupancyInfoIter = tempVector.begin(); occupancyInfoIter != tempVector.end(); ++occupancyInfoIter)
+                    for (unsigned int j = 0; j < kernelCount; j++)
                     {
-                        occupancyInfoList.push_back(*occupancyInfoIter);
+                        occupancyInfo = occupancyFileDataInfo->GetOccupancyInfoDataHandler(osThreadIds[i], j);
+                        occupancyInfoList.push_back(occupancyInfo);
                     }
 
-                    m_occupancyTable.insert(occupancyThreadIter->first, occupancyInfoList);
+                    m_occupancyTable.insert(osThreadIds[i], occupancyInfoList);
                 }
             }
         }

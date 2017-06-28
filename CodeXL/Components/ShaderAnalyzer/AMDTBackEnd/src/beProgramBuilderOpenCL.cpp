@@ -79,6 +79,22 @@
     X(CL_INVALID_PARTITION_COUNT_EXT) \
     X(CL_INVALID_PARTITION_NAME_EXT)
 
+// Retrieves the list of devices according to the given HW generation.
+static void AddGenerationDevices(GDT_HW_GENERATION hwGen, std::vector<GDT_GfxCardInfo>& cardList,
+    std::set<std::string> &uniqueNamesOfPublishedDevices)
+{
+    std::vector<GDT_GfxCardInfo> cardListBuffer;
+    if (AMDTDeviceInfoUtils::Instance()->GetAllCardsInHardwareGeneration(hwGen, cardListBuffer))
+    {
+        cardList.insert(cardList.end(), cardListBuffer.begin(), cardListBuffer.end());
+
+        for (const GDT_GfxCardInfo& cardInfo : cardList)
+        {
+            uniqueNamesOfPublishedDevices.insert(cardInfo.m_szCALName);
+        }
+    }
+}
+
 // statics/utils
 /// return a string from the cl error code
 // TODO: this should be a Common utility.  It gets used in at least 4 projects.
@@ -228,44 +244,30 @@ beKA::beStatus beProgramBuilderOpenCL::Initialize(const string& sDllModule/* = "
 {
     (void)(sDllModule); // Unreferenced parameter
 
-    beKA::beStatus retVal = beKA::beStatus_General_FAILED;
+    std::set<string> uniqueNamesOfPublishedDevices;
 
-    retVal = InitializeOpenCL();
-    set<string> uniqueNamesOfPublishedDevices;
+    // Populate the sorted device (card) info table.
+    m_OpenCLDeviceTable.clear();
 
-    if (retVal == beKA::beStatus_SUCCESS)
+    // DX support now only SI, CI and VI
+    if (AMDTDeviceInfoUtils::Instance()->GetAllCardsInHardwareGeneration(GDT_HW_GENERATION_SOUTHERNISLAND, m_OpenCLDeviceTable))
     {
-        // TODO: the asicInfoList is not used anywhere after being retrieved. Is this actually needed?  If not, suggest removing the next two lines
-        AsicInfoList asicInfoList;
-        AMDTADLUtils::Instance()->GetAsicInfoList(asicInfoList);
-
-        // Populate the sorted device (card) info table.
-        std::vector<GDT_GfxCardInfo> cardList;
-
-        // DX support now only SI, CI and VI
-        if (AMDTDeviceInfoUtils::Instance()->GetAllCardsInHardwareGeneration(GDT_HW_GENERATION_SOUTHERNISLAND, cardList))
-        {
-            AddValidatedDevices(cardList, uniqueNamesOfPublishedDevices);
-        }
-
-        if (AMDTDeviceInfoUtils::Instance()->GetAllCardsInHardwareGeneration(GDT_HW_GENERATION_SEAISLAND, cardList))
-        {
-            AddValidatedDevices(cardList, uniqueNamesOfPublishedDevices);
-        }
-
-        if (AMDTDeviceInfoUtils::Instance()->GetAllCardsInHardwareGeneration(GDT_HW_GENERATION_VOLCANICISLAND, cardList))
-        {
-            AddValidatedDevices(cardList, uniqueNamesOfPublishedDevices);
-        }
-
-        sort(m_OpenCLDeviceTable.begin(), m_OpenCLDeviceTable.end(), beUtils::GfxCardInfoSortPredicate);
-
+        AddValidatedDevices(m_OpenCLDeviceTable, uniqueNamesOfPublishedDevices);
     }
 
-    // Iterate through the device names that the OpenCL driver reported, and remove the names of devices that have not been published yet.
-    RemoveNamesOfUnpublishedDevices(uniqueNamesOfPublishedDevices);
+    if (AMDTDeviceInfoUtils::Instance()->GetAllCardsInHardwareGeneration(GDT_HW_GENERATION_SEAISLAND, m_OpenCLDeviceTable))
+    {
+        AddValidatedDevices(m_OpenCLDeviceTable, uniqueNamesOfPublishedDevices);
+    }
 
-    return retVal;
+    if (AMDTDeviceInfoUtils::Instance()->GetAllCardsInHardwareGeneration(GDT_HW_GENERATION_VOLCANICISLAND, m_OpenCLDeviceTable))
+    {
+        AddValidatedDevices(m_OpenCLDeviceTable, uniqueNamesOfPublishedDevices);
+    }
+
+    sort(m_OpenCLDeviceTable.begin(), m_OpenCLDeviceTable.end(), beUtils::GfxCardInfoSortPredicate);
+
+    return beKA::beStatus::beStatus_SUCCESS;
 }
 
 beKA::beStatus beProgramBuilderOpenCL::InitializeOpenCL()
@@ -2034,6 +2036,22 @@ void beProgramBuilderOpenCL::ForceEnd()
 void beProgramBuilderOpenCL::GetSupportedPublicDevices(std::set<std::string>& devices) const
 {
     devices = m_DeviceNames;
+}
+
+bool beProgramBuilderOpenCL::GetAllGraphicsCards(std::vector<GDT_GfxCardInfo>& cardList, std::set<std::string>& uniqueNamesOfPublishedDevices)
+{
+    bool ret = true;
+
+    // Retrieve the list of devices for every relevant hardware generations.
+    AddGenerationDevices(GDT_HW_GENERATION_SOUTHERNISLAND, cardList, uniqueNamesOfPublishedDevices);
+    AddGenerationDevices(GDT_HW_GENERATION_SEAISLAND, cardList, uniqueNamesOfPublishedDevices);
+    AddGenerationDevices(GDT_HW_GENERATION_VOLCANICISLAND, cardList, uniqueNamesOfPublishedDevices);
+    AddGenerationDevices(GDT_HW_GENERATION_GFX9, cardList, uniqueNamesOfPublishedDevices);
+
+    // Sort the data.
+    std::sort(cardList.begin(), cardList.end(), beUtils::GfxCardInfoSortPredicate);
+
+    return ret;
 }
 
 double beProgramBuilderOpenCL::getOpenCLPlatformVersion()

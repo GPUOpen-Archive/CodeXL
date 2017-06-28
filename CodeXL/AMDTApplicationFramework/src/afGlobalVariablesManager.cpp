@@ -1021,36 +1021,9 @@ void afGlobalVariablesManager::FindInstalledAMDComponents()
     // No components Loaded:
     m_installedAMDComponentsBitmask = 0;
 
-    gtPtrVector<apCLDevice*> devicesList;
-    afSystemInformationCommand sysInfoCmd;
-    bool rcGetDevices = sysInfoCmd.CollectOpenCLDevicesInformation(devicesList, true);
-
-    if (rcGetDevices)
-    {
-        // look in all the devices for the AMD vendor and GPU device
-        int numDevices = devicesList.size();
-
-        for (int nDevice = 0; nDevice < numDevices; nDevice++)
-        {
-            apCLDevice* pCurrentDevice = devicesList[nDevice];
-
-            if (nullptr != pCurrentDevice)
-            {
-                if ((pCurrentDevice->deviceType().value() == CL_DEVICE_TYPE_GPU) && (pCurrentDevice->deviceVendor().compareNoCase(L"Advanced Micro Devices, Inc.") == 0))
-                {
-                    m_installedAMDComponentsBitmask |= AF_AMD_GPU_COMPONENT;
-                }
-
-                //if ((pCurrentDevice->deviceType().value() == CL_DEVICE_TYPE_CPU) && ((pCurrentDevice->deviceVendor().compareNoCase(L"Advanced Micro Devices, Inc.") == 0) || (pCurrentDevice->deviceVendor().compareNoCase(L"AuthenticAMD") == 0)))
-                //{
-                //    m_installedAMDComponents |= AF_AMD_CPU_COMPONENT;
-                //}
-                delete pCurrentDevice;
-            }
-        }
-    }
-
-    devicesList.clear();
+    // Assume we have some GPU devices installed.
+    // TODO: this should be replaced by some detailed GPU device analysis.
+    m_installedAMDComponentsBitmask |= AF_AMD_GPU_COMPONENT;
 
     // check CPU not using catalyst in case catalyst was not installed:
     unsigned regs[4];

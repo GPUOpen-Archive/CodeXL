@@ -316,21 +316,14 @@ bool kaFindFamilyName(QString& deviceName, QString& familyName)
 
     if (retVal)
     {
-        // Clear the device name a bit:
-        int textEnd = familyName.indexOf("(");
-
-        if (textEnd != -1)
+        std::string tempFamilyName = familyName.toStdString();
+        size_t trimFromIndex = tempFamilyName.find("-");
+        if (trimFromIndex != std::string::npos)
         {
-            familyName = familyName.left(textEnd - 1);
-        }
-        else
-        {
-            // this is a CPU family name
-            textEnd = familyName.indexOf(" ");
-
-            if (textEnd != -1)
+            tempFamilyName = tempFamilyName.substr(0, trimFromIndex);
+            if (!tempFamilyName.empty())
             {
-                familyName = familyName.left(textEnd);
+                familyName = QString(tempFamilyName.c_str());
             }
         }
     }
