@@ -20,12 +20,14 @@ downloadMappingWin = {
     "https://github.com/GPUOpen-Tools/RGA/releases/download/1.1.0.0/rga-windows-x86-1.1.zip" : "../../Common/Lib/AMD/RGA/x86",
     "https://github.com/GPUOpen-Tools/RGA/releases/download/1.1.0.0/rga-windows-x64-1.1.zip" : "../../Common/Lib/AMD/RGA/x64",
     "https://github.com/GPUOpen-Tools/RCP/releases/download/v5.1/RadeonComputeProfiler.2017-06-26-v5.1.6451.zip" : "../../Common/Lib/AMD/RCP",
-    "https://github.com/GPUOpen-Tools/RCP/releases/download/v5.1/RCPProfileDataParser.2017-06-26-v5.1.6451.zip" : "../../Common/Lib/AMD/RCP"
+    "https://github.com/GPUOpen-Tools/RCP/releases/download/v5.1/RCPProfileDataParser.2017-06-26-v5.1.6451.zip" : "../../Common/Lib/AMD/RCP",
+    "https://github.com/GPUOpen-Tools/GPA/releases/download/v2.23/GPUPerfAPI-2.23.2382.0.zip" : "../../Common/Lib/AMD/GPUPerfAPI"
 }
 downloadMappingLin = {
     "https://github.com/GPUOpen-Tools/RGA/releases/download/1.1.0.0/rga-linux-1.1.tgz" : "../../Common/Lib/AMD/RGA",
     "https://github.com/GPUOpen-Tools/RCP/releases/download/v5.1/RadeonComputeProfiler-v5.1.6396.tgz" : "../../Common/Lib/AMD/RCP",
-    "https://github.com/GPUOpen-Tools/RCP/releases/download/v5.1/RCPProfileDataParser-v5.1.6396.tgz" : "../../Common/Lib/AMD/RCP"
+    "https://github.com/GPUOpen-Tools/RCP/releases/download/v5.1/RCPProfileDataParser-v5.1.6396.tgz" : "../../Common/Lib/AMD/RCP",
+    "https://github.com/GPUOpen-Tools/GPA/releases/download/v2.23/GPUPerfAPI.2.23.1973-lnx.tgz" : "../../Common/Lib/AMD/GPUPerfAPI"
 }
 
 # to allow the script to be run from anywhere - not just the cwd - store the absolute path to the script file

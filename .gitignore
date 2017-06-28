@@ -303,5 +303,8 @@ Common/Lib/AMD/RCP/jqPlot
 Common/Lib/AMD/RCP/CXLActivityLogger
 Common/Lib/AMD/RCP/include
 
+# GPA
+Common/Lib/AMD/GPUPerfAPI/2_23
+
 # RGA
 Common/Lib/AMD/RGA
