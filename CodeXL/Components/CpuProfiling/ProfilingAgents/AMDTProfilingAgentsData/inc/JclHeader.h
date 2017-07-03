@@ -57,7 +57,7 @@ struct JclHeader
         hdrInfo.numRecords = 0;
         hdrInfo.is32Bit    = 0;
 
-        memset(appName, 0, OS_MAX_PATH);
+        memset(appName, 0, OS_MAX_PATH * sizeof(wchar_t));
     }
 };
 
@@ -78,9 +78,9 @@ struct JitLoadRecord
 
     JitLoadRecord()
     {
-        memset(classFunctionName, 0, OS_MAX_PATH);
-        memset(jncFileName, 0, OS_MAX_PATH);
-        memset(srcFileName, 0, OS_MAX_PATH);
+        memset(classFunctionName, 0, OS_MAX_PATH * sizeof(wchar_t));
+        memset(jncFileName, 0, OS_MAX_PATH * sizeof(wchar_t));
+        memset(srcFileName, 0, OS_MAX_PATH * sizeof(wchar_t));
     }
 };
 
