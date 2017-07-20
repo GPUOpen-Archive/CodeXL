@@ -323,7 +323,7 @@ private:
     std::vector<HSADataTransferBranchInfo>   m_hsaDataTransferBranches; ///< the HSA src and destination branches in the timeline
     QMap<unsigned int, acTimelineBranch*>    m_oclCtxMap;               ///< map from OCL context id to the branch for that context
     QMap<unsigned int, OCLQueueBranchInfo*>  m_oclQueueMap;             ///< map from OCL queue id to the QueueBranchInfo for that queue
-    QMap<QString, acTimelineBranch*>         m_hsaQueueMap;             ///< map from HSA queue handle string to the branch for that queue
+    QMap<unsigned int, acTimelineBranch*>    m_hsaQueueMap;             ///< map from HSA queue index to the branch for that queue
     QMap<osThreadId, int>                    m_oclThreadOccIndexMap;    ///< map from thread id to the current occupancy index for that thread (for OCL)
     QMap<osThreadId, int>                    m_hsaThreadOccIndexMap;    ///< map from thread id to the current occupancy index for that thread (for HSA)
     QStack<unsigned long long>               m_timestampStack;          ///< stack of timestamps - used when handling perf markers

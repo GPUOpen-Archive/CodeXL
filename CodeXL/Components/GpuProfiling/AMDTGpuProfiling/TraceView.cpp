@@ -1653,30 +1653,21 @@ void TraceView::HandleHSAAPIInfo(IHSAAPIInfoDataHandler* phsaApiInfo)
                     m_pHSABranch->setText(GPU_STR_TraceViewHSA);
                 }
 
-                QString handleStr = QString::fromStdString(dispatchInfo->GetHSAQueueHandleString());
+                unsigned int hsaQueueIndex = dispatchInfo->GetHSAQueueIndex();
 
-                if (m_hsaQueueMap.contains(handleStr))
+                if (m_hsaQueueMap.contains(hsaQueueIndex))
                 {
-                    deviceBranch = m_hsaQueueMap[handleStr];
+                    deviceBranch = m_hsaQueueMap[hsaQueueIndex];
                 }
                 else
                 {
                     deviceBranch = new acTimelineBranch();
                     deviceBranch->SetBGColor(QColor::fromRgb(230, 230, 230));
-                    QString queueBranchText;
-
-                    if (handleStr == "<UnknownQueue>")
-                    {
-                        queueBranchText = deviceNameStr;
-                    }
-                    else
-                    {
-                        unsigned int hsaQueueIndex = dispatchInfo->GetHSAQueueIndex();
-                        queueBranchText = QString(tr(GPU_STR_HSATraceViewQueueRow)).arg(hsaQueueIndex).arg(handleStr).arg(deviceNameStr);
-                    }
+                    QString deviceIndexStr = dispatchInfo->GetHSAQueueHandleString(); // "GetHSAQueueHandleString" is a misnomer. This function returns the device index
+                    QString queueBranchText = QString(tr(GPU_STR_HSATraceViewQueueRow)).arg(hsaQueueIndex).arg(deviceIndexStr).arg(deviceNameStr);
 
                     deviceBranch->setText(queueBranchText);
-                    m_hsaQueueMap[handleStr] = deviceBranch;
+                    m_hsaQueueMap[hsaQueueIndex] = deviceBranch;
                 }
 
                 unsigned int uiSeqId = pApiInfo->GetApiSequenceId();
@@ -1981,7 +1972,7 @@ void TraceView::DoneParsingATPFile()
         timelineDataLoaded = true;
         bool anySubBranchAdded = false;
 
-        for (QMap<QString, acTimelineBranch*>::const_iterator i = m_hsaQueueMap.begin(); i != m_hsaQueueMap.end(); ++i)
+        for (QMap<unsigned int, acTimelineBranch*>::const_iterator i = m_hsaQueueMap.begin(); i != m_hsaQueueMap.end(); ++i)
         {
             m_pHSABranch->addSubBranch(*i);
             anySubBranchAdded = true;
