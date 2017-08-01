@@ -407,7 +407,7 @@
 #define AF_STR_newProjectEnterName "Enter Project Name..."
 #define AF_STR_newProjectDefaultProjectName "Project%1"
 #define AF_STR_newProjectInvalidName L"CodeXL project name cannot be empty. Please enter a valid project name."
-#define AF_STR_newProjectProjectNameChanged "The project contain saved data of type: %1.\nChanging the project name will create a new project that will not contain the data stored in this project.\nDo you want to change the project name?"
+#define AF_STR_newProjectProjectNameChanged "The project contains saved data of type: %1.\nChanging the project name will create a new project that will not contain the data stored in this project.\nDo you want to change the project name?"
 #define AF_STR_newProjectInvalidNameInvalidChars L"The project name contains invalid characters."
 #define AF_STR_newProjectExeDoesNotExistOrInvalid L"Executable path does not exist or executable is invalid"
 #define AF_STR_newProjectWindowsStoreAppInvalid L"Invalid Windows Store app User Model ID"
