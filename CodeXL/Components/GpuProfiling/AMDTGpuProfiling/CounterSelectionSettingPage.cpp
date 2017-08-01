@@ -760,7 +760,7 @@ void CounterSelectionSettingWindow::InitializeCounterTreeView(bool isRemoteSessi
 
     // Log the supported hardware families on the machine:
     gtString message;
-    message.appendFormattedString(L"Supported HW families: GFX9: %d, GFX8: %d, GFX6: %d, GFX6: %d", bGfx9Supported, bGfx8Supported, bGfx7Supported, bGfx6Supported);
+    message.appendFormattedString(L"Supported HW families: GFX9: %d, GFX8: %d, GFX7: %d, GFX6: %d", bGfx9Supported, bGfx8Supported, bGfx7Supported, bGfx6Supported);
     OS_OUTPUT_DEBUG_LOG(message.asCharArray(), OS_DEBUG_LOG_INFO);
 
 
