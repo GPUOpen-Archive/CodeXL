@@ -44,7 +44,7 @@ Component licenses can be found under the CodeXL GitHub repository source root, 
 
 OpenCL is a trademark of Apple Inc. used by permission by Khronos. OpenGL is a registered trademark of Silicon Graphics, Inc. in the United States and/or other countries worldwide. Microsoft, Windows, DirectX and Visual Studio are registered trademarks of Microsoft Corporation in the United States and/or other jurisdictions. Vulkan is a registered trademark of Khronos Group Inc. in the United States and/or other jurisdictions. Linux is the registered trademark of Linus Torvalds in the United States and/or other jurisdictions.
 
-LGPL (Copyright ©1991, 1999 Free Software Foundation, Inc.  51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA). Use of the Qt library is governed by the GNU Lesser General Public License version 2.1 (LGPL v 2.1). CodeXL uses QT 5.5.1. Source code for QT is available here: http://qt-project.org/downloads. The QT source code has not been tempered with and the built binaries are identical to what any user that downloads the source code from the web and builds them will produce.
+LGPL (Copyright ©1991, 1999 Free Software Foundation, Inc.  51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA). Use of the Qt library is governed by the GNU Lesser General Public License version 2.1 (LGPL v 2.1). CodeXL uses Qt 5.5.1. Source code for Qt is available here: http://qt-project.org/downloads. The Qt source code has not been tampered with and the built binaries are identical to that which any user that downloading the Qt source code from the web would build.
 
 * Boost is Copyright © Beman Dawes, 2003.
 * [CR]LunarG, Inc. is Copyright © 2015 LunarG, Inc.
