@@ -1681,7 +1681,7 @@ bool ProfileManager::GenerateOccupancyPage(GPUSessionTreeItemData* pSessionData,
         // Generate the path of the output file
         m_strOutputOccHTMLPage = QString("%1%2_%3_%4_Occupancy.html")
             .arg(sessionDirStr)
-            .arg(QString().fromStdString(pOccInfo->GetKernelName()))
+            .arg(QString::fromStdString(pOccInfo->GetKernelName()))
             .arg(pOccInfo->GetThreadId())
             .arg(callIndex);
 
@@ -1707,7 +1707,7 @@ bool ProfileManager::GenerateOccupancyPage(GPUSessionTreeItemData* pSessionData,
             }
             else
             {
-                strErrorMessageOut.fromStdString(errorMessage);
+                strErrorMessageOut = QString::fromStdString(errorMessage);
             }
         }
         else
@@ -1979,14 +1979,22 @@ void ProfileManager::HandleProfileFinished(int exitCode)
 
 void ProfileManager::HandleMissingProfileOutput(QString& strError)
 {
-    QString strProjectType = (m_pCurrentProjectSettings->m_traceOptions.m_apiToTrace == APIToTrace_OPENCL) ? "an OpenCL program" : "an HSA program";
+    QString strProjectType;
+
+    if (m_profileParameters.ProfileTypeValue() == API_TRACE)
+    {
+       strProjectType = (m_pCurrentProjectSettings->m_traceOptions.m_apiToTrace == APIToTrace_OPENCL) ? "an OpenCL program" : "an HSA program";
+    }
+    else if (m_profileParameters.ProfileTypeValue() == PERFORMANCE)
+    {
+        strProjectType = (m_pCurrentProjectSettings->m_counterOptions.m_api == APIToTrace_OPENCL) ? "an OpenCL program" : "an HSA program";
+    }
+
     QString strExtraReason;
     strExtraReason.clear();
 
     if (m_profileParameters.ProfileTypeValue() == API_TRACE)
     {
-        strProjectType = (m_pCurrentProjectSettings->m_traceOptions.m_apiToTrace == APIToTrace_OPENCL) ? "an OpenCL program" : "an HSA program";
-
         // in timeout mode, the backend does not produce an .atp file if all APIs called were filtered away
         if (m_pCurrentProjectSettings->m_traceOptions.m_mode == TIMEOUT)
         {
@@ -1997,8 +2005,14 @@ void ProfileManager::HandleMissingProfileOutput(QString& strError)
     }
     else
     {
-        strProjectType += ".</li><li>The active project is an OpenCL program, but it did not enqueue any kernels.";
-        strProjectType += ".</li><li>The active project is an OpenCL program, but it did not enqueue any kernels listed in the Profile Specific Kernels section";
+        QString thisReason = QString(".</li><li>The active project is %1,  but it did not enqueue any kernels.").arg(strProjectType);
+        thisReason += QString("</li><li>The active project is %1, but it did not enqueue any kernels listed in the Profile Specific Kernels section").arg(strProjectType);
+        strProjectType.append(thisReason);
+
+        if (Util::IsHSAEnabled() && m_pCurrentProjectSettings->m_counterOptions.m_api == APIToTrace_OPENCL)
+        {
+            strExtraReason = QString("<li>Collecting OpenCL performance counters when running on the ROCm stack might not be supported.%1 </li>").arg(Util::ms_ENABLE_HSA_OPTION);
+        }
     }
 
     strError = QString("Unable to gather profile data.  This error can occur for one of several reasons:<ul>");

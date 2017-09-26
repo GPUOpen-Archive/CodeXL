@@ -1,10 +1,8 @@
 
 #include <CElf.h>
 #include <locale>
-// This is from ADL's include directory.
 #include <ADLUtil.h>
 #include <ACLModuleManager.h>
-#include <customer/oem_structures.h>
 #include <DeviceInfoUtils.h>
 #include <AMDTBaseTools/Include/AMDTDefinitions.h>
 

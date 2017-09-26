@@ -12,9 +12,7 @@
 #include <DX10AsmInterface.h>
 #include <DX10AsmBuffer.h>
 
-// This is from ADL's include directory.
 #include <ADLUtil.h>
-#include <customer/oem_structures.h>
 #include <DeviceInfoUtils.h>
 
 #include <D3D10ShaderObject.h>

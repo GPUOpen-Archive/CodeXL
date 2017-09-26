@@ -68,12 +68,14 @@ const QString Util::ms_KERNEL_ASSEMBLY_FILE_PREFIX = KERNEL_ASSEMBLY_FILE_PREFIX
 const QString Util::ms_TRUESTR = "True";
 const QString Util::ms_FALSESTR = "False";
 const QString Util::ms_APP_TRACE_OPTIONS_PAGE = GPU_NARROW_STR_TRACE_PROJECT_SETTINGS_DISPLAY;
+const QString Util::ms_APP_COUNTER_OPTIONS_PAGE = GPU_NARROW_STR_COUNTER_PROJECT_SETTINGS_DISPLAY;
 #if (AMDT_BUILD_TARGET == AMDT_WINDOWS_OS)
     const QString Util::ms_ENABLE_TIMEOUT_OPTION = QString("Try enabling the \"Write trace data in intervals during program execution\" option (or reducing the interval if the option is already enabled) on the \"%1\" project setting page.").arg(ms_APP_TRACE_OPTIONS_PAGE);
 #endif
 #if (AMDT_BUILD_TARGET == AMDT_LINUX_OS)
     const QString Util::ms_ENABLE_TIMEOUT_OPTION = QString("Try reducing the \"Interval at which to write trace data during program execution\" on the \"%1\" project setting page.").arg(ms_APP_TRACE_OPTIONS_PAGE);
 #endif
+const QString Util::ms_ENABLE_HSA_OPTION = QString("Try enabling the \"HSA\" option on the \"%1\" project setting page.").arg(ms_APP_COUNTER_OPTIONS_PAGE);
 
 void Util::GetProfilerAppDataDir(osFilePath& appDataDir)
 {

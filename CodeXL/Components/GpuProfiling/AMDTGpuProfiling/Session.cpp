@@ -592,45 +592,45 @@ const OccupancyTable& GPUSessionTreeItemData::LoadAndGetOccupancyTable()
 
             void* pPtr;
             AtpDataHandlerFunc pAtpDataHandler_func = AtpUtils::Instance()->GetAtpDataHandlerFunc();
-            IOccupancyFileInfoDataHandler* occupancyFileDataInfo = nullptr;
+            IOccupancyFileInfoDataHandler* pOccupancyFileDataInfo = nullptr;
 
             if (nullptr != pAtpDataHandler_func)
             {
                 pAtpDataHandler_func(&pPtr);
                 IAtpDataHandler* pApDataHandler = reinterpret_cast<IAtpDataHandler*>(pPtr);
-                m_occupancyFile.fromStdString(std::string(m_pParentData->m_filePath.asString().asASCIICharArray()));
                 std::string occupancyFile = m_occupancyFile.toStdString();
 
-                occupancyFileDataInfo = pApDataHandler->GetOccupancyFileInfoDataHandler(occupancyFile.c_str());
+                pOccupancyFileDataInfo = pApDataHandler->GetOccupancyFileInfoDataHandler(occupancyFile.c_str());
 
-                if (nullptr != occupancyFileDataInfo)
+                if (nullptr != pOccupancyFileDataInfo)
                 {
-                    m_occupancyFileIsLoaded = occupancyFileDataInfo->ParseOccupancyFile(occupancyFile.c_str());
+                    if (!pOccupancyFileDataInfo->IsDataReady())
+                    {
+                        m_occupancyFileIsLoaded = pOccupancyFileDataInfo->ParseOccupancyFile(occupancyFile.c_str());
+                    }
                 }
-
-                m_occupancyFileIsLoaded = occupancyFileDataInfo->ParseOccupancyFile(occupancyFile.c_str());
             }
 
-            if (m_occupancyFileIsLoaded)
+            if (m_occupancyFileIsLoaded && nullptr != pOccupancyFileDataInfo)
             {
-                osThreadId* osThreadIds;
+                osThreadId* pOsThreadIds;
                 unsigned int threadCount;
-                occupancyFileDataInfo->GetOccupancyThreads(&osThreadIds, threadCount);
+                pOccupancyFileDataInfo->GetOccupancyThreads(&pOsThreadIds, threadCount);
 
                 for (unsigned int i = 0; i < threadCount; i++)
                 {
                     const IOccupancyInfoDataHandler* occupancyInfo;
                     unsigned int kernelCount;
-                    occupancyFileDataInfo->GetKernelCountByThreadId(osThreadIds[i], kernelCount);
+                    pOccupancyFileDataInfo->GetKernelCountByThreadId(pOsThreadIds[i], kernelCount);
                     QList<const IOccupancyInfoDataHandler*> occupancyInfoList;
 
                     for (unsigned int j = 0; j < kernelCount; j++)
                     {
-                        occupancyInfo = occupancyFileDataInfo->GetOccupancyInfoDataHandler(osThreadIds[i], j);
+                        occupancyInfo = pOccupancyFileDataInfo->GetOccupancyInfoDataHandler(pOsThreadIds[i], j);
                         occupancyInfoList.push_back(occupancyInfo);
                     }
 
-                    m_occupancyTable.insert(osThreadIds[i], occupancyInfoList);
+                    m_occupancyTable.insert(pOsThreadIds[i], occupancyInfoList);
                 }
             }
         }

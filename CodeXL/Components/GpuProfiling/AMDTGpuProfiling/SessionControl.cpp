@@ -528,8 +528,7 @@ const IOccupancyInfoDataHandler* SessionControl::GetOccupancyForRow(int rowIndex
         {
             // If the occupancy info doesn't match the one in the map, this means that the user sorted the table,
             // and the information in the map is no longer reflecting the correct line numbers:
-            QString tempString;
-            tempString.fromStdString(retVal->GetKernelName());
+            QString tempString = QString::fromStdString(retVal->GetKernelName());
             if (!kernelName.startsWith(tempString))
             {
                 QMap<int, const IOccupancyInfoDataHandler*>::const_iterator iter = m_rowOccupancyInfoMap.begin();
@@ -538,8 +537,7 @@ const IOccupancyInfoDataHandler* SessionControl::GetOccupancyForRow(int rowIndex
                 {
                     if ((*iter) != nullptr)
                     {
-                        QString currentRowKernelName;
-                        currentRowKernelName.fromStdString((*iter)->GetKernelName());
+                        QString currentRowKernelName = QString::fromStdString((*iter)->GetKernelName());
                         if (kernelName.startsWith(currentRowKernelName))
                         {
                             retVal = (*iter);

@@ -27,8 +27,6 @@
 #define KA_BACKEND_DLL_EXPORT
 
 #include <ADLUtil.h>
-// This is from ADL's include directory.
-#include <customer/oem_structures.h>
 #include <DeviceInfoUtils.h>
 #include <ADLUtil.h>
 

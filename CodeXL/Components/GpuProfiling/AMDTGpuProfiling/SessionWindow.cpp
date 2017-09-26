@@ -373,7 +373,7 @@ void GPUSessionWindow::CellContentClicked(const QModelIndex& index)
                 return;
             }
 
-            m_currentDisplayedOccupancyKernel = QString().fromStdString(occupancyInfo->GetKernelName());
+            m_currentDisplayedOccupancyKernel = QString::fromStdString(occupancyInfo->GetKernelName());
             QTableView* pPcTable = m_pControl->GetTableView();
             int columnCount = pPcTable->model()->columnCount();
             int callIndexColIndex = -1;

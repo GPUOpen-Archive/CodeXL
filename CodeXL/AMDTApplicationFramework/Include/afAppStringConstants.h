@@ -779,8 +779,8 @@
 #define AF_STR_SystemInformationCommandVendorID L"Vendor ID"
 #define AF_STR_SystemInformationCommandCpuFamily L"CPU Family"
 #define AF_STR_SystemInformationCommandPipePrefix L"AMDT_SI_PIPE_NAME"
-#define AF_STR_SystemInformationCommandHelper32Name L"AMDTSystemInformationHelper"
-#define AF_STR_SystemInformationCommandHelper64Name L"AMDTSystemInformationHelper-x64"
+#define AF_STR_SystemInformationCommandHelper32Name L"CXLSystemInformationHelper"
+#define AF_STR_SystemInformationCommandHelper64Name L"CXLSystemInformationHelper-x64"
 #define AF_STR_SystemInformationCommandTimeOut L"System Information gathering timed out after 10s"
 
 // Context Information dialog

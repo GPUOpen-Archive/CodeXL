@@ -115,16 +115,30 @@ void HSAMemoryTimelineItem::tooltipItems(acTimelineItemToolTip& tooltip) const
     tooltip.add(tr("Size"), QString(tr("%1")).arg(m_size));
 }
 
-HSAMemoryTransferTimelineItem::HSAMemoryTransferTimelineItem(quint64 transferStartTime, quint64 transferEndTime, int apiIndex, size_t size, QString srcAgent, QString dstAgent)
-    : HSAMemoryTimelineItem(transferStartTime, transferEndTime, apiIndex, size), m_srcAgent(srcAgent), m_dstAgent(dstAgent)
+HSAMemoryTransferTimelineItem::HSAMemoryTransferTimelineItem(
+    quint64 transferStartTime,
+    quint64 transferEndTime,
+    int apiIndex,
+    size_t size,
+    QString srcAgentHandle,
+    QString srcAgentName,
+    QString dstAgentHandle,
+    QString dstAgentName):
+    HSAMemoryTimelineItem(transferStartTime, transferEndTime, apiIndex, size),
+    m_srcAgentHandle(srcAgentHandle),
+    m_srcAgentName(srcAgentName),
+    m_dstAgentHandle(dstAgentHandle),
+    m_dstAgentName(dstAgentName)
 {
 }
 
 void HSAMemoryTransferTimelineItem::tooltipItems(acTimelineItemToolTip& tooltip) const
 {
     tooltip.add(tr("Name"), m_strText);
-    tooltip.add(tr("Source Agent Handle"), m_srcAgent);
-    tooltip.add(tr("Destination Agent Handle"), m_dstAgent);
+    tooltip.add(tr("Source Agent Handle"), m_srcAgentHandle);
+    tooltip.add(tr("Source Agent Name"), m_srcAgentName);
+    tooltip.add(tr("Destination Agent Handle"), m_dstAgentHandle);
+    tooltip.add(tr("Destination Agent Name"), m_dstAgentName);
 
     acTimeline* timeline = m_pParentBranch->parentTimeline();
 

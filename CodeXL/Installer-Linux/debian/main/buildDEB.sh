@@ -20,7 +20,7 @@ do
 done
 
 VERSION_VER=$(find . -name 'CodeXL*.tar.gz' | awk -F"." '{ print $4}') 
-BASE_VERSION=2.4
+BASE_VERSION=2.5
 INTERNAL_VERSION=${BASE_VERSION}.$VERSION_VER
 VERSION=${BASE_VERSION}-$VERSION_VER
 PACAKGENAME="codexl"

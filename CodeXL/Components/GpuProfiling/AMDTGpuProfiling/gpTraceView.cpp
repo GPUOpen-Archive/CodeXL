@@ -367,7 +367,7 @@ void gpTraceView::OnTableItemClick(const QModelIndex& clickedItem)
 
             if (pOccupancyInfo != nullptr)
             {
-                m_currentDisplayedOccupancyKernel.fromStdString(pOccupancyInfo->GetKernelName());
+                m_currentDisplayedOccupancyKernel = QString::fromStdString(pOccupancyInfo->GetKernelName());
 
                 // get the api index from the Index column (column 0)
                 QString strCallIndex;

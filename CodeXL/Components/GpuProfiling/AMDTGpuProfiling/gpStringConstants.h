@@ -137,6 +137,7 @@
 #define GPU_STR_TRACE_PROJECT_SETTINGS_DISPLAY              L"GPU Profile: Application Trace"
 #define GPU_STR_TRACE_PROJECT_TREE_PATH_STR                 L"Profile, GPU Profile: Perf. Counters"
 #define GPU_NARROW_STR_TRACE_PROJECT_SETTINGS_DISPLAY       "Application Timeline Trace"
+#define GPU_NARROW_STR_COUNTER_PROJECT_SETTINGS_DISPLAY     "GPU Profile: Perf. Counters"
 #define GPU_STR_TRACE_PROJECT_SETTINGS_TAB_NAME             L"GPU Profile: Application &Trace"
 #define GPU_STR_GENERAL_SETTINGS                            L"GPUProfiler"
 #define GPU_STR_GENERAL_SETTINGS_DISPLAY                    L"GPU Profile"

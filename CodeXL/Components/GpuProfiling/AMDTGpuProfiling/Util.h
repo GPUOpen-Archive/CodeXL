@@ -84,7 +84,9 @@ public:
     static const QString ms_TRUESTR;                            ///< String containing "True"
     static const QString ms_FALSESTR;                           ///< String containing "False"
     static const QString ms_APP_TRACE_OPTIONS_PAGE;             ///< the name of the APP Trace Project Setting page
+    static const QString ms_APP_COUNTER_OPTIONS_PAGE;           ///< the name of the Perf Counters Project Setting page
     static const QString ms_ENABLE_TIMEOUT_OPTION;              ///< Message suggesting to user that they enable the trace timeout mode
+    static const QString ms_ENABLE_HSA_OPTION;                  ///< Message suggesting to user that they enable the HSA radio button
 
 
     /// Gets the string representing the summary type described in the input enum

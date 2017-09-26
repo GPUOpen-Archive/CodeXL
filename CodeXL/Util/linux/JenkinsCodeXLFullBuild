@@ -36,7 +36,7 @@ export AMD_OUTPUT=$AMD_BRANCH_ROOT/
 
 # Version Number stuff
 VERSION_MAJOR=2
-VERSION_MINOR=4
+VERSION_MINOR=5
 VERSION_BUILD=0
 # VERSION_UPDATE=0
 VERSIONINFO_FILE=${AMD_CODEXL}/../Common/Src/VersionInfo/VersionInfo.h
@@ -1079,12 +1079,12 @@ PackageTheBuild()
     cp -f Output_x86_64/release/bin/Plugins/libCXLGraphicsServerVulkan.json      ${PKG_NAME}/Plugins
     cp -f Output_x86_64/release/bin/Plugins/libVulkanEnv.so                      ${PKG_NAME}/Plugins
 		
-		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RGA/bin/amdspv               ${PKG_NAME}
-		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RGA/bin/spvgen.so            ${PKG_NAME}
-		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RGA/bin/VirtualContext       ${PKG_NAME}
-		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RGA/bin/shae                 ${PKG_NAME}
-		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RGA/bin/rga                  ${PKG_NAME}
-		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RGA/bin/rga-bin              ${PKG_NAME}
+		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RGA/rga-1.2.50/amdspv               ${PKG_NAME}
+		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RGA/rga-1.2.50/spvgen.so            ${PKG_NAME}
+		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RGA/rga-1.2.50/VirtualContext       ${PKG_NAME}
+		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RGA/rga-1.2.50/shae                 ${PKG_NAME}
+		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RGA/rga-1.2.50/rga                  ${PKG_NAME}
+		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RGA/rga-1.2.50/rga-bin              ${PKG_NAME}
 
 		mkdir -p ${PKG_NAME}/SDK/CXLPowerProfile/inc
 		cp -f ${AMD_CODEXL}/../Common/Src/AMDTCommonHeaders/AMDTDefinitions.h									${PKG_NAME}/SDK/CXLPowerProfile/inc
@@ -3013,12 +3013,12 @@ PackageTheBuild()
     cp -f Output_x86_64/release/bin/Plugins/libCXLGraphicsServerVulkan.json      ${PKG_NAME}/Plugins
     cp -f Output_x86_64/release/bin/Plugins/libVulkanEnv.so                      ${PKG_NAME}/Plugins
 
-		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RGA/bin/amdspv               ${PKG_NAME}
-		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RGA/bin/spvgen.so            ${PKG_NAME}
-		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RGA/bin/VirtualContext       ${PKG_NAME}
-		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RGA/bin/shae                 ${PKG_NAME}
-		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RGA/bin/rga                  ${PKG_NAME}
-		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RGA/bin/rga-bin              ${PKG_NAME}
+		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RGA/rga-1.2.50/amdspv               ${PKG_NAME}
+		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RGA/rga-1.2.50/spvgen.so            ${PKG_NAME}
+		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RGA/rga-1.2.50/VirtualContext       ${PKG_NAME}
+		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RGA/rga-1.2.50/shae                 ${PKG_NAME}
+		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RGA/rga-1.2.50/rga                  ${PKG_NAME}
+		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RGA/rga-1.2.50/rga-bin              ${PKG_NAME}
 
 		mkdir -p ${PKG_NAME}/SDK/CXLPowerProfile/inc
 		cp -f ${AMD_CODEXL}/../Common/Src/AMDTCommonHeaders/AMDTDefinitions.h									${PKG_NAME}/SDK/CXLPowerProfile/inc

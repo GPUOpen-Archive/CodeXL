@@ -468,7 +468,7 @@ const IOccupancyInfoDataHandler* gpTraceDataContainer::FindOccupancyInfo(ICLAPII
 
                     if ((pClApiInfo->GetCLApiType() & CL_ENQUEUE_KERNEL) == CL_ENQUEUE_KERNEL)
                     {
-                        if ((occupancyIndex < tempInfosList.count()) && Util::CheckOccupancyDeviceName(QString().fromStdString(tempInfosList[occupancyIndex]->GetDeviceName()), deviceNameStr))
+                        if ((occupancyIndex < tempInfosList.count()) && Util::CheckOccupancyDeviceName(QString::fromStdString(tempInfosList[occupancyIndex]->GetDeviceName()), deviceNameStr))
                         {
                             pRetVal = tempInfosList[occupancyIndex];
                             occupancyIndex++;

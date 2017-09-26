@@ -59,6 +59,7 @@
 #include <AMDTGpuProfiling/gpViewsCreator.h>
 #include <iostream>
 #include <Version.h>
+#include <ProfilerOutputFileDefs.h>
 
 
 static QList<TraceTableModel::TraceTableColIndex> s_hsaHiddenColumns = { TraceTableModel::TRACE_DEVICE_BLOCK_COLUMN, TraceTableModel::TRACE_OCCUPANCY_COLUMN, TraceTableModel::TRACE_DEVICE_TIME_COLUMN };
@@ -397,7 +398,7 @@ void TraceView::TraceTableMouseClickedHandler(const QModelIndex& modelIndex)
 
             if (occInfo != nullptr)
             {
-                m_strOccupancyKernelName = QString().fromStdString(occInfo->GetKernelName());
+                m_strOccupancyKernelName = QString::fromStdString(occInfo->GetKernelName());
 
                 // get the api index from the Index column (column 0)
                 QString strCallIndex;
@@ -409,7 +410,7 @@ void TraceView::TraceTableMouseClickedHandler(const QModelIndex& modelIndex)
                 // if we got a valid call index, then show the occupancy view
                 if (ok)
                 {
-                    m_currentDisplayedOccupancyKernel = QString().fromStdString(occInfo->GetKernelName());
+                    m_currentDisplayedOccupancyKernel = QString::fromStdString(occInfo->GetKernelName());
 
                     QString strErrorMessageOut;
                     connect(ProfileManager::Instance(), SIGNAL(OccupancyFileGenerationFinished(bool, const QString&, const QString&)), this, SLOT(OnOccupancyFileGenerationFinish(bool, const QString&, const QString&)));
@@ -885,10 +886,9 @@ bool TraceView::CheckStopParsing(quint64 curEndTime)
     return stopParsing;
 }
 
-
-acTimelineBranch* TraceView::AddHSADataTransferBranch(QString src, QString dest)
+acTimelineBranch* TraceView::AddHSADataTransferBranch(QString srcHandle, QString srcName, QString destHandle, QString destName)
 {
-    acTimelineBranch* returnBranch = GetHSADataTransferBranch(src, dest);
+    acTimelineBranch* returnBranch = GetHSADataTransferBranch(srcHandle, destHandle);
 
     if (returnBranch == nullptr)
     {
@@ -897,11 +897,13 @@ acTimelineBranch* TraceView::AddHSADataTransferBranch(QString src, QString dest)
         if (nullptr != returnBranch)
         {
             HSADataTransferBranchInfo dataTransferBranchInfo;
-            dataTransferBranchInfo.m_Source = src;
-            dataTransferBranchInfo.m_Destination = dest;
+            dataTransferBranchInfo.m_sourceHandle = srcHandle;
+            dataTransferBranchInfo.m_sourceName = srcName;
+            dataTransferBranchInfo.m_destinationHandle = destHandle;
+            dataTransferBranchInfo.m_destinationName = destName;
             dataTransferBranchInfo.m_pTransferBranch = returnBranch;
             dataTransferBranchInfo.m_pTransferBranch->SetBGColor(QColor::fromRgb(230, 230, 230));
-            QString branchText = src + "->" + dest;
+            QString branchText = srcHandle + " (" + srcName + ")" +" -> " + destHandle + " (" + destName + ")";
             dataTransferBranchInfo.m_pTransferBranch->setText(branchText);
             m_hsaDataTransferBranches.push_back(dataTransferBranchInfo);
         }
@@ -918,7 +920,7 @@ acTimelineBranch* TraceView::GetHSADataTransferBranch(QString src, QString dest)
     for (std::vector<HSADataTransferBranchInfo>::iterator it = m_hsaDataTransferBranches.begin();
          it != m_hsaDataTransferBranches.end(); ++it)
     {
-        if (src == it->m_Source && dest == it->m_Destination)
+        if (src == it->m_sourceHandle && dest == it->m_destinationHandle)
         {
             returnBranch = it->m_pTransferBranch;
             break;
@@ -1334,7 +1336,7 @@ void TraceView::HandleCLAPIInfo(ICLAPIInfoDataHandler* pClApiInfo)
                         if (pOccupancyInfosList != nullptr && nOccIndex < pOccupancyInfosList->count())
                         {
                             std::string tempString((*pOccupancyInfosList)[nOccIndex]->GetDeviceName());
-                            QString deviceName = QString().fromStdString(tempString);
+                            QString deviceName = QString::fromStdString(tempString);
 
                             if (Util::CheckOccupancyDeviceName(deviceName, deviceNameStr))
                             {
@@ -1555,18 +1557,59 @@ void TraceView::HandleHSAAPIInfo(IHSAAPIInfoDataHandler* phsaApiInfo)
             uint64_t hsaTransferStartTime = 0;
             uint64_t hsaTransferEndTime = 0;
 
-            if (pHsaMemoryTransferAPIInfo != nullptr)
+            if (nullptr != pHsaMemoryTransferAPIInfo)
             {
                 hsaTransferStartTime = pHsaMemoryTransferAPIInfo->GetHSAMemoryTransferStartTime();
                 hsaTransferEndTime = pHsaMemoryTransferAPIInfo->GetHSAMemoryTransferEndTime();
             }
 
+            auto SplitAgentHandleAndName = [](const std::string& agentString, std::string& agentHandle , std::string& agentName)
+            {
+                std::string agentStringWithoutBraces = std::string(agentString.begin() + 1, agentString.end() - 1);
+                size_t agentHandleNameSeparatorPos = agentStringWithoutBraces.find(",");
+                if (std::string::npos != agentHandleNameSeparatorPos)
+                {
+                    agentHandle = std::string(agentStringWithoutBraces.begin(), agentStringWithoutBraces.begin() + agentHandleNameSeparatorPos);
+                    size_t nameValueseparatorPos = agentHandle.find(ATP_PARAM_VALUE_DELIMITER);
+                    agentHandle = std::string(agentHandle.begin() + nameValueseparatorPos + 1, agentHandle.end());
+
+                    agentName = std::string(agentStringWithoutBraces.begin() + agentHandleNameSeparatorPos + 1, agentStringWithoutBraces.end());
+                    nameValueseparatorPos = agentName.find(ATP_PARAM_VALUE_DELIMITER);
+                    agentName = std::string(agentName.begin() + nameValueseparatorPos + 1, agentName.end());
+                }
+                else
+                {
+                    agentHandle = agentStringWithoutBraces;
+                    agentName = "Unknown";
+                }
+            };
+
             if ((nullptr != pHsaMemoryTransferAPIInfo) && (0 != hsaTransferStartTime) && (0 != hsaTransferEndTime))
             {
-                QString srcAgent = QString::fromStdString(pHsaMemoryTransferAPIInfo->GetHSASrcAgentString());
-                QString dstAgent = QString::fromStdString(pHsaMemoryTransferAPIInfo->GetHSADestinationAgentString());
 
-                HSAMemoryTransferTimelineItem* transferItem = new HSAMemoryTransferTimelineItem(hsaTransferStartTime, hsaTransferEndTime, dispSeqId, hsaMemorySize, srcAgent, dstAgent);
+                std::string agentHandle;
+                std::string agentName;
+
+                std::string agentString = pHsaMemoryTransferAPIInfo->GetHSASrcAgentString();
+                SplitAgentHandleAndName(agentString, agentHandle, agentName);
+                QString srcAgentHandle = QString::fromStdString(agentHandle);
+                QString srcAgentName = QString::fromStdString(agentName);
+
+                agentString = pHsaMemoryTransferAPIInfo->GetHSADestinationAgentString();
+                SplitAgentHandleAndName(agentString, agentHandle, agentName);
+                QString dstAgentHandle = QString::fromStdString(agentHandle);
+                QString dstAgentName = QString::fromStdString(agentName);
+
+                HSAMemoryTransferTimelineItem* transferItem = new HSAMemoryTransferTimelineItem(
+                    hsaTransferStartTime,
+                    hsaTransferEndTime,
+                    dispSeqId,
+                    hsaMemorySize,
+                    srcAgentHandle,
+                    srcAgentName,
+                    dstAgentHandle,
+                    dstAgentName);
+
                 transferItem->setHostItem(item);
                 transferItem->setBackgroundColor(APIColorMap::Instance()->GetAPIColor(apiName, QColor(90, 90, 90)));
 
@@ -1583,7 +1626,6 @@ void TraceView::HandleHSAAPIInfo(IHSAAPIInfoDataHandler* phsaApiInfo)
                     m_pHSABranch->setText(GPU_STR_TraceViewHSA);
                 }
 
-                // TODO: investigate getting the name of the source and destination of the data transfer branch
                 if (nullptr == m_pHSADataTransferBranch)
                 {
                     m_pHSADataTransferBranch = new acTimelineBranch();
@@ -1591,11 +1633,11 @@ void TraceView::HandleHSAAPIInfo(IHSAAPIInfoDataHandler* phsaApiInfo)
                     m_pHSADataTransferBranch->setText(GPU_STR_TraceViewHSADataTransfers);
                 }
 
-                acTimelineBranch*  pHsaDataTransferBranch = GetHSADataTransferBranch(srcAgent, dstAgent);
+                acTimelineBranch*  pHsaDataTransferBranch = GetHSADataTransferBranch(srcAgentHandle, dstAgentHandle);
 
                 if (nullptr == pHsaDataTransferBranch)
                 {
-                    pHsaDataTransferBranch = AddHSADataTransferBranch(srcAgent, dstAgent);
+                    pHsaDataTransferBranch = AddHSADataTransferBranch(srcAgentHandle, srcAgentName, dstAgentHandle, dstAgentName);
                 }
 
                 pHsaDataTransferBranch->addTimelineItem(transferItem);

@@ -80,7 +80,7 @@ public:
 
     /// Fill in a TimelineItemToolTip instance with a set of name/value pairs that will be displayed in the tooltip for this timeline item
     /// \param tooltip acTimelineItemToolTip instance that should get populated with name/value pairs
-    virtual void tooltipItems(acTimelineItemToolTip& tooltip) const;
+    virtual void tooltipItems(acTimelineItemToolTip& tooltip) const override;
 
 private:
     QString                         m_strQueueHandle;    ///< the queue handle for this API
@@ -104,7 +104,7 @@ public:
 
     /// Fill in a TimelineItemToolTip instance with a set of name/value pairs that will be displayed in the tooltip for this timeline item
     /// \param tooltip acTimelineItemToolTip instance that should get populated with name/value pairs
-    virtual void tooltipItems(acTimelineItemToolTip& tooltip) const;
+    virtual void tooltipItems(acTimelineItemToolTip& tooltip) const override;
 
 protected:
     size_t m_size;                ///< the memory size for this API
@@ -119,17 +119,29 @@ public:
     /// \param transferEndTime the end time for this data transfer.
     /// \param apiIndex the index of this api in the application's call sequence
     /// \param size the size of the memory operation
-    /// \param srcAgent the source agent of the memory transfer
-    /// \param dstAgent the destination agent of the memory transfer
-    HSAMemoryTransferTimelineItem(quint64 transferStartTime, quint64 transferEndTime, int apiIndex, size_t size, QString srcAgent, QString dstAgent);
+    /// \param srcAgentHandle the source agent handle of the memory transfer
+    /// \param srcAgentName the source agent name of the memory transfer
+    /// \param dstAgentHandle the destination agent handle of the memory transfer
+    /// \param dstAgentName the destination agent name of the memory transfer
+    HSAMemoryTransferTimelineItem(
+        quint64 transferStartTime,
+        quint64 transferEndTime,
+        int apiIndex,
+        size_t size,
+        QString srcAgentHandle,
+        QString srcAgentName,
+        QString dstAgentHandle,
+        QString dstAgentName);
 
     /// Fill in a TimelineItemToolTip instance with a set of name/value pairs that will be displayed in the tooltip for this timeline item
     /// \param tooltip acTimelineItemToolTip instance that should get populated with name/value pairs
-    virtual void tooltipItems(acTimelineItemToolTip& tooltip) const;
+    virtual void tooltipItems(acTimelineItemToolTip& tooltip) const override;
 
 protected:
-    QString m_srcAgent;  ///< the source agent of the transfer
-    QString m_dstAgent;  ///< the destination agent of the transfer
+    QString m_srcAgentHandle;   ///< the source agent handle of the transfer
+    QString m_srcAgentName;     ///< the source agent name of the transfer
+    QString m_dstAgentHandle;   ///< the destination agent handle of the transfer
+    QString m_dstAgentName;     ///< the destination agent name of the transfer
 };
 
 #endif // _HSA_TIMELINE_ITEMS_H_

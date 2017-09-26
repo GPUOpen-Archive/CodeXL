@@ -55,12 +55,12 @@ const QString CounterManager::ms_GFX7_FAMILY_ENV_VAR_VALUE = "GFX7";
 const QString CounterManager::ms_GFX8_FAMILY_ENV_VAR_VALUE = "GFX8";
 const QString CounterManager::ms_GFX9_FAMILY_ENV_VAR_VALUE = "GFX9";
 
-const int CounterManager::ms_GFX6_PLACEHOLDER_DEVICE_ID = 0x6798; // a Tahiti device
-const int CounterManager::ms_GFX7_PLACEHOLDER_DEVICE_ID = 0x6650; // a Bonaire device
-const int CounterManager::ms_GFX8_PLACEHOLDER_DEVICE_ID = 0x6900; // an Iceland device
-const int CounterManager::ms_GFX9_PLACEHOLDER_DEVICE_ID = 0x6860; // a Vega device
+const size_t CounterManager::ms_GFX6_PLACEHOLDER_DEVICE_ID = 0x6798; // a Tahiti device
+const size_t CounterManager::ms_GFX7_PLACEHOLDER_DEVICE_ID = 0x6649; // a Bonaire device
+const size_t CounterManager::ms_GFX8_PLACEHOLDER_DEVICE_ID = 0x6900; // an Iceland device
+const size_t CounterManager::ms_GFX9_PLACEHOLDER_DEVICE_ID = 0x6860; // a Vega device
 
-const int CounterManager::ms_UNSPECIFIED_REV_ID = 0;
+const size_t CounterManager::ms_UNSPECIFIED_REV_ID = static_cast<size_t>(REVISION_ID_ANY);
 
 const int CounterManager::ms_AMD_VENDOR_ID = 0x1002;
 
@@ -359,7 +359,7 @@ void CounterManager::LoadCountersModule()
     }
 }
 
-void CounterManager::AddDeviceId(int deviceId, int revId)
+void CounterManager::AddDeviceId(size_t deviceId, size_t revId)
 {
     GDT_GfxCardInfo gfxCardInfo;
 
@@ -394,7 +394,7 @@ void CounterManager::AddDeviceId(int deviceId, int revId)
     }
 }
 
-void CounterManager::AddDeviceIdToFamily(HardwareFamily hardwareFamily, int deviceId, int revId)
+void CounterManager::AddDeviceIdToFamily(HardwareFamily hardwareFamily, size_t deviceId, size_t revId)
 {
     QList<DeviceAndRevInfo> deviceInfoList;
 

@@ -192,12 +192,12 @@ private:
     static const QString ms_GFX7_FAMILY_NAME;           ///< string constant for the GFX7 hardware family name
     static const QString ms_GFX8_FAMILY_NAME;           ///< string constant for the GFX8 hardware family name
     static const QString ms_GFX9_FAMILY_NAME;           ///< string constant for the GFX9 hardware family name
-    static const int     ms_GFX6_PLACEHOLDER_DEVICE_ID; ///< placeholder device id for a GFX6 device
-    static const int     ms_GFX7_PLACEHOLDER_DEVICE_ID; ///< placeholder device id for a GFX7 device
-    static const int     ms_GFX8_PLACEHOLDER_DEVICE_ID; ///< placeholder device id for a GFX8 device
-    static const int     ms_GFX9_PLACEHOLDER_DEVICE_ID; ///< placeholder device id for a GFX9 device
-    static const int     ms_UNSPECIFIED_REV_ID;       ///< unspecified device revision id
-    static const int     ms_AMD_VENDOR_ID;            ///< AMD vendor id
+    static const size_t  ms_GFX6_PLACEHOLDER_DEVICE_ID; ///< placeholder device id for a GFX6 device
+    static const size_t  ms_GFX7_PLACEHOLDER_DEVICE_ID; ///< placeholder device id for a GFX7 device
+    static const size_t  ms_GFX8_PLACEHOLDER_DEVICE_ID; ///< placeholder device id for a GFX8 device
+    static const size_t  ms_GFX9_PLACEHOLDER_DEVICE_ID; ///< placeholder device id for a GFX9 device
+    static const size_t  ms_UNSPECIFIED_REV_ID;         ///< unspecified device revision id
+    static const int     ms_AMD_VENDOR_ID;              ///< AMD vendor id
 
     /// typedef used for counter indices
     struct CounterIndices
@@ -260,13 +260,13 @@ private:
     /// NA_HARDWARE_FAMILY family
     /// \param deviceId the device id to add to the hardware family
     /// \param revId the revision id to add to the hardware family
-    void AddDeviceId(int deviceId, int revId);
+    void AddDeviceId(size_t deviceId, size_t revId);
 
     /// Adds the specified device id to the list of devices for the specified hardware family
     /// \param hardwareFamily the hardware family to which the device should be added
     /// \param deviceId the device id to add to the hardware family
     /// \param revId the revision id to add to the hardware family
-    void AddDeviceIdToFamily(HardwareFamily hardwareFamily, int deviceId, int revId);
+    void AddDeviceIdToFamily(HardwareFamily hardwareFamily, size_t deviceId, size_t revId);
 
     /// Updates the m_counterIndices after the counters have been sorted
     /// \param counterNames the sorted list of counters
@@ -276,8 +276,8 @@ private:
     // structure for holding device id and rev id for installed devices
     struct DeviceAndRevInfo
     {
-        int m_deviceID; ///< device id
-        int m_revID;    ///< rev id
+        size_t m_deviceID; ///< device id
+        size_t m_revID;    ///< rev id
     };
 
     osModuleHandle                                 m_gpaCountersModuleHandle;         ///< module handle for GPACounters DLL

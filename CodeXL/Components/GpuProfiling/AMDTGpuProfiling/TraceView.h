@@ -191,9 +191,11 @@ private:
     /// struct holding the info of the HSA data transfer branch
     struct HSADataTransferBranchInfo
     {
-        QString m_Source;                          ///< source of the data transfer
-        QString m_Destination;                     ///< destination of the data transfer
-        acTimelineBranch* m_pTransferBranch;       ///< pointer to the timeline branch
+        QString m_sourceHandle;                             ///< source handle of the data transfer
+        QString m_sourceName;                               ///< source name of the data transfer
+        QString m_destinationHandle;                        ///< destination handle of the data transfer
+        QString m_destinationName;                          ///< destination name of the data transfer
+        acTimelineBranch* m_pTransferBranch;                ///< pointer to the timeline branch
 
         HSADataTransferBranchInfo(): m_pTransferBranch(nullptr)
         {
@@ -281,10 +283,12 @@ private:
     bool CheckStopParsing(quint64 curEndTime);
 
     /// Adds the data transfer branch based on uniqueness of the src and dest
-    /// \param[in] src source string of the HSA data transfer
-    /// \param[in] dest destination string of the HSA data transfer
+    /// \param[in] srcHandle source string of the HSA data transfer
+    /// \param[in] srcName source string of the HSA data transfer
+    /// \param[in] destHandle destination string of the HSA data transfer
+    /// \param[in] destName destination string of the HSA data transfer
     /// \return pointer to the new data transfer acTimelineBranch
-    acTimelineBranch* AddHSADataTransferBranch(QString src, QString dest);
+    acTimelineBranch* AddHSADataTransferBranch(QString srcHandle, QString srcName, QString destHandle, QString destName);
 
     /// Returns pointer to the existing timeline branch of the HSA data transfer
     /// \param[in] src source string of the HSA data transfer
