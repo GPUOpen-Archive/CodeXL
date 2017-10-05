@@ -41,17 +41,5 @@
 				</Kernel>
 			</Kernels>
 		</Test>
-		<Test>
-			<ExecutablePath>samples\opencl\bin\x86\MatrixMulDouble.exe</ExecutablePath>
-			<WorkingDirectory>samples\opencl\bin\x86\</WorkingDirectory>
-			<TestName>MatrixMulDouble_StepTest</TestName>
-			<TestType>StepTest</TestType>
-			<Kernels>
-				<Kernel>
-					<KernelName>mmmKernel_local</KernelName>
-					<WorkItemId>0,0,0</WorkItemId>
-				</Kernel>
-			</Kernels>
-		</Test>
 	</Tests>
 </CodeXL>       
