@@ -154,13 +154,24 @@ static void pp_anon_inode_mmap_close(struct vm_area_struct* vma)
     return;
 }
 
-static int pp_anon_inode_mmap_fault(struct vm_area_struct* vma, struct vm_fault* vmf)
+#ifdef KERNEL_newer_than_4_10
+    // For the kernels newer than 4.10
+    static int pp_anon_inode_mmap_fault(struct vm_fault* vmf)
+#else
+    // For the kernels older than 4.10
+    static int pp_anon_inode_mmap_fault(struct vm_area_struct* vma, struct vm_fault* vmf)
+#endif
 {
     struct page* page               = NULL;
     struct pp_anon_inode_ctx* ctx   = NULL;
     uint8_t* info                   = NULL;
     int ret                         = 0;
 
+    #ifdef KERNEL_newer_than_4_10
+        // For the kernels newer than 4.10
+        struct vm_area_struct * vma = vmf->vma;
+    #endif
+        
     if (NULL != vma && NULL != vmf)
     {
         ctx = (struct pp_anon_inode_ctx*)(vma->vm_private_data);
