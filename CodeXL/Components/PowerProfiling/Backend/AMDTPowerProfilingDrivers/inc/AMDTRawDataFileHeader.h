@@ -83,7 +83,7 @@ typedef enum
     RAW_UNKNOWN_ERROR = 3,
 } RAW_Status;
 
-static const wchar_t g_RawFileMagicStr[] = L"_RAWHDR_";
+static const wchar_t g_RawFileMagicStr[] = {'', 'R', 'A', 'W', 'H', 'D', 'R', ''};
 #define RAWFILE_MAGIC    (*(uint64*)g_RawFileMagicStr)
 #define MAJOR_VERSION 3
 #define MINOR_VERSION 3
