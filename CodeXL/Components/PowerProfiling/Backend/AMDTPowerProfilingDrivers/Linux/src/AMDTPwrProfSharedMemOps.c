@@ -154,13 +154,14 @@ static void pp_anon_inode_mmap_close(struct vm_area_struct* vma)
     return;
 }
 
-static int pp_anon_inode_mmap_fault(struct vm_area_struct* vma, struct vm_fault* vmf)
+static int pp_anon_inode_mmap_fault(struct vm_fault* vmf)
 {
     struct page* page               = NULL;
     struct pp_anon_inode_ctx* ctx   = NULL;
     uint8_t* info                   = NULL;
     int ret                         = 0;
-
+    struct vm_area_struct * vma = vmf->vma;
+    
     if (NULL != vma && NULL != vmf)
     {
         ctx = (struct pp_anon_inode_ctx*)(vma->vm_private_data);
