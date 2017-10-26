@@ -850,7 +850,8 @@ AMDTResult AMDTPwrGetTargetSystemInfo(
 
             }
 
-            if (PLATFORM_ZEPPELIN != g_pTargetSystemInfo->m_platformId)
+            if ((PLATFORM_ZEPPELIN != g_pTargetSystemInfo->m_platformId)
+               && (PLATFORM_INVALID != g_pTargetSystemInfo->m_targetInfo.m_platformId))
             {
                 // Fill the pState frequency table
                 PrepareApuPstateTable();
