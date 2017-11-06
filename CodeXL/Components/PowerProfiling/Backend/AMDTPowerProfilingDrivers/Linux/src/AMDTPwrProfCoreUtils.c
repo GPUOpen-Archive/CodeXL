@@ -25,6 +25,10 @@
 // LOCAL INCLUDES
 #include <AMDTPwrProfCoreUtils.h>
 
+// SYSTEM INCLUDES
+#include <linux/uaccess.h>
+
+//
 // Wrappers for kmalloc to allocate memory
 void* AllocateMemory(size_t n, gfp_t flags)
 {
@@ -44,7 +48,7 @@ void* SetMemory(void* src, int c, size_t n)
 }
 
 // Wrappers for list_add to add a new entry in a list
-void AddToList(struct list_head* new , struct list_head* head)
+void AddToList(struct list_head* new, struct list_head* head)
 {
     list_add(new, head);
 

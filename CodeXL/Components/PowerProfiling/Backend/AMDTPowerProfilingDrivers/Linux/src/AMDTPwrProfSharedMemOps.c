@@ -26,6 +26,7 @@
 #include <linux/slab.h>
 #include <linux/mm.h>
 #include <linux/poll.h>
+#include <linux/version.h>
 
 #include <AMDTPwrProfSharedMemOps.h>
 #include <AMDTHelpers.h>
@@ -154,37 +155,49 @@ static void pp_anon_inode_mmap_close(struct vm_area_struct* vma)
     return;
 }
 
-static int pp_anon_inode_mmap_fault(struct vm_area_struct* vma, struct vm_fault* vmf)
+#if LINUX_VERSION_CODE > KERNEL_VERSION(4, 10, 0)
+    static int pp_anon_inode_mmap_fault(struct vm_fault* vmf)
+#else
+    static int pp_anon_inode_mmap_fault(struct vm_area_struct* vma, struct vm_fault* vmf)
+#endif
 {
     struct page* page               = NULL;
     struct pp_anon_inode_ctx* ctx   = NULL;
     uint8_t* info                   = NULL;
     int ret                         = 0;
 
-    if (NULL != vma && NULL != vmf)
+    if (NULL != vmf)
     {
-        ctx = (struct pp_anon_inode_ctx*)(vma->vm_private_data);
 
-        if (NULL != ctx)
+#if LINUX_VERSION_CODE > KERNEL_VERSION(4, 10, 0)
+        struct vm_area_struct* vma = vmf->vma;
+#endif
+
+        if (NULL != vma)
         {
-            if (NULL != vmf->page)
+            ctx = (struct pp_anon_inode_ctx*)(vma->vm_private_data);
+
+            if (NULL != ctx)
             {
-                DRVPRINT("vmf page is %p ..\n", vmf->page);
+                if (NULL != vmf->page)
+                {
+                    DRVPRINT("vmf page is %p ..\n", vmf->page);
+                }
+                else
+                {
+                    info = (uint8_t*)(ctx->mmaped_address + (vmf->pgoff * 4096));
+                }
+
+                page = virt_to_page(info);
+
+                get_page(page);
+                vmf->page = page;
             }
             else
             {
-                info = (uint8_t*)(ctx->mmaped_address + (vmf->pgoff * 4096));
+                DRVPRINT("vm_private_data is NULL\n");
+                ret = -1;
             }
-
-            page = virt_to_page(info);
-
-            get_page(page);
-            vmf->page = page;
-        }
-        else
-        {
-            DRVPRINT("vm_private_data is NULL\n");
-            ret = -1;
         }
     }
 
