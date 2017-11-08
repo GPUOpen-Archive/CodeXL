@@ -38,6 +38,7 @@
 #include <linux/sched.h>
 #include <linux/slab.h>
 #include <linux/types.h>
+#include <linux/uaccess.h>
 
 // Wrappers for kmalloc to allocate memory
 void* AllocateMemory(size_t, gfp_t);
