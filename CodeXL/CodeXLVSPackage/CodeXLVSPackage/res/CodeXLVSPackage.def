@@ -1,9 +1,0 @@
-﻿; CodeXLVSPackage.def : Declares the module parameters.
-
-LIBRARY      "CodeXLVSPackage.DLL"
-
-EXPORTS
-	DllCanUnloadNow            PRIVATE
-	DllGetClassObject          PRIVATE
-	DllRegisterServer          PRIVATE
-	DllUnregisterServer        PRIVATE
