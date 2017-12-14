@@ -1,4 +1,4 @@
-// CodeXL -- builds the VSPackage and assmebles the build from the upstream components
+// CodeXL -- Assembles the build from the upstream components
 
 // "P4ROOT" is passed in by the build script from Jenkins
 // "COPYARTIFACT_BUILD_NUMBER_*" variables referenced below are passed in to the build script from Jenkins
@@ -13,7 +13,6 @@ Define "COMPPATH"		"[CXLPATH]\Components"
 Define "CPUPATH"		"[COMPPATH]\CpuProfiling"
 Define "GPUDPATH"		"[COMPPATH]\GpuDebugging"
 Define "GPUPPATH"		"[COMPPATH]\GpuProfiling"
-Define "CXLVSPATH"		"[CXLPATH]\CodeXLVSPackage"
 Define "CXLRELEASEDIR"	"[CXLPATH]\Output\Release"
 Define "RELEASEDIR"		"[COMPPATH]\Output\Release"
 Define "DEBUGDIR"		"[COMPPATH]\Output\Debug"
@@ -35,15 +34,9 @@ Image
     // Put the CPU Profiling bits in the correct location for the VS Package build
 //    XCopy "[CPUPATH]\Installer\AMDTCpuProfiling\Lib\x86\AMDTCpuProfiling.lib" "[RELEASEDIR]\arch\"
 //    XCopy "[CPUPATH]\Installer\AMDTCpuProfiling\Lib\x86\AMDTCpuProfiling-d.lib" "[DEBUGDIR]\arch\"
-//    XCopy "[CPUPATH]\Installer\AMDTCpuProfiling\Lib\x86\*.dll" "[CXLVSPATH]\CodeXLVSPackage\CodeXLVSPackageVSIX\"
-//    XCopy "[CPUPATH]\Installer\AMDTCpuProfiling\Lib\x86\*.pdb" "[CXLVSPATH]\CodeXLVSPackage\CodeXLVSPackageVSIX\"
 //    XCopy "[CPUPATH]\Installer\AMDTCpuProfiling\Lib\x86\AMDTCpuProfiling.dll" "[COMPPATH]\Output\Release\bin\"
     
     // Put the GPU Profiling bits in the correct location for the VS Package build
-//    XCopy "[APPPPATH]\Installer\AMDTGpuProfilingCodeXLPlugin\CodeXLVSPackageBuildFiles\AMDTGpuProfiling.lib" "[RELEASEDIR]\arch\"
-//    XCopy "[APPPPATH]\Installer\AMDTGpuProfilingCodeXLPlugin\CodeXLVSPackageBuildFiles\AMDTGpuProfiling-d.lib" "[DEBUGDIR]\arch\"
-//    XCopy "[APPPPATH]\Installer\AMDTGpuProfilingCodeXLPlugin\CodeXLVSPackageBuildFiles\*.dll" "[CXLVSPATH]\CodeXLVSPackage\CodeXLVSPackageVSIX\"
-//    XCopy "[APPPPATH]\Installer\AMDTGpuProfilingCodeXLPlugin\CodeXLVSPackageBuildFiles\*.pdb" "[CXLVSPATH]\CodeXLVSPackage\CodeXLVSPackageVSIX\"
 
 //    XCopy "[APPPPATH]\Installer\AMDTGPUProfilingCodeXLPlugin\AMDTGpuProfiling.dll"            "[APPPPATH]\bin\Release-Win32\AMDTGpuProfiling\"
 //    Xcopy "[APPPPATH]\Installer\AMDTGPUProfilingCodeXLPlugin\x86\*.*"                         "[APPPPATH]\bin\Release-Win32\sprofile\"
@@ -58,9 +51,7 @@ Image
 
     // Put the GPU Debugging bits in the correct location for the VS Package build
 //    XCopy /S "[GPUDPATH]\Installer\AMDTGpuDebugging\Release\*.*" "[RELEASEDIR]\"
-//    XCopy "[GPUDPATH]\Installer\AMDTGpuDebugging\Release\bin\*.*" "[CXLVSPATH]\CodeXLVSPackage\CodeXLVSPackageVSIX\"
 //    XCopy /S "[GPUDPATH]\Installer\AMDTGpuDebugging_Debug\Debug\*.*" "[DEBUGDIR]\"
-//    XCopy "[GPUDPATH]\Installer\AMDTGpuDebugging_Debug\Debug\bin\*.*" "[CXLVSPATH]\CodeXLVSPackage\CodeXLVSPackageVSIX\"
 
     // need to copy the symbol files to make a zip for easier debugging
     Define "SYMZIPDIR" "[CXLPATH]\Output\Symbols"
@@ -79,61 +70,6 @@ Image
     MKDIR "[ZIPDIRX64]"
 
 Version
-    // Handle the Package Version info
-    // ========================
-    // Update various files with correct version information.  BUILD is passed in by Jenkins
-    MakeWriteable "[CXLVSPATH]\CodeXLVSPackage\CodeXLVSPackageVSIX\Properties\AssemblyInfo.cs"
-    Replace "[CXLVSPATH]\CodeXLVSPackage\CodeXLVSPackageVSIX\Properties\AssemblyInfo.cs" "(.*AssemblyVersion\(\")[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+" "$1[MAJOR].[MINOR].[BUILD].[UPDATE]"
-    Replace "[CXLVSPATH]\CodeXLVSPackage\CodeXLVSPackageVSIX\Properties\AssemblyInfo.cs" "(.*AssemblyFileVersion\(\")[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+" "$1[MAJOR].[MINOR].[BUILD].[UPDATE]"
-    MakeWriteable "[CXLVSPATH]\CodeXLVSPackage\CodeXLVSPackageVS11VSIX\Properties\AssemblyInfo.cs"
-    Replace "[CXLVSPATH]\CodeXLVSPackage\CodeXLVSPackageVS11VSIX\Properties\AssemblyInfo.cs" "(.*AssemblyVersion\(\")[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+" "$1[MAJOR].[MINOR].[BUILD].[UPDATE]"
-    Replace "[CXLVSPATH]\CodeXLVSPackage\CodeXLVSPackageVS11VSIX\Properties\AssemblyInfo.cs" "(.*AssemblyFileVersion\(\")[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+" "$1[MAJOR].[MINOR].[BUILD].[UPDATE]"
-    MakeWriteable "[CXLVSPATH]\CodeXLVSPackage\CodeXLVSPackageVS12VSIX\Properties\AssemblyInfo.cs"
-    Replace "[CXLVSPATH]\CodeXLVSPackage\CodeXLVSPackageVS12VSIX\Properties\AssemblyInfo.cs" "(.*AssemblyVersion\(\")[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+" "$1[MAJOR].[MINOR].[BUILD].[UPDATE]"
-    Replace "[CXLVSPATH]\CodeXLVSPackage\CodeXLVSPackageVS12VSIX\Properties\AssemblyInfo.cs" "(.*AssemblyFileVersion\(\")[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+" "$1[MAJOR].[MINOR].[BUILD].[UPDATE]"
-    MakeWriteable "[CXLVSPATH]\CodeXLVSPackage\CodeXLVSPackageVS14VSIX\Properties\AssemblyInfo.cs"
-    Replace "[CXLVSPATH]\CodeXLVSPackage\CodeXLVSPackageVS14VSIX\Properties\AssemblyInfo.cs" "(.*AssemblyVersion\(\")[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+" "$1[MAJOR].[MINOR].[BUILD].[UPDATE]"
-    Replace "[CXLVSPATH]\CodeXLVSPackage\CodeXLVSPackageVS14VSIX\Properties\AssemblyInfo.cs" "(.*AssemblyFileVersion\(\")[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+" "$1[MAJOR].[MINOR].[BUILD].[UPDATE]"
-
-    // In order to update the manifest with the version info - and not have it crash - need to turn off a project setting in a couple of files
-    MakeWriteable "[CXLVSPATH]\CodeXLVSPackage\CodeXLVSPackageVSIX\CodeXLVSPackageVSIX.csproj"
-    Replace "[CXLVSPATH]\CodeXLVSPackage\CodeXLVSPackageVSIX\CodeXLVSPackageVSIX.csproj" "<DeployExtension>True</DeployExtension>" "<DeployExtension>False</DeployExtension>"
-    MakeWriteable "[CXLVSPATH]\CodeXLVSPackage\CodeXLVSPackageVS11VSIX\CodeXLVSPackageVS11VSIX.csproj"
-    Replace "[CXLVSPATH]\CodeXLVSPackage\CodeXLVSPackageVS11VSIX\CodeXLVSPackageVS11VSIX.csproj" "<DeployExtension>True</DeployExtension>" "<DeployExtension>False</DeployExtension>"
-    MakeWriteable "[CXLVSPATH]\CodeXLVSPackage\CodeXLVSPackageVS12VSIX\CodeXLVSPackageVS12VSIX.csproj"
-    Replace "[CXLVSPATH]\CodeXLVSPackage\CodeXLVSPackageVS12VSIX\CodeXLVSPackageVS12VSIX.csproj" "<DeployExtension>True</DeployExtension>" "<DeployExtension>False</DeployExtension>"
-    MakeWriteable "[CXLVSPATH]\CodeXLVSPackage\CodeXLVSPackageVS14VSIX\CodeXLVSPackageVS14VSIX.csproj"
-    Replace "[CXLVSPATH]\CodeXLVSPackage\CodeXLVSPackageVS14VSIX\CodeXLVSPackageVS14VSIX.csproj" "<DeployExtension>True</DeployExtension>" "<DeployExtension>False</DeployExtension>"
-    //   MakeWriteable "[CXLVSPATH]\CodeXLVSPackage\CodeXLVSPackageVSIX\CodeXLVSPackageVSIX-Release.csproj"
-    //   Replace "[CXLVSPATH]\CodeXLVSPackage\CodeXLVSPackageVSIX\CodeXLVSPackageVSIX-Release.csproj" "<DeployExtension>True</DeployExtension>" "<DeployExtension>False</DeployExtension>"
-
-    // update version number in manifest files
-    MakeWriteable "[CXLVSPATH]\CodeXLVSPackage\CodeXLVSPackageVSIX\source.extension.vsixmanifest"
-    Replace "[CXLVSPATH]\CodeXLVSPackage\CodeXLVSPackageVSIX\source.extension.vsixmanifest" "(.*<Version>)[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+" "$1[MAJOR].[MINOR].[BUILD].[UPDATE]"
-    MakeWriteable "[CXLVSPATH]\CodeXLVSPackage\CodeXLVSPackageVS11VSIX\source.extension.vsixmanifest"
-    Replace "[CXLVSPATH]\CodeXLVSPackage\CodeXLVSPackageVS11VSIX\source.extension.vsixmanifest" "(.*Version=\")[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+" "$1[MAJOR].[MINOR].[BUILD].[UPDATE]"
-    MakeWriteable "[CXLVSPATH]\CodeXLVSPackage\CodeXLVSPackageVS12VSIX\source.extension.vsixmanifest"
-    Replace "[CXLVSPATH]\CodeXLVSPackage\CodeXLVSPackageVS12VSIX\source.extension.vsixmanifest" "(.*Version=\")[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+" "$1[MAJOR].[MINOR].[BUILD].[UPDATE]"
-    MakeWriteable "[CXLVSPATH]\CodeXLVSPackage\CodeXLVSPackageVS14VSIX\source.extension.vsixmanifest"
-    Replace "[CXLVSPATH]\CodeXLVSPackage\CodeXLVSPackageVS14VSIX\source.extension.vsixmanifest" "(.*Version=\")[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+" "$1[MAJOR].[MINOR].[BUILD].[UPDATE]"
-    //   MakeWriteable "[CXLVSPATH]\CodeXLVSPackage\CodeXLVSPackageVSIX\source.release.extension.vsixmanifest"
-    //   Replace "[CXLVSPATH]\CodeXLVSPackage\CodeXLVSPackageVSIX\source.release.extension.vsixmanifest" "(.*<Version>)[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+" "$1[MAJOR].[MINOR].[BUILD].[UPDATE]"
-  
-    MakeWriteable "[CXLVSPATH]\CodeXLVSPackage\res\CodeXLVSPackage.pkgdef"
-    Replace "[CXLVSPATH]\CodeXLVSPackage\res\CodeXLVSPackage.pkgdef" "(.*\"ProductVersion\"=\")[0-9]+\.[0-9]+" "$1[MAJOR].[MINOR]"
-    Replace "[CXLVSPATH]\CodeXLVSPackage\res\CodeXLVSPackage.pkgdef" "(.*\"PID\"=\")[0-9]+\.[0-9]+" "$1[MAJOR].[MINOR]"
-    MakeWriteable "[CXLVSPATH]\CodeXLVSPackage\res\CodeXLVSPackageVS11.pkgdef"
-    Replace "[CXLVSPATH]\CodeXLVSPackage\res\CodeXLVSPackageVS11.pkgdef" "(.*\"ProductVersion\"=\")[0-9]+\.[0-9]+" "$1[MAJOR].[MINOR]"
-    Replace "[CXLVSPATH]\CodeXLVSPackage\res\CodeXLVSPackageVS11.pkgdef" "(.*\"PID\"=\")[0-9]+\.[0-9]+" "$1[MAJOR].[MINOR]"
-    //Adding VS2013 extension
-    MakeWriteable "[CXLVSPATH]\CodeXLVSPackage\res\CodeXLVSPackageVS12.pkgdef"
-    Replace "[CXLVSPATH]\CodeXLVSPackage\res\CodeXLVSPackageVS12.pkgdef" "(.*\"ProductVersion\"=\")[0-9]+\.[0-9]+" "$1[MAJOR].[MINOR]"
-    Replace "[CXLVSPATH]\CodeXLVSPackage\res\CodeXLVSPackageVS12.pkgdef" "(.*\"PID\"=\")[0-9]+\.[0-9]+" "$1[MAJOR].[MINOR]"
-    //Adding VS2015 extension
-    MakeWriteable "[CXLVSPATH]\CodeXLVSPackage\res\CodeXLVSPackageVS14.pkgdef"
-    Replace "[CXLVSPATH]\CodeXLVSPackage\res\CodeXLVSPackageVS14.pkgdef" "(.*\"ProductVersion\"=\")[0-9]+\.[0-9]+" "$1[MAJOR].[MINOR]"
-    Replace "[CXLVSPATH]\CodeXLVSPackage\res\CodeXLVSPackageVS14.pkgdef" "(.*\"PID\"=\")[0-9]+\.[0-9]+" "$1[MAJOR].[MINOR]"
-
     // Handle the Package Framework info
     // ========================
     // update version number
@@ -175,18 +111,11 @@ Clean
     BuildSln "[ALLPROJECTS]\CodeXL-AllProjects.sln" "" "Clean" "Debug|Win32"
     BuildSln "[ALLPROJECTS]\CodeXL-AllProjects.sln" "" "Clean" "Release|x64"
     BuildSln "[ALLPROJECTS]\CodeXL-AllProjects.sln" "" "Clean" "Debug|x64"
-    BuildSln "[CXLPATH]\CodeXLVSPackage\CodeXLVSPackageVS11.sln" "" "Clean" "Release|Win32"
-    BuildSln "[CXLPATH]\CodeXLVSPackage\CodeXLVSPackageVS12.sln" "" "Clean" "Release|Win32"
-    //Adding VS2013 extension
-    BuildSln "[CXLPATH]\CodeXLVSPackage\CodeXLVSPackage.sln" "" "Clean" "Release|Win32"
 
 Debug
 
     BuildSln "[ALLPROJECTS]\CodeXL-AllProjects.sln" "" "BuildandTest" "Debug|x64"
     BuildSln "[ALLPROJECTS]\CodeXL-AllProjects.sln" "" "BuildandTest" "Debug|Win32"
-    //BuildSln "[CXLPATH]\CodeXLVSPackage\CodeXLVSPackageVS11.sln" "" "BuildandTest" "Debug|Win32"
-    //BuildSln "[CXLPATH]\CodeXLVSPackage\CodeXLVSPackageVS12.sln" "" "BuildandTest" "Debug|Win32"
-    //BuildSln "[CXLPATH]\CodeXLVSPackage\CodeXLVSPackage.sln" "" "BuildandTest" "Debug|Win32"
     //BuildSln "[CXLPATH]\Examples\AMDTTeaPot\AMDTTeaPotVS2015.sln" "" "BuildandTest" "Debug|Win32"
     SendBuildErrors "[EMAIL]" "CodeXL All Projects Debug Win32 Build Failed"
 
@@ -194,9 +123,6 @@ Release
 
     BuildSln "[ALLPROJECTS]\CodeXL-AllProjects.sln" "" "BuildandTest" "Release|x64"
     BuildSln "[ALLPROJECTS]\CodeXL-AllProjects.sln" "" "BuildandTest" "Release|Win32"
-    BuildSln "[CXLPATH]\CodeXLVSPackage\CodeXLVSPackageVS11.sln" "" "BuildandTest" "Release|Win32"
-    BuildSln "[CXLPATH]\CodeXLVSPackage\CodeXLVSPackageVS12.sln" "" "BuildandTest" "Release|Win32"
-    BuildSln "[CXLPATH]\CodeXLVSPackage\CodeXLVSPackage.sln" "" "BuildandTest" "Release|Win32"
     SendBuildErrors "[EMAIL]" "CodeXL All Projects Release Win32 Build Failed"
 
     SYSTEM "[CXLPATH]\Installer\VersionPatch.bat [CXLPATH]\Installer\VersionPatch.ps1 [ROOTPATH] [MAJOR].[MINOR].[BUILD].[UPDATE] Public"
@@ -208,9 +134,6 @@ ReleaseInternal
 
     BuildSln "[ALLPROJECTS]\CodeXL-AllProjects.sln" "" "BuildandTest" "Release|x64"
     BuildSln "[ALLPROJECTS]\CodeXL-AllProjects.sln" "" "BuildandTest" "Release|Win32"
-    BuildSln "[CXLPATH]\CodeXLVSPackage\CodeXLVSPackageVS11.sln" "" "BuildandTest" "Release|Win32"
-    BuildSln "[CXLPATH]\CodeXLVSPackage\CodeXLVSPackageVS12.sln" "" "BuildandTest" "Release|Win32"
-    BuildSln "[CXLPATH]\CodeXLVSPackage\CodeXLVSPackage.sln" "" "BuildandTest" "Release|Win32"
     SendBuildErrors "[EMAIL]" "CodeXL All Projects Internal Release Win32 Build Failed"
 
     SYSTEM "[CXLPATH]\Installer\VersionPatch.bat [CXLPATH]\Installer\VersionPatch.ps1 [ROOTPATH] [MAJOR].[MINOR].[BUILD].[UPDATE] internal"
@@ -222,9 +145,6 @@ ReleaseNda
 
     BuildSln "[ALLPROJECTS]\CodeXL-AllProjects.sln" "" "BuildandTest" "Release|x64"
     BuildSln "[ALLPROJECTS]\CodeXL-AllProjects.sln" "" "BuildandTest" "Release|Win32"
-    BuildSln "[CXLPATH]\CodeXLVSPackage\CodeXLVSPackageVS11.sln" "" "BuildandTest" "Release|Win32"
-    BuildSln "[CXLPATH]\CodeXLVSPackage\CodeXLVSPackageVS12.sln" "" "BuildandTest" "Release|Win32"
-    BuildSln "[CXLPATH]\CodeXLVSPackage\CodeXLVSPackage.sln" "" "BuildandTest" "Release|Win32"
     SendBuildErrors "[EMAIL]" "CodeXL All Projects NDA Release Win32 Build Failed"
 
     SYSTEM "[CXLPATH]\Installer\VersionPatch.bat [CXLPATH]\Installer\VersionPatch.ps1 [ROOTPATH] [MAJOR].[MINOR].[BUILD].[UPDATE] nda"
