@@ -56,7 +56,6 @@ Image
     Define "SYMZIPDIR" "[CXLPATH]\Output\Symbols"
     MKDIR "[CXLPATH]\Output"
     MKDIR "[SYMZIPDIR]"
-    MKDIR "[SYMZIPDIR]\VS14"
 
     Define "ZIPDIR" "[CXLPATH]\Installer\CodeXL_KA_ZIP"
     Define "ZIPDIRX86" "[CXLPATH]\Installer\CodeXL_KA_ZIP\x86"
@@ -189,16 +188,13 @@ ReleaseNda
 
 	
 Image Release
-    XCopy "[CXLPATH]\Output\Release-public\bin\VS14\*.pdb" "[SYMZIPDIR]\VS14\"
-	XCopy "[CXLPATH]\Output\Release\bin\*.pdb" "[SYMZIPDIR]\"
+    XCopy "[CXLPATH]\Output\Release\bin\*.pdb" "[SYMZIPDIR]\"
 	
 Image ReleaseNda
-    XCopy "[CXLPATH]\Output\Release-nda\bin\VS14\*.pdb" "[SYMZIPDIR]\VS14\"
-	XCopy "[CXLPATH]\Output\Release\bin\*.pdb" "[SYMZIPDIR]\"
+    XCopy "[CXLPATH]\Output\Release\bin\*.pdb" "[SYMZIPDIR]\"
 
 Image ReleaseInternal
-    XCopy "[CXLPATH]\Output\Release-internal\bin\VS14\*.pdb" "[SYMZIPDIR]\VS14\"
-	XCopy "[CXLPATH]\Output\Release\bin\*.pdb" "[SYMZIPDIR]\"
+    XCopy "[CXLPATH]\Output\Release\bin\*.pdb" "[SYMZIPDIR]\"
 
 Image Debug
     XCopy "[CXLPATH]\Output\Debug\bin\*.pdb" "[SYMZIPDIR]\"
