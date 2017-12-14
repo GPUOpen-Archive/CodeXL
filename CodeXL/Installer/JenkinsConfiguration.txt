@@ -57,9 +57,6 @@ Image
     Define "SYMZIPDIR" "[CXLPATH]\Output\Symbols"
     MKDIR "[CXLPATH]\Output"
     MKDIR "[SYMZIPDIR]"
-    MKDIR "[SYMZIPDIR]\VS10"
-    MKDIR "[SYMZIPDIR]\VS11"
-    MKDIR "[SYMZIPDIR]\VS12"
     MKDIR "[SYMZIPDIR]\VS14"
 
     Define "ZIPDIR" "[CXLPATH]\Installer\CodeXL_KA_ZIP"
@@ -151,23 +148,14 @@ ReleaseNda
 
 	
 Image Release
-    XCopy "[CXLPATH]\Output\Release-public\bin\VS10\*.pdb" "[SYMZIPDIR]\VS10\"
-    XCopy "[CXLPATH]\Output\Release-public\bin\VS11\*.pdb" "[SYMZIPDIR]\VS11\"
-    XCopy "[CXLPATH]\Output\Release-public\bin\VS12\*.pdb" "[SYMZIPDIR]\VS12\"
     XCopy "[CXLPATH]\Output\Release-public\bin\VS14\*.pdb" "[SYMZIPDIR]\VS14\"
 	XCopy "[CXLPATH]\Output\Release\bin\*.pdb" "[SYMZIPDIR]\"
 	
 Image ReleaseNda
-    XCopy "[CXLPATH]\Output\Release-nda\bin\VS10\*.pdb" "[SYMZIPDIR]\VS10\"
-    XCopy "[CXLPATH]\Output\Release-nda\bin\VS11\*.pdb" "[SYMZIPDIR]\VS11\"
-    XCopy "[CXLPATH]\Output\Release-nda\bin\VS12\*.pdb" "[SYMZIPDIR]\VS12\"
     XCopy "[CXLPATH]\Output\Release-nda\bin\VS14\*.pdb" "[SYMZIPDIR]\VS14\"
     XCopy "[CXLPATH]\Output\Release\bin\*.pdb" "[SYMZIPDIR]\"
 
 Image ReleaseInternal
-    XCopy "[CXLPATH]\Output\Release-internal\bin\VS10\*.pdb" "[SYMZIPDIR]\VS10\"
-    XCopy "[CXLPATH]\Output\Release-internal\bin\VS11\*.pdb" "[SYMZIPDIR]\VS11\"
-    XCopy "[CXLPATH]\Output\Release-internal\bin\VS12\*.pdb" "[SYMZIPDIR]\VS12\"
     XCopy "[CXLPATH]\Output\Release-internal\bin\VS14\*.pdb" "[SYMZIPDIR]\VS14\"
     XCopy "[CXLPATH]\Output\Release\bin\*.pdb" "[SYMZIPDIR]\"
 
