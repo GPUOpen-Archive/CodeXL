@@ -125,7 +125,6 @@ void CLAPITimelineItem::tooltipItems(acTimelineItemToolTip& tooltip) const
 
     strNum.setNum(localHostItem->apiIndex());
     tooltip.add(tr("clEnqueue Call Index"), strNum);
-
 }
 
 QString CLAPITimelineItem::getDataSizeString(quint64 dataSizeInBytes, int precision)
@@ -230,30 +229,6 @@ void CLMemTimelineItem::tooltipItems(acTimelineItemToolTip& tooltip) const
     tooltip.add(tr("Transfer Rate"), transferRateStr);
     tooltip.add(tr("Transfer Size"), getDataSizeString(m_nDataTransferSize, 3));
 
-}
-
-
-void CLOtherEnqueueOperationsTimelineItem::tooltipItems(acTimelineItemToolTip& tooltip) const
-{
-    CLAPITimelineItem::tooltipItems(tooltip);
-
-    // remove existing "Call Index" item from ancestor
-    tooltip.remove(tooltip.count() - 1);
-
-    QString callIndexInfo;
-
-    if (apiIndex() <= 0)
-    {
-        // the rare case where clGetEventInfo is the first API called
-        callIndexInfo = tr("N/A (precedes index 0)");
-    }
-    else
-    {
-        callIndexInfo = QString(tr("N/A (follows index %1)")).arg(apiIndex());
-    }
-
-    // add a "Call Index" item which indicates where in the api list this api was called
-    tooltip.add(tr("Call Index"), callIndexInfo);
 }
 
 void CLDataEnqueueOperationsTimelineItem::tooltipItems(acTimelineItemToolTip& tooltip) const

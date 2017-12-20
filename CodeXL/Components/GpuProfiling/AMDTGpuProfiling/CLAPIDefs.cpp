@@ -163,6 +163,12 @@ CLAPIDefs::CLAPIDefs()
                       "clEnqueueSVMUnmapAMD" <<
                       "clSetKernelArgSVMPointerAMD" <<
                       "clSetKernelExecInfoAMD" <<
+                      "clCreateSsgFileObjectAMD" <<
+                      "clGetSsgFileObjectInfoAMD" <<
+                      "clRetainSsgFileObjectAMD" <<
+                      "clReleaseSsgFileObjectAMD" <<
+                      "clEnqueueReadSsgFileAMD" <<
+                      "clEnqueueWriteSsgFileAMD" <<
                       "";
 
     GT_ASSERT(m_openCLAPIString.length() - 1 == CL_FUNC_TYPE_Unknown);
@@ -298,6 +304,12 @@ CLAPIDefs::CLAPIDefs()
     m_openCLAPIMap.insert(m_openCLAPIString[CL_FUNC_TYPE_clEnqueueSVMUnmapAMD], CL_FUNC_TYPE_clEnqueueSVMUnmapAMD);
     m_openCLAPIMap.insert(m_openCLAPIString[CL_FUNC_TYPE_clSetKernelArgSVMPointerAMD], CL_FUNC_TYPE_clSetKernelArgSVMPointerAMD);
     m_openCLAPIMap.insert(m_openCLAPIString[CL_FUNC_TYPE_clSetKernelExecInfoAMD], CL_FUNC_TYPE_clSetKernelExecInfoAMD);
+    m_openCLAPIMap.insert(m_openCLAPIString[CL_FUNC_TYPE_clCreateSsgFileObjectAMD], CL_FUNC_TYPE_clCreateSsgFileObjectAMD);
+    m_openCLAPIMap.insert(m_openCLAPIString[CL_FUNC_TYPE_clGetSsgFileObjectInfoAMD], CL_FUNC_TYPE_clGetSsgFileObjectInfoAMD);
+    m_openCLAPIMap.insert(m_openCLAPIString[CL_FUNC_TYPE_clRetainSsgFileObjectAMD], CL_FUNC_TYPE_clRetainSsgFileObjectAMD);
+    m_openCLAPIMap.insert(m_openCLAPIString[CL_FUNC_TYPE_clReleaseSsgFileObjectAMD], CL_FUNC_TYPE_clReleaseSsgFileObjectAMD);
+    m_openCLAPIMap.insert(m_openCLAPIString[CL_FUNC_TYPE_clEnqueueReadSsgFileAMD], CL_FUNC_TYPE_clEnqueueReadSsgFileAMD);
+    m_openCLAPIMap.insert(m_openCLAPIString[CL_FUNC_TYPE_clEnqueueWriteSsgFileAMD], CL_FUNC_TYPE_clEnqueueWriteSsgFileAMD);
 
     m_clAPIGroupMap.insert(CL_FUNC_TYPE_clGetPlatformIDs, CLAPIGroup_QueryInfo);
     m_clAPIGroupMap.insert(CL_FUNC_TYPE_clGetPlatformInfo, CLAPIGroup_QueryInfo);
@@ -422,7 +434,7 @@ CLAPIDefs::CLAPIDefs()
     m_clAPIGroupMap.insert(CL_FUNC_TYPE_clEnqueueSVMUnmap, CLAPIGroup_EnqueueDataTransfer);
     m_clAPIGroupMap.insert(CL_FUNC_TYPE_clCreateSamplerWithProperties, CLAPIGroup_CLObjectCreate);
     m_clAPIGroupMap.insert(CL_FUNC_TYPE_clSetKernelArgSVMPointer, CLAPIGroup_Other);
-    m_clAPIGroupMap.insert(CL_FUNC_TYPE_clSetKernelExecInfo, CLAPIGroup_QueryInfo);
+    m_clAPIGroupMap.insert(CL_FUNC_TYPE_clSetKernelExecInfo, CLAPIGroup_Other);
     m_clAPIGroupMap.insert(CL_FUNC_TYPE_clSVMAllocAMD, CLAPIGroup_Other);
     m_clAPIGroupMap.insert(CL_FUNC_TYPE_clSVMFreeAMD, CLAPIGroup_Other);
     m_clAPIGroupMap.insert(CL_FUNC_TYPE_clEnqueueSVMFreeAMD, CLAPIGroup_EnqueueOther);
@@ -431,7 +443,13 @@ CLAPIDefs::CLAPIDefs()
     m_clAPIGroupMap.insert(CL_FUNC_TYPE_clEnqueueSVMMapAMD, CLAPIGroup_EnqueueDataTransfer);
     m_clAPIGroupMap.insert(CL_FUNC_TYPE_clEnqueueSVMUnmapAMD, CLAPIGroup_EnqueueDataTransfer);
     m_clAPIGroupMap.insert(CL_FUNC_TYPE_clSetKernelArgSVMPointerAMD, CLAPIGroup_Other);
-    m_clAPIGroupMap.insert(CL_FUNC_TYPE_clSetKernelExecInfoAMD, CLAPIGroup_QueryInfo);
+    m_clAPIGroupMap.insert(CL_FUNC_TYPE_clSetKernelExecInfoAMD, CLAPIGroup_Other);
+    m_clAPIGroupMap.insert(CL_FUNC_TYPE_clCreateSsgFileObjectAMD, CLAPIGroup_CLObjectCreate);
+    m_clAPIGroupMap.insert(CL_FUNC_TYPE_clGetSsgFileObjectInfoAMD, CLAPIGroup_QueryInfo);
+    m_clAPIGroupMap.insert(CL_FUNC_TYPE_clRetainSsgFileObjectAMD, CLAPIGroup_CLObjectRetain);
+    m_clAPIGroupMap.insert(CL_FUNC_TYPE_clReleaseSsgFileObjectAMD, CLAPIGroup_CLObjectRelease);
+    m_clAPIGroupMap.insert(CL_FUNC_TYPE_clEnqueueReadSsgFileAMD, CLAPIGroup_EnqueueOther);
+    m_clAPIGroupMap.insert(CL_FUNC_TYPE_clEnqueueWriteSsgFileAMD, CLAPIGroup_EnqueueOther);
 }
 
 const QString& CLAPIDefs::GetOpenCLAPIString(CL_FUNC_TYPE type)

@@ -171,11 +171,6 @@ public:
     /// \param endTime the end time for this timeline item.
     /// \param apiIndex the index of this api in the application's call sequence
     CLOtherEnqueueOperationsTimelineItem(quint64 startTime, quint64 endTime, int apiIndex) : CLAPITimelineItem(startTime, endTime, apiIndex) {};
-
-    /// Fill in a TimelineItemToolTip instance with a set of name/value pairs that will be displayed in the tooltip for this timeline item
-    /// \param tooltip qcTimelineItemToolTip instance that should get populated with name/value pairs
-    virtual void tooltipItems(acTimelineItemToolTip& tooltip) const;
-
 };
 
 /// CLDataEnqueueOperationsTimelineItem descendant for fill operations API items

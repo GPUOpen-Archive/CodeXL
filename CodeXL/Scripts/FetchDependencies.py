@@ -19,14 +19,14 @@ if isPython3OrAbove:
 downloadMappingWin = {
     "https://github.com/GPUOpen-Tools/RGA/releases/download/1.2.0.0/rga-windows-x86-1.2.zip" : "../../Common/Lib/AMD/RGA/x86",
     "https://github.com/GPUOpen-Tools/RGA/releases/download/1.2.0.0/rga-windows-x64-1.2.zip" : "../../Common/Lib/AMD/RGA/x64",
-    "https://github.com/GPUOpen-Tools/RCP/releases/download/v5.2/RadeonComputeProfiler.2017-09-28-v5.2.6612.zip" : "../../Common/Lib/AMD/RCP",
-    "https://github.com/GPUOpen-Tools/RCP/releases/download/v5.2/RCPProfileDataParser.2017-09-28-v5.2.6612.zip" : "../../Common/Lib/AMD/RCP",
+    "https://github.com/GPUOpen-Tools/RCP/releases/download/v5.3/RadeonComputeProfiler-v5.3.6710.zip" : "../../Common/Lib/AMD/RCP",
+    "https://github.com/GPUOpen-Tools/RCP/releases/download/v5.3/RCPProfileDataParser-v5.3.6710.zip" : "../../Common/Lib/AMD/RCP",
     "https://github.com/GPUOpen-Tools/GPA/releases/download/v2.23.1/GPUPerfAPI-2.23.2392.1.zip" : "../../Common/Lib/AMD/GPUPerfAPI"
 }
 downloadMappingLin = {
     "https://github.com/GPUOpen-Tools/RGA/releases/download/1.2.0.0/rga-linux-1.2.tgz" : "../../Common/Lib/AMD/RGA",
-    "https://github.com/GPUOpen-Tools/RCP/releases/download/v5.2/RadeonComputeProfiler-v5.2.6553.tgz" : "../../Common/Lib/AMD/RCP",
-    "https://github.com/GPUOpen-Tools/RCP/releases/download/v5.2/RCPProfileDataParser-v5.2.6553.tgz" : "../../Common/Lib/AMD/RCP",
+    "https://github.com/GPUOpen-Tools/RCP/releases/download/v5.3/RadeonComputeProfiler-v5.3.6657.tgz" : "../../Common/Lib/AMD/RCP",
+    "https://github.com/GPUOpen-Tools/RCP/releases/download/v5.3/RCPProfileDataParser-v5.3.6657.tgz" : "../../Common/Lib/AMD/RCP",
     "https://github.com/GPUOpen-Tools/GPA/releases/download/v2.23.1/GPUPerfAPI.2.23.1986-lnx.tgz" : "../../Common/Lib/AMD/GPUPerfAPI"
 }
 
