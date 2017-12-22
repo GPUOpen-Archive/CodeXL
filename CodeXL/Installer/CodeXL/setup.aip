@@ -2687,7 +2687,7 @@
     <ROW Signature_="FileSearchSignPCoreOld64" Path="[System64Folder]\[Drivers_1_Dir]" Depth="1"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiIconsComponent">
-    <ROW Name="CodeXL.exe" SourcePath="CodeXL\CodeXL\Output\Release\bin\CodeXL.exe" Index="0"/>
+    <ROW Name="CodeXL.exe" SourcePath="CodeXL\Output\Release\bin\CodeXL.exe" Index="0"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiInstExSeqComponent">
     <ROW Action="AI_DOWNGRADE" Condition="AI_NEWERPRODUCTFOUND AND (UILevel &lt;&gt; 5)" Sequence="201"/>
