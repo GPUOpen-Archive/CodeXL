@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<DOCUMENT Type="Advanced Installer" CreateVersion="9.5" version="12.4.2" Modules="professional" RootPath="..\..\..*" Language="en" Id="{B8B02E9A-B6E8-4701-BE1B-9491423E7D04}">
+<DOCUMENT Type="Advanced Installer" CreateVersion="9.5" version="12.4.1" Modules="professional" RootPath="..\..\..*" Language="en" Id="{B8B02E9A-B6E8-4701-BE1B-9491423E7D04}">
   <COMPONENT cid="caphyon.advinst.msicomp.MsiValidationComponent">
     <ROW Table="File" Column="Sequence" MinValue="1" MaxValue="2147483647" Description="Sequence with respect to the media images; order must track cabinet order." Options="0" ColumnType="3" ColumnIndex="7" ColumnSize="4" MsiKey="File#Sequence"/>
     <ROW Table="Media" Column="LastSequence" MinValue="0" MaxValue="2147483647" Description="File sequence number for the last file for this media." Options="0" ColumnType="3" ColumnIndex="1" ColumnSize="4" MsiKey="Media#LastSequence"/>
