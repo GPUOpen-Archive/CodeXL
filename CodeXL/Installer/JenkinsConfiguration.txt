@@ -18,12 +18,14 @@ Define "RELEASEDIR"		"[COMPPATH]\Output\Release"
 Define "DEBUGDIR"		"[COMPPATH]\Output\Debug"
 Define "ALLPROJECTS"	"[CXLPATH]\AllProjectsBuild"
 
-Define "MAJOR" "2"
-Define "MINOR" "6"
 Define "UPDATE" "0"
 
 Always
     Log "[P4ROOT]\CodeXL_Build.log"
+
+   // read version number from VersionInfo.h
+   Version "[COMMONSRCPATH]\VersionInfo\VersionInfo.h" "#define CODEXL_MAJOR_AND_MINOR_VERSION       [GETMAJOR],[0-9]+,[0-9]+,[0-9]+"
+   Version "[COMMONSRCPATH]\VersionInfo\VersionInfo.h" "#define CODEXL_MAJOR_AND_MINOR_VERSION       [0-9]+,[GETMINOR],[0-9]+,[0-9]+"
 
 Image
 
