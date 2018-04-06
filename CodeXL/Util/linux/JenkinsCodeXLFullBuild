@@ -28,7 +28,10 @@ CODEXL_HELP_FOLDER=${AMD_BRANCH_ROOT}/CodeXL/Help
 CODEXL_COMMON_DIR=${AMD_PERFORCE_ROOT}/Common/
 
 # Set Java_Home locally
-export JAVA_HOME=/opt/java/jdk1.8.0_77
+if [ -z ${JAVA_HOME+x} ]
+then
+    export JAVA_HOME=/opt/java/jdk1.8.0_77
+fi
 
 # NOTE: This is used by buildCodeXLFullLinuxProjects
 export AMD_CODEXL=$AMD_BRANCH_ROOT/CodeXL
