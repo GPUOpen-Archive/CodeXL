@@ -516,9 +516,9 @@ void tpAppController::GetThreadProfilingSessionsList(gtList<gtString>& sessionsP
     osDirectory projectDirectory;
     gtList<osFilePath> sessionsDirectoriesList;
     projectDirectory.setDirectoryFullPathFromString(projectFolderString);
-    bool isExsistingProjectDirectory = projectDirectory.exists();
+    bool isExistingProjectDirectory  = projectDirectory.exists();
 
-    if (isExsistingProjectDirectory && projectDirectory.getSubDirectoriesPaths(osDirectory::SORT_BY_DATE_ASCENDING, sessionsDirectoriesList))
+    if (isExistingProjectDirectory  && projectDirectory.getSubDirectoriesPaths(osDirectory::SORT_BY_DATE_ASCENDING, sessionsDirectoriesList))
     {
         // check each path if it has a '.cxldb' file that shows it is a power profiling session:
         gtList<osFilePath>::iterator sessionsIt = sessionsDirectoriesList.begin();
