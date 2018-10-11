@@ -59,17 +59,13 @@ int main(int argc, char* argv[])
 #if (AMDT_BUILD_TARGET == AMDT_LINUX_OS)
     codexlStartupData.m_dllNamesForLoad.push_back(L"libCXLGpuDebugging");
     codexlStartupData.m_dllNamesForLoad.push_back(L"libCXLSharedProfiling");
-    codexlStartupData.m_dllNamesForLoad.push_back(L"libCXLCpuProfiling");
     codexlStartupData.m_dllNamesForLoad.push_back(L"libCXLGpuProfiling");
     codexlStartupData.m_dllNamesForLoad.push_back(L"libCXLAnalyzer");
-    codexlStartupData.m_dllNamesForLoad.push_back(L"libCXLPowerProfiling");
 #else
     codexlStartupData.m_dllNamesForLoad.push_back(L"CXLGpuDebugging"     AMDT_PROJECT_SUFFIX_W);
     codexlStartupData.m_dllNamesForLoad.push_back(L"CXLSharedProfiling"  AMDT_PROJECT_SUFFIX_W);
-    codexlStartupData.m_dllNamesForLoad.push_back(L"CXLCpuProfiling"     AMDT_PROJECT_SUFFIX_W);
     codexlStartupData.m_dllNamesForLoad.push_back(L"CXLGpuProfiling"     AMDT_PROJECT_SUFFIX_W);
     codexlStartupData.m_dllNamesForLoad.push_back(L"CXLAnalyzer"         AMDT_PROJECT_SUFFIX_W);
-    codexlStartupData.m_dllNamesForLoad.push_back(L"CXLPowerProfiling"   AMDT_PROJECT_SUFFIX_W);
 #endif
 
 

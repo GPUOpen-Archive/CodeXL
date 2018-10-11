@@ -23,7 +23,7 @@
 #include <kaDataTypes.h>
 
 class Instruction;
-class QWebView;
+class QWebEngineView;
 
 enum KA_ISA_COLUMNS
 {
@@ -116,7 +116,7 @@ private:
     gtVector<QAction*> m_addedMenuActions;
 
     /// HTML view for displaying the ISA code as HTML table:
-    QWebView* m_pSourceTableViewHtml;
+    QWebEngineView* m_pSourceTableViewHtml;
 
     /// The HTML text representing the ISA code:
     QString m_htmlText;

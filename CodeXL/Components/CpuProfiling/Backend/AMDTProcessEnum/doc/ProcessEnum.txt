@@ -1,3 +1,0 @@
-Initially based on ModEnumerator, from CodeAnalyst
-
-This is necessary, because 32-bit and 64-bit processes can't accurately enumerate each-other's process data in Windows.

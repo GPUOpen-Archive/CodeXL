@@ -210,7 +210,6 @@ kaApplicationTreeHandler::kaApplicationTreeHandler() : afApplicationTreeHandler(
 
 
     m_unsupportedFileTypes.push_back(AF_STR_projectFileExtension);
-    m_unsupportedFileTypes.push_back(AF_STR_frameAnalysisArchivedFileExtension);
     m_unsupportedFileTypes.push_back(AF_STR_visualStudioProjectFileExtension);
 
 }

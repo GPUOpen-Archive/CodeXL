@@ -1,15 +1,9 @@
 //=============================================================
-// (c) 2012 Advanced Micro Devices, Inc.
+// Copyright (c) 2012-2018 Advanced Micro Devices, Inc. All rights reserved.
 //
-/// \author franksw
-/// \version $Revision: #21 $
-/// \brief  A brief file description that Doxygen makes note of.
-//
-//=============================================================
-// $Id: //devtools/main/CodeXL/Components/GpuProfiling/AMDTGpuProfiling/ProfileProcessMonitor.cpp#21 $
-// Last checkin:   $DateTime: 2016/04/18 06:02:03 $
-// Last edited by: $Author: salgrana $
-// Change list:    $Change: 569613 $
+/// \author GPU Developer Tools
+/// \file
+/// \brief  This file contains ProfileProcessMonitor which monitors the RCP process to know when it terminates.
 //=============================================================
 
 #ifdef _WIN32
@@ -38,7 +32,7 @@
 
 // Sigal 5/30/2013:
 // Currently the duration displayed in GPU profile is not accurate, since it also displays the time
-// used to post process the session in CodeXLGpuProfiler.exe. In the future, we will implement a "real" duration
+// used to post process the session in RCP.exe. In the future, we will implement a "real" duration
 // report, and then this flag can be enabled
 // #define SHOW_PROFILE_DURATION
 
@@ -60,10 +54,6 @@ ProfileProcessMonitor::ProfileProcessMonitor(osProcessId launchedProcessId, Prof
 
         case ProfileServerRunType_GenOccupancy:
             m_strProgressMessage = GPU_STR_ProcessMonitorRunType_GenOccupancy;
-            break;
-
-        case PerfStudioServerRunType_Application:
-            m_strProgressMessage = GPU_STR_ProcessMonitorRunType_Geneneric;
             break;
 
         default:

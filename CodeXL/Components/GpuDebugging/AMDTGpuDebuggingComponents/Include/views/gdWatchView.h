@@ -67,8 +67,6 @@ protected slots:
     void displaySelectedWatchProperties();
 
 
-    void onAddMultiWatch();
-    void onAboutToShowTextContextMenu();
     void onEditPaste();
 
 private:
@@ -77,12 +75,8 @@ private:
     void updateWatchLineValue(int lineNum);
     void addEditableWatchRow();
     void updateValueColumnHeader();
-    void extendContextMenu();
 
 private:
-
-    // Actions for context menu:
-    QAction* _pAddMultiWatchAction;
 
     gdApplicationCommands* _pApplicationCommands;
 

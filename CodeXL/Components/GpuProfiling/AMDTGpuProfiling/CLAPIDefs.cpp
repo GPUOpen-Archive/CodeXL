@@ -169,6 +169,15 @@ CLAPIDefs::CLAPIDefs()
                       "clReleaseSsgFileObjectAMD" <<
                       "clEnqueueReadSsgFileAMD" <<
                       "clEnqueueWriteSsgFileAMD" <<
+                      "clCloneKernel" <<
+                      "clCreateProgramWithIL" <<
+                      "clEnqueueSVMMigrateMem" <<
+                      "clGetDeviceAndHostTimer" <<
+                      "clGetHostTimer" <<
+                      "clGetKernelSubGroupInfo" <<
+                      "clSetDefaultDeviceCommandQueue" <<
+                      "clSetProgramReleaseCallback" <<
+                      "clSetProgramSpecializationConstant" <<
                       "";
 
     GT_ASSERT(m_openCLAPIString.length() - 1 == CL_FUNC_TYPE_Unknown);
@@ -310,6 +319,15 @@ CLAPIDefs::CLAPIDefs()
     m_openCLAPIMap.insert(m_openCLAPIString[CL_FUNC_TYPE_clReleaseSsgFileObjectAMD], CL_FUNC_TYPE_clReleaseSsgFileObjectAMD);
     m_openCLAPIMap.insert(m_openCLAPIString[CL_FUNC_TYPE_clEnqueueReadSsgFileAMD], CL_FUNC_TYPE_clEnqueueReadSsgFileAMD);
     m_openCLAPIMap.insert(m_openCLAPIString[CL_FUNC_TYPE_clEnqueueWriteSsgFileAMD], CL_FUNC_TYPE_clEnqueueWriteSsgFileAMD);
+    m_openCLAPIMap.insert(m_openCLAPIString[CL_FUNC_TYPE_clCloneKernel], CL_FUNC_TYPE_clCloneKernel);
+    m_openCLAPIMap.insert(m_openCLAPIString[CL_FUNC_TYPE_clCreateProgramWithIL], CL_FUNC_TYPE_clCreateProgramWithIL);
+    m_openCLAPIMap.insert(m_openCLAPIString[CL_FUNC_TYPE_clEnqueueSVMMigrateMem], CL_FUNC_TYPE_clEnqueueSVMMigrateMem);
+    m_openCLAPIMap.insert(m_openCLAPIString[CL_FUNC_TYPE_clGetDeviceAndHostTimer], CL_FUNC_TYPE_clGetDeviceAndHostTimer);
+    m_openCLAPIMap.insert(m_openCLAPIString[CL_FUNC_TYPE_clGetHostTimer], CL_FUNC_TYPE_clGetHostTimer);
+    m_openCLAPIMap.insert(m_openCLAPIString[CL_FUNC_TYPE_clGetKernelSubGroupInfo], CL_FUNC_TYPE_clGetKernelSubGroupInfo);
+    m_openCLAPIMap.insert(m_openCLAPIString[CL_FUNC_TYPE_clSetDefaultDeviceCommandQueue], CL_FUNC_TYPE_clSetDefaultDeviceCommandQueue);
+    m_openCLAPIMap.insert(m_openCLAPIString[CL_FUNC_TYPE_clSetProgramReleaseCallback], CL_FUNC_TYPE_clSetProgramReleaseCallback);
+    m_openCLAPIMap.insert(m_openCLAPIString[CL_FUNC_TYPE_clSetProgramSpecializationConstant], CL_FUNC_TYPE_clSetProgramSpecializationConstant);
 
     m_clAPIGroupMap.insert(CL_FUNC_TYPE_clGetPlatformIDs, CLAPIGroup_QueryInfo);
     m_clAPIGroupMap.insert(CL_FUNC_TYPE_clGetPlatformInfo, CLAPIGroup_QueryInfo);
@@ -450,6 +468,15 @@ CLAPIDefs::CLAPIDefs()
     m_clAPIGroupMap.insert(CL_FUNC_TYPE_clReleaseSsgFileObjectAMD, CLAPIGroup_CLObjectRelease);
     m_clAPIGroupMap.insert(CL_FUNC_TYPE_clEnqueueReadSsgFileAMD, CLAPIGroup_EnqueueOther);
     m_clAPIGroupMap.insert(CL_FUNC_TYPE_clEnqueueWriteSsgFileAMD, CLAPIGroup_EnqueueOther);
+    m_clAPIGroupMap.insert(CL_FUNC_TYPE_clCloneKernel, CLAPIGroup_CLObjectCreate);
+    m_clAPIGroupMap.insert(CL_FUNC_TYPE_clCreateProgramWithIL, CLAPIGroup_CLObjectCreate);
+    m_clAPIGroupMap.insert(CL_FUNC_TYPE_clEnqueueSVMMigrateMem, CLAPIGroup_EnqueueDataTransfer);
+    m_clAPIGroupMap.insert(CL_FUNC_TYPE_clGetDeviceAndHostTimer, CLAPIGroup_QueryInfo);
+    m_clAPIGroupMap.insert(CL_FUNC_TYPE_clGetHostTimer, CLAPIGroup_QueryInfo);
+    m_clAPIGroupMap.insert(CL_FUNC_TYPE_clGetKernelSubGroupInfo, CLAPIGroup_QueryInfo);
+    m_clAPIGroupMap.insert(CL_FUNC_TYPE_clSetDefaultDeviceCommandQueue, CLAPIGroup_Other);
+    m_clAPIGroupMap.insert(CL_FUNC_TYPE_clSetProgramReleaseCallback, CLAPIGroup_SetCallback);
+    m_clAPIGroupMap.insert(CL_FUNC_TYPE_clSetProgramSpecializationConstant, CLAPIGroup_Other);
 }
 
 const QString& CLAPIDefs::GetOpenCLAPIString(CL_FUNC_TYPE type)

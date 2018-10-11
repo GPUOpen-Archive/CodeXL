@@ -60,12 +60,7 @@ protected slots:
     void onChosenListKeyDown(QKeyEvent* pEvent);
     void onBreakpointsFilterTextChanged(const QString& filterText);
     void onFunctionsFilterFocused(bool hasFocus);
-    void onBeforeRemoveRow(int row);
     void onAfterRemoveRow(int row);
-    // Kernel events:
-    void onKernelFilterFocused(bool hasFocus);
-    void onKernelFilterTextChanged(const QString& filterText);
-    void onKernelEndEditLabel();
     void onChosenItemChanged(QTableWidgetItem* pItem);
     void onLeftListSelectionChanged();
     void onRightListSelectionChanged();
@@ -75,7 +70,6 @@ protected slots:
 protected:
     void onListSelectionChanged(acListCtrl* pCallingList);
     bool initAPIFunctionsList();
-    void initKernelList();
     bool initGenericBreakpointsList();
 
     void setDialogActiveBreakpoints();
@@ -91,17 +85,12 @@ protected:
     unsigned int getMonitoredFunctionsFilterByCurrentProjectType();
     bool isBreakpointChosen(const gdBreakpointsItemData* pBrekapointItemData, QTableWidgetItem*& pRetItem);
     void addBreakpointToRightListCtrl(const gdBreakpointsItemData* pBreakpointItemData, gtString& breakpointName, bool checkStatus);
-    void addKernelToRightListCtrl(gtAutoPtr<apBreakPoint>& aptrBreakpoint);
     void updateSelectAllCheckBoxStatus(bool ignoreLastItem = true);
     gdBreakpointsItemData* findBreakpointMatchingItemData(gtAutoPtr<apBreakPoint>& aptrBreakpoint);
     QTableWidgetItem* findBreakpointMatchingItem(gtAutoPtr<apBreakPoint>& aptrBreakpoint);
-    bool isKernelMarkedAsBreakpoint(const gtString& kernelName, QTableWidgetItem*& pRetItem);
     void colorActiveKernelInLeftListCtrl();
     gdBreakpointsItemData* getBreakpointData(QTableWidgetItem* pItem);
     void getBreakpointTypeString(gdBreakpointsItemData* pNewBreapointData, QString& typeString);
-    // Kernel function name edit line:
-    void addKernelEditLine();
-    void removeKernelEditLine();
 
 private:
     void resetListColor(acListCtrl* pList, QColor col = Qt::black);
@@ -117,7 +106,6 @@ private:
     QVBoxLayout* m_pCenterButtonsLayoutV;
     QVBoxLayout* m_pRightLayoutV;
     QVBoxLayout* m_pAPILayoutV;
-    QVBoxLayout* m_pKernelLayoutV;
     QVBoxLayout* m_pBreakpointsLayoutV;
     QHBoxLayout* m_pBottomButtonsLayoutH;
 
@@ -129,8 +117,6 @@ private:
 
     // A list containing all possible breakpoints (left list):
     acListCtrl* m_pAPIList;
-    // List of all possible Kernel function names:
-    acListCtrl* m_pKernelList;
     // List of all generic breakpoints:
     acListCtrl* m_pGenericBreakpointsList;
     // The right list:
@@ -144,7 +130,6 @@ private:
     // Tabs:
     QTabWidget* m_pTabs;
     QWidget* m_pAPITab;
-    QWidget* m_pKernelTab;
     QWidget* m_pBreakpointsTab;
     // A pointer to the last row:
     QTableWidgetItem* m_pLastChosenRow;

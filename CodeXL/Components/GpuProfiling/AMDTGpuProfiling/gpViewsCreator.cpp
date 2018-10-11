@@ -1,16 +1,10 @@
 //=====================================================================
-// Copyright (c) 2012 Advanced Micro Devices, Inc. All rights reserved.
+// Copyright (c) 2012 2018 Advanced Micro Devices, Inc. All rights reserved.
 //
 /// \author GPU Developer Tools
-/// \file $File: //devtools/main/CodeXL/Components/GpuProfiling/AMDTGpuProfiling/gpViewsCreator.cpp $
-/// \version $Revision: #25 $
+/// \file
 /// \brief  This file contains the MDI views added by the GPU Profiler plugin
 //
-//=====================================================================
-// $Id: //devtools/main/CodeXL/Components/GpuProfiling/AMDTGpuProfiling/gpViewsCreator.cpp#25 $
-// Last checkin:   $DateTime: 2016/04/18 06:02:03 $
-// Last edited by: $Author: salgrana $
-// Change list:    $Change: 569613 $
 //=====================================================================
 
 // Qt
@@ -38,14 +32,6 @@
 #include <AMDTGpuProfiling/SessionWindow.h>
 #include <AMDTGpuProfiling/ProfileManager.h>
 #include <AMDTGpuProfiling/TraceView.h>
-#include <AMDTGpuProfiling/gpExecutionMode.h>
-#include <AMDTGpuProfiling/gpSessionView.h>
-#include <AMDTGpuProfiling/gpTraceView.h>
-#ifdef GP_OBJECT_VIEW_ENABLE
-    #include <AMDTGpuProfiling/gpObjectView.h>
-#endif
-#include <AMDTGpuProfiling/gpTreeHandler.h>
-#include <AMDTGpuProfiling/gpFrameView.h>
 
 gpViewsCreator::gpViewsCreator()
 {
@@ -79,7 +65,7 @@ gpViewsCreator::gpViewsCreator()
 
 void gpViewsCreator::titleString(int viewIndex, gtString& viewTitle, gtString& viewMenuCommand)
 {
-    (void)(viewIndex); // unused
+    Q_UNUSED(viewIndex);
     viewTitle = m_lastSessionFileOpened;
     viewMenuCommand = m_lastSessionFileOpened;
 }
@@ -381,76 +367,11 @@ bool gpViewsCreator::displayExistingView(const apMDIViewCreateEvent& mdiViewEven
                 {
                     m_lastSessionFileOpened.appendFormattedString(L" (%ls)", sessionType.asCharArray());
                 }
-                else if (windowType == GPUWindowTypeFrameAnalysisFrameView)
-                {
-                    gpSessionTreeNodeData* pFrameData = qobject_cast<gpSessionTreeNodeData*>(pSessionData);
-                    GT_IF_WITH_ASSERT(pFrameData != nullptr)
-                    {
-                        QString frameIndexStr = FrameIndexToString(pFrameData->m_frameIndex);
-                        m_lastSessionFileOpened.appendFormattedString(L" - Frame %ls", acQStringToGTString(frameIndexStr).asCharArray());
-                    }
-                }
             }
-            else if (windowType == GPUWindowTypeFrameAnalysisSession)
-            {
-                m_lastSessionFileOpened = GPU_STR_TreeNodeDashboard;
-            }
-            else if (windowType == GPUWindowTypeFrameAnalysisFrameView)
-            {
-                m_lastSessionFileOpened = GPU_STR_TreeNodeOverview;
-            }
-
-#ifdef GP_OBJECT_VIEW_ENABLE
-            else if (windowType == GPUWindowTypeFrameAnalysisObjectInspector)
-            {
-                m_lastSessionFileOpened = GPU_STR_TreeNodeOverview;
-            }
-
-#endif
             else
             {
                 m_lastSessionFileOpened = mdiViewEvent.filePath().asString();
             }
-        }
-    }
-
-    return retVal;
-}
-
-bool gpViewsCreator::CanFileBeOpened(const osFilePath& filePath, gtString& cannotOpenFileMessage)
-{
-    bool retVal = true;
-
-    gtString ext;
-    filePath.getFileExtension(ext);
-
-    if (ext == GP_LTR_FileExtensionW)
-    {
-        // When the trace file is missing from the local disk, or when it is an empty file,
-        // this means that we should get the file from the server
-        bool shouldGetFileFromServer = !filePath.exists();
-
-        if (filePath.exists())
-        {
-            osFile fileHandle(filePath);
-            fileHandle.open(osChannel::OS_ASCII_TEXT_CHANNEL, osFile::OS_OPEN_TO_READ);
-            unsigned long fileSize = 0;
-            fileHandle.getSize(fileSize);
-
-            if (fileSize == 0)
-            {
-                shouldGetFileFromServer = true;
-            }
-
-            fileHandle.close();
-        }
-
-        bool isProcessRunning = (afPluginConnectionManager::instance().getCurrentRunModeMask() & AF_DEBUGGED_PROCESS_EXISTS);
-
-        if (shouldGetFileFromServer && isProcessRunning)
-        {
-            retVal = false;
-            cannotOpenFileMessage = GP_Str_ErrorTimelineCannotBeRetrievedWhileProcessIsRunning;
         }
     }
 
@@ -555,7 +476,7 @@ void gpViewsCreator::HideSession(const osFilePath& sessionPath)
     {
         osFilePath sessionFile = sessionPath;
 
-        if (GPUWindowTypeFromFilePath(sessionPath) == PERFORMANCE)
+        if (GPUWindowTypeFromFilePath(sessionPath) == GPUWindowTypePerformanceCounters)
         {
             SessionTreeNodeData* pSessionData = nullptr;
             afApplicationTreeItemData* pItemData = ProfileApplicationTreeHandler::instance()->FindItemByProfileFilePath(sessionPath);
@@ -601,39 +522,6 @@ bool gpViewsCreator::GetWidgetForFilePath(GPUWindowType profileType, QWidget* pP
             pCreatedSessionWindow = CreateAppTraceSessionWindow(pParent);
             break;
         }
-
-#ifdef GP_OBJECT_VIEW_ENABLE
-
-        case GPUWindowTypeObjectInspector:
-        {
-            pCreatedSessionWindow = CreateAppObjectInspectorSessionWindow(pParent);
-            break;
-        }
-
-#endif
-
-        case GPUWindowTypeFrameAnalysisSession:
-        {
-            pCreatedSessionWindow = CreateFrameAnalysisSessionView(pParent, sessionPath);
-            break;
-        }
-
-        case GPUWindowTypeFrameAnalysisFrameView:
-        {
-            errorMessage = GP_Str_ErrorWhileLoadingFrame;
-            pCreatedSessionWindow = CreateFrameAnalysisFrameView(pParent);
-            break;
-        }
-
-#ifdef GP_OBJECT_VIEW_ENABLE
-
-        case GPUWindowTypeFrameAnalysisObjectInspector:
-        {
-            pCreatedSessionWindow = CreateFrameAnalysisObjectView(pParent);
-            break;
-        }
-
-#endif
 
         default:
         {
@@ -694,22 +582,6 @@ GPUWindowType gpViewsCreator::GPUWindowTypeFromFilePath(const osFilePath& filePa
     {
         retVal = GPUWindowTypePerformanceCounters;
     }
-    else if (filePath.IsMatchingExtension(AF_STR_frameAnalysisDashboardFileExtension))
-    {
-        retVal = GPUWindowTypeFrameAnalysisSession;
-    }
-    else if (filePath.IsMatchingExtension(AF_STR_frameAnalysisOverviewFileExtension) || filePath.IsMatchingExtension(AF_STR_profileFileExtension8) || filePath.IsMatchingExtension(AF_STR_profileFileExtension9))
-    {
-        retVal = GPUWindowTypeFrameAnalysisFrameView;
-    }
-
-#ifdef GP_OBJECT_VIEW_ENABLE
-    else if (filePath.IsMatchingExtension(AF_STR_profileFileExtension10))
-    {
-        retVal = GPUWindowTypeFrameAnalysisObjectInspector;
-    }
-
-#endif
 
     return retVal;
 }
@@ -815,7 +687,7 @@ void gpViewsCreator::UpdateTitleString(const osFilePath& oldSessionFileName, con
             // setting the window title will cause the tab text to change
             QString newTitle;
 
-            if (profileType == PERFORMANCE)
+            if (profileType == GPUWindowTypePerformanceCounters)
             {
                 // Add GPU prefix for performance counters profiles:
                 newTitle.append(GP_Str_ProfileSessionGPUPrefix);
@@ -879,7 +751,7 @@ gtString gpViewsCreator::GetViewTitleForFile(const osFilePath& fileName)
             // check the profile type of the file -- if valid then create the dummy session, read the display name, and then destroy it
             profileType = SessionManager::Instance()->GetProfileType(strFileName);
 
-            if (profileType != GPUWindowTypeUnknown)
+            if (profileType != NA_PROFILE_TYPE)
             {
                 osDirectory fileDir;
                 localFilePath.getFileDirectory(fileDir);
@@ -930,10 +802,6 @@ QPixmap* gpViewsCreator::iconAsPixmap(int viewIndex)
     {
         profileType = PERFORMANCE;
     }
-    else
-    {
-        profileType = FRAME_ANALYSIS;
-    }
 
     pRetVal = ProfileApplicationTreeHandler::instance()->TreeItemTypeToPixmap(AF_TREE_ITEM_PROFILE_SESSION, Util::GetProfileTypeName(profileType));
 
@@ -968,56 +836,9 @@ SharedSessionWindow* gpViewsCreator::CreateAppTraceSessionWindow(QWidget* pParen
         // Create a new trace view window:
         pRetVal = new TraceView(pParent);
     }
-    else if (m_traceUI == NEW_UI)
-    {
-        pRetVal = new gpTraceView(pParent);
-    }
-    else
-    {
-        int user = acMessageBox::instance().question("CodeXL", "Do you want to create new UI view?", QMessageBox::Yes | QMessageBox::No);
-
-        if (user == QMessageBox::No)
-        {
-            // Create a new trace view window:
-            pRetVal = new TraceView(pParent);
-        }
-        else
-        {
-            pRetVal = new gpTraceView(pParent);
-
-        }
-    }
-
 
     return pRetVal;
 }
-
-#ifdef GP_OBJECT_VIEW_ENABLE
-SharedSessionWindow* gpViewsCreator::CreateAppObjectInspectorSessionWindow(QWidget* pParent)
-{
-    SharedSessionWindow* pRetVal = nullptr;
-
-    if (m_objectInspectorUI == NEW_UI)
-    {
-        pRetVal = new gpObjectView(pParent);
-    }
-    else
-    {
-        int user = acMessageBox::instance().question("CodeXL", "Do you want to create new UI view?", QMessageBox::Yes | QMessageBox::No);
-
-        if (user == QMessageBox::No)
-        {
-            // do nothing
-        }
-        else
-        {
-            pRetVal = new gpObjectView(pParent);
-        }
-    }
-
-    return pRetVal;
-}
-#endif
 
 void gpViewsCreator::OnWindowClose(QWidget* pClosedSessionWindow)
 {
@@ -1048,8 +869,6 @@ void gpViewsCreator::OnWindowClose(QWidget* pClosedSessionWindow)
             {
                 m_filePathToSessionWindowsMap.remove(pSessionWindow->SessionFilePath());
             }
-
-            gpUIManager::Instance()->OnWindowClose(pSessionWindow);
         }
 
         TraceView* pTraceView = qobject_cast<TraceView*>(pClosedSessionWindow);
@@ -1119,40 +938,9 @@ bool gpViewsCreator::LoadFileToView(SharedSessionWindow* pNewSessionWindow, cons
                 // Get the requested profile from the manager
                 retVal = pNewSessionWindow->DisplaySession(sessionFilePath, displayItemInView, errorMessage);
             }
-            else
-            {
-                // For the frame analysis views, we create model and view, and load the view differently
-                gpBaseSessionView* pSessionView = qobject_cast<gpBaseSessionView*>(pNewSessionWindow);
-
-                if (pSessionView != nullptr)
-                {
-                    // Load the DX session
-                    retVal = LoadFrameAnalysisView(pNewSessionWindow, sessionFilePath, displayItemInView, errorMessage);
-                }
-            }
         }
     }
 
-    return retVal;
-
-}
-
-bool gpViewsCreator::LoadFrameAnalysisView(SharedSessionWindow* pNewSessionWindow, const osFilePath& sessionFilePath, afTreeItemType displayItemInView, QString& errorMessage)
-{
-    bool retVal = false;
-
-    gpBaseSessionView* pSessionView = qobject_cast<gpBaseSessionView*>(pNewSessionWindow);
-
-    // Sanity check:
-    GT_IF_WITH_ASSERT(pSessionView != nullptr)
-    {
-        // Set the session file path. This is done here, for the case that the operation will be canceled. We need the window to unmap
-        // itself in its destructor
-        pSessionView->SetSessionFilePath(sessionFilePath);
-
-        // Display the session
-        retVal = pSessionView->DisplaySession(sessionFilePath, displayItemInView, errorMessage);
-    }
     return retVal;
 
 }
@@ -1166,95 +954,8 @@ gtString gpViewsCreator::SessionFilePathToSessionName(const osFilePath& sessionF
         sessionFilePath.IsMatchingExtension(AF_STR_GpuProfileTraceFileExtension))
     {
         sessionFilePath.getFileName(retVal);
-
-    }
-
-    else if (sessionFilePath.IsMatchingExtension(AF_STR_frameAnalysisDashboardFileExtension))
-    {
-        osDirectory sessionDir;
-        sessionFilePath.getFileDirectory(sessionDir);
-        gtString fullPathStr = sessionDir.directoryPath().asString();
-
-        if (fullPathStr[fullPathStr.length() - 1] == osFilePath::osPathSeparator)
-        {
-            fullPathStr.getSubString(0, fullPathStr.length() - 1, fullPathStr);
-        }
-
-        if (fullPathStr[fullPathStr.length() - 1] == osFilePath::osPathSeparator)
-        {
-            fullPathStr.getSubString(0, fullPathStr.length() - 1, fullPathStr);
-        }
-
-        int pos = fullPathStr.findLastOf(osFilePath::osPathSeparator);
-        fullPathStr.getSubString(pos + 1, fullPathStr.length() - 1, retVal);
-    }
-    else if (sessionFilePath.IsMatchingExtension(AF_STR_frameAnalysisOverviewFileExtension) ||
-             sessionFilePath.IsMatchingExtension(AF_STR_profileFileExtension8) ||
-             sessionFilePath.IsMatchingExtension(AF_STR_profileFileExtension9))
-    {
-        gtString fileName;
-        sessionFilePath.getFileName(fileName);
-        int pos = fileName.findLastOf(L"_Frame");
-        fileName.getSubString(0, pos - 5, retVal);
     }
 
     return retVal;
 }
 
-SharedSessionWindow* gpViewsCreator::CreateFrameAnalysisSessionView(QWidget* pParent, const osFilePath& sessionPath)
-{
-    SharedSessionWindow* pRetVal = nullptr;
-
-    gpSessionView* pSessionView = new gpSessionView(pParent, sessionPath);
-    pRetVal = pSessionView;
-
-    return pRetVal;
-}
-
-
-SharedSessionWindow* gpViewsCreator::CreateFrameAnalysisFrameView(QWidget* pParent)
-{
-#ifdef INCLUDE_FRAME_ANALYSIS_PERFORMANCE_COUNTERS
-
-    SharedSessionWindow* pRetVal = new gpFrameView(pParent);
-#else
-    SharedSessionWindow* pRetVal = new gpTraceView(pParent);
-#endif
-    return pRetVal;
-}
-
-#ifdef GP_OBJECT_VIEW_ENABLE
-SharedSessionWindow* gpViewsCreator::CreateFrameAnalysisObjectView(QWidget* pParent)
-{
-#ifdef INCLUDE_FRAME_ANALYSIS_PERFORMANCE_COUNTERS
-    SharedSessionWindow* pRetVal = new gpFrameView(pParent);
-#else
-    SharedSessionWindow* pRetVal = new gpObjectView(pParent);
-#endif
-    return pRetVal;
-}
-#endif
-
-bool gpViewsCreator::onMDISubWindowClose(afQMdiSubWindow* pMDISubWindow)
-{
-    bool retVal = false;
-
-    GT_IF_WITH_ASSERT(pMDISubWindow != nullptr)
-    {
-
-        // Check if need to stop the frame analysis profiling
-        osFilePath filePath = pMDISubWindow->filePath();
-
-        if (filePath == gpUIManager::Instance()->CurrentExecutingFrameAnalysisPath())
-        {
-            gpExecutionMode* pFrameAnalysisManager = ProfileManager::Instance()->GetFrameAnalysisModeManager();
-            GT_IF_WITH_ASSERT(pFrameAnalysisManager != nullptr)
-            {
-                pFrameAnalysisManager->stopCurrentRun();
-            }
-            retVal = true;
-        }
-    }
-
-    return retVal;
-}

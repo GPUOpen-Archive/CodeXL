@@ -694,13 +694,8 @@ bool afMainAppWindow::addActionForView(afViewCreatorAbstract* pCreator, int view
         filePath.getFileExtension(fileExtension);
 
         if ((fileExtension == AF_STR_CodeXMLImageBuffersFilesExtension) ||
-            (fileExtension == AF_STR_CpuProfileFileExtension) ||
             (fileExtension == AF_STR_GpuProfileTraceFileExtension) ||
-            (fileExtension == AF_STR_FrameAnalysisTraceFileExtension) ||
             (fileExtension == AF_STR_GpuProfileSessionFileExtension) ||
-            (fileExtension == AF_STR_PowerProfileSessionFileExtension) ||
-            (fileExtension == AF_STR_FrameAnalysisPerfCountersFileExtension) ||
-            (fileExtension == AF_STR_frameAnalysisDashboardFileExtension) ||
             (fileExtension == AF_STR_GpuPerformanceCountersSessionFileExtension) ||
             (actionText.isEmpty()))
         {
@@ -1110,28 +1105,12 @@ gtString afMainAppWindow::getLayoutName(LayoutFormats layoutId)
             retVal = AF_STR_LayoutDebug;
             break;
 
-        case LayoutDebugKernel:
-            retVal = AF_STR_LayoutDebugKernel;
-            break;
-
-        case LayoutProfileCPU:
-            retVal = AF_STR_LayoutProfileCPU;
-            break;
-
         case LayoutProfileGPU:
             retVal = AF_STR_LayoutProfileGPU;
             break;
 
-        case LayoutProfilePP:
-            retVal = AF_STR_LayoutProfilePP;
-            break;
-
         case LayoutKernelAnalyzer:
             retVal = AF_STR_LayoutKernelAnalyze;
-            break;
-
-        case LayoutFrameAnalysis:
-            retVal = AF_STR_LayoutFrameAnalysis;
             break;
 
         default:
@@ -1220,28 +1199,12 @@ void afMainAppWindow::writePredefineLayout(LayoutFormats layoutId)
             tempSettingFile.writeString(LayoutDebugSTR);
             break;
 
-        case LayoutDebugKernel:
-            tempSettingFile.writeString(LayoutDebugKernelSTR);
-            break;
-
-        case LayoutProfileCPU:
-            tempSettingFile.writeString(LayoutProfileCPUSTR);
-            break;
-
         case LayoutProfileGPU:
             tempSettingFile.writeString(LayoutProfileGPUSTR);
             break;
 
-        case LayoutProfilePP:
-            tempSettingFile.writeString(LayoutProfilePPSTR);
-            break;
-
         case LayoutKernelAnalyzer:
             tempSettingFile.writeString(LayoutKernelAnalyzerSTR);
-            break;
-
-        case LayoutFrameAnalysis:
-            tempSettingFile.writeString(LayoutFrameAnalysisSTR);
             break;
 
         case nLayoutFormats:

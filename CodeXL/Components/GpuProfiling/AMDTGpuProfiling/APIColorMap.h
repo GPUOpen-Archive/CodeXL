@@ -1,16 +1,9 @@
 //=====================================================================
-// Copyright (c) 2012 Advanced Micro Devices, Inc. All rights reserved.
+// Copyright (c) 2012-2018 Advanced Micro Devices, Inc. All rights reserved.
 //
 /// \author GPU Developer Tools
-/// \file $File: //devtools/main/CodeXL/Components/GpuProfiling/AMDTGpuProfiling/APIColorMap.h $
-/// \version $Revision: #9 $
+/// \file
 /// \brief  This file contains the api color map singleton class
-//
-//=====================================================================
-// $Id: //devtools/main/CodeXL/Components/GpuProfiling/AMDTGpuProfiling/APIColorMap.h#9 $
-// Last checkin:   $DateTime: 2016/04/18 06:02:03 $
-// Last edited by: $Author: salgrana $
-// Change list:    $Change: 569613 $
 //=====================================================================
 
 #ifndef _API_COLOR_MAP_H_
@@ -26,7 +19,6 @@
 #include <QtWidgets>
 
 #include <TSingleton.h>
-#include <AMDTGpuProfiling/ProfileSessionDataItem.h>
 
 
 /// singleton class which can get the color for a particular API
@@ -41,13 +33,6 @@ public:
     /// \param defaultColor color the color to use if this is an unknown api
     /// \return the color for the specified apiName
     QColor GetAPIColor(const QString& apiName, const QColor& defaultColor);
-
-    /// Gets the API color for the specified api type
-    /// \param itemType struct describing the API function (main + sub types)
-    /// \param apiId the apiId
-    /// \param defaultColor color the color to use if this is an unknown API
-    /// \return the color for the specified apiName
-    QColor GetAPIColor(ProfileSessionDataItem::ProfileItemType itemType, unsigned int apiId, const QColor& defaultColor);
 
     /// Gets the color for a performance marker item
     /// \return the color for performance markers
@@ -88,11 +73,6 @@ private:
 
     typedef QMap<QString, APIColorInfo*> ColorMap;      ///< typedef for the map used in the api color cache
     ColorMap                             m_apiColorMap; ///< a map from api name to the color info for that api
-
-    ///< typedef for the map used in the api color cache
-    typedef QMap<QPair<ProfileSessionDataItem::ProfileItemType, unsigned int>, APIColorInfo*> APIToColorMap;
-    ///< a map from api type + function ID to the color info for that api
-    APIToColorMap m_apiTypeToColorMap;
 
     /// A vector of colors for command lists
     QVector<QColor> m_commandListsColors;

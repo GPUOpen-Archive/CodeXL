@@ -107,9 +107,8 @@ public:
     ExplorerSessionId AddSession(SessionTreeNodeData* pNewItemSessionData, bool activateItem);
 
     /// Expand the tree according to the new session type and mode
-    /// \param mode the new mode
     /// \param the session type
-    void ExpandCurrentSessionType(const gtString& mode, const gtString& sessionType);
+    void ExpandCurrentSessionType(const gtString& sessionType);
 
     /// Initializes the application tree pointer, and connect the relevant slots to the tree object
     void InitializeApplicationTree();
@@ -118,6 +117,7 @@ public:
     /// This method should be called for each supported filter
     /// \param strDescription description of the filter to be shown in the File Open Dialog
     /// \param strFileMask the mask of the filter
+    /// \param modeName the name of the profile mode which is adding this filter
     void AddImportFileFilter(const QString& strDescription, const QString& strFileMask, const gtString& modeName);
 
     /// Gets the specified session node session data
@@ -131,7 +131,8 @@ public:
     afApplicationTreeItemData* GetSessionNodeItemData(ExplorerSessionId sessionId);
 
     /// Return the pixmap pointer for the requested item type icon
-    /// \ param itemType - the item type
+    /// \param itemType the item type
+    /// \param sessionTypeAsStr the session type
     QPixmap* TreeItemTypeToPixmap(afTreeItemType itemType, const QString& sessionTypeAsStr = "");
 
     /// Gets the name and directory for the next session for the given project name and directory
@@ -148,18 +149,6 @@ public:
     /// \param profileTypeStr the string describing the profile type
     /// \return QTreeWidgetItem* the item for the requested profile type
     QTreeWidgetItem* GetProfileTypeNode(const QString& profileTypeStr, bool shouldCreate = true);
-
-    /// Uses the empty session node to create a new session
-    /// \return afApplicationTreeItemData* the pointer for the renamed session item data or null if there is no empty session
-    afApplicationTreeItemData* RenameEmptySession(const QString& newSessionName);
-
-    /// Checks if the tree has an empty session:
-    /// \return true if there is an empty session, false if not
-    bool DoesEmptySessionExist() const;
-
-    /// Checks if the tree has an empty session node (even if not initialized:
-    /// \return true if there is an empty session, false if not
-    bool DoesEmptySessionNodeExist() const { return (nullptr != m_pEmptySessionItemData) && (nullptr != m_pEmptySessionItemData->m_pTreeWidgetItem); };
 
     /// Get the specific session type tree handler
     /// \param sessionType the name of the current session
@@ -214,13 +203,6 @@ protected:
     /// \param msg reason when importing is not ok
     /// \return True if Importing is Ok with current mode
     bool isImportingOkWithCurrentMode(QString& msg);
-
-    /// Add a node to the tree for the empty session creation:
-    /// \param shouldSelect should the created node be selected
-    void AddEmptySessionCreationNode(bool shouldSelect);
-
-    /// Create an empty session:
-    void OnCreateEmptySession();
 
     /// Rename the session:
     /// \param pItemData the item data representing the session that should be renamed:
@@ -290,12 +272,6 @@ protected slots:
 
     /// Handles the import a session request:
     void OnImportSession();
-
-    /// Handles the export a session request:
-    void OnExportSession();
-
-    /// Handles the refresh sessions from server request:
-    void OnRefreshFromServer();
 
     /// Handles the delete all sessions request:
     void OnDeleteAllSessions();
@@ -379,17 +355,6 @@ private:
     /// \param menu the menu to build
     bool BuildContextMenuForSingleItem(const afApplicationTreeItemData* pItemData, QMenu& menu);
 
-    /// Checks if the "New Session" tree node should be enabled:
-    /// \param message [output] a message to the user describing a reason why the empty session node cannot be used
-    /// \param sessionType the string describing the current session type
-    /// \param shouldPopupUserMessage true iff the user should be prompt to change the profile type to power:
-    /// \return true if the session node can be activated, false if not
-    bool IsEmptySessionEnabled(gtString& message, const gtString& sessionType, bool shouldPopupUserMessage);
-
-    /// Enable or disables the empty session node:
-    /// \param sessionType the string describing the current session type
-    void EnableEmptySessionNode(const gtString& sessionType);
-
     /// Check if the current CodeXL execution mode is supported by this manager
     bool CurrentModeIsSupported();
 
@@ -432,12 +397,6 @@ private:
     /// Session item context menu import
     afBrowseAction* m_pImportSessionAction;
 
-    /// Session item context menu export
-    afBrowseAction* m_pExportSessionAction;
-
-    /// Session item context menu refresh from server
-    QAction* m_pRefreshFromServerAction;
-
     /// Indicates if import is in progress
     bool m_bImportInProgress;
 
@@ -453,9 +412,6 @@ private:
     /// Vector with the profile handler. hold one instance of each one.
     gtList<SessionTypeTreeHandlerAbstract*> m_sessionTypeToTreeHandlerList;
     QMap<acIconId, QPixmap*> m_iconsMap;
-
-    /// An item used for empty session creation:
-    afApplicationTreeItemData* m_pEmptySessionItemData;
 
     /// True iff the application tree was already initialized. Is used to avoid multiple initialization:
     bool m_isTreeInitialized;

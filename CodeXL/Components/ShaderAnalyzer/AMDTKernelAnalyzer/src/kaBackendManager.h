@@ -273,7 +273,9 @@ public:
         kaStatReqdWorkGroupX,
         kaStatReqdWorkGroupY,
         kaStatReqdWorkGroupZ,
-        kaStatISASize
+        kaStatISASize,
+
+        kaStatNUM
     };
 
     /// Get the last build file

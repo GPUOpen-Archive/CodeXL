@@ -1,16 +1,9 @@
 //=====================================================================
-// Copyright (c) 2012 Advanced Micro Devices, Inc. All rights reserved.
+// Copyright (c) 2012-2018 Advanced Micro Devices, Inc. All rights reserved.
 //
 /// \author GPU Developer Tools
-/// \file $File: //devtools/main/CodeXL/Components/GpuProfiling/AMDTGpuProfiling/Util.h $
-/// \version $Revision: #37 $
+/// \file
 /// \brief :  This file contains Util class
-//
-//=====================================================================
-// $Id: //devtools/main/CodeXL/Components/GpuProfiling/AMDTGpuProfiling/Util.h#37 $
-// Last checkin:   $DateTime: 2016/02/03 12:12:58 $
-// Last edited by: $Author: tchiu $
-// Change list:    $Change: 557941 $
 //=====================================================================
 
 #ifndef _UTIL_H_
@@ -51,15 +44,7 @@ enum GPUProfileType
     /// API Trace profile type
     API_TRACE,
 
-#ifdef GP_OBJECT_VIEW_ENABLE
-    /// Object Inspector
-    OBJECT_INSPECTOR,
-#endif
-
-    /// Frame analysis dashboard
-    FRAME_ANALYSIS,
-
-    GPU_PROFILE_TYPES_COUNT = FRAME_ANALYSIS
+    GPU_PROFILE_TYPES_COUNT = API_TRACE
 };
 
 class GPUSessionTreeItemData;

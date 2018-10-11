@@ -49,7 +49,6 @@
 #include <AMDTGpuDebuggingComponents/Include/views/gdCallsStackListCtrl.h>
 #include <AMDTGpuDebuggingComponents/Include/views/gdMemoryView.h>
 #include <AMDTGpuDebuggingComponents/Include/gdDebugApplicationTreeData.h>
-#include <AMDTGpuDebuggingComponents/Include/views/gdMultiWatchView.h>
 
 // Local:
 #include <AMDTGpuDebugging/Include/gwgDEBuggerAppWrapperDLLBuild.h>
@@ -288,55 +287,6 @@ gdWatchView* gwApplicationCommands::watchView()
 }
 
 // ---------------------------------------------------------------------------
-// Name:        gwApplicationCommands::multiWatchView
-// Description: Get the application multi watch view
-// Return Val:  gdMultiWatchView*
-// Author:      Sigal Algranaty
-// Date:        26/9/2011
-// ---------------------------------------------------------------------------
-gdMultiWatchView* gwApplicationCommands::multiWatchView(int viewIndex)
-{
-    gdMultiWatchView* pRetVal = gwgDEBuggerAppWrapper::multiWatchView1();
-
-    if (viewIndex == 1)
-    {
-        pRetVal = multiWatchView2();
-    }
-
-    else if (viewIndex == 2)
-    {
-        pRetVal = multiWatchView3();
-    }
-
-    return pRetVal;
-}
-
-/// -----------------------------------------------------------------------------------------------
-/// \brief Name:        multiWatchView2
-/// \brief Description: Get the application multi watch view 2
-/// \return gdMultiWatchView*
-/// -----------------------------------------------------------------------------------------------
-gdMultiWatchView* gwApplicationCommands::multiWatchView2()
-{
-    gdMultiWatchView* pRetVal = NULL;
-    pRetVal = gwgDEBuggerAppWrapper::multiWatchView2();
-
-    return pRetVal;
-}
-
-/// -----------------------------------------------------------------------------------------------
-/// \brief Name:        multiWatchView3
-/// \brief Description: Get the application multi watch view 3
-/// \return gdMultiWatchView*
-/// -----------------------------------------------------------------------------------------------
-gdMultiWatchView* gwApplicationCommands::multiWatchView3()
-{
-    gdMultiWatchView* pRetVal = NULL;
-    pRetVal = gwgDEBuggerAppWrapper::multiWatchView3();
-
-    return pRetVal;
-}
-
 // ---------------------------------------------------------------------------
 // Name:        gwApplicationCommands::localsView
 // Description: Get the application locals view
@@ -678,35 +628,4 @@ bool gwApplicationCommands::raiseMemoryView()
 
     return retVal;
 }
-
-
-
-// ---------------------------------------------------------------------------
-// Name:        gwApplicationCommands::raiseMultiWatchView
-// Description: Raise the requested multiwatch view
-// Arguments:   gdMultiWatchView* pMultiWatchView
-// Return Val:  bool - Success / failure.
-// Author:      Sigal Algranaty
-// Date:        26/9/2011
-// ---------------------------------------------------------------------------
-bool gwApplicationCommands::raiseMultiWatchView(gdMultiWatchView* pMultiWatchView)
-{
-    bool retVal = false;
-
-    // Get the main window:
-    GT_IF_WITH_ASSERT(pMultiWatchView != NULL)
-    {
-        // Get the widget parent:
-        QDockWidget* pDockWidgetParent = qobject_cast<QDockWidget*>(pMultiWatchView->parent());
-        GT_IF_WITH_ASSERT(pDockWidgetParent != NULL)
-        {
-            pDockWidgetParent->show();
-            pDockWidgetParent->setFocus();
-            pDockWidgetParent->raise();
-        }
-    }
-
-    return retVal;
-}
-
 

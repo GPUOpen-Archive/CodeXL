@@ -27,13 +27,6 @@
 #include "SessionExplorerDefs.h"
 #include "LibExport.h"
 
-enum ProfileSessionScope
-{
-    PM_PROFILE_SCOPE_SINGLE_EXE,
-    PM_PROFILE_SCOPE_SYS_WIDE,
-    PM_PROFILE_SCOPE_SYS_WIDE_FOCUS_ON_EXE
-};
-
 /// QTreeWidgetItem descendant used for profiler sessions in the session explorer
 class AMDTSHAREDPROFILING_API SessionTreeNodeData : public afTreeDataExtension
 {
@@ -151,9 +144,6 @@ public:
     ///< Session end time:
     QString m_endTime;
 
-    ///< Single application / System-wide / System-wide with focus
-    ProfileSessionScope m_profileScope;
-
     ///< Profile entire duration:
     bool m_shouldProfileEntireDuration;
 
@@ -166,11 +156,6 @@ public:
     ///< End after (seconds):
     int m_profileDuration;
 
-    ///< Should terminate after data collection is done:
-    bool m_terminateAfterDataCollectionIsDone;
-
-    ///< Is this session running (relevant for online profile sessions only):
-    bool m_isSessionRunning;
 
 };
 

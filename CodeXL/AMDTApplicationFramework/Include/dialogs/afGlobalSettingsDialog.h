@@ -87,9 +87,6 @@ private:
     QSpinBox* m_pSpyEventsPortSpinBox;
     QSpinBox* m_pRDSPortSpinBox;
     QSpinBox* m_pRDSEventsPortSpinBox;
-
-    // Source files:
-    QCheckBox* m_pAlertMissingSourceFile;
 };
 
 #endif //__AFGLOBALSETTINGSDIALOG_H

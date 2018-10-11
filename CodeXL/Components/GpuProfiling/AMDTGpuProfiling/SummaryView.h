@@ -65,8 +65,9 @@ public slots:
     void OnEditCopy();
     void OnEditSelectAll();
 
+    // TODO: Temporarily disabled due to deprecation of related APIs
     /// Export to CSV context menu slot:
-    void OnExportToCSV();
+    // void OnExportToCSV();
 
 private:
     /// OpenCL Trace Summarizer
@@ -117,7 +118,7 @@ private:
     QMenu* m_pContextMenu;
     QAction* m_pCopyAction;
     QAction* m_pSelectAllAction;
-
+    QAction* m_pExportToCSVAction;
 };
 
 #endif // _SUMMARY_VIEW_H_

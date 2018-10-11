@@ -74,7 +74,6 @@ afRunModes gdFrameworkConnectionManager::getCurrentRunModeMask()
 
     bool processExists = gaDebuggedProcessExists();
     bool processSuspended = processExists && gaIsDebuggedProcessSuspended();
-    bool processInKernelDebugging = processExists && (gaIsInKernelDebugging() || gaIsInHSAKernelDebugging());
 
     if (processExists)
     {
@@ -89,11 +88,6 @@ afRunModes gdFrameworkConnectionManager::getCurrentRunModeMask()
     if (processExists && processSuspended)
     {
         retVal |= AF_DEBUGGED_PROCESS_SUSPENDED;
-    }
-
-    if (processInKernelDebugging)
-    {
-        retVal |= AF_DEBUGGED_PROCESS_IN_KERNEL_DEBUGGING;
     }
 
     return retVal;

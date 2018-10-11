@@ -49,8 +49,6 @@
 #include <AMDTApplicationFramework/Include/views/afInformationView.h>
 
 static QStringList s_sampleSourceNamesListTeapot;
-static QStringList s_sampleSourceNamesListD3DMT;
-static QStringList s_sampleSourceNamesListMatMul;
 
 // These should match the value of AP_DEFAULT_INTERCEPTION_METHOD:
 #if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
@@ -156,8 +154,6 @@ afApplicationCommands::afApplicationCommands()
 
 
     // Initialize the list of sample source names
-    s_sampleSourceNamesListMatMul << AF_STR_MatMulSrc1;
-    s_sampleSourceNamesListD3DMT << AF_STR_D3DMTSrc1;
     s_sampleSourceNamesListTeapot << AF_STR_TeapotSrc1;
     s_sampleSourceNamesListTeapot << AF_STR_TeapotSrc2;
     s_sampleSourceNamesListTeapot << AF_STR_TeapotSrc3;
@@ -281,22 +277,11 @@ bool afApplicationCommands::ConvertSamplesFilePath(const osFilePath& srcFilePath
         QString fileNameQt = acGTStringToQString(fileNameAndExtension);
 
         osFilePath::osApplicationSpecialDirectories folderEnum = osFilePath::OS_CODEXL_EXAMPLES_PATH;
+
         if (s_sampleSourceNamesListTeapot.contains(fileNameQt.toLower()))
         {
             retVal = true;
             folderEnum = osFilePath::OS_CODEXL_TEAPOT_SAMPLE_PATH;
-        }
-
-        else if (s_sampleSourceNamesListMatMul.contains(fileNameQt.toLower()))
-        {
-            retVal = true;
-            folderEnum = osFilePath::OS_CODEXL_MAT_MUL_SAMPLE_PATH;
-        }
-
-        if (s_sampleSourceNamesListD3DMT.contains(fileNameQt.toLower()))
-        {
-            retVal = true;
-            folderEnum = osFilePath::OS_CODEXL_D3D_MT_SAMPLE_PATH;
         }
 
         if (retVal)
@@ -308,12 +293,6 @@ bool afApplicationCommands::ConvertSamplesFilePath(const osFilePath& srcFilePath
             srcFilePath.getFileName(fileName);
             srcFilePath.getFileExtension(extension);
 
-            #if AMDT_BUILD_TARGET == AMDT_LINUX_OS
-            if (folderEnum == osFilePath::OS_CODEXL_MAT_MUL_SAMPLE_PATH)
-            {
-                localSrcFilePath.appendSubDirectory(AF_STR_CodeXLMatMulSourceFolderName);
-            }
-            #endif
             localSrcFilePath.setFileName(fileName);
             localSrcFilePath.setFileExtension(extension);
         }
@@ -1547,9 +1526,7 @@ void afApplicationCommands::enableWhenNoProcess(bool& isEnabled) const
     // Check if there is already a debugged process running:
     bool debuggedProcessExist = (0 == (afPluginConnectionManager::instance().getCurrentRunModeMask() & AF_DEBUGGED_PROCESS_EXISTS));
     bool analyzeCurrentlyBuilding = (0 == (afPluginConnectionManager::instance().getCurrentRunModeMask() & AF_ANALYZE_CURRENTLY_BUILDING));
-    bool analyzeCurrentlyExporting = (0 == (afPluginConnectionManager::instance().getCurrentRunModeMask() & AF_FRAME_ANALYZE_CURRENTLY_EXPORTING));
-    bool analyzeCurrentlyImporting = (0 == (afPluginConnectionManager::instance().getCurrentRunModeMask() & AF_FRAME_ANALYZE_CURRENTLY_IMPORTING));
-    isEnabled = (debuggedProcessExist && analyzeCurrentlyBuilding && analyzeCurrentlyExporting && analyzeCurrentlyImporting);
+    isEnabled = (debuggedProcessExist && analyzeCurrentlyBuilding);
 }
 
 // ---------------------------------------------------------------------------
@@ -1719,7 +1696,7 @@ bool afApplicationCommands::promptForExit()
     afPluginConnectionManager& thePluginConnectionManager = afPluginConnectionManager::instance();
     afRunModes mode = thePluginConnectionManager.getCurrentRunModeMask();
 
-    if ((AF_DEBUGGED_PROCESS_EXISTS == (mode & AF_DEBUGGED_PROCESS_EXISTS)) || ((mode & AF_FRAME_ANALYZE_CONNECTING) != 0))
+    if ((AF_DEBUGGED_PROCESS_EXISTS == (mode & AF_DEBUGGED_PROCESS_EXISTS)))
     {
         // Get the current action:
         afIExecutionMode* pExecMode = afExecutionModeManager::instance().activeMode();
@@ -1965,14 +1942,6 @@ bool afApplicationCommands::WriteSampleCXL(afCodeXLSampleID sampleId)
                 {
                     sampleName = AF_STR_TeapotSampleVSProjectName;
                 }
-                else if (sampleId == AF_MATMUL_SAMPLE)
-                {
-                    sampleName = AF_STR_CodeXLMatMulExampleBinaryName;
-                }
-                else if (sampleId == AF_D3D12MULTITHREADING_SAMPLE)
-                {
-                    sampleName = AF_STR_D3D12MultithreadingSampleProjectName;
-                }
 
                 // Get the sample CXL file path:
                 afGetUserDataFolderPath(sampleCXLFile);
@@ -2012,30 +1981,6 @@ void afApplicationCommands::GetSampleProperties(afCodeXLSampleID sampleId, gtStr
         }
         break;
 
-        case AF_MATMUL_SAMPLE:
-        {
-            sampleName = AF_STR_MatMulSampleProjectName;
-            sampleDirName = OS_STR_CodeXLMatMulExampleDirName;
-            sampleBinaryName = AF_STR_CodeXLMatMulExampleBinaryName;
-            sampleProjectName = AF_STR_CodeXLMatMulExampleProjectName;
-            buildOptions = AF_STR_Empty;
-            sampleMode = AF_STR_CodeXLMatMulLastMode;
-            sampleSessionType = AF_STR_CodeXLMatMulLastSessionType;
-        }
-        break;
-
-        case AF_D3D12MULTITHREADING_SAMPLE:
-        {
-            sampleName = AF_STR_D3D12MultithreadingSampleProjectName;
-            sampleDirName = OS_STR_CodeXLD3D12MultithreadingExampleDirName;
-            sampleBinaryName = AF_STR_CodeXLD3D12MultithreadingExampleBinaryName;
-            sampleProjectName = AF_STR_D3D12MultithreadingSampleProjectName;
-            buildOptions = AF_STR_Empty;
-            sampleMode = AF_STR_CodeXLD3DMTLastMode;
-            sampleSessionType = AF_STR_CodeXLD3DMTLastMode;
-        }
-        break;
-
         default:
             break;
     }
@@ -2065,25 +2010,6 @@ void afApplicationCommands::GetSampleSourceFileDirectories(afCodeXLSampleID samp
             sourceFilePath = samplePath;
             sourceFilePath.appendSubDirectory(AF_STR_CodeXLTeapotExampleSourceFileFolder2);
             sourceFileDirectories.append(sourceFilePath.fileDirectoryAsString());
-            sourceFileDirectories.append(AF_STR_Semicolon);
-        }
-        break;
-
-        case AF_MATMUL_SAMPLE:
-        case AF_D3D12MULTITHREADING_SAMPLE:
-        {
-            // In both these samples, the source is located in the sample root
-            osFilePath sourceFilePath = samplePath;
-            sourceFileDirectories.append(sourceFilePath.fileDirectoryAsString());
-#if AMDT_BUILD_TARGET == AMDT_LINUX_OS
-
-            if (AF_MATMUL_SAMPLE == sampleId)
-            {
-                sourceFileDirectories.append(osFilePath::osPathSeparator);
-                sourceFileDirectories.append(AF_STR_CodeXLMatMulSourceFolderName);
-            }
-
-#endif
             sourceFileDirectories.append(AF_STR_Semicolon);
         }
         break;
@@ -2363,7 +2289,7 @@ void afApplicationCommands::BuildSampleCLFilesSection(const afCodeXLSampleID sam
     }
     else
     {
-        // The MatMul sample does not have any CL files
+        // no CL files
         fileInfosAsString = AF_STR_Empty;
     }
 
@@ -2384,14 +2310,6 @@ void afApplicationCommands::LoadSample(afCodeXLSampleID sampleId)
     {
         case AF_TEAPOT_SAMPLE:
             sampleName = AF_STR_TeapotSampleProjectName;
-            break;
-
-        case AF_MATMUL_SAMPLE:
-            sampleName = AF_STR_MatMulSampleProjectName;
-            break;
-
-        case AF_D3D12MULTITHREADING_SAMPLE:
-            sampleName = AF_STR_D3D12MultithreadingSampleProjectName;
             break;
 
         default:
@@ -2774,8 +2692,7 @@ afApplicationTree::DragAction afApplicationCommands::DragActionForDropEvent(QDro
 
 
                     if ((extension == AF_STR_profileFileExtension1) || (extension == AF_STR_profileFileExtension2) || (extension == AF_STR_profileFileExtension3)
-                        || (extension == AF_STR_profileFileExtension4) || (extension == AF_STR_profileFileExtension5) || (extension == AF_STR_profileFileExtension6)
-                        || (extension == AF_STR_profileFileExtension7) || (extension == AF_STR_profileFileExtension8) || (extension == AF_STR_profileFileExtension9))
+                        || (extension == AF_STR_profileFileExtension4) || (extension == AF_STR_profileFileExtension5))
                     {
                         // Check if the list is mixed:
                         if ((retVal != afApplicationTree::DRAG_NO_ACTION) && (retVal != afApplicationTree::DRAG_ADD_SESSION_TO_TREE))

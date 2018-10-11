@@ -248,12 +248,6 @@
 #define GD_STR_memoryViewCaptionWithContext L"Memory - %ls"
 #define GD_STR_memoryViewCaptionDefault L"Memory"
 #define GD_STR_memoryViewCommandName L"&Memory"
-#define GD_STR_multiwatchView1Caption L"OpenCL Multi-Watch 1"
-#define GD_STR_multiwatchView1CommandName L"OpenCL Multi-Watch &1"
-#define GD_STR_multiwatchView2Caption L"OpenCL Multi-Watch 2"
-#define GD_STR_multiwatchView2CommandName L"OpenCL Multi-Watch &2"
-#define GD_STR_multiwatchView3Caption L"OpenCL Multi-Watch 3"
-#define GD_STR_multiwatchView3CommandName L"OpenCL Multi-Watch &3"
 #define GD_STR_DebuggedProcessEventsViewCaption L"Debugged Process Events"
 #define GD_STR_DebuggedProcessEventsViewCommandName L"&Debugged Process Events"
 #define GD_STR_StateVariablesViewCaptionDefault L"OpenGL State Variables"
@@ -437,9 +431,6 @@
 #define GD_STR_StepOutDebuggingStatusbarString L"Step Out (" GD_STR_keyboardShortcutStepOutString L") - Step out of the current function"
 #define GD_STR_BreakDebuggingStatusbarString L"Break (" GD_STR_keyboardShortcutBreakString L") - Suspend the application process at the next API function call"
 #define GD_STR_StopDebuggingStatusbarString L"Stop Debugging (" GD_STR_keyboardShortcutStopString L") - Terminate the debugged application"
-
-// "View" menu:
-#define GD_STR_MultiWatchViewsMenuString L"OpenCL M&ulti-Watch"
 
 // "Breakpoints" menu:
 #define GD_STR_BreakPointsMenuString L"Brea&kpoints"
@@ -703,8 +694,8 @@
 #define GD_STR_openclMinimumMajorVersion 831
 #define GD_STR_openclMinimumMinorVersion 4
 // Catalyst 11.11 has a runtime number of "OpenCL 1.1 AMD-APP (831.4)"
-#define GD_STR_driverNoAMDWarning "You do not have a supported AMD GPU. OpenCL kernel debugging will be disabled."
-#define GD_STR_driverVeryOldDriverWarning "The version of AMD Radeon Software you have installed does not contain support for this version of CodeXL. OpenCL kernel debugging will be disabled. It is recommended to install the latest versions of both AMD Radeon Software and CodeXL."
+#define GD_STR_driverNoAMDWarning "You do not have a supported AMD GPU."
+#define GD_STR_driverVeryOldDriverWarning "The version of AMD Radeon Software you have installed does not contain support for this version of CodeXL. It is recommended to install the latest versions of both AMD Radeon Software and CodeXL."
 
 // "Connection" tab in options dialog
 #define GD_STR_OptionsConnectionProxySettings L"Proxy settings"
@@ -714,14 +705,6 @@
 #define GD_STR_OptionsConnectionInvalidProxyPort L"Please insert a valid proxy port (number between 1 and 65535)"
 #define GD_STR_OptionsConnectionInvalidProxyAddressAndPort GD_STR_OptionsConnectionInvalidProxyAddress L"\n\n" GD_STR_OptionsConnectionInvalidProxyPort
 #define GD_STR_OptionsConnectionLogFilesDirDialogTitle L"Choose a directory for recording call logs"
-
-// "Survey" dialog:
-#define GD_STR_SurveyTitle L"User Survey"
-#define GD_STR_SurveyDescription L"Do you want to participate in the CodeXL user survey?\n\nHelp us make CodeXL a more productive tool for your workflow by taking a moment to fill out the CodeXL User Survey.\nA drawing will be held among all survey participants.The lucky winner will receive a free CodeXL license!"
-#define GD_STR_SurveyRemindMeLater L"&Remind me later."
-#define GD_STR_SurveyURL  L"http://srvy.gremedy.com"
-#define GD_STR_SurveyYesButton  L"&Yes"
-#define GD_STR_SurveyNoButton  L"&No"
 
 // "Breakpoints" dialog:
 #define GD_STR_BreakpointsTitle "Breakpoints"
@@ -1741,13 +1724,6 @@
 // Properties View:
 #define GD_STR_PropertiesView L"Properties View"
 #define GD_STR_PropertiesViewLinkAvailableOnProcessSuspensionMessage "Object links are available only when debugged process is suspended"
-
-// Multi watch load status messages:
-#define GD_STR_MultiWatchViewVariableNameTitle L"Kernel multi-watch view"
-#define GD_STR_MultiWatchViewVariableNameMessage L"Please select or type the variable name"
-#define GD_STR_MultiWatchViewKernelVariableLoadFailureMessage L"Kernel variable data is unavailable"
-#define GD_STR_MultiWatchViewKernelVariableUnsupportedType L"Kernel variable type is not supported"
-#define GD_STR_MultiWatchViewKernelVariableInvalidExpression L"Invalid expression"
 
 // Multi watch view:
 #define GD_STR_MultiWatchVariableTypeCaption "Variable Type:"

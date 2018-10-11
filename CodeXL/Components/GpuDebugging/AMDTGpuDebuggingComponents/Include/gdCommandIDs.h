@@ -568,22 +568,6 @@ enum gdMainMenuItemCommands
 // "Calls History" View
 #define ID_CALLS_HISTORY_LIST                               1223
 
-// MultiWatch views:
-#define ID_MULTIWATCH_VIEW1                                 1230
-#define ID_MULTIWATCH_VIEW_FIRST                            ID_MULTIWATCH_VIEW1
-#define ID_MULTIWATCH_VIEW2                                 1231
-#define ID_MULTIWATCH_VIEW3                                 1232
-
-#define ID_MULTIWATCH_DATA_VIEWER1                          1237
-#define ID_MULTIWATCH_DATA_VIEWER_FIRST ID_MULTIWATCH_DATA_VIEWER1
-#define ID_MULTIWATCH_DATA_VIEWER2                          1238
-#define ID_MULTIWATCH_DATA_VIEWER3                          1239
-
-#define ID_MULTIWATCH_IMAGE_VIEWER1                         1240
-#define ID_MULTIWATCH_IMAGE_VIEWER_FIRST ID_MULTIWATCH_IMAGE_VIEWER1
-#define ID_MULTIWATCH_IMAGE_VIEWER2                         1241
-#define ID_MULTIWATCH_IMAGE_VIEWER3                         1242
-
 #define ID_STATE_VARIABLES_VIEW                             1250
 
 

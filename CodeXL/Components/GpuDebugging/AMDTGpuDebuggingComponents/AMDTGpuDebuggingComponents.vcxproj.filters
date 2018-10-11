@@ -220,9 +220,6 @@
     <ClCompile Include="views\src\gdImageDataView.cpp">
       <Filter>Views\src</Filter>
     </ClCompile>
-    <ClCompile Include="views\src\gdMultiWatchView.cpp">
-      <Filter>Views\src</Filter>
-    </ClCompile>
     <ClCompile Include="src\gdAPICallsHistoryPanel.cpp">
       <Filter>src</Filter>
     </ClCompile>
@@ -329,9 +326,6 @@
       <Filter>Generated files</Filter>
     </ClCompile>
     <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gdImageDataView.cpp">
-      <Filter>Generated files</Filter>
-    </ClCompile>
-    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gdMultiWatchView.cpp">
       <Filter>Generated files</Filter>
     </ClCompile>
     <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gdImagesAndBuffersControlPanel.cpp">
@@ -564,9 +558,6 @@
       <Filter>Views\Include</Filter>
     </CustomBuild>
     <CustomBuild Include="Include\views\gdImageDataView.h">
-      <Filter>Views\Include</Filter>
-    </CustomBuild>
-    <CustomBuild Include="Include\views\gdMultiWatchView.h">
       <Filter>Views\Include</Filter>
     </CustomBuild>
     <CustomBuild Include="Include\views\gdImagesAndBuffersControlPanel.h">

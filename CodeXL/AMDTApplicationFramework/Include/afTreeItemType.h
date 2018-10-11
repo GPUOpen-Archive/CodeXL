@@ -28,15 +28,8 @@ enum afTreeItemType
 
     AF_TREE_ITEM_PROFILE_SESSION,
     AF_TREE_FIRST_PROFILE_ITEM_TYPE = AF_TREE_ITEM_PROFILE_SESSION,
-    AF_TREE_ITEM_PROFILE_EMPTY_SESSION,
 
     AF_TREE_ITEM_PROFILE_SESSION_TYPE,
-    AF_TREE_ITEM_PROFILE_CPU_OVERVIEW,
-    AF_TREE_ITEM_PROFILE_CPU_MODULES,
-    AF_TREE_ITEM_PROFILE_CPU_CALL_GRAPH,
-    AF_TREE_ITEM_PROFILE_CPU_FUNCTIONS,
-    AF_TREE_ITEM_PROFILE_CPU_SOURCE_CODES,
-    AF_TREE_ITEM_PROFILE_CPU_SOURCE_CODE,
 
     AF_TREE_ITEM_PROFILE_GPU_SUMMARY,
     AF_TREE_ITEM_PROFILE_GPU_API_SUMMARY,
@@ -50,25 +43,7 @@ enum afTreeItemType
     AF_TREE_ITEM_PROFILE_GPU_KERNELS,
     AF_TREE_ITEM_PROFILE_GPU_KERNEL,
 
-    AF_TREE_ITEM_TP_OVERVIEW,
-    AF_TREE_ITEM_TP_TIMELINE,
-
-    AF_TREE_ITEM_PP_SUMMARY,
-    AF_TREE_ITEM_PP_TIMELINE,
-
-    AF_TREE_ITEM_GP_FRAME,
-    AF_TREE_ITEM_GP_FRAME_OVERVIEW,
-    AF_TREE_ITEM_GP_FRAME_FIRST_CHILD = AF_TREE_ITEM_GP_FRAME_OVERVIEW,
-    AF_TREE_ITEM_GP_FRAME_TIMELINE,
-    AF_TREE_ITEM_GP_FRAME_PERFORMANCE_PROFILES,
-    AF_TREE_ITEM_GP_FRAME_PERFORMANCE_PROFILE,
-    AF_TREE_ITEM_GP_FRAME_IMAGE,
-#ifdef GP_OBJECT_VIEW_ENABLE    // GP_OBJECT_VIEW_ENABLE(manual enable)
-    AF_TREE_ITEM_GP_FRAME_OBJECTINSPCTOR,
-    AF_TREE_LAST_PROFILE_ITEM_TYPE = AF_TREE_ITEM_GP_FRAME_OBJECTINSPCTOR,
-#else
-    AF_TREE_LAST_PROFILE_ITEM_TYPE = AF_TREE_ITEM_GP_FRAME_IMAGE,
-#endif
+    AF_TREE_LAST_PROFILE_ITEM_TYPE = AF_TREE_ITEM_PROFILE_GPU_KERNEL,
     AF_TREE_ITEM_KA_FILE,
     AF_TREE_FIRST_KA_ITEM_TYPE = AF_TREE_ITEM_KA_FILE,
     AF_TREE_ITEM_KA_EXE_FILE,
@@ -171,14 +146,10 @@ enum AF_API afItemLoadFailureDescription
     AF_ITEM_LOAD_GLBEGIN_END_BLOCK,             // Item was loaded while in glBegin-glEnd block:
     AF_ITEM_LOAD_PROCESS_IS_RUNNING,            // Item was loaded while process is running:
     AF_ITEM_LOAD_PROCESS_IS_TERMINATED,         // Item was loaded while process is terminated:
-    AF_ITEM_LOAD_NOT_IN_KERNEL_DEBUGGING,       // Item was loaded not in kernel debugging:
-    AF_ITEM_LOAD_EMPTY_VARIABLE_NAME,           // Item was not loaded due to an empty variable name:
     AF_ITEM_LOAD_TEXTURE_TYPE_UNKNOWN,          // Item was not loaded - a texture with an unknown type:
     AF_ITEM_LOAD_IMAGE_TYPE_UNKNOWN,            // Item was not loaded - an image with an unknown type:
     AF_ITEM_LOAD_STATIC_BUFFER_BOUND_TO_FBO,    // Item was not loaded - it is bound to an FBO:
     AF_ITEM_LOAD_VARIABLE_LOAD_FAILURE,         // Item was not loaded - kernel variable data failed to load
-    AF_ITEM_LOAD_VARIABLE_UNSUPPORTED_TYPE,     // Item was not loaded - kernel variable type is not supported
-    AF_ITEM_LOAD_VARIABLE_NOT_EXIST,            // Item was not loaded - kernel variable doesn't exist in the current context
     AF_ITEM_LOAD_EMPTY_THUMBS,                  // Item was not loaded - there were no available items
     AF_ITEM_LOAD_CL_GL_INTEROP                  // Item was not loaded - GL-CL interoperability items are not supported currently
 };

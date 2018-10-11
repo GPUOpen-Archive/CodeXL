@@ -46,7 +46,6 @@ class gdStateVariablesView;
 class gdCommandQueuesView;
 class gdPerformanceGraphView;
 class gdPerformanceDashboardView;
-class gdMultiWatchView;
 class gdBreakpointsView;
 class gdWatchView;
 class gdLocalsView;
@@ -101,7 +100,6 @@ public:
     virtual gdDebuggedProcessEventsView* debuggedProcessEventsView() = 0;
     virtual gdStateVariablesView* stateVariablesView() = 0;
     virtual gdCommandQueuesView* commandQueuesView() = 0;
-    virtual gdMultiWatchView* multiWatchView(int viewIndex);
     virtual gdBreakpointsView* breakpointsView();
     virtual gdWatchView* watchView();
     virtual gdLocalsView* localsView();
@@ -110,7 +108,6 @@ public:
     virtual bool raiseStatisticsView();
     virtual bool raiseCommandQueuesView();
     virtual bool raiseMemoryView();
-    virtual bool raiseMultiWatchView(gdMultiWatchView* pMultiWatchView);
 
     // File menu commands:
     virtual void onFileSaveStateVariables();
@@ -167,9 +164,8 @@ public:
     // Clear current statistics:
     virtual bool clearCurrentStatistics();
 
-    // Watch / Multiwatch:
+    // Watch:
     virtual bool addWatchVariable(const gtString& watchVariable);
-    virtual bool displayMultiwatchVariable(const gtString& watchVariable);
 
     // Open file at a line with addition source file taken into account:
     virtual bool openFileAtLineWithAdditionSourceDir(const osFilePath& filePath, const gtString& modulePath, int fileLine, int programCounterIndex);

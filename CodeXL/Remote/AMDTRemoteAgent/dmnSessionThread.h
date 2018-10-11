@@ -24,7 +24,6 @@
 // Local:
 #include <AMDTRemoteAgent/Public Include/dmnDefinitions.h>
 #include <AMDTRemoteAgent/dmnUtils.h>
-#include <AMDTRemoteAgent/dmnPowerBackendAdapter.h>
 
 // Represents a thread that is being spawned by
 // the remote agent to handle a connection with a single client.
@@ -107,7 +106,6 @@ private:
     osProcessId m_rdsProcId;
     osProcessId m_sProfProcId;
     osProcessId m_sGraphicsProcId;
-    dmnPowerBackendAdapter m_powerBackendAdapter;
     bool m_isForcedTerminationRequired;
 
     // No copy.

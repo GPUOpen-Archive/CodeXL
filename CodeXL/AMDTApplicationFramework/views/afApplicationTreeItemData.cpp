@@ -732,30 +732,6 @@ bool afApplicationTreeItemData::itemTypeAsString(afTreeItemType itemType, gtStri
             itemTypeStr = AF_STR_ProfileSessionType;
             break;
 
-        case AF_TREE_ITEM_PROFILE_CPU_OVERVIEW:
-            itemTypeStr = AF_STR_ProfileSessionCPUOverview;
-            break;
-
-        case AF_TREE_ITEM_PROFILE_CPU_MODULES:
-            itemTypeStr = AF_STR_ProfileSessionCPUModules;
-            break;
-
-        case AF_TREE_ITEM_PROFILE_CPU_CALL_GRAPH:
-            itemTypeStr = AF_STR_ProfileSessionCPUCallGraph;
-            break;
-
-        case AF_TREE_ITEM_PROFILE_CPU_FUNCTIONS:
-            itemTypeStr = AF_STR_ProfileSessionCPUFunctions;
-            break;
-
-        case AF_TREE_ITEM_PROFILE_CPU_SOURCE_CODES:
-            itemTypeStr = AF_STR_ProfileSessionCPUSourceCodes;
-            break;
-
-        case AF_TREE_ITEM_PROFILE_CPU_SOURCE_CODE:
-            itemTypeStr = AF_STR_ProfileSessionCPUSourceCode;
-            break;
-
         case AF_TREE_ITEM_PROFILE_GPU_SUMMARY:
             itemTypeStr = AF_STR_ProfileSessionGPUSummary;
             break;
@@ -790,14 +766,6 @@ bool afApplicationTreeItemData::itemTypeAsString(afTreeItemType itemType, gtStri
 
         case AF_TREE_ITEM_PROFILE_GPU_KERNEL:
             itemTypeStr = AF_STR_ProfileSessionGPUKernel;
-            break;
-
-        case AF_TREE_ITEM_PP_SUMMARY:
-            itemTypeStr = AF_STR_ProfileSessionPPSummary;
-            break;
-
-        case AF_TREE_ITEM_PP_TIMELINE:
-            itemTypeStr = AF_STR_ProfileSessionPPTimeline;
             break;
 
         case AF_TREE_ITEM_KA_FILE:
@@ -910,20 +878,6 @@ bool afApplicationTreeItemData::getItemStatusAsString(afTreeItemType itemType, g
         }
         break;
 
-        case AF_ITEM_LOAD_NOT_IN_KERNEL_DEBUGGING:
-        {
-            statusTitle = AF_STR_ImagesAndBuffersViewKernelIsNotDebuggedTitle;
-            statusStr = AF_STR_ImagesAndBuffersViewKernelIsNotDebugged;
-        }
-        break;
-
-        case AF_ITEM_LOAD_EMPTY_VARIABLE_NAME:
-        {
-            statusStr = AF_STR_MultiWatchViewVariableNameMessage;
-            statusTitle = AF_STR_MultiWatchViewVariableNameTitle;
-        }
-        break;
-
         case AF_ITEM_LOAD_TEXTURE_TYPE_UNKNOWN:
         {
             statusTitle = AF_STR_ImagesAndBuffersViewObjectUnavailableMessageTitle;
@@ -950,20 +904,6 @@ bool afApplicationTreeItemData::getItemStatusAsString(afTreeItemType itemType, g
             statusStr = AF_STR_Empty;
             statusTitle = AF_STR_ImagesAndBuffersViewObjectUnavailableMessageTitle;
 
-        }
-        break;
-
-        case AF_ITEM_LOAD_VARIABLE_UNSUPPORTED_TYPE:
-        {
-            statusTitle = AF_STR_ImagesAndBuffersViewObjectUnavailableMessageTitle;
-            statusStr = AF_STR_MultiWatchViewKernelVariableUnsupportedType;
-        }
-        break;
-
-        case AF_ITEM_LOAD_VARIABLE_NOT_EXIST:
-        {
-            statusTitle = AF_STR_ImagesAndBuffersViewVariableDoNotExistMessageTitle;
-            statusStr = AF_STR_MultiWatchViewVariableNameMessage;
         }
         break;
 

@@ -36,7 +36,7 @@
   <ImportGroup Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="$(SolutionDir)\CodeXLCommonProjects.props" />
-    <Import Project="$(AMDTCommonExt)\Qt\Global-QT.props" />
+    <Import Project="$(CommonDir)\Src\Qt\Global-QT.props" />
     <Import Project="$(CommonDir)\Src\TSingleton\Global-TSingleton.props" />
     <Import Project="$(AMDTCommonExt)\tinyxml\Global-TinyXML-2015.props" />
   </ImportGroup>
@@ -52,7 +52,7 @@
       <PreprocessorDefinitions>WIN32;_WINDOWS;_CRT_SECURE_NO_WARNINGS;_USRDLL;NOMINMAX;AMDTSHAREDPROFILING_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <AdditionalOptions> /MP %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions> /MP /wd4714 %(AdditionalOptions)</AdditionalOptions>
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
     </ClCompile>
     <Link>
@@ -92,49 +92,49 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <CustomBuild Include="inc\AMDTSharedProfiling.h">
-      <Command>"$(QtDir)\bin\moc.exe" "inc\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Command>"$(QTBINDIR)\moc.exe" "inc\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
       <Message>moc creation for %(Filename)</Message>
       <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
-      <AdditionalInputs>$(QtDir)\bin\moc.exe</AdditionalInputs>
+      <AdditionalInputs>$(QTBINDIR)\moc.exe</AdditionalInputs>
     </CustomBuild>
     <ClInclude Include="inc\LibExport.h" />
     <CustomBuild Include="inc\SharedProfileManager.h">
-      <Command>"$(QtDir)\bin\moc.exe" "inc\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Command>"$(QTBINDIR)\moc.exe" "inc\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
       <Message>moc creation for %(Filename)</Message>
       <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
-      <AdditionalInputs>$(QtDir)\bin\moc.exe</AdditionalInputs>
+      <AdditionalInputs>$(QTBINDIR)\moc.exe</AdditionalInputs>
     </CustomBuild>
     <CustomBuild Include="inc\ProfileApplicationTreeHandler.h">
       <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
-      <AdditionalInputs>$(QtDir)\bin\moc.exe</AdditionalInputs>
+      <AdditionalInputs>$(QTBINDIR)\moc.exe</AdditionalInputs>
       <Message>moc creation for %(Filename)</Message>
-      <Command>"$(QtDir)\bin\moc.exe" "inc\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Command>"$(QTBINDIR)\moc.exe" "inc\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
     </CustomBuild>
     <ClInclude Include="inc\SessionExplorerDefs.h" />
     <CustomBuild Include="inc\SharedMenuActions.h">
-      <Command>"$(QtDir)\bin\moc.exe" "inc\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Command>"$(QTBINDIR)\moc.exe" "inc\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
       <Message>moc creation for %(Filename)</Message>
       <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
-      <AdditionalInputs>$(QtDir)\bin\moc.exe</AdditionalInputs>
+      <AdditionalInputs>$(QTBINDIR)\moc.exe</AdditionalInputs>
     </CustomBuild>
     <CustomBuild Include="inc\SessionTreeNodeData.h">
-      <AdditionalInputs>$(QtDir)\bin\moc.exe</AdditionalInputs>
+      <AdditionalInputs>$(QTBINDIR)\moc.exe</AdditionalInputs>
       <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
       <Message>moc creation for %(Filename)</Message>
-      <Command>"$(QtDir)\bin\moc.exe" "inc\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Command>"$(QTBINDIR)\moc.exe" "inc\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
     </CustomBuild>
     <ClInclude Include="inc\SessionTypeTreeHandlerAbstract.h" />
     <CustomBuild Include="inc\SharedProfileSettingPage.h">
-      <Command>"$(QtDir)\bin\moc.exe" "inc\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Command>"$(QTBINDIR)\moc.exe" "inc\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
       <Message>moc creation for %(Filename)</Message>
       <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
-      <AdditionalInputs>$(QtDir)\bin\moc.exe</AdditionalInputs>
+      <AdditionalInputs>$(QTBINDIR)\moc.exe</AdditionalInputs>
     </CustomBuild>
     <CustomBuild Include="inc\SharedSessionWindow.h">
-      <Command>"$(QtDir)\bin\moc.exe" "inc\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Command>"$(QTBINDIR)\moc.exe" "inc\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
       <Message>moc creation for %(Filename)</Message>
       <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
-      <AdditionalInputs>$(QtDir)\bin\moc.exe</AdditionalInputs>
+      <AdditionalInputs>$(QTBINDIR)\moc.exe</AdditionalInputs>
     </CustomBuild>
     <ClInclude Include="inc\SharedProfileProcessMonitor.h" />
     <ClInclude Include="inc\SharedProfileSingletonsDelete.h" />

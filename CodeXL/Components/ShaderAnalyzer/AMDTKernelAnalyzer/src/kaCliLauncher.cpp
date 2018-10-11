@@ -31,6 +31,7 @@
 
 const std::string KA_STR_CL_CLI_CMD_PREFIX = "-s cl";
 const std::string KA_STR_VK_CLI_CMD_PREFIX = "-s vulkan";
+const std::string KA_STR_VK_CLI_CMD_LIST_DEVICES = "-l";
 const std::string KA_STR_GLShaderCommandLineOption = "-s opengl";
 const std::string KA_STR_DXShaderCommandLineOption =  "-s hlsl";
 const std::string KA_STR_D3D_FXC_ShaderCommandLineOption = "-s DXAsm";
@@ -810,24 +811,25 @@ bool LaunchRenderSessionForDevice(const BuildType buildType, AnalyzerBuildArchit
     return retVal;
 }
 
-bool GetOpenCLDevices(std::set<std::string>& devices)
+bool GetOpenCLDevices(std::vector<std::string>& devices)
 {
     bool ret = false;
     bool shouldCancel = false;
     devices.clear();
     std::stringstream commandLine;
     commandLine << GetCliExecutableName(AnalyzerBuildArchitecture::kaBuildArch32_bit).c_str();
-    commandLine << " -s cl -l";
+    commandLine << " " << KA_STR_CL_CLI_CMD_PREFIX << " " << KA_STR_VK_CLI_CMD_LIST_DEVICES;
+
     std::string cliOutput;
-    ExecAndGrabOutput(commandLine.str().c_str(), shouldCancel, cliOutput);
-    
-    if (!cliOutput.empty())
+    ret = ExecAndGrabOutput(commandLine.str().c_str(), shouldCancel, cliOutput);
+
+    if (ret && !cliOutput.empty())
     {
         std::vector<std::string> deviceNames;
         split(cliOutput, '\n', deviceNames);
         for(const std::string& deviceName : deviceNames)
         {
-            devices.insert(deviceName);
+            devices.push_back(deviceName);
         }
     }
     ret = !devices.empty();

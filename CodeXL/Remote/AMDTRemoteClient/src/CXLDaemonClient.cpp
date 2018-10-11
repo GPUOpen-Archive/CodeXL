@@ -26,9 +26,6 @@
 // For RDS's definitions.
 #include <AMDTRemoteDebuggingServer/Include/rdStringConstants.h>
 
-// Power profiling backend data types.
-#include <AMDTPowerProfileAPI/inc/AMDTPowerProfileDataTypes.h>
-
 // C++.
 #include <sstream>
 #include <algorithm>
@@ -593,7 +590,7 @@ public:
 
         gtString sprofOutFileName;
         ret = m_tcpClient.readString(sprofOutFileName);
-        GT_ASSERT_EX(ret, L"DMN Client: Failed reading CodeXLGpuProfiler output file name.");
+        GT_ASSERT_EX(ret, L"DMN Client: Failed reading rcprof output file name.");
 
         // Now get the original file size.
         gtInt32 originalFileSize = 0;
@@ -620,7 +617,7 @@ public:
                 outputFilePath.setFileDirectory(whereToSave);
                 outputFilePath.setFileName(sprofOutFileName);
                 ret = tmpBuffer.toFile(outputFilePath);
-                GT_ASSERT_EX(ret, L"DMN Client: Failed to receive CodeXLGpuProfiler output file.");
+                GT_ASSERT_EX(ret, L"DMN Client: Failed to receive rcprof output file.");
 
                 // Now check if we need to decompress the file.
                 if (isCompressed)
@@ -634,8 +631,8 @@ public:
         return ret;
     }
 
-    // Extracts the target application part from CodeXLGpuProfiler's command line arguments.
-    static void ExtractCodeXLGpuProfilerTargetApp(const gtString& fixedCmdLineArgs, gtString& targetApp)
+    // Extracts the target application part from rcprof's command line arguments.
+    static void ExtractGpuProfilerTargetApp(const gtString& fixedCmdLineArgs, gtString& targetApp)
     {
         int beginIndex = 0;
         int endIndex = 0;
@@ -660,10 +657,10 @@ public:
         }
     }
 
-    bool LaunchCodeXLGpuProfiler(const gtString& cmdLineArgs, const gtString& localCodeXLGpuProfilerBaseDir,
-                                 const gtString& counterFileName, const gtString& envVarsFileName,
-                                 const gtString& ApiFilterFileName, const gtString& ApiRulesFileName,
-                                 const gtVector<gtString>& specificKernels, RemoteClientError& errorCode)
+    bool LaunchGpuProfiler(const gtString& cmdLineArgs, const gtString& localGpuProfilerBaseDir,
+                           const gtString& counterFileName, const gtString& envVarsFileName,
+                           const gtString& apiFilterFileName, const gtString& apiRulesFileName,
+                           const gtVector<gtString>& specificKernels, RemoteClientError& errorCode)
     {
         const unsigned DEFAULT_TIMEOUT_MS = 15000;
         errorCode = rceUnknown;
@@ -680,7 +677,7 @@ public:
             {
                 gtString fixedCmdLineArgs;
                 ret = FixLocalFilePaths(cmdLineArgs, fixedCmdLineArgs);
-                GT_ASSERT_EX(ret, L"DMN: Fixing local paths in CodeXLGpuProfiler params.");
+                GT_ASSERT_EX(ret, L"DMN: Fixing local paths in rcprof params.");
 
                 if (ret)
                 {
@@ -699,7 +696,7 @@ public:
                         // Verify that the target application exists.
                         gtString targetApp;
                         bool isTargetAppExists = false;
-                        ExtractCodeXLGpuProfilerTargetApp(fixedCmdLineArgs, targetApp);
+                        ExtractGpuProfilerTargetApp(fixedCmdLineArgs, targetApp);
 
                         // Send target application's name.
                         m_tcpClient << targetApp;
@@ -712,7 +709,7 @@ public:
                         {
                             // Send the command line args.
                             ret = m_tcpClient.writeString(fixedCmdLineArgs);
-                            GT_ASSERT_EX(ret, L"Transferring CodeXLGpuProfiler cmd line string.");
+                            GT_ASSERT_EX(ret, L"Transferring rcprof cmd line string.");
 
                             // Verify.
                             opStatus = dosFailure;
@@ -728,17 +725,17 @@ public:
                                 // 4. API rules file.
                                 gtInt32 counterFileType = (IsFileExists(counterFileName) ? dftProfilerCounterFile : dftMissingFile);
                                 gtInt32 envVarsFileType = (IsFileExists(envVarsFileName) ? dftProfilerEnvVarsFile : dftMissingFile);
-                                gtInt32 apiFiltersFileType = (IsFileExists(ApiFilterFileName) ? dftProfilerApiFiltersFile : dftMissingFile);
-                                gtInt32 apiRulesFileType = (IsFileExists(ApiRulesFileName) ? dftProfilerApiRulesFile : dftMissingFile);
+                                gtInt32 apiFiltersFileType = (IsFileExists(apiFilterFileName) ? dftProfilerApiFiltersFile : dftMissingFile);
+                                gtInt32 apiRulesFileType = (IsFileExists(apiRulesFileName) ? dftProfilerApiRulesFile : dftMissingFile);
 
                                 ret = ret &&  SendRemoteFile(counterFileType, counterFileName);
-                                GT_ASSERT_EX(ret, L"DMN Client: Failed sending CodeXLGpuProfiler counters file.");
+                                GT_ASSERT_EX(ret, L"DMN Client: Failed sending rcprof counters file.");
                                 ret = SendRemoteFile(envVarsFileType, envVarsFileName);
-                                GT_ASSERT_EX(ret, L"DMN Client: Failed sending CodeXLGpuProfiler env vars file.");
-                                ret = ret && SendRemoteFile(apiFiltersFileType, ApiFilterFileName);
-                                GT_ASSERT_EX(ret, L"DMN Client: Failed sending CodeXLGpuProfiler api filters file.");
-                                ret = ret && SendRemoteFile(apiRulesFileType, ApiRulesFileName);
-                                GT_ASSERT_EX(ret, L"DMN Client: Failed sending CodeXLGpuProfiler api rules file.");
+                                GT_ASSERT_EX(ret, L"DMN Client: Failed sending rcprof env vars file.");
+                                ret = ret && SendRemoteFile(apiFiltersFileType, apiFilterFileName);
+                                GT_ASSERT_EX(ret, L"DMN Client: Failed sending rcprof api filters file.");
+                                ret = ret && SendRemoteFile(apiRulesFileType, apiRulesFileName);
+                                GT_ASSERT_EX(ret, L"DMN Client: Failed sending rcprof api rules file.");
 
                                 if (ret)
                                 {
@@ -746,7 +743,7 @@ public:
                                     opStatus = dosFailure;
                                     m_tcpClient >> opStatus;
                                     ret = (opStatus == dosSuccess);
-                                    GT_ASSERT_EX(ret, L"DMN Cilent: verifying CodeXLGpuProfiler files arrival to dmn.");
+                                    GT_ASSERT_EX(ret, L"DMN Cilent: verifying rcprof files arrival to dmn.");
 
                                     // Tell the agent if we are in kernel-specific mode.
                                     bool isKernelSpecific = !specificKernels.empty();
@@ -777,13 +774,13 @@ public:
 
                                         if (ret)
                                         {
-                                            GT_ASSERT_EX(ret, L"DMN Cilent: verifying CodeXLGpuProfiler remote process launch succeeded.");
+                                            GT_ASSERT_EX(ret, L"DMN Cilent: verifying rcprof remote process launch succeeded.");
 
                                             // Wait for the number of output files.
                                             gtInt32 sprofOutputFilesCount = 0;
                                             m_tcpClient >> sprofOutputFilesCount;
                                             ret = (sprofOutputFilesCount > 0);
-                                            GT_ASSERT_EX(ret, L"DMN Client: Non-positive number of CodeXLGpuProfiler output files.");
+                                            GT_ASSERT_EX(ret, L"DMN Client: Non-positive number of rcprof output files.");
 
                                             // Report back whether the number of files was received successfully.
                                             gtInt32 report = (ret) ? dosSuccess : dosFailure;
@@ -791,7 +788,7 @@ public:
 
                                             for (gtInt32 i = 0; i < sprofOutputFilesCount; i++)
                                             {
-                                                ret = ReceiveRemoteFile(localCodeXLGpuProfilerBaseDir);
+                                                ret = ReceiveRemoteFile(localGpuProfilerBaseDir);
                                                 GT_ASSERT_EX(ret, L"DMN Client: Receiving remote file.");
                                             }
 
@@ -1316,650 +1313,6 @@ public:
         return ret;
     }
 
-    // Power Profiling - START.
-
-    bool InitPowerProfilingSession(gtUInt32& beApiRetVal)
-    {
-        bool ret = false;
-        OS_DEBUG_LOG_TRACER_WITH_RETVAL(ret);
-
-        // Transfer the opcode.
-        m_tcpClient << docPowerInit;
-
-        // Verify.
-        gtInt32 opStatus = dosFailure;
-        m_tcpClient >> opStatus;
-        ret = (opStatus == dosSuccess);
-        GT_ASSERT_EX(ret, L"Initializing power profiling backend - status query ACK.");
-
-        // Check if another power profiling session is already in progress.
-        bool isDriverTaken = false;
-        m_tcpClient >> isDriverTaken;
-
-        if (!isDriverTaken)
-        {
-            // For now, we always use "Online" mode.
-            const AMDTPwrProfileMode PROFILE_MODE = AMDT_PWR_PROFILE_MODE_ONLINE;
-
-            // Transfer the session mode.
-            m_tcpClient << PROFILE_MODE;
-
-            // Get the return code.
-            beApiRetVal = 0;
-            m_tcpClient >> beApiRetVal;
-        }
-        else
-        {
-            beApiRetVal = AMDT_ERROR_DRIVER_UNAVAILABLE;
-        }
-
-        return ret;
-    }
-
-    bool SetPowerProfilingSamplingOption(gtInt32 samplingOption, gtUInt32& beApiRetVal)
-    {
-        bool ret = false;
-        OS_DEBUG_LOG_TRACER_WITH_RETVAL(ret);
-
-        // Transfer the opcode.
-        m_tcpClient << docPowerSetSamplingConfig;
-
-        // Verify.
-        gtInt32 opStatus = dosFailure;
-        m_tcpClient >> opStatus;
-        ret = (opStatus == dosSuccess);
-        GT_ASSERT_EX(ret, L"Setting power profiling sampling option - status query ACK.");
-
-        // Transfer the sampling interval.
-        m_tcpClient << samplingOption;
-
-        // Get the return code.
-        beApiRetVal = 0;
-        m_tcpClient >> beApiRetVal;
-
-        return ret;
-    }
-
-
-    bool SetPowerSamplingInterval(gtUInt32 samplingInterval, gtUInt32& beApiRetVal)
-    {
-        bool ret = false;
-        OS_DEBUG_LOG_TRACER_WITH_RETVAL(ret);
-
-        // Transfer the opcode.
-        m_tcpClient << docPowerSetSamplingInterval;
-
-        // Verify.
-        gtInt32 opStatus = dosFailure;
-        m_tcpClient >> opStatus;
-        ret = (opStatus == dosSuccess);
-        GT_ASSERT_EX(ret, L"Setting power profiling sampling interval - status query ACK.");
-
-        // Transfer the sampling interval.
-        m_tcpClient << samplingInterval;
-
-        // Get the return code.
-        beApiRetVal = 0;
-        m_tcpClient >> beApiRetVal;
-
-        return ret;
-    }
-
-    AMDTPwrDevice* ExtractPowerDeviceFromSocket()
-    {
-        OS_DEBUG_LOG_TRACER;
-
-        AMDTPwrDevice* pRetDevice = new AMDTPwrDevice();
-        gtASCIIString deviceDescriptionBuffer;
-        gtASCIIString deviceNameBuffer;
-
-        // Get the device id.
-        m_tcpClient >> (pRetDevice->m_deviceID);
-
-        // Get the device description.
-        m_tcpClient.readString(deviceDescriptionBuffer);
-
-        // Get the device name.
-        m_tcpClient.readString(deviceNameBuffer);
-
-        // Get the device type.
-        gtInt32 deviceType = 0;
-        m_tcpClient >> deviceType;
-        pRetDevice->m_type = static_cast<AMDTDeviceType>(deviceType);
-
-        // Copy the description string.
-        size_t len = deviceDescriptionBuffer.length();
-        pRetDevice->m_pDescription = new char[len + 1];
-        const char* pUnderlyingDescStr = deviceDescriptionBuffer.asCharArray();
-        std::copy(pUnderlyingDescStr, pUnderlyingDescStr + len, pRetDevice->m_pDescription);
-        pRetDevice->m_pDescription[len] = '\0';
-
-        // Copy the name string.
-        len = deviceNameBuffer.length();
-        pRetDevice->m_pName = new char[len + 1];
-        const char* pUnderlyingNameStr = deviceNameBuffer.asCharArray();
-        std::copy(pUnderlyingNameStr, pUnderlyingNameStr + len, pRetDevice->m_pName);
-        pRetDevice->m_pName[len] = '\0';
-
-        // Check if this device has sub devices.
-        gtUInt32 hasSubDevices = 0;
-        m_tcpClient >> hasSubDevices;
-        pRetDevice->m_pFirstChild = NULL;
-
-        // Handle the sub devices.
-        if (hasSubDevices > 0)
-        {
-            pRetDevice->m_pFirstChild = ExtractPowerDeviceFromSocket();
-        }
-
-        // Handle succeeding devices.
-        gtUInt32 hasSucceedingDevices = 0;
-        m_tcpClient >> hasSucceedingDevices;
-        pRetDevice->m_pNextDevice = NULL;
-
-        if (hasSucceedingDevices > 0)
-        {
-            pRetDevice->m_pNextDevice = ExtractPowerDeviceFromSocket();
-        }
-
-        return pRetDevice;
-    }
-
-    bool GetSystemTopology(AMDTPwrDevice*& pTreeRoot, gtUInt32& beApiRetVal)
-    {
-        bool ret = false;
-        OS_DEBUG_LOG_TRACER_WITH_RETVAL(ret);
-
-        // Transfer the opcode.
-        m_tcpClient << docPowerGetSystemTopology;
-
-        // Verify.
-        gtInt32 opStatus = dosFailure;
-        m_tcpClient >> opStatus;
-        ret = (opStatus == dosSuccess);
-        GT_ASSERT_EX(ret, L"Getting system topology - status query ACK.");
-
-        // Get the return code.
-        beApiRetVal = 0;
-        m_tcpClient >> beApiRetVal;
-
-        if (beApiRetVal == AMDT_STATUS_OK)
-        {
-            pTreeRoot = ExtractPowerDeviceFromSocket();
-        }
-
-        return ret;
-    }
-
-    bool GetMinSamplingIntervalMs(gtUInt32& minSamplingIntervalMs, gtUInt32& beApiRetVal)
-    {
-        bool ret = false;
-        OS_DEBUG_LOG_TRACER_WITH_RETVAL(ret);
-
-        // Transfer the opcode.
-        m_tcpClient << docPowerGetMinimumSamplingInterval;
-
-        // Verify.
-        gtInt32 opStatus = dosFailure;
-        m_tcpClient >> opStatus;
-        ret = (opStatus == dosSuccess);
-        GT_ASSERT_EX(ret, L"Getting min sampling interval - status query ACK.");
-
-        // Get the return code.
-        beApiRetVal = 0;
-        m_tcpClient >> beApiRetVal;
-
-        // Get the min sampling interval.
-        m_tcpClient >> minSamplingIntervalMs;
-
-        return ret;
-    }
-
-    bool GetCurrentSamplingIntervalMs(gtUInt32& currentSamplingIntervalMs, gtUInt32& beApiRetVal)
-    {
-        bool ret = false;
-        OS_DEBUG_LOG_TRACER_WITH_RETVAL(ret);
-
-        // Transfer the opcode.
-        m_tcpClient << docPowerGetCurrentSamplingPeriod;
-
-        // Verify.
-        gtInt32 opStatus = dosFailure;
-        m_tcpClient >> opStatus;
-        ret = (opStatus == dosSuccess);
-        GT_ASSERT_EX(ret, L"Getting current sampling interval - status query ACK.");
-
-        // Get the return code.
-        beApiRetVal = 0;
-        m_tcpClient >> beApiRetVal;
-
-        // Get the min sampling interval.
-        m_tcpClient >> currentSamplingIntervalMs;
-
-        return ret;
-    }
-
-    bool EnableCounter(gtUInt32 counterId, gtUInt32& beApiRetVal)
-    {
-        bool ret = false;
-        OS_DEBUG_LOG_TRACER_WITH_RETVAL(ret);
-
-        if (true == m_isConnected)
-        {
-            // Transfer the opcode.
-            m_tcpClient << docPowerEnableCounter;
-
-            // Verify.
-            gtInt32 opStatus = dosFailure;
-            m_tcpClient >> opStatus;
-            ret = (opStatus == dosSuccess);
-            GT_ASSERT_EX(ret, L"Enabling power profiling counter - status query ACK.");
-
-            // Transfer the counter id.
-            m_tcpClient << counterId;
-
-            // Get the return code.
-            beApiRetVal = 0;
-            m_tcpClient >> beApiRetVal;
-        }
-        else
-        {
-            gtString infoStr;
-            infoStr.appendFormattedString(L"session not connected, probably remote agent down, counter(%d) not enabled", counterId);
-            OS_OUTPUT_DEBUG_LOG(infoStr.asCharArray(), OS_DEBUG_LOG_DEBUG);
-        }
-
-        return ret;
-    }
-
-    bool DisableCounter(gtUInt32 counterId, gtUInt32& beApiRetVal)
-    {
-        bool ret = false;
-        OS_DEBUG_LOG_TRACER_WITH_RETVAL(ret);
-
-        // Transfer the opcode.
-        m_tcpClient << docPowerDisableCounter;
-
-        // Verify.
-        gtInt32 opStatus = dosFailure;
-        m_tcpClient >> opStatus;
-        ret = (opStatus == dosSuccess);
-        GT_ASSERT_EX(ret, L"Disabling power profiling counter - status query ACK.");
-
-        // Transfer the counter id.
-        m_tcpClient << counterId;
-
-        // Get the return code.
-        beApiRetVal = 0;
-        m_tcpClient >> beApiRetVal;
-
-        return ret;
-    }
-
-    bool IsCounterEnabled(gtUInt32 counterId, gtUInt32& beApiRetVal)
-    {
-        bool ret = false;
-        OS_DEBUG_LOG_TRACER_WITH_RETVAL(ret);
-
-        // Transfer the opcode.
-        m_tcpClient << docPowerIsCounterEnabled;
-
-        // Verify.
-        gtInt32 opStatus = dosFailure;
-        m_tcpClient >> opStatus;
-        ret = (opStatus == dosSuccess);
-        GT_ASSERT_EX(ret, L"Checking if a power profiling counter is enabled - status query ACK.");
-
-        // Transfer the counter id.
-        m_tcpClient << counterId;
-
-        // Get the return code.
-        beApiRetVal = 0;
-        m_tcpClient >> beApiRetVal;
-
-        return ret;
-    }
-
-    bool StartPowerProfiling(gtUInt32& beApiRetVal, const ApplicationLaunchDetails& remoteAppDetails, AppLaunchStatus& remoteAppLaunchStatus)
-    {
-        bool ret = false;
-        OS_DEBUG_LOG_TRACER_WITH_RETVAL(ret);
-
-        remoteAppLaunchStatus = rasUnknown;
-
-        // Transfer the opcode.
-        m_tcpClient << docPowerStartProfiling;
-
-        // Verify.
-        gtInt32 opStatus = dosFailure;
-        m_tcpClient >> opStatus;
-        ret = (opStatus == dosSuccess);
-        GT_ASSERT_EX(ret, L"Starting power profiling session - status query ACK.");
-
-        if (ret)
-        {
-            // Notify the agent about whether or not an application needs to be launched.
-            m_tcpClient << remoteAppDetails.m_isLaunchRequired;
-
-            // If required, transfer the details of the remote application.
-            if (remoteAppDetails.m_isLaunchRequired)
-            {
-                // Remote application full path.
-                m_tcpClient << remoteAppDetails.m_remoteAppFullPath;
-
-                // Check if the app was found on the remote machine.
-                bool isFound = false;
-                m_tcpClient >> isFound;
-
-                if (isFound)
-                {
-                    // Transfer the target application's working directory.
-                    m_tcpClient << remoteAppDetails.m_remoteAppWorkingDirectory;
-
-                    // Check if the working dir was found.
-                    m_tcpClient >> isFound;
-
-                    if (isFound)
-                    {
-                        // Transfer the command line arguments.
-                        m_tcpClient << remoteAppDetails.m_remoteAppCmdLineArgs;
-
-                        // Transfer the number of environment variables.
-                        gtUInt32 numOfEnvVars = remoteAppDetails.m_remoteAppEnvVars.size();
-                        m_tcpClient << numOfEnvVars;
-
-                        // Transfer the environment variables themselves (if any).
-                        for (size_t i = 0; i < numOfEnvVars; ++i)
-                        {
-                            m_tcpClient << remoteAppDetails.m_remoteAppEnvVars[i]._name;
-                            m_tcpClient << remoteAppDetails.m_remoteAppEnvVars[i]._value;
-                        }
-
-                        // No errors encountered.
-                        remoteAppLaunchStatus = rasOk;
-                    }
-                    else
-                    {
-                        remoteAppLaunchStatus = rasWorkingDirNotFound;
-                    }
-                }
-                else
-                {
-                    remoteAppLaunchStatus = rasApplicationNotFound;
-                }
-            }
-        }
-
-        // Get the return code.
-        beApiRetVal = 0;
-        m_tcpClient >> beApiRetVal;
-
-        return ret;
-    }
-
-    bool StopPowerProfiling(gtUInt32& beApiRetVal)
-    {
-        bool ret = false;
-        OS_DEBUG_LOG_TRACER_WITH_RETVAL(ret);
-
-        // Transfer the opcode.
-        m_tcpClient << docPowerStopProfiling;
-
-        // Verify.
-        gtInt32 opStatus = dosFailure;
-        m_tcpClient >> opStatus;
-        ret = (opStatus == dosSuccess);
-        GT_ASSERT_EX(ret, L"Stopping power profiling session - status query ACK.");
-
-        // Get the return code.
-        beApiRetVal = 0;
-        m_tcpClient >> beApiRetVal;
-
-        return ret;
-    }
-
-    bool PausePowerProfiling(gtUInt32& beApiRetVal)
-    {
-        bool ret = false;
-        OS_DEBUG_LOG_TRACER_WITH_RETVAL(ret);
-
-        // Transfer the opcode.
-        m_tcpClient << docPowerPauseProfiling;
-
-        // Verify.
-        gtInt32 opStatus = dosFailure;
-        m_tcpClient >> opStatus;
-        ret = (opStatus == dosSuccess);
-        GT_ASSERT_EX(ret, L"Pausing power profiling session - status query ACK.");
-
-        // Get the return code.
-        beApiRetVal = 0;
-        m_tcpClient >> beApiRetVal;
-
-        return ret;
-    }
-
-    bool ResumePowerProfiling(gtUInt32& beApiRetVal)
-    {
-        bool ret = false;
-        OS_DEBUG_LOG_TRACER_WITH_RETVAL(ret);
-
-        // Transfer the opcode.
-        m_tcpClient << docPowerResumeProfiling;
-
-        // Verify.
-        gtInt32 opStatus = dosFailure;
-        m_tcpClient >> opStatus;
-        ret = (opStatus == dosSuccess);
-        GT_ASSERT_EX(ret, L"Resuming power profiling session - status query ACK.");
-
-        // Get the return code.
-        beApiRetVal = 0;
-        m_tcpClient >> beApiRetVal;
-
-        return ret;
-    }
-
-    bool ClosePowerProfiling(gtUInt32& beApiRetVal)
-    {
-        OS_DEBUG_LOG_TRACER;
-        // Transfer the opcode.
-        m_tcpClient << docPowerClose;
-
-        // Get the return code.
-        beApiRetVal = 0;
-        m_tcpClient >> beApiRetVal;
-
-        return true;
-    }
-
-    bool ReadAllEnabledCounters(gtUInt32& numOfSamples, AMDTPwrSample*& pSamples, gtUInt32& beApiRetVal)
-    {
-        bool ret = false;
-        OS_DEBUG_LOG_TRACER_WITH_RETVAL(ret);
-
-        beApiRetVal = static_cast<gtUInt32>(-1);
-        numOfSamples = 0;
-        pSamples = NULL;
-
-        // Transfer the opcode.
-        m_tcpClient << docPowerGetSamplesBatch;
-
-        // Verify.
-        gtInt32 opStatus = dosFailure;
-        m_tcpClient >> opStatus;
-
-        bool isCommunicationFailure = (opStatus != dosSuccess);
-        GT_ASSERT_EX(!isCommunicationFailure, L"Reading power profiling samples batch - status query ACK.");
-
-        if (!isCommunicationFailure)
-        {
-            // Get the return code.
-            m_tcpClient >> beApiRetVal;
-
-            // Check if the target app stopped.
-            bool isSelfTerminated = (beApiRetVal == DMN_SELF_TERMINATION_CODE);
-
-            if (!isSelfTerminated)
-            {
-
-                AMDTResult rc = static_cast<AMDTResult>(beApiRetVal);
-
-                if (rc == AMDT_STATUS_OK)
-                {
-                    // Get the number of samples.
-                    m_tcpClient >> numOfSamples;
-
-                    if (numOfSamples > 0)
-                    {
-                        // Allocate memory for the samples.
-                        pSamples = new AMDTPwrSample[numOfSamples];
-
-                        // Get all the samples one by one.
-                        for (size_t i = 0; i < numOfSamples; ++i)
-                        {
-                            // System time - seconds.
-                            m_tcpClient >> (pSamples[i].m_systemTime.m_second);
-
-                            // System time - microseconds.
-                            m_tcpClient >> (pSamples[i].m_systemTime.m_microSecond);
-
-                            // Elapsed time - milliseconds.
-                            m_tcpClient >> (pSamples[i].m_elapsedTimeMs);
-
-                            // Record id.
-                            m_tcpClient >> (pSamples[i].m_recordId);
-
-                            // Get the number of values.
-                            m_tcpClient >> (pSamples[i].m_numOfValues);
-
-                            // Allocate memory for the values array.
-                            if (pSamples[i].m_numOfValues > 0)
-                            {
-                                pSamples[i].m_counterValues = new AMDTPwrCounterValue[pSamples[i].m_numOfValues];
-
-                                for (size_t k = 0; k < pSamples[i].m_numOfValues; ++k)
-                                {
-                                    gtUInt32 cidAsGtUInt32 = 0;
-                                    gtFloat32 valueAsGtFloat32 = 0.0;
-
-                                    m_tcpClient >> cidAsGtUInt32;
-                                    m_tcpClient >> valueAsGtFloat32;
-
-                                    (pSamples[i].m_counterValues[k].m_counterID) = cidAsGtUInt32;
-                                    (pSamples[i].m_counterValues[k].m_counterValue) = valueAsGtFloat32;
-                                }
-                            }
-                        }
-
-                        // Success.
-                        ret = true;
-                    }
-                }
-            }
-            else
-            {
-                // The remote agent self-terminated the session after the target app had stopped.
-                beApiRetVal = DMN_SELF_TERMINATION_CODE;
-                OS_OUTPUT_DEBUG_LOG(L"REMOTE PWR: Remote target app terminated.", OS_DEBUG_LOG_INFO);
-            }
-        }
-        else
-        {
-            // The communication with the remote agent was lost.
-            beApiRetVal = rceCommunicationFailure;
-            OS_OUTPUT_DEBUG_LOG(L"REMOTE PWR: Communication with remote agent failed.", OS_DEBUG_LOG_ERROR);
-        }
-
-        return ret;
-    }
-
-    bool GetDeviceSupportedCounters(gtUInt32 deviceId, gtUInt32& beApiRetVal, gtUInt32& numOfSupportedCounters, AMDTPwrCounterDesc*& pSupportedCounters)
-    {
-        bool ret = false;
-        OS_DEBUG_LOG_TRACER_WITH_RETVAL(ret);
-
-        // Transfer the opcode.
-        m_tcpClient << docPowerGetDeviceCounters;
-
-        // Verify.
-        gtInt32 opStatus = dosFailure;
-        m_tcpClient >> opStatus;
-        ret = (opStatus == dosSuccess);
-        GT_ASSERT_EX(ret, L"Retrieving a power profiling device's counters - status query ACK.");
-
-        // Transfer the device id.
-        m_tcpClient << deviceId;
-
-        // Get the return code.
-        beApiRetVal = 0;
-        m_tcpClient >> beApiRetVal;
-
-        if (beApiRetVal == AMDT_STATUS_OK)
-        {
-            // Get the number of supported counters.
-            m_tcpClient >> numOfSupportedCounters;
-
-            if (numOfSupportedCounters > 0)
-            {
-                pSupportedCounters = new AMDTPwrCounterDesc[numOfSupportedCounters];
-
-                for (size_t i = 0; i < numOfSupportedCounters; ++i)
-                {
-                    AMDTPwrCounterDesc& currCounter = pSupportedCounters[i];
-
-                    // Get the counter id.
-                    m_tcpClient >> currCounter.m_counterID;
-
-                    // Get the device id.
-                    m_tcpClient >> currCounter.m_deviceId;
-
-                    // Get the counter name.
-                    gtASCIIString counterName;
-                    m_tcpClient.readString(counterName);
-
-                    // Get the counter description.
-                    gtASCIIString counterDescription;
-                    m_tcpClient.readString(counterDescription);
-
-                    // Get the counter category.
-                    gtInt32 counterCategory = 0;
-                    m_tcpClient >> counterCategory;
-                    currCounter.m_category = static_cast<AMDTPwrCategory>(counterCategory);
-
-                    // Get the counter aggregation.
-                    gtInt32 counterAggregation = 0;
-                    m_tcpClient >> counterAggregation;
-                    currCounter.m_aggregation = static_cast<AMDTPwrAggregation>(counterAggregation);
-
-                    // Get the counter units.
-                    gtInt32 counterUnits = 0;
-                    m_tcpClient >> counterUnits;
-                    currCounter.m_units = static_cast<AMDTPwrUnit>(counterUnits);
-
-                    // Copy the name string.
-                    size_t len = counterName.length();
-                    currCounter.m_name = new char[len + 1];
-                    const char* pUnderlyingNameStr = counterName.asCharArray();
-                    std::copy(pUnderlyingNameStr, pUnderlyingNameStr + len, currCounter.m_name);
-                    currCounter.m_name[len] = '\0';
-
-                    // Copy the description string.
-                    len = counterDescription.length();
-                    currCounter.m_description = new char[len + 1];
-                    const char* pUnderlyingDescStr = counterDescription.asCharArray();
-                    std::copy(pUnderlyingDescStr, pUnderlyingDescStr + len, currCounter.m_description);
-                    currCounter.m_description[len] = '\0';
-
-                }
-            }
-
-            ret = true;
-        }
-
-        return ret;
-    }
-
     bool DisconnectWithoutClosing()
     {
         bool ret = false;
@@ -2479,17 +1832,19 @@ void CXLDaemonClient::Close()
     }
 }
 
-bool CXLDaemonClient::LaunchGPUProfiler(const gtString& cmdLineArgs, const gtString& localCodeXLGpuProfilerBaseDir,
+bool CXLDaemonClient::LaunchGPUProfiler(const gtString& cmdLineArgs, const gtString& localGpuProfilerBaseDir,
                                         const gtString& counterFileName, const gtString& envVarsFileName,
-                                        const gtString& ApiFilterFileName, const gtString& ApiRulesFileName,
+                                        const gtString& apiFilterFileName, const gtString& apiRulesFileName,
                                         const gtVector<gtString>& specificKernels, RemoteClientError& errorCode)
 {
     bool ret = false;
 
     if (m_pImpl != NULL)
     {
-        ret = m_pImpl->LaunchCodeXLGpuProfiler(cmdLineArgs, localCodeXLGpuProfilerBaseDir,
-                                               counterFileName, envVarsFileName, ApiFilterFileName, ApiRulesFileName, specificKernels, errorCode);
+        ret = m_pImpl->LaunchGpuProfiler(cmdLineArgs, localGpuProfilerBaseDir,
+                                         counterFileName, envVarsFileName,
+                                         apiFilterFileName, apiRulesFileName,
+                                         specificKernels, errorCode);
     }
 
     return ret;
@@ -2592,203 +1947,6 @@ bool CXLDaemonClient::PerformHandshake(bool& resultBuffer, gtString& errorStrBuf
     return ret;
 }
 
-bool CXLDaemonClient::InitPowerProfilingSession(gtUInt32& beApiRetVal)
-{
-    bool ret = false;
-
-    if (m_pImpl != NULL)
-    {
-        ret = m_pImpl->InitPowerProfilingSession(beApiRetVal);
-    }
-
-    return ret;
-}
-
-bool CXLDaemonClient::SetPowerProfilingSamplingOption(gtInt32 samplingOption, gtUInt32& beApiRetVal)
-{
-    bool ret = false;
-
-    if (m_pImpl != NULL)
-    {
-        ret = m_pImpl->SetPowerProfilingSamplingOption(samplingOption, beApiRetVal);
-    }
-
-    return ret;
-}
-
-
-bool CXLDaemonClient::SetPowerSamplingInterval(gtUInt32 samplingInterval, gtUInt32& beApiRetVal)
-{
-    bool ret = false;
-
-    if (m_pImpl != NULL)
-    {
-        ret = m_pImpl->SetPowerSamplingInterval(samplingInterval, beApiRetVal);
-    }
-
-    return ret;
-}
-
-bool CXLDaemonClient::GetSystemTopology(AMDTPwrDevice*& pTreeRoot, gtUInt32& beApiRetVal)
-{
-    bool ret = false;
-
-    if (m_pImpl != NULL)
-    {
-        ret = m_pImpl->GetSystemTopology(pTreeRoot, beApiRetVal);
-    }
-
-    return ret;
-}
-
-bool CXLDaemonClient::GetMinSamplingIntervalMs(gtUInt32& minSamplingIntervalMs, gtUInt32& beApiRetVal)
-{
-    bool ret = false;
-
-    if (m_pImpl != NULL)
-    {
-        ret = m_pImpl->GetMinSamplingIntervalMs(minSamplingIntervalMs, beApiRetVal);
-    }
-
-    return ret;
-}
-
-bool CXLDaemonClient::GetCurrentSamplingIntervalMs(gtUInt32& currentSamplingIntervalMs, gtUInt32& beApiRetVal)
-{
-    bool ret = false;
-
-    if (m_pImpl != NULL)
-    {
-        ret = m_pImpl->GetCurrentSamplingIntervalMs(currentSamplingIntervalMs, beApiRetVal);
-    }
-
-    return ret;
-}
-
-bool CXLDaemonClient::EnableCounter(gtUInt32 counterId, gtUInt32& beApiRetVal)
-{
-    bool ret = false;
-
-    if (m_pImpl != NULL)
-    {
-        ret = m_pImpl->EnableCounter(counterId, beApiRetVal);
-    }
-
-    return ret;
-}
-
-bool CXLDaemonClient::DisableCounter(gtUInt32 counterId, gtUInt32& beApiRetVal)
-{
-    bool ret = false;
-
-    if (m_pImpl != NULL)
-    {
-        ret = m_pImpl->DisableCounter(counterId, beApiRetVal);
-    }
-
-    return ret;
-}
-
-bool CXLDaemonClient::IsCounterEnabled(gtUInt32 counterId, gtUInt32& beApiRetVal)
-{
-    bool ret = false;
-
-    if (m_pImpl != NULL)
-    {
-        ret = m_pImpl->IsCounterEnabled(counterId, beApiRetVal);
-    }
-
-    return ret;
-}
-
-bool CXLDaemonClient::StartPowerProfiling(const ApplicationLaunchDetails& remoteAppDetails,
-                                          gtUInt32& beApiRetVal, AppLaunchStatus& remoteAppLaunchStatus)
-{
-    bool ret = false;
-
-    if (m_pImpl != NULL)
-    {
-        ret = m_pImpl->StartPowerProfiling(beApiRetVal, remoteAppDetails, remoteAppLaunchStatus);
-    }
-
-    return ret;
-}
-
-bool CXLDaemonClient::StopPowerProfiling(gtUInt32& beApiRetVal)
-{
-    bool ret = false;
-
-    if (m_pImpl != NULL)
-    {
-        // Stop the profiling session on the remote machine.
-        ret = m_pImpl->StopPowerProfiling(beApiRetVal);
-
-        // Close the remote connection.
-        CXLDaemonClient::Close();
-    }
-
-    return ret;
-}
-
-bool CXLDaemonClient::PausePowerProfiling(gtUInt32& beApiRetVal)
-{
-    bool ret = false;
-
-    if (m_pImpl != NULL)
-    {
-        ret = m_pImpl->PausePowerProfiling(beApiRetVal);
-    }
-
-    return ret;
-}
-
-bool CXLDaemonClient::ResumePowerProfiling(gtUInt32& beApiRetVal)
-{
-    bool ret = false;
-
-    if (m_pImpl != NULL)
-    {
-        ret = m_pImpl->ResumePowerProfiling(beApiRetVal);
-    }
-
-    return ret;
-}
-
-bool CXLDaemonClient::ClosePowerProfiling(gtUInt32& beApiRetVal)
-{
-    bool ret = false;
-
-    if (m_pImpl != NULL)
-    {
-        ret = m_pImpl->ClosePowerProfiling(beApiRetVal);
-    }
-
-    return ret;
-}
-
-bool CXLDaemonClient::ReadAllEnabledCounters(gtUInt32& numOfSamples, AMDTPwrSample*& pSamples, gtUInt32& beApiRetVal)
-{
-    bool ret = false;
-
-    if (m_pImpl != NULL)
-    {
-        ret = m_pImpl->ReadAllEnabledCounters(numOfSamples, pSamples, beApiRetVal);
-    }
-
-    return ret;
-}
-
-bool CXLDaemonClient::GetDeviceSupportedCounters(gtUInt32 deviceId, gtUInt32& beApiRetVal, gtUInt32& numOfSupportedCounters, AMDTPwrCounterDesc*& pSupportedCounters)
-{
-    bool ret = false;
-
-    if (m_pImpl != NULL)
-    {
-        ret = m_pImpl->GetDeviceSupportedCounters(deviceId, beApiRetVal, numOfSupportedCounters, pSupportedCounters);
-    }
-
-    return ret;
-}
 
 bool CXLDaemonClient::ValidateConnectivity(const osPortAddress& daemonAddress, bool& isConnectivityValid)
 {

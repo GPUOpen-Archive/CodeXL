@@ -52,7 +52,7 @@
 afSourceCodeView::afSourceCodeView(QWidget* pParent, bool shouldShowLineNumbers, unsigned int contextMenuMask):
     acSourceCodeView(pParent, shouldShowLineNumbers, contextMenuMask), afBaseView(&afProgressBarWrapper::instance()),
     m_pApplicationCommands(nullptr), _clickedBreakpointLine(-1),
-    _pAddWatchAction(nullptr), _pAddMultiWatchAction(nullptr), _pShowLineNumbersAction(nullptr),
+    _pAddWatchAction(nullptr), _pShowLineNumbersAction(nullptr),
     m_enableBreakpoints(true), m_pMatchingTreeItemData(nullptr)
 {
     // Get the application commands instance:
@@ -862,16 +862,6 @@ void afSourceCodeView::addCommandsToContextMenu(unsigned int contextMenuMask)
             // Connect the action to its handler:
             bool rcConnect = connect(_pAddWatchAction, SIGNAL(triggered()), this, SLOT(onAddWatch()));
             GT_ASSERT(rcConnect);
-
-            // Create an action for the "Add Multi Watch" menu item:
-            _pAddMultiWatchAction = new QAction(AF_STR_SourceCodeAddMultiWatch, _pTextContextMenu);
-
-            // Add the action to the context menu:
-            _pTextContextMenu->addAction(_pAddMultiWatchAction);
-
-            // Connect the action to its handler:
-            rcConnect = connect(_pAddMultiWatchAction, SIGNAL(triggered()), this, SLOT(onAddMultiWatch()));
-            GT_ASSERT(rcConnect);
         }
 
         // Connect the menu to an about to show slot:
@@ -906,40 +896,7 @@ void afSourceCodeView::onAddWatch()
         // Get the watch view:
         GT_IF_WITH_ASSERT(m_pApplicationCommands != nullptr)
         {
-            apAddWatchEvent watchEvent(textForWatch, false);
-            apEventsHandler::instance().registerPendingDebugEvent(watchEvent);
-        }
-    }
-
-    // Else do nothing (no text for watch):
-}
-
-// ---------------------------------------------------------------------------
-// Name:        afSourceCodeView::onAddMultiWatch
-// Description: Handling the "Add Multi Watch" command
-// Author:      Sigal Algranaty
-// Date:        25/9/2011
-// ---------------------------------------------------------------------------
-void afSourceCodeView::onAddMultiWatch()
-{
-    // Get the currently selected text:
-    QString textSelected = selectedText();
-
-    if (textSelected.isEmpty())
-    {
-        // Get the word in the current position:
-        textSelected = wordAtPoint(_currentMousePosition);
-    }
-
-    gtString textForWatch;
-    textForWatch.fromASCIIString(textSelected.toLatin1());
-
-    if (!textForWatch.isEmpty())
-    {
-        // Get the watch view:
-        GT_IF_WITH_ASSERT(m_pApplicationCommands != nullptr)
-        {
-            apAddWatchEvent watchEvent(textForWatch, true);
+            apAddWatchEvent watchEvent(textForWatch);
             apEventsHandler::instance().registerPendingDebugEvent(watchEvent);
         }
     }
@@ -957,15 +914,14 @@ void afSourceCodeView::onAddMultiWatch()
 void afSourceCodeView::onAboutToShowTextContextMenu()
 {
     // Sanity check:
-    if ((_pAddWatchAction != nullptr) && (_pAddMultiWatchAction != nullptr))
+    if ((_pAddWatchAction != nullptr))
     {
         // Check if add watch actions should be enabled:
-        afRunModes neededModes = AF_DEBUGGED_PROCESS_EXISTS | AF_DEBUGGED_PROCESS_SUSPENDED | AF_DEBUGGED_PROCESS_IN_KERNEL_DEBUGGING;
+        afRunModes neededModes = AF_DEBUGGED_PROCESS_EXISTS | AF_DEBUGGED_PROCESS_SUSPENDED;
         bool isEnabled = (neededModes == ((afPluginConnectionManager::instance().getCurrentRunModeMask()) & neededModes));
 
         // Set the actions enable state:
         _pAddWatchAction->setEnabled(isEnabled);
-        _pAddMultiWatchAction->setEnabled(isEnabled);
     }
 }
 

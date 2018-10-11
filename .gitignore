@@ -299,12 +299,14 @@ CodeXL/Components/PowerProfiling/Backend/AMDTPowerProfilingDrivers/Linux/CodeXLP
 Common/Lib/AMD/RCP/RCPProfileDataParser
 Common/Lib/AMD/RCP/RadeonComputeProfiler
 Common/Lib/AMD/RCP/bin
+Common/Lib/AMD/RCP/docs
 Common/Lib/AMD/RCP/jqPlot
 Common/Lib/AMD/RCP/CXLActivityLogger
 Common/Lib/AMD/RCP/include
+Common/Lib/AMD/RCP/repo
 
 # GPA
-Common/Lib/AMD/GPUPerfAPI/2_23
+Common/Lib/AMD/GPUPerfAPI/3_*
 
 # RGA
 Common/Lib/AMD/RGA

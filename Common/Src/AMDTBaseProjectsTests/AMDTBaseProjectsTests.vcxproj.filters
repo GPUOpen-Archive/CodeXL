@@ -32,8 +32,5 @@
     <ClCompile Include="src\AMDTOSWrappersTests\osFileTests.cpp">
       <Filter>src\AMDTOSWrappersTests</Filter>
     </ClCompile>
-    <ClCompile Include="src\AGSLib_test.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
   </ItemGroup>
 </Project>

@@ -18,12 +18,13 @@
 #include <AMDTApplicationFramework/Include/afProjectManager.h>
 
 
-afHTMLView::afHTMLView(const osFilePath& filePath) : QWebView(), m_filePath(filePath)
+afHTMLView::afHTMLView(const osFilePath& filePath) : QWebEngineView(), m_filePath(filePath)
 {
 
     ReloadView();
 
-    page()->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
+	// TODO: setLinkDelegationPolicy deprecated, find alternatives
+    // page()->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
 
     bool rc = connect(this, SIGNAL(linkClicked(const QUrl&)), this, SLOT(OnLinkClicked(const QUrl&)));
     GT_ASSERT(rc);

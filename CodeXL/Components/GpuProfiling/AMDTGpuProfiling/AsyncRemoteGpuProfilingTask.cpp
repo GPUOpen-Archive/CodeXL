@@ -188,7 +188,7 @@ bool AsyncRemoteGpuProfilingTask::RemoteGpuProfilingHelper(CXLDaemonClient* pDmn
 
             pProgUpdater->execute();
 
-            // Launch CodeXLGpuProfiler on the remote machine, and wait for it to finish.
+            // Launch rcprof on the remote machine, and wait for it to finish.
             // An asynchronous implementation will be available in the future.
             RemoteClientError errorCode = rceUnknown;
             retVal = pDmnClient->LaunchGPUProfiler(mCmdLineArgsStr, mProfileOutputDir, mCounterFileName,

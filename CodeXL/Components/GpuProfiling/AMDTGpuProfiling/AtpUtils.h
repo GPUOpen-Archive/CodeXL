@@ -1,5 +1,5 @@
 //==============================================================================
-// Copyright (c) 2017 Advanced Micro Devices, Inc. All rights reserved.
+// Copyright (c) 2017-2018 Advanced Micro Devices, Inc. All rights reserved.
 /// \author AMD Developer Tools Team
 /// \file
 /// \brief RCP ATP parsing util for CodeXL
@@ -11,7 +11,7 @@
 #include "ICallBackParserHandler.h"
 #include <IAtpDataHandler.h>
 #include <ProfileDataParserLoader.h>
-#include "Server/Common/TSingleton.h"
+#include "TSingleton.h"
 #include <vector>
 
 /// Callback function for the Atp file parsing callback function variable OnParse

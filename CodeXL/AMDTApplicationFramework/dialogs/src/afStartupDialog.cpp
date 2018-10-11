@@ -78,7 +78,7 @@ void afRichTextButton::Draw(const QSizeF& buttonSize)
 
 
 afStartupDialog::afStartupDialog(QWidget* pParent)
-    : acDialog(pParent), m_pNewProjectButton(nullptr), m_pAttachToProcessButton(nullptr), m_pSystemWideButton(nullptr)
+    : acDialog(pParent), m_pNewProjectButton(nullptr)
 {
     // Window modality:
     setWindowModality(Qt::WindowModal);
@@ -108,17 +108,6 @@ afStartupDialog::afStartupDialog(QWidget* pParent)
     m_pNewProjectButtonForProfile = new afRichTextButton(acGetIcon(AC_ICON_STARTUP_NEW_PROFILE, iconSize), buttonText);
 
 
-    buttonText = QString("<b>%1</b>%2").arg(AF_STR_StartupDialogAttachToProcessTitle).arg(AF_STR_StartupDialogAttachToProcessDescription);
-    m_pAttachToProcessButton = new afRichTextButton(acGetIcon(AC_ICON_STARTUP_NEW_PROFILE_ATTACH, iconSize), buttonText);
-
-
-    buttonText = QString("<b>%1</b>%2").arg(AF_STR_StartupDialogSystemWideTitle).arg(AF_STR_StartupDialogSystemWideDescription);
-    m_pSystemWideButton = new afRichTextButton(acGetIcon(AC_ICON_STARTUP_NEW_PROFILE_SYSTEM, iconSize), buttonText);
-
-    buttonText = QString("<b>%1</b>%2").arg(AF_STR_StartupDialogNewProjectFrameAnalyzeTitle).arg(AF_STR_StartupDialogNewProjectFrameAnalyzeDescription);
-    m_pNewProjectButtonForFrameAnalyze = new afRichTextButton(acGetIcon(AC_ICON_STARTUP_NEW_FRAME_ANALYZE, iconSize), buttonText);
-
-
     buttonText = QString("<b>%1</b>%2").arg(AF_STR_StartupDialogNewProjectAnalyzeTitle).arg(AF_STR_StartupDialogNewProjectAnalyzeDescription);
     m_pAnalyzeNewCLFile = new afRichTextButton(acGetIcon(AC_ICON_STARTUP_NEW_ANALYZE, iconSize), buttonText);
 
@@ -136,15 +125,6 @@ afStartupDialog::afStartupDialog(QWidget* pParent)
     maxWidth = qMax((float)m_pNewProjectButtonForProfile->CalculatedSize().width(), maxWidth);
     maxHeight = qMax((float)m_pNewProjectButtonForProfile->CalculatedSize().height(), maxHeight);
 
-    maxWidth = qMax((float)m_pNewProjectButtonForFrameAnalyze->CalculatedSize().width(), maxWidth);
-    maxHeight = qMax((float)m_pNewProjectButtonForFrameAnalyze->CalculatedSize().height(), maxHeight);
-
-    maxWidth = qMax((float)m_pSystemWideButton->CalculatedSize().width(), maxWidth);
-    maxHeight = qMax((float)m_pSystemWideButton->CalculatedSize().height(), maxHeight);
-
-    maxWidth = qMax((float)m_pAttachToProcessButton->CalculatedSize().width(), maxWidth);
-    maxHeight = qMax((float)m_pAttachToProcessButton->CalculatedSize().height(), maxHeight);
-
     maxWidth = qMax((float)m_pAnalyzeAddCLFile->CalculatedSize().width(), maxWidth);
     maxHeight = qMax((float)m_pAnalyzeAddCLFile->CalculatedSize().height(), maxHeight);
 
@@ -156,9 +136,6 @@ afStartupDialog::afStartupDialog(QWidget* pParent)
     m_pNewProjectButton->Draw(QSizeF(maxWidth, m_pNewProjectButton->CalculatedSize().height()));
     m_pNewProjectButtonForDebug->Draw(QSizeF(maxWidth, m_pNewProjectButtonForDebug->CalculatedSize().height()));
     m_pNewProjectButtonForProfile->Draw(QSizeF(maxWidth, m_pNewProjectButtonForProfile->CalculatedSize().height()));
-    m_pNewProjectButtonForFrameAnalyze->Draw(QSizeF(maxWidth, m_pNewProjectButtonForFrameAnalyze->CalculatedSize().height()));
-    m_pSystemWideButton->Draw(QSizeF(maxWidth, m_pSystemWideButton->CalculatedSize().height()));
-    m_pAttachToProcessButton->Draw(QSizeF(maxWidth, m_pAttachToProcessButton->CalculatedSize().height()));
     m_pAnalyzeNewCLFile->Draw(QSizeF(maxWidth, m_pAnalyzeNewCLFile->CalculatedSize().height()));
     m_pAnalyzeAddCLFile->Draw(QSizeF(maxWidth, m_pAnalyzeAddCLFile->CalculatedSize().height()));
 
@@ -170,15 +147,6 @@ afStartupDialog::afStartupDialog(QWidget* pParent)
     GT_ASSERT(rc);
 
     rc = connect(m_pNewProjectButtonForProfile, SIGNAL(clicked()), this, SLOT(OnButtonClicked()));
-    GT_ASSERT(rc);
-
-    rc = connect(m_pNewProjectButtonForFrameAnalyze, SIGNAL(clicked()), this, SLOT(OnButtonClicked()));
-    GT_ASSERT(rc);
-
-    rc = connect(m_pAttachToProcessButton, SIGNAL(clicked()), this, SLOT(OnButtonClicked()));
-    GT_ASSERT(rc);
-
-    rc = connect(m_pSystemWideButton, SIGNAL(clicked()), this, SLOT(OnButtonClicked()));
     GT_ASSERT(rc);
 
     rc = connect(m_pAnalyzeNewCLFile, SIGNAL(clicked()), this, SLOT(OnButtonClicked()));
@@ -209,17 +177,6 @@ afStartupDialog::afStartupDialog(QWidget* pParent)
 
     pLayout->addWidget(pProfileLabel, 1, Qt::AlignLeft);
     pLayout->addWidget(m_pNewProjectButtonForProfile, 0, Qt::AlignLeft);
-    pLayout->addWidget(m_pAttachToProcessButton, 0, Qt::AlignLeft);
-    pLayout->addWidget(m_pSystemWideButton, 0, Qt::AlignLeft);
-
-    pLayout->addSpacing(AF_STARTUP_DLG_DEFAULT_LAYOUT_SPACING);
-    QLabel* pFrameAnalyzeLabel = new QLabel(AF_STR_StartupDialogFrameAnalyzeCaption);
-
-
-    pFrameAnalyzeLabel->setStyleSheet(AF_STR_CSSBold);
-
-    pLayout->addWidget(pFrameAnalyzeLabel);
-    pLayout->addWidget(m_pNewProjectButtonForFrameAnalyze, 0, Qt::AlignLeft);
 
     pLayout->addSpacing(AF_STARTUP_DLG_DEFAULT_LAYOUT_SPACING);
     QLabel* pAnalyzeLabel = new QLabel(AF_STR_StartupDialogAnalyzeCaption);
@@ -274,18 +231,6 @@ void afStartupDialog::OnButtonClicked()
         else if (pButton == m_pNewProjectButtonForProfile)
         {
             m_userSelection = AF_NO_PROJECT_USER_ACTION_CREATE_NEW_PROJECT_PROFILE;
-        }
-        else if (pButton == m_pAttachToProcessButton)
-        {
-            m_userSelection = AF_NO_PROJECT_USER_ACTION_CPU_PROFILE_ATTACH_TO_PROCESS;
-        }
-        else if (pButton == m_pSystemWideButton)
-        {
-            m_userSelection = AF_NO_PROJECT_USER_ACTION_CPU_PROFILE_SYSTEM_WIDE;
-        }
-        else if (pButton == m_pNewProjectButtonForFrameAnalyze)
-        {
-            m_userSelection = AF_NO_PROJECT_USER_ACTION_CREATE_NEW_PROJECT_FRAME_ANALYZE;
         }
         else if (pButton == m_pAnalyzeNewCLFile)
         {

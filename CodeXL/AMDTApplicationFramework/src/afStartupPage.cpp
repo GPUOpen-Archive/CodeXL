@@ -35,15 +35,10 @@
 #define AF_STR_startup_page_newProjectLink "new_project"
 #define AF_STR_startup_page_newProjectProfileLink "new_project_profile"
 #define AF_STR_startup_page_newProjectDebugLink "new_project_debug"
-#define AF_STR_startup_page_attachToProcess "attach_to_process"
-#define AF_STR_startup_page_sysWide "system_wide"
-#define AF_STR_startup_page_newProjectFrameAnalyzeLink "new_project_frame_analyze"
 #define AF_STR_startup_page_newClForAnalyze "new_analyze"
 #define AF_STR_startup_page_addClForAnalyze "add_analyze"
 #define AF_STR_startup_page_openProjectLink "open_project"
 #define AF_STR_startup_page_loadTeapotProjectLink "load_teapot"
-#define AF_STR_startup_page_loadMatMulProjectLink "load_matmul"
-#define AF_STR_startup_page_loadD3D12MultithreadingProjectLink "load_d3d12multithreading"
 #define AF_STR_startup_page_helpLink "show_help"
 #define AF_STR_startup_page_quickStartLink "show_quick_start"
 #define AF_STR_startup_page_aboutLink "show_about"
@@ -52,16 +47,17 @@
 #define AF_STR_startup_page_noRecentProjects "No recent projects"
 
 
-afWebPage::afWebPage(QObject* pParent) : QWebPage(pParent) , m_pApplicationCommands(nullptr)
+afWebPage::afWebPage(QObject* pParent) : QWebEnginePage(pParent) , m_pApplicationCommands(nullptr)
 {
     m_pApplicationCommands = afApplicationCommands::instance();
     GT_ASSERT(m_pApplicationCommands != nullptr);
 }
 
-void afWebPage::javaScriptConsoleMessage(const QString& message, int lineNumber, const QString& sourceID)
+void afWebPage::javaScriptConsoleMessage(JavaScriptConsoleMessageLevel level, const QString& message, int lineNumber, const QString& sourceID)
 {
     (void)(sourceID);
     (void)(lineNumber);
+    (void)(level);
 
     // This function is called whenever the buttonClick implemented in JS is called in the welcome page HTML.
     // The function is handling the messages related to CodeXL:
@@ -80,18 +76,6 @@ void afWebPage::javaScriptConsoleMessage(const QString& message, int lineNumber,
         {
             afExecutionModeManager::instance().RunUserStartupAction(AF_NO_PROJECT_USER_ACTION_CREATE_NEW_PROJECT_PROFILE);
         }
-        else if (message == AF_STR_startup_page_attachToProcess)
-        {
-            afExecutionModeManager::instance().RunUserStartupAction(AF_NO_PROJECT_USER_ACTION_CPU_PROFILE_ATTACH_TO_PROCESS);
-        }
-        else if (message == AF_STR_startup_page_sysWide)
-        {
-            afExecutionModeManager::instance().RunUserStartupAction(AF_NO_PROJECT_USER_ACTION_CPU_PROFILE_SYSTEM_WIDE);
-        }
-        else if (message == AF_STR_startup_page_newProjectFrameAnalyzeLink)
-        {
-            afExecutionModeManager::instance().RunUserStartupAction(AF_NO_PROJECT_USER_ACTION_CREATE_NEW_PROJECT_FRAME_ANALYZE);
-        }
         else if (message == AF_STR_startup_page_newClForAnalyze)
         {
             afExecutionModeManager::instance().RunUserStartupAction(AF_NO_PROJECT_USER_ACTION_NEW_FILE_FOR_ANALYZE);
@@ -108,16 +92,6 @@ void afWebPage::javaScriptConsoleMessage(const QString& message, int lineNumber,
         {
             // Open the teapot sample project:
             m_pApplicationCommands->LoadSample(AF_TEAPOT_SAMPLE);
-        }
-        else if (message == AF_STR_startup_page_loadMatMulProjectLink)
-        {
-            // Open the teapot sample project:
-            m_pApplicationCommands->LoadSample(AF_MATMUL_SAMPLE);
-        }
-        else if (message == AF_STR_startup_page_loadD3D12MultithreadingProjectLink)
-        {
-            // Open the teapot sample project:
-            m_pApplicationCommands->LoadSample(AF_D3D12MULTITHREADING_SAMPLE);
         }
         else if (message == AF_STR_startup_page_helpLink)
         {
@@ -160,19 +134,17 @@ void afWebPage::javaScriptConsoleMessage(const QString& message, int lineNumber,
     }
 }
 
-bool afWebPage::acceptNavigationRequest(QWebFrame* frame, const QNetworkRequest& request, QWebPage::NavigationType type)
+bool afWebPage::acceptNavigationRequest(const QUrl &url, NavigationType type, bool isMainFrame)
 {
-    GT_UNREFERENCED_PARAMETER(frame);
-    GT_UNREFERENCED_PARAMETER(request);
-    bool retVal = true;
+    GT_UNREFERENCED_PARAMETER(isMainFrame);
 
-    // Do not allow navigation clicks:
-    if (type == QWebPage::NavigationTypeLinkClicked)
+    if (type == QWebEnginePage::NavigationTypeLinkClicked)
     {
-        retVal = false;
+        emit linkClicked(url);
+        return false;
     }
 
-    return retVal;
+    return true;
 }
 
 // ---------------------------------------------------------------------------
@@ -182,22 +154,20 @@ bool afWebPage::acceptNavigationRequest(QWebFrame* frame, const QNetworkRequest&
 // Author:      Sigal Algranaty
 // Date:        21/2/2012
 // ---------------------------------------------------------------------------
-afStartupPage::afStartupPage() : QWebView()
+afStartupPage::afStartupPage() : QWebEngineView(), m_pPage(nullptr)
 {
 
-    // Set the zoom factor to fit the resolution. QWebView assumes 96 DPI.
+    // Set the zoom factor to fit the resolution. QWebEngineView assumes 96 DPI.
     QWidget* pScreen = QApplication::desktop()->screen();
-
-
-    page()->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
-    bool rc = connect(this, SIGNAL(linkClicked(const QUrl&)), this, SLOT(OnLinkClicked(const QUrl&)));
-    GT_ASSERT(rc);
 
     // Allow focus in this widget:
     setFocusPolicy(Qt::ClickFocus);
 
-    afWebPage* pPage = new afWebPage(nullptr);
-    setPage(pPage);
+    m_pPage = new afWebPage(nullptr);
+    setPage(m_pPage);
+
+    bool rc = connect(m_pPage, &afWebPage::linkClicked, this, &afStartupPage::OnLinkClicked);
+    GT_ASSERT(rc);
 
     // Update the HTML file:
     UpdateHTML();
@@ -220,7 +190,7 @@ afStartupPage::afStartupPage() : QWebView()
 // ---------------------------------------------------------------------------
 afStartupPage::~afStartupPage()
 {
-
+    delete m_pPage;
 }
 
 // ---------------------------------------------------------------------------
@@ -425,8 +395,8 @@ bool afStartupPage::CanLinkBeClicked(const QUrl& url)
     QString urlAsQString = url.toString();
 
     if ((urlAsQString == AF_STR_startup_page_newProjectLink) || (urlAsQString == AF_STR_startup_page_openProjectLink) ||
-        (urlAsQString == AF_STR_startup_page_loadTeapotProjectLink) || (urlAsQString == AF_STR_startup_page_loadMatMulProjectLink) ||
-        (urlAsQString == AF_STR_startup_page_loadD3D12MultithreadingProjectLink) || (urlAsQString.startsWith(AF_STR_startup_page_openProjectLinkPrefix)))
+        (urlAsQString == AF_STR_startup_page_loadTeapotProjectLink) ||
+        (urlAsQString.startsWith(AF_STR_startup_page_openProjectLinkPrefix)))
     {
         // If the user is in the middle of debugging:
         afPluginConnectionManager& thePluginConnectionManager = afPluginConnectionManager::instance();

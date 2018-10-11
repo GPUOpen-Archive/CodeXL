@@ -1,23 +1,4 @@
-/*****************************************************************************\
-*
-*  Module Name    si_id.h
-*  Project        SOUTHERN ISLANDS
-*  Devices        SOUTHERN ISLANDS
-*
-*  Description    Defining Device IDs, ASIC revision IDs for SOUTHERN ISLANDS
-*
-*
-*  (c) 2009 Advanced Micro Devices, Inc. (unpublished)
-*
-*  All rights reserved.  This notice is intended as a precaution against
-*  inadvertent publication and does not imply publication or any waiver
-*  of confidentiality.  The year included in the foregoing notice is the
-*  year of creation of the work.
-*
-*  LOG OF CHANGES
-*
-\*****************************************************************************/
-
+// Copyright (c) 2009-2017 Advanced Micro Devices, Inc. All rights reserved.
 #ifndef _SI_ID_H
 #define _SI_ID_H
 

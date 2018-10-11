@@ -298,20 +298,20 @@ QWidget* kaKernelView::createMultiSourceView(const osFilePath& filePath, const o
         }
 
         // Check that the kaMultiSourcecode does not already exists in the tabs
-        kaMultiSourceView* pMultiWatchView = NULL;
+        kaMultiSourceView* pMultiSourceView = NULL;
         int numTabs = m_pTabWidget->count();
 
-        for (int nTab = 0 ; nTab < numTabs && (NULL == pMultiWatchView) ; nTab++)
+        for (int nTab = 0 ; nTab < numTabs && (NULL == pMultiSourceView) ; nTab++)
         {
-            pMultiWatchView = qobject_cast<kaMultiSourceView*>(m_pTabWidget->widget(nTab));
+            pMultiSourceView = qobject_cast<kaMultiSourceView*>(m_pTabWidget->widget(nTab));
 
-            if (NULL != pMultiWatchView)
+            if (NULL != pMultiSourceView)
             {
                 break;
             }
         }
 
-        if (NULL == pMultiWatchView)
+        if (NULL == pMultiSourceView)
         {
             // mdi file path needed for handling editing of the source file
             osFilePath mdiFilePath(filePath);
@@ -320,8 +320,8 @@ QWidget* kaKernelView::createMultiSourceView(const osFilePath& filePath, const o
             mdiFilePath.setFileName(identifyFileName);
             mdiFilePath.setFileExtension(KA_STR_kernelViewExtension);
 
-            pMultiWatchView = new kaMultiSourceView(this, kernelFilePath, mdiFilePath);
-            sourceView = pMultiWatchView;
+            pMultiSourceView = new kaMultiSourceView(this, kernelFilePath, mdiFilePath);
+            sourceView = pMultiSourceView;
 
         }
         else
@@ -329,9 +329,9 @@ QWidget* kaKernelView::createMultiSourceView(const osFilePath& filePath, const o
             sourceView = NULL;
         }
 
-        GT_IF_WITH_ASSERT(NULL != pMultiWatchView)
+        GT_IF_WITH_ASSERT(NULL != pMultiSourceView)
         {
-            pMultiWatchView->AddView(filePath, isaFilePath, ilFilePath, isGCN);
+            pMultiSourceView->AddView(filePath, isaFilePath, ilFilePath, isGCN);
 
             QFileInfo kernelFileInfo(acGTStringToQString(kernelFilePath.asString()));
             QFileInfo isaFileInfo(acGTStringToQString(isaFilePath.asString()));
@@ -339,10 +339,10 @@ QWidget* kaKernelView::createMultiSourceView(const osFilePath& filePath, const o
             // if the source file modification date is later then the isa/il files date - mark the files as not updated
             if (kernelFileInfo.lastModified() > isaFileInfo.lastModified())
             {
-                pMultiWatchView->ShowUpdateNotUpdateCaption(true);
+                pMultiSourceView->ShowUpdateNotUpdateCaption(true);
             }
 
-            MarkKernelLine(pMultiWatchView);
+            MarkKernelLine(pMultiSourceView);
         }
     }
 

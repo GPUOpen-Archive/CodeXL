@@ -22,22 +22,21 @@
     <PlatformToolset>v140</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
-  <ImportGroup Label="ExtensionSettings">
-  </ImportGroup>
   <ImportGroup Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\..\..\Common\Src\Qt\Global-QT.props" />
   </ImportGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)'=='Debug'">
     <PostBuildEvent>
       <Command>cd ..
-CopyFiles_Debug.bat</Command>
+CopyFiles_Debug.bat $(QTDIR) $(QTBINDIR)</Command>
       <Message>Copying CodeXL component binary files to Debug output directory</Message>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)'=='Release'">
     <PostBuildEvent>
       <Command>cd ..
-CopyFiles_Release.bat</Command>
+CopyFiles_Release.bat $(QTDIR) $(QTBINDIR)</Command>
       <Message>Copying CodeXL component binary files to Release output directory</Message>
     </PostBuildEvent>
   </ItemDefinitionGroup>

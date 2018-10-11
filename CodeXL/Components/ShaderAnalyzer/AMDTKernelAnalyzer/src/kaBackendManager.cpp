@@ -244,6 +244,121 @@ static gtString GenerateMetaFileName(const std::string& entryPointName, const st
     return ret;
 }
 
+//
+// Convert the device list returned by RGA into CodeXL device list format.
+//
+static bool ConvertRGADeviceList(const std::vector<std::string> rgaDevices, QStringList& codexlDevices)
+{
+    bool result = false;
+
+    // Device map: generation --> architectures --> device_names.
+    std::multimap<std::string, std::multimap<std::string, std::string>> deviceMap;
+
+    // Step 1. Parse the RGA output and build the device map.
+    //
+    // "Fiji(Graphics IP v8)"
+    // "   AMD FirePro(TM) S9300 x2"
+    // "   AMD MxGPU"
+    // "   AMD Radeon(TM) Graphics Processor"
+    //    ...
+    //
+
+    std::multimap<std::string, std::string> currentArchMap;
+
+    auto deviceIt = rgaDevices.cbegin();
+
+#if AMDT_BUILD_TARGET == AMDT_LINUX_OS
+    // On Linux ExecAndGrabOutput puts the process executable path in the beginning of the returned process output,
+    // so we have to skip the first "device" here.
+    deviceIt++;
+#endif
+
+    while (deviceIt != rgaDevices.cend())
+    {
+        if (!deviceIt->empty())
+        {
+            result = true;
+            // Extract the architecture and generation name.
+            size_t genStartOffset = deviceIt->find('(');
+            size_t genEndOffset   = deviceIt->find(')');
+            if (genStartOffset == std::string::npos || genEndOffset == std::string::npos || genStartOffset > genEndOffset)
+            {
+                // Unexpected situation.
+                result = false;
+                OS_OUTPUT_DEBUG_LOG(L"Error while parsing the device list dumped by RGA.", OS_DEBUG_LOG_ERROR);
+                break;
+            }
+            const std::string& gen  = deviceIt->substr(genStartOffset + 1, genEndOffset - genStartOffset - 1);
+            const std::string& arch = deviceIt->substr(0, genStartOffset - 1);
+
+            // Walk over all marketing names for this architecture. They start with space or tab.
+            while (++deviceIt != rgaDevices.end() && deviceIt->find_first_of(" \t") == 0)
+            {
+                currentArchMap.insert({arch, *deviceIt});
+            }
+
+            // Put the architecture and corresponding marketing names to the device map.
+            deviceMap.insert({gen, currentArchMap});
+            currentArchMap.clear();
+        }
+        else
+        {
+            deviceIt++;
+        }
+    }
+
+    assert(result);
+    if (result)
+    {
+        // Step 2. Dump the content of device map to the output device name list.
+        codexlDevices.push_back(CheckableTreeItem::encodeHeaderData(QString("Devices")));
+        std::string  gen, arch;
+
+        for (auto genIt = deviceMap.cbegin(); genIt != deviceMap.cend(); genIt++)
+        {
+            // Put the unique generation name.
+            if (genIt->first != gen)
+            {
+                gen = genIt->first;
+                codexlDevices.push_back(CheckableTreeItem::encodeData(QString(gen.c_str()), false, 1));
+            }
+
+            const auto& archMap = genIt->second;
+
+            // Set "checked" property for the last arch of each generation.
+            // Special case for GFX6, GFX7 and GFX8: select "Tahiti", "Bonaire" and "Ellesmere", respectively.
+            bool archChecked = false;
+            if (genIt->first == KA_STR_GFX6_GEN_NAME || genIt->first == KA_STR_GFX7_GEN_NAME || genIt->first == KA_STR_GFX8_GEN_NAME)
+            {
+                if (!archMap.empty() &&
+                    (archMap.cbegin()->first == KA_STR_DEFAULT_GFX6_ARCH ||
+                     archMap.cbegin()->first == KA_STR_DEFAULT_GFX7_ARCH ||
+                     archMap.cbegin()->first == KA_STR_DEFAULT_GFX8_ARCH))
+                {
+                    archChecked = true;
+                }
+            }
+            else
+            {
+                archChecked = (genIt == (--deviceMap.upper_bound(genIt->first)));
+            }
+
+            for (auto archIt = archMap.cbegin(); archIt != archMap.cend(); archIt++)
+            {
+                // Put the unique arch name.
+                if (archIt->first != arch)
+                {
+                    arch = archIt->first;
+                    codexlDevices.push_back(CheckableTreeItem::encodeData(QString(arch.c_str()), archChecked, 2));
+                }
+                // Put the device name.
+                codexlDevices.push_back(CheckableTreeItem::encodeData(QString(archIt->second.c_str()), archChecked, 3));
+            }
+        }
+    }
+
+    return result;
+}
 
 // *** INTERNALLY-LINKED AUXILIARY FUNCTIONS - END ***
 
@@ -477,16 +592,25 @@ beKA::beStatus kaBackendManager::getASICsTreeList(beKA::DeviceTableKind kind,
         {
             case beKA::DeviceTableKind_OpenCL:
             {
-                beProgramBuilderOpenCL* pOpenCLBuilder = m_pBackend->theOpenCLBuilder();
+                // Launch RGA to get the list of devices it supports.
+                std::vector<std::string>  devices;
+                ret = (GetOpenCLDevices(devices) && ConvertRGADeviceList(devices, *pStrListOut)) ?
+                          beStatus_SUCCESS : beStatus_BACKEND_NOT_INITIALIZED;
 
-                if (nullptr != pOpenCLBuilder)
+                // If "dynamic" initialization of device list failed, try legacy "static" method.
+                if (ret != beStatus_SUCCESS)
                 {
-                    std::set<std::string> uniqueNames;
-                    bool isOk = pOpenCLBuilder->GetAllGraphicsCards(deviceTable, uniqueNames);
+                    beProgramBuilderOpenCL* pOpenCLBuilder = m_pBackend->theOpenCLBuilder();
 
-                    if (isOk)
+                    if (nullptr != pOpenCLBuilder)
                     {
-                        ret = makeASICsStringList(deviceTable, includeCPU, &m_deviceNameMaketNameMapCL, nullptr, pStrListOut);
+                        std::set<std::string> uniqueNames;
+                        bool isOk = pOpenCLBuilder->GetAllGraphicsCards(deviceTable, uniqueNames);
+
+                        if (isOk)
+                        {
+                            ret = makeASICsStringList(deviceTable, includeCPU, &m_deviceNameMaketNameMapCL, nullptr, pStrListOut);
+                        }
                     }
                 }
             }

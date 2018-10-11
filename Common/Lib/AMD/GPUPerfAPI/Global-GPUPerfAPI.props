@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Label="UserMacros">
-    <GPUPerfAPIDir>$(CommonDir)\Lib\AMD\GPUPerfAPI\2_23</GPUPerfAPIDir>
+    <GPUPerfAPIDir>$(CommonDir)\Lib\AMD\GPUPerfAPI\3_2</GPUPerfAPIDir>
   </PropertyGroup>
   <PropertyGroup>
     <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>

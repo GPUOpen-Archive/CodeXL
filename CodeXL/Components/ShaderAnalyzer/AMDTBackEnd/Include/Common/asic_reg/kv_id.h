@@ -1,25 +1,4 @@
-/*****************************************************************************\
-*
-*  Module Name    kv_id.h
-*  Project        Kaveri Family
-*  Device         Spectre, Spooky, KALINDI
-*
-*  Description    Identifier file for Kaveri and Kabini driver
-*
-*
-*  (c) 2011 AMD (unpublished)
-*
-*  All rights reserved.  This notice is intended as a precaution against
-*  inadvertent publication and does not imply publication or any waiver
-*  of confidentiality.  The year included in the foregoing notice is the
-*  year of creation of the work.
-*
-*  LOG OF CHANGES
-*
-*  0.1    07/27/11 [szhao] - initial revision
-*
-\*****************************************************************************/
-
+// Copyright (c) 2011-2017 Advanced Micro Devices, Inc. All rights reserved.
 #ifndef KV_ID_H
 #define KV_ID_H
 

@@ -18,13 +18,11 @@ GPUProf_env.VariantDir(buildDirPath, GPUProf_env['CXL_common_dir'] + '/Src')
 UseTinyXml(GPUProf_env)
 UseQScintilla(GPUProf_env)
 UseQt4(GPUProf_env)
-UseQCustomPlot(GPUProf_env)
 
 GPUProf_env.Append( LIBS=
 [
     'CXLRemoteClient',
     'CXLSharedProfiling',
-    'CXLGraphicsServerInterface'
 ])
 
 ###################################################
@@ -43,13 +41,12 @@ GPUProf_env.Append( CPPPATH = [
     GPUProf_env['CXL_common_dir'] + '/Src/AMDTMutex',
     GPUProf_env['CXL_common_dir'] + '/Lib/Ext/utf8cpp/source',
     GPUProf_env['CXL_common_dir'] + '/Lib/AMD/RCP/include',
-    GPUProf_env['CXL_common_dir'] + '/Lib/AMD/GPUPerfAPI/2_23/Include',
+    GPUProf_env['CXL_common_dir'] + '/Lib/AMD/GPUPerfAPI/3_2/Include',
     GPUProf_env['CXL_commonproj_dir'],
     GPUProf_env['CXL_common_dir'] + '/../CodeXL',
     GPUProf_env['CXL_common_dir'] + '/../CodeXL/Components',
     GPUProf_env['CXL_common_dir'] + '/../CodeXL/Components/AMDTSharedProfiling/inc',
     GPUProf_env['CXL_common_dir'] + '/../CodeXL/Remote',
-    GPUProf_env['CXL_common_dir'] + '/../CodeXL/Components/Graphics',
     os.getcwd(),
     '#obj',
     ])
@@ -66,17 +63,11 @@ if GPUProf_env['CXL_os'] == 'Linux':
     GPUProf_env.Prepend(CPPDEFINES="_LINUX")
 # No libpath or libraries for ADL
 
-# NOTE: [Suravee] 
-# Comment this out for now since Chris said this is not needed for the front end.
 # Cal 8.95
 cal_dir = GPUProf_env['CXL_common_dir'] + '/Lib/AMD/CAL/8.95'
 cal_inc = cal_dir + '/include'
-#cal_libpath = cal_dir + '/lib/' + GPUProf_env['CXL_arch']
-#cal_libs = ['aticalcl', 'aticaldd', 'aticalrt']
 #
 GPUProf_env.Append(CPPPATH = [cal_inc])
-#GPUProf_env.Append(LIBPATH = [cal_libpath])
-#GPUProf_env.Append(LIBS = cal_libs)
 
 # APPSDK 3.0 - headers only.
 appsdk_dir = GPUProf_env['CXL_common_dir'] + '/Lib/AMD/APPSDK/3-0'
@@ -103,6 +94,7 @@ uic_files = Split(
         )
 
 moc_files = Split(
+        'gpBaseSessionView.h ' +
         'gpViewsCreator.h ' +
         'APITimelineItems.h ' +
         'CounterSelectionSettingPage.h ' +
@@ -119,32 +111,7 @@ moc_files = Split(
         'CodeViewerWindow.h ' +
         'CustomDataTypes.h ' +
         'SessionControl.h ' +
-        'SessionWindow.h ' +
-        'ProfileSessionDataItem.h ' +
-        'gpBaseSessionView.h ' +
-        'gpConnectDialog.h ' +
-        'gpCountersSelectionDialog.h ' +
-        'gpDetailedDataRibbon.h ' +
-        'gpSessionView.h ' +
-        'gpSessionUpdaterThread.h ' +
-        'gpFrameView.h ' +
-        'gpUIManager.h ' +
-        'gpTimeline.h ' +
-        'gpTraceModels.h ' +
-        'gpTraceTable.h ' + 
-        'gpTraceTree.h ' + 
-        'gpNavigationRibbon.h ' + 
-        'gpOverview.h ' +
-        'gpProjectSettingsExtension.h ' +
-        'gpTraceView.h ' +
-        'gpTraceSummaryWidget.h ' +
-        'gpCommandListSummaryTab.h ' +
-        'gpTraceSummaryTab.h ' +
-        'gpSummaryTab.h ' +
-        'gpCommandListSummaryTable.h ' +
-        'gpSummaryTable.h ' +
-        'gpTraceSummaryTable.h ' +
-        'gpPerformanceCountersDataView.h '
+        'SessionWindow.h '
         )
 
 # This leaves annoying artifacts (objects) in ..../Common/Src
@@ -179,7 +146,6 @@ gpuprof_files = Split(
         'CounterManager.cpp ' +
         'CounterSelectionSettingPage.cpp ' +
         'CustomDataTypes.cpp ' +
-        'DXTimelineItems.cpp ' +
         'EditNameValueDialog.cpp ' +
         'FindToolBarView.cpp ' +
         'GeneralSettingWindow.cpp ' +
@@ -209,48 +175,10 @@ gpuprof_files = Split(
         'TraceView.cpp ' +
         'Util.cpp ' + 
         'gpBaseSessionView.cpp ' +
-        'gpConnectDialog.cpp ' +
-        'gpCountersSelectionDialog.cpp ' +
-        'gpDetailedDataRibbon.cpp ' +
-        'gpSessionView.cpp ' +
-        'gpSessionUpdaterThread.cpp ' +
-        'gpFrameView.cpp ' +
-        'gpTraceDataContainer.cpp ' +
-        'gpTimeline.cpp ' +
-        'gpTraceModels.cpp ' +
-        'gpTraceTable.cpp ' +
-        'gpTraceTree.cpp ' +
-        'gpExecutionMode.cpp ' +
-        'gpRemoteGraphicsBackendHandler.cpp ' +
-        'gpMenuActionsExecutor.cpp ' +
-        'gpNavigationRibbon.cpp ' +
-        'gpOverview.cpp ' +
-        'gpTraceDataParser.cpp ' +
-        'gpProjectSettings.cpp ' +
-        'gpProjectSettingsExtension.cpp ' +
-        'gpRibbonDataCalculator.cpp ' +
-        'gpTraceDataModel.cpp ' +
-        'gpTraceView.cpp ' +
-        'gpTraceSummaryWidget.cpp ' +
-        'gpCommandListSummaryTab.cpp ' +
-        'gpSummaryTab.cpp ' +
-        'gpTraceSummaryTab.cpp ' +
-        'gpCommandListSummaryTable.cpp ' +
-        'gpSummaryTable.cpp ' +
-        'gpTraceSummaryTable.cpp ' +
-        'gpPerformanceCountersDataView.cpp ' +
         'gpTreeHandler.cpp ' +
-        'gpUIManager.cpp ' +
-        'ProfileSessionDataItem.cpp ' +
         'AtpUtils.cpp ' +
         'CXLAnalyzerHTMLUtils.cpp ' +
-        'CXLAtpFile.cpp ' +
-        'DX12Trace/DX12APIInfo.cpp ' +
-        'DX12Trace/DX12AtpFile.cpp ' +
-        'DX12Trace/DX12FunctionDefs.cpp ' +
-        'VulkanTrace/VulkanAPIInfo.cpp ' +
-        'VulkanTrace/VulkanAtpFile.cpp ' +
-        'VulkanTrace/VulkanFunctionDefs.cpp '
+        'CXLAtpFile.cpp '
         )
 
 # Generated files first.

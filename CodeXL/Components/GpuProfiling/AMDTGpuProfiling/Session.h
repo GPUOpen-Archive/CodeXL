@@ -1,16 +1,9 @@
 //=====================================================================
-// Copyright (c) 2012 Advanced Micro Devices, Inc. All rights reserved.
+// Copyright (c) 2012-2018 Advanced Micro Devices, Inc. All rights reserved.
 //
 /// \author GPU Developer Tools
-/// \file $File: //devtools/main/CodeXL/Components/GpuProfiling/AMDTGpuProfiling/Session.h $
-/// \version $Revision: #41 $
+/// \file
 /// \brief :  This file contains GPUSessionTreeItemData class
-//
-//=====================================================================
-// $Id: //devtools/main/CodeXL/Components/GpuProfiling/AMDTGpuProfiling/Session.h#41 $
-// Last checkin:   $DateTime: 2016/04/18 06:02:03 $
-// Last edited by: $Author: salgrana $
-// Change list:    $Change: 569613 $
 //=====================================================================
 
 #ifndef _SESSION_H_
@@ -29,7 +22,6 @@
 #include <AMDTGpuProfiling/OccupancyInfo.h>
 #include <AMDTGpuProfiling/ProjectSettings.h>
 #include <AMDTGpuProfiling/Util.h>
-#include <AMDTGpuProfiling/gpUIManager.h>
 
 #include <IOccupancyFileInfoDataHandler.h>
 
@@ -310,49 +302,6 @@ protected:
 private:
     osFilePath m_sessionTemporaryFile;
 };
-
-
-class AMDT_GPU_PROF_API gpSessionTreeNodeData : public GPUSessionTreeItemData
-{
-    Q_OBJECT
-
-public:
-    /// Initializes a new instance of the PerformanceCounterSession class.
-    /// \param strName the session name
-    /// \param strWorkingDirectory the project's working directory
-    /// \param strSessionFilePath the session file path
-    /// \param strSessionOutputFile the session's output file
-    /// \param strProjName project name
-    /// \param isImported is the session imported
-    gpSessionTreeNodeData(const QString& strName,
-                          const QString& strWorkingDirectory,
-                          const QString& strSessionFilePath,
-                          const QString& strProjName,
-                          bool isImported);
-
-    virtual ~gpSessionTreeNodeData();
-
-    /// HTML content title (override for non-profile items)
-    /// htmlContent the HTML content
-    virtual void StartSessionHTML(afHTMLContent& htmlContent) const;
-
-    /// Delete session files
-    /// \param report Report of deletion, one line for each item
-    /// \return true if could delete
-    virtual bool DeleteSessionFilesFromDisk(QString& report);
-
-    /// Contain a vector of captured frame indices
-    QVector<FrameIndex> m_capturedFramesIndices;
-
-    /// Contain the specific tree item file path (timeline / profile / etc')
-    osFilePath m_frameFilePath;
-
-    /// Frame index
-    FrameIndex m_frameIndex;
-
-    QString m_strSessionFilePath;
-};
-
 
 #endif // _SESSION_H_
 

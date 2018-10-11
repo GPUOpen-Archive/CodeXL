@@ -112,12 +112,8 @@ public:
         LayoutNoProject = 0,
         LayoutNoProjectOutput,
         LayoutDebug,
-        LayoutDebugKernel,
-        LayoutProfileCPU,
         LayoutProfileGPU,
-        LayoutProfilePP,
         LayoutKernelAnalyzer,
-        LayoutFrameAnalysis,
         nLayoutFormats
     };
     // Store layout:

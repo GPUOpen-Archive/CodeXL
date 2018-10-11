@@ -1,16 +1,9 @@
 //=====================================================================
-// Copyright (c) 2012 Advanced Micro Devices, Inc. All rights reserved.
+// Copyright (c) 2012-2018 Advanced Micro Devices, Inc. All rights reserved.
 //
 /// \author GPU Developer Tools
-/// \file $File: //devtools/main/CodeXL/Components/GpuProfiling/AMDTGpuProfiling/ProfileManager.h $
-/// \version $Revision: #52 $
+/// \file
 /// \brief :  This file contains ProfileManager class
-//
-//=====================================================================
-// $Id: //devtools/main/CodeXL/Components/GpuProfiling/AMDTGpuProfiling/ProfileManager.h#52 $
-// Last checkin:   $DateTime: 2016/04/18 06:02:03 $
-// Last edited by: $Author: salgrana $
-// Change list:    $Change: 569613 $
 //=====================================================================
 
 #ifndef _PROFILE_MANAGER_H_
@@ -74,14 +67,14 @@ public:
     /// Adds the profile types to the Profile Menu
     void SetupGPUProfiling();
 
-    /// Call CodeXLGpuProfiler executable to generate summary pages from atp file. Listen for the SummaryPagesGenerationFinished signal to know when async generation is complete
+    /// Call RCP executable to generate summary pages from atp file. Listen for the SummaryPagesGenerationFinished signal to know when async generation is complete
     /// \param strInputAtpFile input atp file
     /// \param strSessionName the name of the session that summary pages are being generated for
     /// \param[out] strErrorMessageOut error message out
     /// \return True if pages are generated successfully
     bool GenerateSummaryPages(const QString& strInputAtpFile, const QString& strSessionName, QString& strErrorMessageOut);
 
-    /// Call CodeXLGpuProfiler executable to generates Occupancy pages. Listen for the OccupancyFileGenerationFinished signal to know when async generation is complete
+    /// Call RCP executable to generates Occupancy pages. Listen for the OccupancyFileGenerationFinished signal to know when async generation is complete
     /// \param pSession session of which occupancy is displayed
     /// \param pOccInfo occupancy information
     /// \param callIndex call index
@@ -109,9 +102,6 @@ public:
     /// Handle invalid project settings
     virtual void HandleInvalidProjectSettings(bool& isProfileSettingsOK, osProcessId& processId);
 
-    /// Return the frame analysis mode manager
-    gpExecutionMode* GetFrameAnalysisModeManager() const { return m_pFrameAnalysisMode; };
-
     /// Add the specified session to the explorer (or to the deferred loading list for when the explorer is shown in the future) and optionally shows the session
     /// \param pSession the session to add and show
     /// \param doShow flag indicating if the session should be shown or not
@@ -131,12 +121,6 @@ protected:
     /// \param oldSessionDirectory the old session directory
     void HandleGPUSessionRename(SessionTreeNodeData* pRenamedSessionData, const osFilePath& oldSessionFilePath);
 
-    /// Rename all the specific files for frame analysis sessions
-    /// \param pRenamedSessionData the item data for the session been renamed
-    /// \param oldSessionFilePath the old session file path
-    /// \param oldSessionDirectory the old session directory
-    void HandleFASessionRename(SessionTreeNodeData* pRenamedSessionData, const osFilePath& oldSessionFilePath);
-
 protected slots:
     /// Handler for when Profiling starts
     /// \param profileTypeStr profile type string
@@ -153,7 +137,7 @@ protected slots:
     void ProfilingFinishedHandler(int exitCode, ProfileProcessMonitor::ProfileServerRunType runType);
 
     /// handler for when generation of the Summary Pages is complete
-    /// \param success indicates whether or not CodeXLGpuProfiler completed successfully
+    /// \param success indicates whether or not RCP completed successfully
     /// \param strError error message on failure
     void SummaryPagesGenerationFinishedHandler(bool success, const QString& strError);
 
@@ -169,12 +153,6 @@ protected slots:
     /// \param oldSessionDirectory the old session directory
     void SessionRenamedHandler(SessionTreeNodeData* pRenamedSessionData, const osFilePath& oldSessionFilePath, const osDirectory& oldSessionDirectory);
 
-    /// Is called before a session is renamed:
-    /// \param pAboutToRenameSessionData the item data for the session which is about to be renamed
-    /// \param isRenameEnabled is the rename enabled?
-    /// \param renameDisableMessage message for the user is the rename is disabled
-    void OnBeforeSessionRename(SessionTreeNodeData* pAboutToRenameSessionData, bool& isRenameEnabled, QString& renameDisableMessage);
-
     /// handler for when a file is imported
     /// \param strFileName the name of the file being imported
     /// \param[out] imported flag indicating if this file was successfully imported.  Should ONLY be set to true if the file was imported.
@@ -182,18 +160,18 @@ protected slots:
 
 signals:
     /// Profiling is finished
-    /// \param profileSuccess indicates whether or not CodeXLGpuProfiler completed successfully
+    /// \param profileSuccess indicates whether or not RCP completed successfully
     /// \param strError error if any
     /// \param pSession newly generated session
     void ProfilingFinished(bool profileSuccess, QString strError, GPUSessionTreeItemData* pSession);
 
     /// Generation of the Summary Pages is complete
-    /// \param success indicates whether or not CodeXLGpuProfiler completed successfully
+    /// \param success indicates whether or not RCP completed successfully
     /// \param strError error message on failure
     void SummaryPagesGenerationFinished(bool success, const QString& strError);
 
     /// Generation of the Occupancy HTML file is complete
-    /// \param success indicates whether or not CodeXLGpuProfiler completed successfully
+    /// \param success indicates whether or not RCP completed successfully
     /// \param strError error message on failure
     /// \param strOccupancyHTMLFileName the name of the Occupancy HTML file that was generated
     void OccupancyFileGenerationFinished(bool success, const QString& strError, const QString& strOccupancyHTMLFileName);
@@ -209,16 +187,16 @@ private:
     /// Makes the signals/slots connection for the SesionExplorer and adds the file filter types
     void HookupSessionExplorer();
 
-    /// Get the appropriate CodeXLGpuProfiler executable
-    /// \param[out] strServer the name of the CodeXLGpuProfiler executable
+    /// Get the appropriate RCP executable
+    /// \param[out] strServer the name of the RCP executable
     /// \param[out] strErrorMessageOut an error message if the function fails
-    /// \return true if the CodeXLGpuProfiler exe if returned, false otherwise
+    /// \return true if the RCP exe if returned, false otherwise
     bool GetProfilerServer(osFilePath& strServer, QString& strErrorMessageOut);
 
-    /// Launch CodeXLGpuProfiler executable with the specified options for the specified reason
-    /// \param strServer full path to the CodeXLGpuProfiler executable
-    /// \param strOptions the set of options to pass to CodeXLGpuProfiler
-    /// \param runType the reason CodeXLGpuProfiler is being executed
+    /// Launch RCP executable with the specified options for the specified reason
+    /// \param strServer full path to the RCP executable
+    /// \param strOptions the set of options to pass to RCP
+    /// \param runType the reason RCP is being executed
     /// \param[out] strErrorMessageOut error message, if any
     /// \return true if the server is successfully launched, false otherwise
     bool LaunchProfilerServer(const osFilePath& strServer, const gtString& strOptions, ProfileProcessMonitor::ProfileServerRunType runType, QString& strErrorMessageOut);
@@ -283,20 +261,20 @@ private:
     /// \param strSessionFile the full path of the session file
     void AddImportedSession(const QString& strSessionName, GPUProfileType profileType, const QString& strSessionFile);
 
-    /// helper to deal with a profiling CodeXLGpuProfiler session completing
-    /// \param exitCode the exit code of the CodeXLGpuProfiler process
+    /// helper to deal with an RCP profiling session completing
+    /// \param exitCode the exit code of the RCP process
     void HandleProfileFinished(int exitCode);
 
     /// Handles the situation when the profile has finished, and there is no output file
     /// \param strError the user error output message
     void HandleMissingProfileOutput(QString& strError);
 
-    /// helper to deal with a summary generation CodeXLGpuProfiler session completing
-    /// \param exitCode the exit code of the CodeXLGpuProfiler process
+    /// helper to deal with an RCP summary generation session completing
+    /// \param exitCode the exit code of the RCP process
     void HandleGenSummaryFinished(int exitCode);
 
-    /// helper to deal with a occupancy generation CodeXLGpuProfiler session completing
-    /// \param exitCode the exit code of the CodeXLGpuProfiler process
+    /// helper to deal with an RCP occupancy generation session completing
+    /// \param exitCode the exit code of the RCP process
     void HandleGenOccupancyFinished(int exitCode);
 
     /// Import a session file:
@@ -304,12 +282,9 @@ private:
     /// \param importedSessionDir the imported session destination folder
     bool DoImport(GPUSessionTreeItemData* pTempSessionItemData, const osDirectory& importedSessionDir);
 
-    /// helper extract kernels names from a coma separated string and write to m_pSpecificKernelsFile file
+    /// helper extract kernels names from a comma separated string and write to m_pSpecificKernelsFile file
     /// it will be used as input for profiling
     bool ExportSpecificKernelsToFile(gtString& kernels);
-
-    /// Exracts data from archived frame analysis session and creates gpSessionTreeNodeData
-    bool ExtractArchivedSession(const QString& strSessionFilePath, osDirectory sessionOSDir, const QString& strProjName, gtString& xmlFileNewName, gtString& strSessionDisplayName);
 
     /// Rename session files according to imported session naming convention
    bool RenameSessionFiles(const osDirectory& sessionDir, const gtString& stringToReplace, const gtString& newString);
@@ -331,9 +306,6 @@ private:
     QString                           m_strOutputOccHTMLPage;   ///< used to store the name of the HTML file when generating occupancy HTML page asynchronously
     QString                           m_strRemoteProfilingError;///< used to the error message for errors which occur during asynchronous remote profiling
 
-    // frame analysis execution mode
-    gpExecutionMode* m_pFrameAnalysisMode;
-
     /// Static list of file extensions that should be renamed when the session is renamed
     static QList<gtString>           m_sAdditionalFileExtensionsToRename;
 
@@ -345,4 +317,3 @@ private:
 };
 
 #endif // _PROFILE_MANAGER_H_
-

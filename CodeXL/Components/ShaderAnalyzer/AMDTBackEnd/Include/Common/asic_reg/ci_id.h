@@ -1,23 +1,4 @@
-/*****************************************************************************\
-*
-*  Module Name    ci_id.h
-*  Project        SEA ISLANDS
-*  Devices        SEA ISLANDS
-*
-*  Description    Defining Device IDs, ASIC revision IDs for SEA ISLANDS
-*
-*
-*  (c) 2011 Advanced Micro Devices, Inc. (unpublished)
-*
-*  All rights reserved.  This notice is intended as a precaution against
-*  inadvertent publication and does not imply publication or any waiver
-*  of confidentiality.  The year included in the foregoing notice is the
-*  year of creation of the work.
-*
-*  LOG OF CHANGES
-*
-\*****************************************************************************/
-
+// Copyright (c) 2011-2017 Advanced Micro Devices, Inc. All rights reserved.
 #ifndef _CI_ID_H
 #define _CI_ID_H
 

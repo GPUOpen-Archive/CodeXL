@@ -1,16 +1,10 @@
 //=====================================================================
-// Copyright (c) 2012 Advanced Micro Devices, Inc. All rights reserved.
+// Copyright (c) 2012-2018 Advanced Micro Devices, Inc. All rights reserved.
 //
 /// \author GPU Developer Tools
-/// \file $File: //devtools/main/CodeXL/Components/GpuProfiling/AMDTGpuProfiling/gpViewsCreator.h $
-/// \version $Revision: #13 $
+/// \file
+/// \version
 /// \brief  This file contains the MDI views added by the GPU Profiler plugin
-//
-//=====================================================================
-// $Id: //devtools/main/CodeXL/Components/GpuProfiling/AMDTGpuProfiling/gpViewsCreator.h#13 $
-// Last checkin:   $DateTime: 2016/03/17 05:20:00 $
-// Last edited by: $Author: salgrana $
-// Change list:    $Change: 564197 $
 //=====================================================================
 
 #ifndef _GPVIEWSCREATOR_H_
@@ -62,19 +56,7 @@ enum GPUWindowType
     /// API Trace window
     GPUWindowTypeAPITrace,
 
-    /// Ojbect Inspector window
-    GPUWindowTypeObjectInspector,
-
-    /// Frame analysis dashboard
-    GPUWindowTypeFrameAnalysisSession,
-
-    /// Frame analysis frame view
-    GPUWindowTypeFrameAnalysisFrameView,
-
-    /// Frame analysis Object Inspector
-    GPUWindowTypeFrameAnalysisObjectInspector,
-
-    GPUWindowTypesCount = GPUWindowTypeFrameAnalysisObjectInspector
+    GPUWindowTypesCount = GPUWindowTypeAPITrace
 };
 
 /// View Creator for the GPU Profiler GPUSessionTreeItemData views
@@ -124,11 +106,6 @@ public:
     virtual void handleUiUpdate(int viewIndex, int actionIndex);
 
     virtual bool displayExistingView(const apMDIViewCreateEvent& mdiViewEvent);
-
-    /// Enable the creator to block the process of a file open.
-    /// \param cannotOpenFileMessage the message displayed to the user in case that the file cannot be opened
-    /// \return true iff the file can currently be opened
-    virtual bool CanFileBeOpened(const osFilePath& filePath, gtString& cannotOpenFileMessage);
 
     /// Try to find a window that is matching this file path:
     /// For sessions, look for the file path itself
@@ -189,9 +166,6 @@ public:
     /// \param sessionPath the session file path
     QWidget* CreateMDIWidget(QWidget* pParent, const osFilePath& sessionPath);
 
-    // Events:
-    virtual bool onMDISubWindowClose(afQMdiSubWindow* pMDISubWindow);
-
 private:
     /// Initializes the GpuProfilerMDIViewsCreator singleton
     gpViewsCreator();
@@ -214,30 +188,10 @@ private:
     /// \return true if widget is successfully created, false otherwise
     bool GetWidgetForFilePath(GPUWindowType profileType, QWidget* pParent, const osFilePath& sessionPath, QWidget*& pWidget);
 
-    /// Creates frame analysis dashboard
-    /// \param pParent the parent widget
-    /// \return the created dashboard window
-    SharedSessionWindow* CreateFrameAnalysisSessionView(QWidget* pParent, const osFilePath& sessionPath);
-
-    /// Creates frame analysis overview
-    /// \param pParent the parent widget
-    /// \return the created overview window
-    SharedSessionWindow* CreateFrameAnalysisFrameView(QWidget* pParent);
-
     /// Create an application trace session window:
     /// \param pParent the parent widget
     /// \return the created API trace window
     SharedSessionWindow* CreateAppTraceSessionWindow(QWidget* pParent);
-
-    /// Create an application object inspector session window:
-    /// \param pParent the parent widget
-    /// \return the created object inspector window
-    SharedSessionWindow* CreateFrameAnalysisObjectView(QWidget* pParent);
-
-    /// Create an application object inspector session window:
-    /// \param pParent the parent widget
-    /// \return the created object inspector window
-    SharedSessionWindow* CreateAppObjectInspectorSessionWindow(QWidget* pParent);
 
     /// Create a performance counters session window:
     /// \param pParent the parent widget
@@ -252,12 +206,6 @@ private:
     /// \param displayItemInView the type of the item that should be displayed within the view
     /// \param [out] errorMessage when the display fails, errorMessage should contain a message for the user
     bool LoadFileToView(SharedSessionWindow* pNewSessionWindow, const osFilePath& sessionFilePath, afTreeItemType displayItemInView, QString& errorMessage);
-
-    /// Load a DX session into a view
-    /// \param pNewSessionWindow the session created window
-    /// \param sessionFilePath the session file path
-    /// \param displayItemInView the type of the item that should be displayed within the view
-    bool LoadFrameAnalysisView(SharedSessionWindow* pNewSessionWindow, const osFilePath& sessionFilePath, afTreeItemType displayItemInView, QString& errorMessage);
 
     /// Convert a session path to a session name
     /// \param sessionFilePath the session full file path

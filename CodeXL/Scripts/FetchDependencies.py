@@ -17,17 +17,21 @@ if isPython3OrAbove:
 # key = GitHub release link
 # value = location
 downloadMappingWin = {
-    "https://github.com/GPUOpen-Tools/RGA/releases/download/1.2.0.0/rga-windows-x86-1.2.zip" : "../../Common/Lib/AMD/RGA/x86",
-    "https://github.com/GPUOpen-Tools/RGA/releases/download/1.2.0.0/rga-windows-x64-1.2.zip" : "../../Common/Lib/AMD/RGA/x64",
-    "https://github.com/GPUOpen-Tools/RCP/releases/download/v5.3/RadeonComputeProfiler-v5.3.6710.zip" : "../../Common/Lib/AMD/RCP",
-    "https://github.com/GPUOpen-Tools/RCP/releases/download/v5.3/RCPProfileDataParser-v5.3.6710.zip" : "../../Common/Lib/AMD/RCP",
-    "https://github.com/GPUOpen-Tools/GPA/releases/download/v2.23.1/GPUPerfAPI-2.23.2392.1.zip" : "../../Common/Lib/AMD/GPUPerfAPI"
+    "https://github.com/GPUOpen-Tools/RGA/releases/download/2.0.1/rga-windows-x86-2.0.1-cli-only.zip" : "../../Common/Lib/AMD/RGA/x86",
+    "https://github.com/GPUOpen-Tools/RGA/releases/download/2.0.1/rga-windows-x64-2.0.1.zip" : "../../Common/Lib/AMD/RGA/x64",
+    "https://github.com/GPUOpen-Tools/RCP/releases/download/v5.5/RadeonComputeProfiler-v5.5.6980.zip" : "../../Common/Lib/AMD/RCP",
+    "https://github.com/GPUOpen-Tools/RCP/releases/download/v5.5/RCPProfileDataParser-v5.5.6980.zip" : "../../Common/Lib/AMD/RCP",
+    "https://github.com/GPUOpen-Tools/GPA/releases/download/v3.2/GPUPerfAPI-3.2.623.0.zip" : "../../Common/Lib/AMD/GPUPerfAPI"
 }
 downloadMappingLin = {
-    "https://github.com/GPUOpen-Tools/RGA/releases/download/1.2.0.0/rga-linux-1.2.tgz" : "../../Common/Lib/AMD/RGA",
-    "https://github.com/GPUOpen-Tools/RCP/releases/download/v5.3/RadeonComputeProfiler-v5.3.6657.tgz" : "../../Common/Lib/AMD/RCP",
-    "https://github.com/GPUOpen-Tools/RCP/releases/download/v5.3/RCPProfileDataParser-v5.3.6657.tgz" : "../../Common/Lib/AMD/RCP",
-    "https://github.com/GPUOpen-Tools/GPA/releases/download/v2.23.1/GPUPerfAPI.2.23.1986-lnx.tgz" : "../../Common/Lib/AMD/GPUPerfAPI"
+    "https://github.com/GPUOpen-Tools/RGA/releases/download/2.0.1/rga-linux-2.0.1.tgz" : "../../Common/Lib/AMD/RGA",
+    "https://github.com/GPUOpen-Tools/RCP/releases/download/v5.5/RadeonComputeProfiler-v5.5.6947.tgz" : "../../Common/Lib/AMD/RCP",
+    "https://github.com/GPUOpen-Tools/RCP/releases/download/v5.5/RCPProfileDataParser-v5.5.6947.tgz" : "../../Common/Lib/AMD/RCP",
+    "https://github.com/GPUOpen-Tools/GPA/releases/download/v3.2/GPUPerfAPI.3.2.858-lnx.tgz" : "../../Common/Lib/AMD/GPUPerfAPI"
+}
+
+githubMappingLin = {
+    "https://github.com/GPUOpen-Tools/RCP" : ["v5.5", "../../Common/Lib/AMD/RCP/repo/RCP", "Scripts", "UpdateCommon.py"]
 }
 
 # to allow the script to be run from anywhere - not just the cwd - store the absolute path to the script file
@@ -75,5 +79,30 @@ def downloadandunzip(key, value):
             tarfile.open(zipPath).extractall(targetPath)
             os.remove(zipPath)
 
+def clonerepo(repoUrl, branch, location, scriptlocation, script):
+    # convert targetPath to OS specific format
+    tmppath = os.path.join(scriptRoot, "", location)
+    # clean up path, collapsing any ../ and converting / to \ for Windows
+    targetPath = os.path.normpath(tmppath)
+    if False == os.path.isdir(targetPath):
+        # clone
+        commandArgs = ["git", "clone", "--branch", branch, repoUrl, targetPath]
+        p = subprocess.Popen(commandArgs)
+        p.wait()
+        scriptloc = os.path.join(tmppath, scriptlocation)
+        scriptpath = os.path.join(scriptloc, script)
+        p = subprocess.Popen(["python", scriptpath], cwd=scriptloc)
+        p.wait()
+    else:
+        # pull
+        p = subprocess.Popen(["git","pull"], cwd=targetPath)
+        p.wait()
+    sys.stdout.flush()
+    sys.stderr.flush()
+
 for key in downloadMapping:
     downloadandunzip(key, downloadMapping[key])
+
+if MACHINE_OS == "Linux":
+   for key in githubMappingLin:
+       clonerepo(key, githubMappingLin[key][0], githubMappingLin[key][1], githubMappingLin[key][2], githubMappingLin[key][3])

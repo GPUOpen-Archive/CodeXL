@@ -43,7 +43,7 @@
 // Date:        12/9/2011
 // ---------------------------------------------------------------------------
 gdWatchView::gdWatchView(QWidget* pParent)
-    : acListCtrl(pParent), _pAddMultiWatchAction(NULL), _pApplicationCommands(NULL), m_stackDepth(-2), m_currentlyAddingLine(false)
+    : acListCtrl(pParent), _pApplicationCommands(NULL), m_stackDepth(-2), m_currentlyAddingLine(false)
 {
     // Get the application commands instance:
     _pApplicationCommands = gdApplicationCommands::gdInstance();
@@ -75,9 +75,6 @@ gdWatchView::gdWatchView(QWidget* pParent)
 
     // Add the editable row:
     addEditableWatchRow();
-
-    // Extend the context menu:
-    extendContextMenu();
 
     // Allow drops:
     setAcceptDrops(true);
@@ -626,98 +623,6 @@ bool gdWatchView::addWatch(const gtString& variableName)
     }
 
     return retVal;
-}
-
-// ---------------------------------------------------------------------------
-// Name:        gdWatchView::onAddMultiWatch
-// Description: Handling the "Add Multi Watch" command
-// Author:      Sigal Algranaty
-// Date:        25/9/2011
-// ---------------------------------------------------------------------------
-void gdWatchView::onAddMultiWatch()
-{
-    // Get the item at the context menu position:
-    QTableWidgetItem* pItemAtContextMenu = itemAt(m_contextMenuPosition);
-    GT_IF_WITH_ASSERT(pItemAtContextMenu != NULL)
-    {
-        // Get the row for the selected item:
-        int row = pItemAtContextMenu->row();
-
-        GT_IF_WITH_ASSERT(row >= 0)
-        {
-            // Get the first column item:
-            QTableWidgetItem* pItem0 = item(row, 0);
-            GT_IF_WITH_ASSERT(pItem0 != NULL)
-            {
-                // Get the current selected item:
-                QString textSelected = pItem0->text();
-
-                gtString textForWatch;
-                textForWatch.fromASCIIString(textSelected.toLatin1());
-
-                if (!textForWatch.isEmpty())
-                {
-                    // Get the watch view:
-                    GT_IF_WITH_ASSERT(_pApplicationCommands != NULL)
-                    {
-                        bool rc = _pApplicationCommands->displayMultiwatchVariable(textForWatch);
-                        GT_ASSERT(rc);
-                    }
-                }
-
-                // Else do nothing (no text for watch):
-            }
-        }
-    }
-}
-
-// ---------------------------------------------------------------------------
-// Name:        gdWatchView::extendContextMenu
-// Description: Extend the context menu (add watch & multiwatch actions)
-// Author:      Sigal Algranaty
-// Date:        26/9/2011
-// ---------------------------------------------------------------------------
-void gdWatchView::extendContextMenu()
-{
-    // Sanity check:
-    GT_IF_WITH_ASSERT(m_pContextMenu != NULL)
-    {
-        m_pContextMenu->addSeparator();
-
-        // Create an action for the "Add Multi Watch" menu item:
-        _pAddMultiWatchAction = new QAction(AF_STR_SourceCodeAddMultiWatch, m_pContextMenu);
-
-        // Add the action to the context menu:
-        m_pContextMenu->addAction(_pAddMultiWatchAction);
-
-        // Connect the action to its handler:
-        bool rcConnect = connect(_pAddMultiWatchAction, SIGNAL(triggered()), this, SLOT(onAddMultiWatch()));
-        GT_ASSERT(rcConnect);
-
-        // Connect the menu to an about to show slot:
-        rcConnect = connect(m_pContextMenu, SIGNAL(aboutToShow()), this, SLOT(onAboutToShowTextContextMenu()));
-        GT_ASSERT(rcConnect);
-    }
-}
-
-// ---------------------------------------------------------------------------
-// Name:        gdWatchView::onAboutToShowTextContextMenu
-// Description: Is called when the text context menu is shown - enable / disable
-//              the context menu actions according to the current debug situation
-// Author:      Sigal Algranaty
-// Date:        25/9/2011
-// ---------------------------------------------------------------------------
-void gdWatchView::onAboutToShowTextContextMenu()
-{
-    // Sanity check:
-    GT_IF_WITH_ASSERT(_pAddMultiWatchAction != NULL)
-    {
-        // Check if add watch actions should be enabled:
-        bool isEnabled = gaIsDebuggedProcessSuspended() && gaIsInKernelDebugging();
-
-        // Set the actions enable state:
-        _pAddMultiWatchAction->setEnabled(isEnabled);
-    }
 }
 
 // ---------------------------------------------------------------------------

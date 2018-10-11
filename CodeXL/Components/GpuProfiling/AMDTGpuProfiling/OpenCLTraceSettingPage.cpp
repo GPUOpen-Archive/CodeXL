@@ -417,7 +417,7 @@ bool OpenCLTraceOptions::setProjectSettingsXML(const gtString& projectAsXMLStrin
 
 void OpenCLTraceOptions::RestoreDefaultProjectSettings()
 {
-    m_currentSettings.RestoreDefault();
+    m_currentSettings.RestoreDefault(m_currentSettings.m_apiToTrace);
     m_currentSettings.m_pFilterManager->SetAPIFilterSet(gsFullAPIsList);
 
     RestoreCurrentSettings();
@@ -1183,7 +1183,7 @@ void OpenCLTraceOptions::AddHSAAPIFunctionsToTree()
     {
         QStringList groupNamesForItem;
 
-        for (int index = HSA_API_Type_UNKNOWN + 1; index < HSA_API_Type_COUNT; index++)
+        for (int index = HSA_API_Type_UNKNOWN + 1; index < HSA_API_Type_Init; index++)
         {
             HSA_API_Type type = HSA_API_Type(index);
             HSAAPIGroups groups = HSAAPIDefs::Instance()->GetHSAAPIGroup(type);
@@ -1256,11 +1256,21 @@ void OpenCLTraceOptions::AddHSAAPIFunctionsToTree()
                 {
                     groupNamesForItem.append(HSAAPIDefs::Instance()->GroupToString(HSAAPIGroup_Signal));
                 }
+
+                if (groups == HSAAPIGroup_ExtensionsAMD)
+                {
+                    groupNamesForItem.append(HSAAPIDefs::Instance()->GroupToString(HSAAPIGroup_ExtensionsAMD));
+                }
+
+                if (groups == HSAAPIGroup_VendorExtensionsAMD)
+                {
+                    groupNamesForItem.append(HSAAPIDefs::Instance()->GroupToString(HSAAPIGroup_VendorExtensionsAMD));
+                }
             }
 
             QTreeWidgetItem* pCurrentHSAAPIGroup = nullptr;
 
-            if (groups != HSA_API_Type_UNKNOWN)
+            GT_IF_WITH_ASSERT(groups != HSAAPIGroup_Unknown)
             {
                 for (int i = 0; i < groupNamesForItem.count(); i++)
                 {

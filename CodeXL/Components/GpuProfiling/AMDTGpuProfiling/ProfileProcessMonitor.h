@@ -1,16 +1,11 @@
 //=============================================================
-// (c) 2012 Advanced Micro Devices, Inc.
+// Copyright (c) 2012-2018 Advanced Micro Devices, Inc. All rights reserved.
 //
 /// \author GPU Developer Tools
-/// \version $Revision: #9 $
-/// \brief  This file contains ProfileProcessMonitor which monitors the CodeXLGpuProfiler process to know when it terminates.
-//
+/// \file
+/// \brief  This file contains ProfileProcessMonitor which monitors the RCP process to know when it terminates.
 //=============================================================
-// $Id: //devtools/main/CodeXL/Components/GpuProfiling/AMDTGpuProfiling/ProfileProcessMonitor.h#9 $
-// Last checkin:   $DateTime: 2015/10/06 11:59:06 $
-// Last edited by: $Author: chesik $
-// Change list:    $Change: 542961 $
-//=============================================================
+
 #ifndef _PROFILE_PROCESS_MONITOR_H
 #define _PROFILE_PROCESS_MONITOR_H
 
@@ -21,14 +16,13 @@ class ProfileProcessMonitor : public osThread
 {
 public:
 
-    /// Enum defining the reason that CodeXLGpuProfiler is being called
+    /// Enum defining the reason that rcprof is being called
     enum ProfileServerRunType
     {
-        ProfileServerRunType_Unknown = -1,     ///< CodeXLGpuProfiler is called for unknown reason
-        ProfileServerRunType_Profile = 0,      ///< CodeXLGpuProfiler is called to profile an application
-        ProfileServerRunType_GenSummary = 1,   ///< CodeXLGpuProfiler is called to generate summary pages
-        ProfileServerRunType_GenOccupancy = 2, ///< CodeXLGpuProfiler is called to generate an occupancy display page
-        PerfStudioServerRunType_Application,   ///< PerfStudio is running an application process monitoring
+        ProfileServerRunType_Unknown = -1,     ///< RCP is called for unknown reason
+        ProfileServerRunType_Profile = 0,      ///< RCP is called to profile an application
+        ProfileServerRunType_GenSummary = 1,   ///< RCP is called to generate summary pages
+        ProfileServerRunType_GenOccupancy = 2, ///< RCP is called to generate an occupancy display page
     };
 
     /// Initializes a new instance of the ProfileProcessMonitor class

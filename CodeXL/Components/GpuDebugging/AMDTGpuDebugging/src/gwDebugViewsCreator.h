@@ -113,9 +113,6 @@ public:
     gdDebuggedProcessEventsView* debuggedProcessEventsView() {return m_pDebuggedProcessEventsView;};
     gdCallStackView* callStackView() {return m_pCallStackView;};
     gdMemoryView* memoryView() {return m_pMemoryView;};
-    gdMultiWatchView* multiWatchView1() {return m_pMultiWatchView1;};
-    gdMultiWatchView* multiWatchView2() {return m_pMultiWatchView2;};
-    gdMultiWatchView* multiWatchView3() {return m_pMultiWatchView3;};
 
 protected:
 
@@ -128,9 +125,6 @@ protected:
         gdLocalsViewIndex,
         gdWatchViewIndex,
         gdStateVariablesViewIndex,
-        gdMultiWatch1Index,
-        gdMultiWatch2Index,
-        gdMultiWatch3Index,
 
         gdBreakpointsViewIndex,
 
@@ -166,10 +160,6 @@ protected:
     gdDebuggedProcessEventsView* m_pDebuggedProcessEventsView;
     gdMemoryView* m_pMemoryView;
     gdCallStackView* m_pCallStackView;
-
-    gdMultiWatchView* m_pMultiWatchView1;
-    gdMultiWatchView* m_pMultiWatchView2;
-    gdMultiWatchView* m_pMultiWatchView3;
 
 };
 

@@ -29,7 +29,6 @@
 #include <AMDTGpuDebuggingComponents/Include/gdImagesAndBuffersManager.h>
 #include <AMDTGpuDebuggingComponents/Include/views/gdImageAndBufferViewsController.h>
 #include <AMDTGpuDebuggingComponents/Include/views/gdImageAndBufferView.h>
-#include <AMDTGpuDebuggingComponents/Include/views/gdMultiWatchView.h>
 #include <AMDTGpuDebuggingComponents/Include/views/gdThumbnailView.h>
 #include <AMDTGpuDebuggingComponents/Include/dialogs/gdSaveAllTexturesBuffersDialog.h>
 
@@ -1764,30 +1763,6 @@ void gdImageAndBufferViewsController::updateOpenedViewsHexDisplayMode(bool hexDi
             // Set the hex display mode:
             pImageBufferView->setHexDisplayMode(hexDisplayMode);
         }
-    }
-
-    // Get the application commands:
-    gdApplicationCommands* pApplicationCommands = gdApplicationCommands::gdInstance();
-    GT_IF_WITH_ASSERT(pApplicationCommands != NULL)
-    {
-        gdMultiWatchView* pMultiWatch1 = pApplicationCommands->multiWatchView(0);
-        GT_IF_WITH_ASSERT(pMultiWatch1 != NULL)
-        {
-            pMultiWatch1->setHexDisplayMode(hexDisplayMode);
-        }
-
-        gdMultiWatchView* pMultiWatch2 = pApplicationCommands->multiWatchView(1);
-        GT_IF_WITH_ASSERT(pMultiWatch2 != NULL)
-        {
-            pMultiWatch2->setHexDisplayMode(hexDisplayMode);
-        }
-
-        gdMultiWatchView* pMultiWatch3 = pApplicationCommands->multiWatchView(2);
-        GT_IF_WITH_ASSERT(pMultiWatch3 != NULL)
-        {
-            pMultiWatch3->setHexDisplayMode(hexDisplayMode);
-        }
-
     }
 }
 

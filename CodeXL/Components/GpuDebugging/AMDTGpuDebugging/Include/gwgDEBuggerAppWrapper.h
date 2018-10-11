@@ -20,7 +20,6 @@ class gdDebuggedProcessEventsView;
 class gdExecutionMode;
 class gdLocalsView;
 class gdMemoryView;
-class gdMultiWatchView;
 class gdPropertiesEventObserver;
 class gdStateVariablesView;
 class gdStatisticsPanel;
@@ -54,9 +53,6 @@ public:
     static gdStateVariablesView* stateVariablesView();
     static gdCommandQueuesView* commandQueuesView();
     static gdStatisticsPanel* statisticsPanel();
-    static gdMultiWatchView* multiWatchView1();
-    static gdMultiWatchView* multiWatchView2();
-    static gdMultiWatchView* multiWatchView3();
     static gwKernelWorkItemToolbar* kernelWorkItemToolbar();
     static gdBreakpointsView* breakpointsView();
     static gdWatchView* watchView();

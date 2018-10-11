@@ -141,6 +141,14 @@ bool LaunchRenderSessionForDevice(const BuildType buildType,
                                   const bool& shouldCancel,
                                   std::string& cliOutput);
 
+
+///-----------------------------------------------------------------------------
+/// \brief Name: GetOpenCLDevices
+/// \brief Description: Gets the list of devices supported by CLI.
+/// \param[out] devices   List of devices returned by CLI.
+///
+bool GetOpenCLDevices(std::vector<std::string>& devices);
+
 #if _WIN32
 struct DXAdditionalBuildOptions;
 

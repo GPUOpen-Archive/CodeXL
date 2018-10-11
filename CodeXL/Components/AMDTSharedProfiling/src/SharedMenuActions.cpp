@@ -60,9 +60,9 @@ void SharedMenuActions::populateSupportedCommandIds()
 {
     // fill the vector of supported command ids:
     m_supportedCommandIds.push_back(ID_PM_START_PROFILE);
-    m_supportedCommandIds.push_back(ID_PM_PAUSE_PROFILE);
-    m_supportedCommandIds.push_back(ID_PM_STOP_PROFILE);
-    m_supportedCommandIds.push_back(ID_PM_ATTACH_PROFILE);
+    //m_supportedCommandIds.push_back(ID_PM_PAUSE_PROFILE);
+    //m_supportedCommandIds.push_back(ID_PM_STOP_PROFILE);
+    //m_supportedCommandIds.push_back(ID_PM_ATTACH_PROFILE);
     m_supportedCommandIds.push_back(ID_PM_SELECTED_PROFILE);
     m_supportedCommandIds.push_back(ID_PM_PROFILE_SETTINGS_DIALOG);
 }
@@ -87,13 +87,13 @@ void SharedMenuActions::initActionIcons()
     initSingleActionIcon(ID_PM_START_PROFILE, AC_ICON_EXECUTION_PLAY);
 
     // Pause command:
-    initSingleActionIcon(ID_PM_PAUSE_PROFILE, AC_ICON_EXECUTION_PAUSE);
+    //initSingleActionIcon(ID_PM_PAUSE_PROFILE, AC_ICON_EXECUTION_PAUSE);
 
     // Pause command:
-    initSingleActionIcon(ID_PM_STOP_PROFILE, AC_ICON_EXECUTION_STOP);
+    //initSingleActionIcon(ID_PM_STOP_PROFILE, AC_ICON_EXECUTION_STOP);
 
     // Stop command:
-    initSingleActionIcon(ID_PM_STOP_PROFILE, AC_ICON_EXECUTION_STOP);
+    //initSingleActionIcon(ID_PM_STOP_PROFILE, AC_ICON_EXECUTION_STOP);
 }
 
 /// Each hierarchy on the menu include name/priority.
@@ -120,10 +120,10 @@ bool SharedMenuActions::actionText(int actionIndex, gtString& caption, gtString&
                 tooltip = PM_STR_STATUS_START;
                 break;
 
-            case ID_PM_ATTACH_PROFILE:
-                caption = PM_STR_MENU_ATTACH;
-                tooltip = PM_STR_STATUS_ATTACH;
-                break;
+            //case ID_PM_ATTACH_PROFILE:
+            //    caption = PM_STR_MENU_ATTACH;
+            //    tooltip = PM_STR_STATUS_ATTACH;
+            //    break;
 
             case ID_PM_SELECTED_PROFILE:
                 caption = PM_STR_PROFILE_MODE_MENU_COMMAND_PREFIX;
@@ -136,15 +136,15 @@ bool SharedMenuActions::actionText(int actionIndex, gtString& caption, gtString&
                 tooltip = PM_STR_STATUS_SETTINGS;
                 break;
 
-            case ID_PM_PAUSE_PROFILE:
-                caption = PM_STR_MENU_PAUSE;
-                tooltip = PM_STR_STATUS_PAUSE;
-                break;
+            //case ID_PM_PAUSE_PROFILE:
+            //    caption = PM_STR_MENU_PAUSE;
+            //    tooltip = PM_STR_STATUS_PAUSE;
+            //    break;
 
-            case ID_PM_STOP_PROFILE:
-                caption = PM_STR_MENU_STOP;
-                tooltip = PM_STR_STATUS_STOP;
-                break;
+            //case ID_PM_STOP_PROFILE:
+            //    caption = PM_STR_MENU_STOP;
+            //    tooltip = PM_STR_STATUS_STOP;
+            //    break;
 
             default:
             {
@@ -192,21 +192,21 @@ gtString SharedMenuActions::menuPosition(int actionIndex, afActionPositionData& 
         {
             // Profile menu
         case ID_PM_START_PROFILE:
-        case ID_PM_PAUSE_PROFILE:
-        case ID_PM_STOP_PROFILE:
+        //case ID_PM_PAUSE_PROFILE:
+        //case ID_PM_STOP_PROFILE:
                 retVal = AF_STR_ProfileMenuString;
                 positionData.m_beforeActionMenuPosition = AF_STR_ProfileMenuString;
                 positionData.m_beforeActionMenuPosition.append(PM_STR_MENU_SEPARATOR);
                 positionData.m_beforeActionText = PM_STR_MENU_SETTINGS;
                 break;
 
-            case ID_PM_ATTACH_PROFILE:
-                retVal = AF_STR_ProfileMenuString;
-                positionData.m_beforeActionMenuPosition = AF_STR_ProfileMenuString;
-                positionData.m_beforeActionMenuPosition.append(PM_STR_MENU_SEPARATOR);
-                positionData.m_beforeActionText = PM_STR_MENU_SETTINGS;
-                positionData.m_actionSeparatorType = afActionPositionData::AF_SEPARATOR_BEFORE_COMMAND;
-                break;
+            //case ID_PM_ATTACH_PROFILE:
+            //    retVal = AF_STR_ProfileMenuString;
+            //    positionData.m_beforeActionMenuPosition = AF_STR_ProfileMenuString;
+            //    positionData.m_beforeActionMenuPosition.append(PM_STR_MENU_SEPARATOR);
+            //    positionData.m_beforeActionText = PM_STR_MENU_SETTINGS;
+            //    positionData.m_actionSeparatorType = afActionPositionData::AF_SEPARATOR_BEFORE_COMMAND;
+            //    break;
 
             case ID_PM_SELECTED_PROFILE:
                 positionData.m_actionSeparatorType = afActionPositionData::AF_SEPARATOR_BEFORE_COMMAND;
@@ -291,24 +291,12 @@ void SharedMenuActions::handleTrigger(int actionIndex)
                 m_pProfiles->onStartAction();
                 break;
 
-            case ID_PM_ATTACH_PROFILE:
-                m_pProfiles->onInvokeAttachToProcess();
-                break;
-
             case ID_PM_SELECTED_PROFILE:
                 m_pProfiles->onSelectProfileMode(false);
                 break;
 
             case ID_PM_PROFILE_SETTINGS_DIALOG:
                 m_pProfiles->onInvokeProjectSettings();
-                break;
-
-            case ID_PM_PAUSE_PROFILE:
-                m_pProfiles->onPauseToggle();
-                break;
-
-            case ID_PM_STOP_PROFILE:
-                m_pProfiles->stopCurrentRun();
                 break;
 
             default:
@@ -370,9 +358,9 @@ void SharedMenuActions::handleUiUpdate(int actionIndex)
                 actionText = SharedProfileManager::instance().FindStartProfileActionText();
                 break;
 
-            case ID_PM_ATTACH_PROFILE:
-                isActionEnabled = m_pProfiles->isAttachEnabled(isActionCheckable, isActionChecked);
-                break;
+            //case ID_PM_ATTACH_PROFILE:
+            //    isActionEnabled = m_pProfiles->isAttachEnabled(isActionCheckable, isActionChecked);
+            //    break;
 
             case ID_PM_SELECTED_PROFILE:
             {
@@ -390,23 +378,23 @@ void SharedMenuActions::handleUiUpdate(int actionIndex)
                 isActionEnabled = m_pProfiles->isProjectSettingsEnabled(isActionCheckable, isActionChecked);
                 break;
 
-            case ID_PM_PAUSE_PROFILE:
-            {
-                isActionEnabled = m_pProfiles->isPausedEnabled(isActionCheckable, isActionChecked, isShown);
-                pAction->setText(acGTStringToQString(PM_STR_MENU_PAUSE));
-                pAction->setToolTip(acGTStringToQString(PM_STR_STATUS_PAUSE));
+            //case ID_PM_PAUSE_PROFILE:
+            //{
+            //    isActionEnabled = m_pProfiles->isPausedEnabled(isActionCheckable, isActionChecked, isShown);
+            //    pAction->setText(acGTStringToQString(PM_STR_MENU_PAUSE));
+            //    pAction->setToolTip(acGTStringToQString(PM_STR_STATUS_PAUSE));
 
-                if (m_pProfiles->selectedSessionTypeName().startsWith(L"CPU:"))
-                {
-                    pAction->setText(acGTStringToQString(PM_STR_MENU_PAUSE_DATA));
-                    pAction->setToolTip(PM_STR_STATUS_PAUSE_DATA);
-                }
-            }
-            break;
+            //    if (m_pProfiles->selectedSessionTypeName().startsWith(L"CPU:"))
+            //    {
+            //        pAction->setText(acGTStringToQString(PM_STR_MENU_PAUSE_DATA));
+            //        pAction->setToolTip(PM_STR_STATUS_PAUSE_DATA);
+            //    }
+            //}
+            //break;
 
-            case ID_PM_STOP_PROFILE:
-                isActionEnabled = m_pProfiles->isStopEnabled(isActionCheckable, isActionChecked);
-                break;
+            //case ID_PM_STOP_PROFILE:
+            //    isActionEnabled = m_pProfiles->isStopEnabled(isActionCheckable, isActionChecked);
+            //    break;
 
             default:
                 GT_ASSERT_EX(false, L"Unknown event id");
@@ -481,19 +469,8 @@ void SharedMenuActions::addAccelerator(gtString& caption)
 
     if (!sInitialized)
     {
-        sCaptionToCaptionsWithAccelerators[PM_profileTypeTimeBasedPrefix] = PM_profileTypeTimeBasedPrefixWithAccelerator;
-        sCaptionToCaptionsWithAccelerators[PM_profileTypeCustomProfilePrefix] = PM_profileTypeCustomProfilePrefixWithAccelerator;
-        sCaptionToCaptionsWithAccelerators[PM_profileTypeCLUPrefix] = PM_profileTypeCLUPrefixWithAccelerator;
-        sCaptionToCaptionsWithAccelerators[PM_profileTypeAssesPerformancePrefix] = PM_profileTypeAssesPerformancePrefixWithAccelerator;
-        sCaptionToCaptionsWithAccelerators[PM_profileTypeInstructionBasedSamplingPrefix] = PM_profileTypeInstructionBasedSamplingPrefixWithAccelerator;
-        sCaptionToCaptionsWithAccelerators[PM_profileTypeInvestigateBranchingPrefix] = PM_profileTypeInvestigateBranchingPrefixWithAccelerator;
-        sCaptionToCaptionsWithAccelerators[PM_profileTypeInvestigateDataAccessPrefix] = PM_profileTypeInvestigateDataAccessPrefixWithAccelerator;
-        sCaptionToCaptionsWithAccelerators[PM_profileTypeInvestigateInstructionAccessPrefix] = PM_profileTypeInvestigateInstructionAccessPrefixWithAccelerator;
-        sCaptionToCaptionsWithAccelerators[PM_profileTypeInvestigateInstructionL2CacheAccessPrefix] = PM_profileTypeInvestigateInstructionL2CacheAccessPrefixWithAccelerator;
-        sCaptionToCaptionsWithAccelerators[PM_profileTypeThreadProfilePrefix] = PM_profileTypeThreadProfilePrefixWithAccelerator;
         sCaptionToCaptionsWithAccelerators[PM_profileTypePerformanceCountersPrefix] = PM_profileTypePerformanceCountersPrefixWithAccelerator;
         sCaptionToCaptionsWithAccelerators[PM_profileTypeApplicationTracePrefix] = PM_profileTypeApplicationTracePrefixWithAccelerator;
-        sCaptionToCaptionsWithAccelerators[PM_profileTypePowerProfilePrefix] = PM_profileTypePowerProfilePrefixWithAccelerator;
     }
 
     QString qstrCaption = acGTStringToQString(caption);

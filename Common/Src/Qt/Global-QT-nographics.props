@@ -1,0 +1,37 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Label="UserMacros">
+    <QTDIR Condition="!Exists('$(QT_PATH)') AND Exists('$(COMMONDIR)\Lib\Ext\QT\5.9')">$(COMMONDIR)\Lib\Ext\QT\5.9</QTDIR>
+    <QTDIR Condition="!Exists('$(QT_PATH)') AND Exists('C:\QT\Qt5.9.5\5.9.5\msvc2015')">C:\QT\Qt5.9.5\5.9.5\msvc2015</QTDIR>
+    <QTDIR Condition="Exists('$(QT_PATH)')">$(QT_PATH)</QTDIR>
+    <QTBINDIR>$(QTDIR)\bin</QTBINDIR>
+    <QTLIBDIR>$(QTDIR)\lib</QTLIBDIR>
+    <QTSRCDIR>$(COMMONDIR)\Src\Qt</QTSRCDIR>
+  </PropertyGroup>
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.40219.1</_ProjectFileVersion>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(QTSRCDIR);$(QTDir)\include;$(QtDir)\include\QtCore;$(QtDir)\include\QtXml;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>Qt5Core$(AMDTDebugSuffixNoDash).lib;Qt5Xml$(AMDTDebugSuffixNoDash).lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(QTLIBDIR);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <BuildMacro Include="QTDIR">
+      <Value>$(QTDIR)</Value>
+    </BuildMacro>
+    <BuildMacro Include="QTBINDIR">
+      <Value>$(QTBINDIR)</Value>
+    </BuildMacro>
+    <BuildMacro Include="QTLIBDIR">
+      <Value>$(QTLIBDIR)</Value>
+    </BuildMacro>
+    <BuildMacro Include="QTSRCDIR">
+      <Value>$(QTSRCDIR)</Value>
+    </BuildMacro>
+  </ItemGroup>
+</Project>

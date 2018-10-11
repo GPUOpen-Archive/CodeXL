@@ -63,11 +63,9 @@ void afMenuActionsExecutor::populateSupportedCommandIds()
     m_supportedCommandIds.push_back(AF_ID_TOOLS_OPTIONS);
     m_supportedCommandIds.push_back(AF_ID_HELP_USER_GUIDE);
     m_supportedCommandIds.push_back(AF_ID_HELP_QUICK_START);
-    m_supportedCommandIds.push_back(AF_ID_HELP_UPDATES);
+    // m_supportedCommandIds.push_back(AF_ID_HELP_UPDATES); // updater is no longer supported
     m_supportedCommandIds.push_back(AF_ID_HELP_DEV_TOOLS_SUPPORT_FORUM);
     m_supportedCommandIds.push_back(AF_ID_HELP_LOAD_TEAPOT_SAMPLE);
-    m_supportedCommandIds.push_back(AF_ID_HELP_LOAD_MATMUL_SAMPLE);
-    m_supportedCommandIds.push_back(AF_ID_HELP_LOAD_D3DMT_SAMPLE);
     m_supportedCommandIds.push_back(AF_ID_HELP_ABOUT);
     m_supportedCommandIds.push_back(AF_ID_EXIT);
 }
@@ -188,16 +186,6 @@ bool afMenuActionsExecutor::actionText(int actionIndex, gtString& caption, gtStr
             tooltip = AF_STR_LoadTeapotSampleStatusbarString;
             break;
 
-        case AF_ID_HELP_LOAD_MATMUL_SAMPLE:
-            caption = AF_STR_LoadMatMulSample;
-            tooltip = AF_STR_LoadMatMulSampleStatusbarString;
-            break;
-
-        case AF_ID_HELP_LOAD_D3DMT_SAMPLE:
-            caption = AF_STR_LoadD3D12MTSample;
-            tooltip = AF_STR_LoadD3D12MTSampleStatusbarString;
-            break;
-
         case AF_ID_HELP_ABOUT:
             caption = AF_STR_HelpAbout;
             tooltip = AF_STR_HelpAboutStatusbarString;
@@ -299,8 +287,6 @@ gtString afMenuActionsExecutor::menuPosition(int actionIndex, afActionPositionDa
         case AF_ID_HELP_QUICK_START:
         case AF_ID_HELP_UPDATES:
         case AF_ID_HELP_DEV_TOOLS_SUPPORT_FORUM:
-        case AF_ID_HELP_LOAD_MATMUL_SAMPLE:
-        case AF_ID_HELP_LOAD_D3DMT_SAMPLE:
         {
             retVal = AF_STR_HelpMenuString;
         }
@@ -404,14 +390,6 @@ void afMenuActionsExecutor::handleTrigger(int actionIndex)
                 m_pApplicationCommands->LoadSample(AF_TEAPOT_SAMPLE);
                 break;
 
-            case AF_ID_HELP_LOAD_MATMUL_SAMPLE:
-                m_pApplicationCommands->LoadSample(AF_MATMUL_SAMPLE);
-                break;
-
-            case AF_ID_HELP_LOAD_D3DMT_SAMPLE:
-                m_pApplicationCommands->LoadSample(AF_D3D12MULTITHREADING_SAMPLE);
-                break;
-
             case AF_ID_HELP_ABOUT:
                 m_pApplicationCommands->onHelpAbout();
                 break;
@@ -501,19 +479,9 @@ void afMenuActionsExecutor::handleUiUpdate(int actionIndex)
                 m_pApplicationCommands->enableWhenNoProcess(isActionEnabled);
                 break;
 
-            case AF_ID_HELP_LOAD_MATMUL_SAMPLE:
             case AF_ID_HELP_LOAD_TEAPOT_SAMPLE:
-            case AF_ID_HELP_LOAD_D3DMT_SAMPLE:
             {
                 m_pApplicationCommands->enableWhenNoProcess(isActionEnabled);
-#if AMDT_BUILD_TARGET == AMDT_LINUX_OS
-
-                if (commandId == AF_ID_HELP_LOAD_D3DMT_SAMPLE)
-                {
-                    isActionVisible = false;
-                }
-
-#endif
                 break;
             }
 

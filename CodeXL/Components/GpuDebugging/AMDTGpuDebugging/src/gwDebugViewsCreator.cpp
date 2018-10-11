@@ -31,7 +31,6 @@
 #include <AMDTGpuDebuggingComponents/Include/views/gdDebuggedProcessEventsView.h>
 #include <AMDTGpuDebuggingComponents/Include/views/gdLocalsView.h>
 #include <AMDTGpuDebuggingComponents/Include/views/gdMemoryView.h>
-#include <AMDTGpuDebuggingComponents/Include/views/gdMultiWatchView.h>
 #include <AMDTGpuDebuggingComponents/Include/views/gdStateVariablesView.h>
 #include <AMDTGpuDebuggingComponents/Include/views/gdWatchView.h>
 
@@ -59,8 +58,7 @@
 gwDebugViewsCreator::gwDebugViewsCreator():
     m_pApplicationCommandsHandler(NULL), m_pPropertiesView(NULL), m_pBreakpointsView(NULL), m_pLocalsView(NULL),
     m_pWatchView(NULL), m_pStatisticsPanel(NULL), m_pStateVariablesView(NULL), m_pCommandQueuesView(NULL), m_pAPICallsHistoryPanel(NULL),
-    m_pDebuggedProcessEventsView(NULL), m_pMemoryView(NULL), m_pCallStackView(NULL),
-    m_pMultiWatchView1(NULL), m_pMultiWatchView2(NULL), m_pMultiWatchView3(NULL)
+    m_pDebuggedProcessEventsView(NULL), m_pMemoryView(NULL), m_pCallStackView(NULL)
 {
     // Initialize the view captions:
     m_viewCaptions[gdBreakpointsViewIndex] = GD_STR_breakpointsViewCaption;
@@ -72,9 +70,6 @@ gwDebugViewsCreator::gwDebugViewsCreator():
     m_viewCaptions[gdDebuggedProcessEventsViewIndex] = GD_STR_DebuggedProcessEventsViewCaption;
     m_viewCaptions[gdMemoryViewIndex] = GD_STR_memoryViewCaptionDefault;
     m_viewCaptions[gdCallStackViewIndex] = GD_STR_CallsStackViewCaption;
-    m_viewCaptions[gdMultiWatch1Index] = GD_STR_multiwatchView1Caption;
-    m_viewCaptions[gdMultiWatch2Index] = GD_STR_multiwatchView2Caption;
-    m_viewCaptions[gdMultiWatch3Index] = GD_STR_multiwatchView3Caption;
 
     // Initialize the view captions:
     m_viewMenuCommands[gdBreakpointsViewIndex] = GD_STR_breakpointsViewCommandName;
@@ -86,10 +81,6 @@ gwDebugViewsCreator::gwDebugViewsCreator():
     m_viewMenuCommands[gdDebuggedProcessEventsViewIndex] = GD_STR_DebuggedProcessEventsViewCommandName;
     m_viewMenuCommands[gdMemoryViewIndex] = GD_STR_memoryViewCommandName;
     m_viewMenuCommands[gdCallStackViewIndex] = GD_STR_CallsStackViewCommandName;
-    m_viewMenuCommands[gdMultiWatch1Index] = GD_STR_multiwatchView1CommandName;
-    m_viewMenuCommands[gdMultiWatch2Index] = GD_STR_multiwatchView2CommandName;
-    m_viewMenuCommands[gdMultiWatch3Index] = GD_STR_multiwatchView3CommandName;
-
 
     // Array with the views docking areas:
     m_viewDockingAreas[gdBreakpointsViewIndex] = AF_VIEW_DOCK_BottomDockWidgetArea;
@@ -103,11 +94,6 @@ gwDebugViewsCreator::gwDebugViewsCreator():
     m_viewDockingAreas[gdMemoryViewIndex] = AF_VIEW_DOCK_RightDockWidgetArea;
     m_viewDockingAreas[gdCallStackViewIndex] = AF_VIEW_DOCK_BottomDockWidgetArea;
 
-    m_viewDockingAreas[gdMultiWatch1Index] = AF_VIEW_DOCK_RightDockWidgetArea;
-    m_viewDockingAreas[gdMultiWatch2Index] = AF_VIEW_DOCK_RightDockWidgetArea;
-    m_viewDockingAreas[gdMultiWatch3Index] = AF_VIEW_DOCK_RightDockWidgetArea;
-
-
     // Initialize the array with the views docking features:
     m_viewDockingFeatures[gdStateVariablesViewIndex] = QDockWidget::AllDockWidgetFeatures;
     m_viewDockingFeatures[gdBreakpointsViewIndex] = QDockWidget::AllDockWidgetFeatures;
@@ -119,9 +105,6 @@ gwDebugViewsCreator::gwDebugViewsCreator():
     m_viewDockingFeatures[gdDebuggedProcessEventsViewIndex] = QDockWidget::AllDockWidgetFeatures;
     m_viewDockingFeatures[gdMemoryViewIndex] = QDockWidget::AllDockWidgetFeatures;
     m_viewDockingFeatures[gdCallStackViewIndex] = QDockWidget::AllDockWidgetFeatures;
-    m_viewDockingFeatures[gdMultiWatch1Index] = QDockWidget::AllDockWidgetFeatures;
-    m_viewDockingFeatures[gdMultiWatch2Index] = QDockWidget::AllDockWidgetFeatures;
-    m_viewDockingFeatures[gdMultiWatch3Index] = QDockWidget::AllDockWidgetFeatures;
 
     // Create an action creator:
     _pViewActionCreator = new gwDebugActionsCreator;
@@ -147,9 +130,6 @@ void gwDebugViewsCreator::initialize()
     initSingleViewIcon(gdCallStackViewIndex, AC_ICON_DEBUG_VIEW_CALLSTACK);
     initSingleViewIcon(gdStateVariablesViewIndex, AC_ICON_DEBUG_VIEW_STATEVARS);
     initSingleViewIcon(gdMemoryViewIndex, AC_ICON_DEBUG_VIEW_MEMORY);
-    initSingleViewIcon(gdMultiWatch1Index, AC_ICON_DEBUG_VIEW_MULTIWATCH);
-    initSingleViewIcon(gdMultiWatch2Index, AC_ICON_DEBUG_VIEW_MULTIWATCH);
-    initSingleViewIcon(gdMultiWatch3Index, AC_ICON_DEBUG_VIEW_MULTIWATCH);
 }
 
 // ---------------------------------------------------------------------------
@@ -187,13 +167,9 @@ void gwDebugViewsCreator::titleString(int viewIndex, gtString& viewTitle, gtStri
 // ---------------------------------------------------------------------------
 gtString gwDebugViewsCreator::modeMenuPosition(int actionIndex, afActionPositionData& positionData)
 {
+    (void)(actionIndex); // unused
     (void)(positionData); // unused
     gtString retVal = L"";
-
-    if ((actionIndex >= gdMultiWatch1Index) && (actionIndex <= gdMultiWatch3Index))
-    {
-        retVal.append(GD_STR_MultiWatchViewsMenuString);
-    }
 
     return retVal;
 }
@@ -208,13 +184,9 @@ gtString gwDebugViewsCreator::modeMenuPosition(int actionIndex, afActionPosition
 // ---------------------------------------------------------------------------
 gtString gwDebugViewsCreator::associatedToolbar(int viewIndex)
 {
+    (void)(viewIndex); // unused
     gtString retVal;
-
-    if ((viewIndex == gdMultiWatch1Index) || (viewIndex == gdMultiWatch2Index) || (viewIndex == gdMultiWatch3Index))
-    {
-        retVal = GD_STR_OpenCLDebuggingToolbarName;
-    }
-
+    //TODO: implement this
     return retVal;
 }
 
@@ -302,17 +274,6 @@ gtString gwDebugViewsCreator::dockWith(int viewIndex)
 
             case gdBreakpointsViewIndex:
                 retString.append(m_viewCaptions[gdCallStackViewIndex]);
-                break;
-
-            case gdMultiWatch1Index:
-                break;
-
-            case gdMultiWatch2Index:
-                retString = m_viewCaptions[gdMultiWatch1Index];
-                break;
-
-            case gdMultiWatch3Index:
-                retString = m_viewCaptions[gdMultiWatch2Index];
                 break;
 
             default:
@@ -409,13 +370,6 @@ QSize gwDebugViewsCreator::initialSize(int viewIndex)
             retSize.setHeight(GD_MAIN_VIEWS_HEIGHT_PROPORTION(desktopSize.height()));
             break;
 
-        case gdMultiWatch1Index:
-        case gdMultiWatch2Index:
-        case gdMultiWatch3Index:
-            retSize.setWidth(GD_SIDE_VIEWS_WIDTH_PROPORTION(desktopSize.width()));
-            retSize.setHeight(GD_MAIN_VIEWS_HEIGHT_PROPORTION(desktopSize.height()));
-            break;
-
         default:
             GT_ASSERT_EX(false, L"View creation failure");
             break;
@@ -448,12 +402,6 @@ bool gwDebugViewsCreator::visibility(int viewIndex)
             case gdDebuggedProcessEventsViewIndex:
             case gdCallStackViewIndex:
                 retVal = true;
-                break;
-
-            case gdMultiWatch1Index:
-            case gdMultiWatch2Index:
-            case gdMultiWatch3Index:
-                retVal = false;
                 break;
 
             default:
@@ -620,36 +568,6 @@ bool gwDebugViewsCreator::createViewContent(int viewIndex, QWidget*& pContentQWi
             m_pMemoryView = new gdMemoryView(&afProgressBarWrapper::instance(), pQParent);
 
             pContentQWidget = m_pMemoryView;
-        }
-        break;
-
-        case gdMultiWatch1Index:
-        {
-            // Create the API calls history view:
-            m_pMultiWatchView1 = new gdMultiWatchView(pQParent, &afProgressBarWrapper::instance());
-
-            m_pMultiWatchView1->initialize(minViewSize);
-            pContentQWidget = m_pMultiWatchView1;
-        }
-        break;
-
-        case gdMultiWatch2Index:
-        {
-            // Create the API calls history view:
-            m_pMultiWatchView2 = new gdMultiWatchView(pQParent, &afProgressBarWrapper::instance());
-
-            m_pMultiWatchView2->initialize(minViewSize);
-            pContentQWidget = m_pMultiWatchView2;
-        }
-        break;
-
-        case gdMultiWatch3Index:
-        {
-            // Create the API calls history view:
-            m_pMultiWatchView3 = new gdMultiWatchView(pQParent, &afProgressBarWrapper::instance());
-
-            m_pMultiWatchView3->initialize(minViewSize);
-            pContentQWidget = m_pMultiWatchView3;
         }
         break;
 

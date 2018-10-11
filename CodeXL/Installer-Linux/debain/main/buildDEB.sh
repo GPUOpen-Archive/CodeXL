@@ -47,12 +47,8 @@ cp AMDExtractFolder/amdremoteagenticon.desktop usr/share/applications/amdremotea
 # Edit Debian package files with current version
 echo "Setting debian package files"
 chmod +w control
-chmod +w postinst
-chmod +w prerm
 chmod +w changelog
 sed -i "s/Version: /Version: ${VERSION}/g" control 
-sed -i "s/CodeXL_[^/]*/CodeXL_${VERSION}/g" postinst
-sed -i "s/CodeXL_[^/]*/CodeXL_${VERSION}/g" prerm
 sed -i "s/()/(${VERSION})/g" changelog
 #get build time
 buildtime=$(date +"%a, %d %b %Y %H:%M:%S %z")
@@ -61,7 +57,7 @@ sed -i "s/com>/com> ${buildtime}/g" changelog
 #Running FPM command
 # Reference command - fpm -f -C ~/Downloads/FromRPM --workdir ~/Downloads/testrpmdeb/ --deb-custom-control ~/Downloads/debscripts/control --after-install ~/Downloads/debscripts/postinst --before-remove ~/Downloads/debscripts/prerm -s dir -t deb -n amdcodexl -v 1.8-9000 opt/ usr/
 echo "Running fpm... (pack the directories to deb package)"
-fpm -f -C . --deb-custom-control control --after-install postinst --before-remove prerm --deb-changelog changelog -s dir -t deb -n ${PACAKGENAME} -v ${VERSION} opt/ usr/
+fpm -f -C . --deb-custom-control control --deb-changelog changelog -s dir -t deb -n ${PACAKGENAME} -v ${VERSION} opt/ usr/
 mv codexl*.deb ../../../../
 
 #Clean local files and folders 

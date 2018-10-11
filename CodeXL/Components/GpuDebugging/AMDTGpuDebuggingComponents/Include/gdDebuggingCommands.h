@@ -31,7 +31,6 @@ public:
     static gdDebuggingCommands* instance();
 
     virtual bool addWatchVariable(const gtString& watchVariable) = 0;
-    virtual bool displayMultiwatchVariable(const gtString& watchVariable) = 0;
 
 protected:
     gdDebuggingCommands() {};

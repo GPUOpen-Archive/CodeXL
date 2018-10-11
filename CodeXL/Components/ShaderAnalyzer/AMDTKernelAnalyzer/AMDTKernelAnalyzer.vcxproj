@@ -38,7 +38,7 @@
     <Import Project="$(CommonDir)\Lib\AMD\CAL\Global-CAL-NoLib.props" />
     <Import Project="$(CommonDir)\Lib\Ext\Windows-Kits\Global-WindowsSDK.props" />
     <Import Project="$(CommonDir)\Lib\Ext\QScintilla\Global-QScintilla.props" />
-    <Import Project="$(CommonDir)\Lib\Ext\Qt\Global-QT.props" />
+    <Import Project="$(CommonDir)\Src\Qt\Global-QT.props" />
     <Import Project="$(CommonDir)\Lib\Ext\tinyxml\Global-TinyXML-2015.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -54,6 +54,7 @@
     <ClCompile>
       <PreprocessorDefinitions>AMDTKERNELANALYZER_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\AMDTBackend\Include\Common\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions> /wd4714 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
 	<PostBuildEvent>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)\rga_copy.bat $(Configuration)</Command>
@@ -138,152 +139,152 @@
     <ClInclude Include="Include\kaCommandIDs.h" />
     <ClInclude Include="src\kaUtils.h" />
     <CustomBuild Include="src\kaExportBinariesDialog.h">
-      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "src\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Command>"$(QTBINDIR)\moc.exe" "src\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
       <Message>moc creation %(Filename)</Message>
       <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
-      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+      <AdditionalInputs>$(QTBINDIR)\moc.exe;src\%(Filename).cpp</AdditionalInputs>
     </CustomBuild>
     <CustomBuild Include="src\kaAddFileDialog.h">
-      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "src\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Command>"$(QTBINDIR)\moc.exe" "src\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
       <Message>moc creation %(Filename)</Message>
       <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
-      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+      <AdditionalInputs>$(QTBINDIR)\moc.exe;src\%(Filename).cpp</AdditionalInputs>
     </CustomBuild>
     <ClInclude Include="src\kaCliLauncher.h" />
     <CustomBuild Include="src\kaCreateProgramDialog.h">
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "src\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">"$(QTBINDIR)\moc.exe" "src\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">moc creation %(Filename)</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "src\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(QTBINDIR)\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">"$(QTBINDIR)\moc.exe" "src\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">moc creation %(Filename)</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(QTBINDIR)\moc.exe;src\%(Filename).cpp</AdditionalInputs>
     </CustomBuild>
     <ClInclude Include="src\kaDataTypes.h" />
     <ClInclude Include="src\kaFileManager.h" />
     <ClInclude Include="src\kaMultiSourceActionCreator.h" />
     <CustomBuild Include="src\kaSourceCodeView.h">
-      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "src\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Command>"$(QTBINDIR)\moc.exe" "src\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
       <Message>moc creation %(Filename)</Message>
       <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
-      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+      <AdditionalInputs>$(QTBINDIR)\moc.exe;src\%(Filename).cpp</AdditionalInputs>
     </CustomBuild>
     <CustomBuild Include="src\kaSourceCodeTableView.h">
-      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "src\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Command>"$(QTBINDIR)\moc.exe" "src\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
       <Message>moc creation %(Filename)</Message>
       <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
-      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+      <AdditionalInputs>$(QTBINDIR)\moc.exe;src\%(Filename).cpp</AdditionalInputs>
     </CustomBuild>
     <CustomBuild Include="src\kaTableView.h">
-      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "src\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Command>"$(QTBINDIR)\moc.exe" "src\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
       <Message>moc creation %(Filename)</Message>
       <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
-      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+      <AdditionalInputs>$(QTBINDIR)\moc.exe;src\%(Filename).cpp</AdditionalInputs>
     </CustomBuild>
     <ClInclude Include="Include\kaExecutionMode.h" />
     <ClInclude Include="Include\kaStringConstants.h" />
     <CustomBuild Include="src\kaAnalysisView.h">
-      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "src\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Command>"$(QTBINDIR)\moc.exe" "src\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
       <Message>moc creation %(Filename)</Message>
       <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
-      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+      <AdditionalInputs>$(QTBINDIR)\moc.exe;src\%(Filename).cpp</AdditionalInputs>
     </CustomBuild>
     <CustomBuild Include="src\kaAnalyzeSettingsPage.h">
-      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "src\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Command>"$(QTBINDIR)\moc.exe" "src\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
       <Message>moc creation %(Filename)</Message>
       <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
-      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+      <AdditionalInputs>$(QTBINDIR)\moc.exe;src\%(Filename).cpp</AdditionalInputs>
     </CustomBuild>
     <ClInclude Include="src\kaApplicationCommands.h" />
     <CustomBuild Include="src\kaStatisticsView.h">
-      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "src\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Command>"$(QTBINDIR)\moc.exe" "src\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
       <Message>moc creation %(Filename)</Message>
       <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
-      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+      <AdditionalInputs>$(QTBINDIR)\moc.exe;src\%(Filename).cpp</AdditionalInputs>
     </CustomBuild>
     <CustomBuild Include="src\kaKernelView.h">
-      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "src\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Command>"$(QTBINDIR)\moc.exe" "src\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
       <Message>moc creation %(Filename)</Message>
       <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
-      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+      <AdditionalInputs>$(QTBINDIR)\moc.exe;src\%(Filename).cpp</AdditionalInputs>
     </CustomBuild>
     <CustomBuild Include="src\kaBuildToolbar.h">
-      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "src\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Command>"$(QTBINDIR)\moc.exe" "src\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
       <Message>moc creation %(Filename)</Message>
       <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
-      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+      <AdditionalInputs>$(QTBINDIR)\moc.exe;src\%(Filename).cpp</AdditionalInputs>
     </CustomBuild>
     <ClInclude Include="src\kaMDIViewCreator.h" />
     <CustomBuild Include="src\kaOverviewView.h">
-      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "src\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Command>"$(QTBINDIR)\moc.exe" "src\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
       <Message>moc creation %(Filename)</Message>
       <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
-      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+      <AdditionalInputs>$(QTBINDIR)\moc.exe;src\%(Filename).cpp</AdditionalInputs>
     </CustomBuild>
     <CustomBuild Include="src\kaMultiSourceView.h">
-      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "src\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Command>"$(QTBINDIR)\moc.exe" "src\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
       <Message>moc creation %(Filename)</Message>
       <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
-      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+      <AdditionalInputs>$(QTBINDIR)\moc.exe;src\%(Filename).cpp</AdditionalInputs>
     </CustomBuild>
     <CustomBuild Include="src\kaProjectDataManager.h">
-      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "src\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Command>"$(QTBINDIR)\moc.exe" "src\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
       <Message>moc creation %(Filename)</Message>
       <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
-      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+      <AdditionalInputs>$(QTBINDIR)\moc.exe;src\%(Filename).cpp</AdditionalInputs>
     </CustomBuild>
     <CustomBuild Include="src\kaTreeDataExtension.h">
-      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "src\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Command>"$(QTBINDIR)\moc.exe" "src\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
       <Message>moc creation %(Filename)</Message>
       <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
-      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+      <AdditionalInputs>$(QTBINDIR)\moc.exe;src\%(Filename).cpp</AdditionalInputs>
     </CustomBuild>
     <CustomBuild Include="src\kaApplicationTreeHandler.h">
-      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "src\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Command>"$(QTBINDIR)\moc.exe" "src\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
       <Message>moc creation %(Filename)</Message>
       <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
-      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+      <AdditionalInputs>$(QTBINDIR)\moc.exe;src\%(Filename).cpp</AdditionalInputs>
     </CustomBuild>
     <CustomBuild Include="src\kaBackendManager.h">
-      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "src\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Command>"$(QTBINDIR)\moc.exe" "src\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
       <Message>moc creation %(Filename)</Message>
       <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
-      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+      <AdditionalInputs>$(QTBINDIR)\moc.exe;src\%(Filename).cpp</AdditionalInputs>
     </CustomBuild>
     <ClInclude Include="src\kaEventObserver.h" />
     <ClInclude Include="src\kaGlobalVariableManager.h" />
     <CustomBuild Include="src\kaProjectSettingsExtension.h">
-      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "src\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Command>"$(QTBINDIR)\moc.exe" "src\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
       <Message>moc creation %(Filename)</Message>
       <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
-      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+      <AdditionalInputs>$(QTBINDIR)\moc.exe;src\%(Filename).cpp</AdditionalInputs>
     </CustomBuild>
     <CustomBuild Include="src\kaProjectSettingsExtensionBase.h">
-      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "src\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Command>"$(QTBINDIR)\moc.exe" "src\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
       <Message>moc creation %(Filename)</Message>
       <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
-      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+      <AdditionalInputs>$(QTBINDIR)\moc.exe;src\%(Filename).cpp</AdditionalInputs>
     </CustomBuild>
     <CustomBuild Include="src\kaProjectSettingsExtensionOther.h">
-      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "src\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Command>"$(QTBINDIR)\moc.exe" "src\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
       <Message>moc creation %(Filename)</Message>
       <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
-      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+      <AdditionalInputs>$(QTBINDIR)\moc.exe;src\%(Filename).cpp</AdditionalInputs>
     </CustomBuild>
     <CustomBuild Include="src\kaProjectSettingsShaderExtension.h">
-      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "src\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Command>"$(QTBINDIR)\moc.exe" "src\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
       <Message>moc creation %(Filename)</Message>
       <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
-      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+      <AdditionalInputs>$(QTBINDIR)\moc.exe;src\%(Filename).cpp</AdditionalInputs>
     </CustomBuild>
     <ClInclude Include="src\kaProgram.h" />
     <ClInclude Include="src\kaSingletonsDelete.h" />
     <CustomBuild Include="src\kaTreeModel.h">
       <Message>moc creation %(Filename)</Message>
-      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "src\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Command>"$(QTBINDIR)\moc.exe" "src\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
       <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
-      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+      <AdditionalInputs>$(QTBINDIR)\moc.exe;src\%(Filename).cpp</AdditionalInputs>
     </CustomBuild>
     <ClInclude Include="src\kaDataAnalyzerFunctions.h" />
     <ClInclude Include="src\kaMenuActionsExecutor.h" />

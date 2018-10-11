@@ -1,16 +1,9 @@
 //=====================================================================
-// Copyright (c) 2012 Advanced Micro Devices, Inc. All rights reserved.
+// Copyright (c) 2013-2018 Advanced Micro Devices, Inc. All rights reserved.
 //
 /// \author GPU Developer Tools
-/// \file $File: //devtools/main/CodeXL/Components/GpuProfiling/AMDTGpuProfiling/APIColorMap.cpp $
-/// \version $Revision: #14 $
+/// \file
 /// \brief  This file contains the api color map singleton class
-//
-//=====================================================================
-// $Id: //devtools/main/CodeXL/Components/GpuProfiling/AMDTGpuProfiling/APIColorMap.cpp#14 $
-// Last checkin:   $DateTime: 2016/04/18 06:02:03 $
-// Last edited by: $Author: salgrana $
-// Change list:    $Change: 569613 $
 //=====================================================================
 
 #include <qtIgnoreCompilerWarnings.h>
@@ -23,8 +16,6 @@
 #include <AMDTBaseTools/Include/gtAssert.h>
 #include <AMDTApplicationComponents/Include/acColours.h>
 
-// Backend
-#include "DX12Trace/DX12FunctionDefs.h"
 
 // Local:
 #include <AMDTGpuProfiling/AMDTGpuProfilerDefs.h>
@@ -54,13 +45,7 @@ APIColorMap::~APIColorMap()
         SAFE_DELETE(*i);
     }
 
-    for (APIToColorMap::iterator i = m_apiTypeToColorMap.begin(); i != m_apiTypeToColorMap.end(); ++i)
-    {
-        SAFE_DELETE(*i);
-    }
-
     m_apiColorMap.clear();
-    m_apiTypeToColorMap.clear();
 }
 
 QColor APIColorMap::GetAPIColor(const QString& apiName, const QColor& defaultColor)
@@ -117,7 +102,7 @@ QColor APIColorMap::GetAPIColor(const QString& apiName, const QColor& defaultCol
     return retVal;
 }
 
-QColor APIColorMap::GetAPIColor(ProfileSessionDataItem::ProfileItemType itemType, unsigned int apiId, const QColor& defaultColor)
+/*QColor APIColorMap::GetAPIColor(ProfileSessionDataItem::ProfileItemType itemType, unsigned int apiId, const QColor& defaultColor)
 {
     QColor retVal = defaultColor;
 
@@ -170,153 +155,10 @@ QColor APIColorMap::GetAPIColor(ProfileSessionDataItem::ProfileItemType itemType
             m_apiTypeToColorMap.insert(itemId, colorInfo);
         }
 
-        else if ((itemType.m_itemMainType == ProfileSessionDataItem::DX12_API_PROFILE_ITEM)
-            || (itemType.m_itemMainType == ProfileSessionDataItem::DX12_GPU_PROFILE_ITEM))
-        {
-            // Get the DX12 API type
-            eAPIType apiType = DX12FunctionDefs::GetAPIGroupFromAPI((FuncId)itemType.m_itemSubType);
-
-            switch (apiType)
-            {
-            case kAPIType_BindingCommand:
-            {
-                retVal = QColor::fromRgb(14, 130, 94);
-                break;
-            }
-
-            case kAPIType_ClearCommand:
-            {
-                retVal = QColor::fromRgb(200, 24, 216);
-                break;
-            }
-
-            case kAPIType_Command:
-            {
-                retVal = QColor::fromRgb(255, 128, 0);
-                break;
-            }
-
-            case kAPIType_Copy:
-            {
-                retVal = QColor::fromRgb(0, 156, 51);
-                break;
-            }
-
-            case kAPIType_Create:
-            {
-                retVal = QColor::fromRgb(0, 156, 51);
-                break;
-            }
-
-            case kAPIType_Debug:
-            {
-                retVal = QColor::fromRgb(216, 24, 31);
-                break;
-            }
-
-            case kAPIType_DrawCommand:
-            {
-                retVal = QColor::fromRgb(60, 24, 216);
-                break;
-            }
-
-            case kAPIType_General:
-            {
-                retVal = QColor::fromRgb(57, 151, 17);
-                break;
-            }
-
-            case kAPIType_Paging:
-            {
-                retVal = QColor::fromRgb(24, 109, 216);
-                break;
-            }
-
-            case kAPIType_Resource:
-            {
-                retVal = QColor::fromRgb(230, 138, 0);
-                break;
-            }
-
-            case kAPIType_StageCommand:
-            {
-                retVal = QColor::fromRgb(127, 24, 216);
-                break;
-            }
-
-            case kAPIType_Synchronization:
-            {
-                retVal = QColor::fromRgb(216, 24, 165);
-                break;
-            }
-
-            default:
-                break;
-            }
-        }
-
-        else if ((itemType.m_itemMainType == ProfileSessionDataItem::VK_API_PROFILE_ITEM)
-            || (itemType.m_itemMainType == ProfileSessionDataItem::VK_GPU_PROFILE_ITEM))
-        {
-            // Get the Vulkan API type
-            vkAPIType apiType = vulkanFunctionDefs::GetAPIGroupFromAPI((VkFuncId)itemType.m_itemSubType);
-
-            switch (apiType)
-            {
-
-            case vkAPIType_CmdBufProfiled:
-            case vkAPIType_CmdBufNonProfiled:
-            {
-                retVal = QColor::fromRgb(60, 24, 216);
-                break;
-            }
-            case vkAPIType_DescriptorSet:
-            {
-                retVal = QColor::fromRgb(57, 151, 17);
-                break;
-            }
-            case vkAPIType_Destroy:
-            case vkAPIType_Create:
-            {
-                retVal = QColor::fromRgb(0, 156, 51);
-                break;
-            }
-            case vkAPIType_Get:
-            {
-                retVal = QColor::fromRgb(216, 24, 31);
-                break;
-            }
-            case vkAPIType_Memory:
-            {
-                retVal = QColor::fromRgb(230, 138, 0);
-                break;
-            }
-            case vkAPIType_QueueSubmission:
-            {
-                retVal = QColor::fromRgb(14, 130, 94);
-                break;
-            }
-            case vkAPIType_Sync:
-            {
-                retVal = QColor::fromRgb(216, 24, 165);
-                break;
-            }
-            case vkAPIType_KHR:
-            {
-            }
-            default:
-                break;
-            }
-
-            // add to cache
-            APIColorInfo* pColorInfo = new APIColorInfo(retVal, false);
-
-            m_apiTypeToColorMap.insert(itemId, pColorInfo);
-        }
     }
 
     return retVal;
-}
+}*/
 
 QColor APIColorMap::GetPerfMarkersColor() const
 {

@@ -46,11 +46,12 @@ SummaryView::SummaryView(QWidget* parent) :
     m_loading(false),
     m_pContextMenu(nullptr),
     m_pCopyAction(nullptr),
-    m_pSelectAllAction(nullptr)
+    m_pSelectAllAction(nullptr),
+    m_pExportToCSVAction(nullptr)
 {
     setupUi(this);
 
-    // Set the zoom factor to fit the resolution. QWebView assumes 96 DPI.
+    // Set the zoom factor to fit the resolution. QWebEngineView assumes 96 DPI.
     QWidget* pScreen = QApplication::desktop()->screen();
 
     if (pScreen != nullptr)
@@ -59,22 +60,21 @@ SummaryView::SummaryView(QWidget* parent) :
         webView->setZoomFactor(horizontalDpi / 96.0);
     }
 
-    webView->page()->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
     webView->setContextMenuPolicy(Qt::NoContextMenu);
-    connect(webView, SIGNAL(linkClicked(const QUrl&)), this, SLOT(LinkClickedHandler(const QUrl&)));
+    connect(webView, SIGNAL(urlChanged(const QUrl&)), this, SLOT(LinkClickedHandler(const QUrl&)));
 
-    m_pContextMenu = new QMenu(this);
-
+    m_pContextMenu = new QMenu(webView);
 
     // Add the actions to the table:
     m_pCopyAction = m_pContextMenu->addAction(AF_STR_CopyA, this, SLOT(OnEditCopy()));
     m_pSelectAllAction = m_pContextMenu->addAction(AF_STR_SelectAllA, this, SLOT(OnEditSelectAll()));
 
-    m_pContextMenu->addSeparator();
-    m_pSelectAllAction = m_pContextMenu->addAction(AF_STR_ExportToCSV, this, SLOT(OnExportToCSV()));
+    // Temporarily disable CSV export since RCP has a similar functionality
+    // m_pContextMenu->addSeparator();
+    // m_pExportToCSVAction = m_pContextMenu->addAction(AF_STR_ExportToCSV, this, SLOT(OnExportToCSV()));
 
-    setContextMenuPolicy(Qt::CustomContextMenu);
-    connect(this, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(OnContextMenu(const QPoint&)));
+    webView->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(webView, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(OnContextMenu(const QPoint&)));
 }
 
 SummaryView::~SummaryView()
@@ -319,43 +319,45 @@ void SummaryView::DisplaySummaryPageType(int type)
 
 void SummaryView::OnEditCopy()
 {
-    webView->triggerPageAction(QWebPage::Copy);
+    webView->triggerPageAction(QWebEnginePage::Copy);
 }
 
 void SummaryView::OnEditSelectAll()
 {
-    webView->triggerPageAction(QWebPage::SelectAll);
+    webView->triggerPageAction(QWebEnginePage::SelectAll);
 }
 
 void SummaryView::OnContextMenu(const QPoint& point)
 {
+    GT_UNREFERENCED_PARAMETER(point);
     // Sanity check:
     GT_IF_WITH_ASSERT(m_pContextMenu != nullptr)
     {
-        m_pContextMenu->exec(acMapToGlobal(this, point));
+        m_pContextMenu->exec(QCursor::pos());
     }
 }
 
-void SummaryView::OnExportToCSV()
-{
-    // Sanity check:
-    GT_IF_WITH_ASSERT(comboBoxPages != nullptr)
-    {
-        // The file path for the saved CSV file:
-        QString csvFilePathStr;
+// TODO: Temporarily disabled due to deprecation of related APIs
+// void SummaryView::OnExportToCSV()
+// {
+//     // Sanity check:
+//     GT_IF_WITH_ASSERT(comboBoxPages != nullptr)
+//     {
+//         // The file path for the saved CSV file:
+//         QString csvFilePathStr;
 
-        // Get the output file name:
-        QString fileNamePostfix = Util::GetShortFileNameFromSumPageName(comboBoxPages->currentText());
+//         // Get the output file name:
+//         QString fileNamePostfix = Util::GetShortFileNameFromSumPageName(comboBoxPages->currentText());
 
-        // Build the CSV default file name:
-        QString fileName = QString(GPU_CSV_FileNameFormat).arg(m_pDisplayedTraceSession->m_displayName).arg(fileNamePostfix);
-        bool rc = afApplicationCommands::instance()->ShowQTSaveCSVFileDialog(csvFilePathStr, fileName, this);
-        GT_IF_WITH_ASSERT(rc)
-        {
-            // Export the web view table to a CSV file:
-            rc = acExportHTMLTableToCSV(csvFilePathStr, webView);
-            GT_ASSERT(rc);
-        }
-    }
-}
+//         // Build the CSV default file name:
+//         QString fileName = QString(GPU_CSV_FileNameFormat).arg(m_pDisplayedTraceSession->m_displayName).arg(fileNamePostfix);
+//         bool rc = afApplicationCommands::instance()->ShowQTSaveCSVFileDialog(csvFilePathStr, fileName, this);
+//         GT_IF_WITH_ASSERT(rc)
+//         {
+//             // Export the web view table to a CSV file:
+//             rc = acExportHTMLTableToCSV(csvFilePathStr, webView);
+//             GT_ASSERT(rc);
+//         }
+//     }
+// }
 

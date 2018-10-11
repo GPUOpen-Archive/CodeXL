@@ -23,7 +23,7 @@
 KernelOccupancyWindow::KernelOccupancyWindow(QWidget* parent) : QWidget(parent), m_pWebBrowser(NULL)
 {
     setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
-    m_pWebBrowser = new QWebView(this);
+    m_pWebBrowser = new QWebEngineView(this);
     m_pWebBrowser->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
     m_pWebBrowser->setContextMenuPolicy(Qt::NoContextMenu);
     QHBoxLayout* layout = new QHBoxLayout(this);

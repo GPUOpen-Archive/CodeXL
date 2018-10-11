@@ -58,9 +58,6 @@ private:
     afRichTextButton* m_pNewProjectButton;
     afRichTextButton* m_pNewProjectButtonForDebug;
     afRichTextButton* m_pNewProjectButtonForProfile;
-    afRichTextButton* m_pNewProjectButtonForFrameAnalyze;
-    afRichTextButton* m_pAttachToProcessButton;
-    afRichTextButton* m_pSystemWideButton;
     afRichTextButton* m_pAnalyzeNewCLFile;
     afRichTextButton* m_pAnalyzeAddCLFile;
 };

@@ -4,13 +4,4 @@
     <!-- This is only to avoid failing the build on 32-bit Windows. When HSA support for Windows exists, we'll re-examine this. -->
     <HSAPlatform Condition="'$(AMDTPlatform)' == 'x86'">x86_64</HSAPlatform>
   </PropertyGroup>
-  <ImportGroup Label="HwDbgProjects">
-    <Import Project="$(AMDTCommonAMD)\HwDebugger\Global-HwDbgHSA.props" />
-    <Import Project="$(AMDTCommonAMD)\HwDebugger\Global-HwDbgFacilities.props" />
-  </ImportGroup>
-  <ItemDefinitionGroup>
-    <Link>
-<!--      <AdditionalDependencies>AMDGPUDebugHSA$(AMDTPlatformSuffix)$(AMDTDebugSuffix).lib;%(AdditionalDependencies)</AdditionalDependencies> -->
-    </Link>
-  </ItemDefinitionGroup>
 </Project>

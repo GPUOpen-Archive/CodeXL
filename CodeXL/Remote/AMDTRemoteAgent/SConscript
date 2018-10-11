@@ -12,9 +12,6 @@ UseAPPSDK(env)
 env.Append( CPPPATH = [ 
     ".",
     "./Public Include/",
-    "../../CodeXL/Components/PowerProfiling/Backend/",
-    env['CXL_commonproj_dir'] +"/../../CodeXL/Components/PowerProfiling/Backend/",
-    env['CXL_commonproj_dir'] +"/../../CodeXL/Components/PowerProfiling/Backend/AMDTPowerProfileAPI/inc/",
     env['CXL_commonproj_dir'] + '/AMDTCommonHeaders/',
     env['CXL_commonproj_dir'],
     env['CXL_commonproj_dir'] + '/../../CodeXL/Remote',
@@ -38,7 +35,6 @@ sources = \
     "./dmnServerThread.cpp",
     "./dmnConnectionWatcherThread.cpp",
     "./IThreadEventObserver.cpp",
-    "./dmnPowerBackendAdapter.cpp",
     "./dmnAppWatcherThread.cpp",
 ]
     
@@ -57,7 +53,6 @@ env.Append (LIBS = [
     "CXLOSWrappers",
     "CXLBaseTools",
     "CXLOSAPIWrappers",
-    "CXLPowerProfileAPI",
     "libz",
     "libpthread",
     "libboost_regex",

@@ -27,7 +27,6 @@
 /// Static members initialization
 SharedProfileSettingPage* SharedProfileSettingPage::m_psMySingleInstance = nullptr;
 QList<gtString> SharedProfileSettingPage::m_profileSessionFileTypes;
-QList<gtString> SharedProfileSettingPage::m_frameAnalyzeSessionFileTypes;
 
 /// compare directory based on session index
 /// \param sessionOneDir first directory
@@ -39,35 +38,17 @@ bool CompareDirOnSessionIndex(QFileInfo sessionOneDir, QFileInfo sessionTwoDir)
 }
 SharedProfileSettingPage::SharedProfileSettingPage(): afProjectSettingsExtension(),
     m_pProfileTypeCombo(NULL),
-    m_pSingleApplicationRadioButton(NULL),
-    m_pSystemWideRadioButton(NULL),
-    m_pSystemWideWithFocusRadioButton(NULL),
     m_pProfileTypeDescription(NULL)
 {
-    m_profileTypeToDescriptionMap.insert(PM_profileTypeTimeBasedPrefix, PM_profileTypeCPUTimeBasedDescription);
-    m_profileTypeToDescriptionMap.insert(PM_profileTypeAssesPerformancePrefix, PM_profileTypeCPUAssessPerformanceDescription);
-    m_profileTypeToDescriptionMap.insert(PM_profileTypeInvestigateDataAccessPrefix, PM_profileTypeCPUInvestigateDataAccessDescription);
-    m_profileTypeToDescriptionMap.insert(PM_profileTypeInvestigateInstructionAccessPrefix, PM_profileTypeCPUInvestigateInstrctionAccessDescription);
-    m_profileTypeToDescriptionMap.insert(PM_profileTypeInvestigateInstructionL2CacheAccessPrefix, PM_profileTypeCPUInvestigateL2CacheDescription);
-    m_profileTypeToDescriptionMap.insert(PM_profileTypeInvestigateBranchingPrefix, PM_profileTypeCPUInvestigateBranchingDescription);
-    m_profileTypeToDescriptionMap.insert(PM_profileTypeCustomProfilePrefix, PM_profileTypeCPUCustomDescription);
-    m_profileTypeToDescriptionMap.insert(PM_profileTypeInstructionBasedSamplingPrefix, PM_profileTypeCPUIBSDescription);
-    m_profileTypeToDescriptionMap.insert(PM_profileTypeCLUPrefix, PM_profileTypeCPUCLUDescription);
     m_profileTypeToDescriptionMap.insert(PM_profileTypePerformanceCountersPrefix, PM_profileTypeGPUPerformanceCountersDescription);
     m_profileTypeToDescriptionMap.insert(PM_profileTypeApplicationTracePrefix, PM_profileTypeApplicationTraceDescription);
-    m_profileTypeToDescriptionMap.insert(PM_profileTypePowerProfilePrefix, PM_profileTypePowerProfileDescription);
-    m_profileTypeToDescriptionMap.insert(PM_profileTypeFrameAnalysisPrefix, PM_profileTypeDXProfileDescription);
 
     // Profile sessions
-    m_profileSessionFileTypes.append(AF_STR_CpuProfileFileExtension);
     m_profileSessionFileTypes.append(AF_STR_GpuProfileSessionFileExtension);
     m_profileSessionFileTypes.append(AF_STR_profileFileExtension4);
     m_profileSessionFileTypes.append(AF_STR_GpuProfileTraceFileExtension);
-    m_profileSessionFileTypes.append(AF_STR_profileFileExtension6);
-    m_profileSessionFileTypes.append(AF_STR_profileFileExtension7);
 
     // Frame analysis sessions
-    m_frameAnalyzeSessionFileTypes.append(AF_STR_frameAnalysisDashboardFileExtension);
 }
 
 SharedProfileSettingPage::~SharedProfileSettingPage()
@@ -103,45 +84,11 @@ void SharedProfileSettingPage::Initialize()
     pMainLayout->addWidget(m_pProfileTypeCombo, currentRow, 1, Qt::AlignLeft);
     pMainLayout->addWidget(pSpacerLabel, currentRow, 2, 2, 1);
 
-    QLabel* pLabel2 = new QLabel(PM_STR_sharedProfileSettingsProfileScope);
-    pLabel2->setToolTip(PM_STR_sharedProfileSettingsProfileScopeTooltip);
-
-    // Create the system-wide / single application radio buttons:
-    m_pSingleApplicationRadioButton = new QRadioButton(PM_STR_sharedProfileSettingsSingleApplication);
-
-    m_pSingleApplicationRadioButton->setToolTip(PM_STR_sharedProfileSettingsSingleApplicationTooltip);
-
-    m_pSystemWideRadioButton = new QRadioButton(PM_STR_sharedProfileSettingsSystemWideProfile);
-
-    m_pSystemWideRadioButton->setToolTip(PM_STR_sharedProfileSettingsSystemWideProfileTooltip);
-
-    m_pSystemWideWithFocusRadioButton = new QRadioButton(PM_STR_sharedProfileSettingsSystemWideWithFocusProfile);
-
-    m_pSystemWideWithFocusRadioButton->setToolTip(PM_STR_sharedProfileSettingsSystemWideWithFocusProfileTooltip);
-
     m_pProfileTypeDescription = new QLabel;
     m_pProfileTypeDescription->setWordWrap(true);
 
     currentRow ++;
     pMainLayout->addWidget(m_pProfileTypeDescription, currentRow, 1, 1, 2);
-
-    QButtonGroup* pGroup = new QButtonGroup;
-
-    pGroup->addButton(m_pSingleApplicationRadioButton);
-    pGroup->addButton(m_pSystemWideRadioButton);
-    pGroup->addButton(m_pSystemWideWithFocusRadioButton);
-
-    QVBoxLayout* pRadioLayout = new QVBoxLayout;
-
-
-    pRadioLayout->addWidget(m_pSingleApplicationRadioButton);
-    pRadioLayout->addWidget(m_pSystemWideRadioButton);
-    pRadioLayout->addWidget(m_pSystemWideWithFocusRadioButton);
-
-    // Add the profile scope label and radio buttons to top grid layout:
-    currentRow ++;
-    pMainLayout->addWidget(pLabel2, currentRow, 0, Qt::AlignLeft | Qt::AlignTop);
-    pMainLayout->addLayout(pRadioLayout, currentRow, 1, Qt::AlignLeft);
 
     QLabel* pStretchLabel = new QLabel;
 
@@ -209,22 +156,6 @@ void SharedProfileSettingPage::RestoreDefaultProjectSettings()
     SessionTreeNodeData restore;
     m_currentSettings = restore;
 
-    if (m_pProfileTypeCombo != nullptr)
-    {
-        // For power profile type, the default scope should be system wide:
-        if (m_pProfileTypeCombo->currentText().contains("Power"))
-        {
-            if (!afProjectManager::instance().currentProjectSettings().executablePath().isEmpty())
-            {
-                m_currentSettings.m_profileScope = PM_PROFILE_SCOPE_SYS_WIDE;
-            }
-            else
-            {
-                m_currentSettings.m_profileScope = PM_PROFILE_SCOPE_SYS_WIDE_FOCUS_ON_EXE;
-            }
-        }
-    }
-
     RestoreCurrentSettings();
 }
 
@@ -234,7 +165,7 @@ bool SharedProfileSettingPage::RestoreCurrentSettings()
     bool retVal = false;
 
     // Sanity check:
-    GT_IF_WITH_ASSERT((m_pProfileTypeCombo != NULL) && (m_pSingleApplicationRadioButton != NULL) && (m_pSystemWideRadioButton != NULL))
+    GT_IF_WITH_ASSERT(m_pProfileTypeCombo != NULL)
     {
         retVal = true;
 
@@ -247,13 +178,8 @@ bool SharedProfileSettingPage::RestoreCurrentSettings()
             m_pProfileTypeCombo->setCurrentIndex(index);
         }
 
-        m_pSingleApplicationRadioButton->setChecked(m_currentSettings.m_profileScope == PM_PROFILE_SCOPE_SINGLE_EXE);
-        m_pSystemWideRadioButton->setChecked(m_currentSettings.m_profileScope == PM_PROFILE_SCOPE_SYS_WIDE);
-        m_pSystemWideWithFocusRadioButton->setChecked(m_currentSettings.m_profileScope == PM_PROFILE_SCOPE_SYS_WIDE_FOCUS_ON_EXE);
-
         // Set the executable path:
         QString exePath = acGTStringToQString(afProjectManager::instance().currentProjectSettings().executablePath().asString());
-        OnExecutableChanged(exePath, false, false);
     }
 
     return retVal;
@@ -269,24 +195,13 @@ bool SharedProfileSettingPage::AreSettingsValid(gtString& invalidMessageStr)
 bool SharedProfileSettingPage::SaveCurrentSettings()
 {
     // Set the selected profile type:
-    GT_IF_WITH_ASSERT((m_pProfileTypeCombo != NULL) && (m_pSystemWideRadioButton != NULL) && (m_pSystemWideWithFocusRadioButton != NULL) && (m_pSingleApplicationRadioButton != NULL))
+    GT_IF_WITH_ASSERT(m_pProfileTypeCombo != NULL)
     {
         gtString currentProfileType = acQStringToGTString(m_pProfileTypeCombo->currentText());
         bool rc = SharedProfileManager::instance().SelectProfileType(currentProfileType);
         GT_ASSERT(rc);
 
         // Save the properties to the settings structure:
-        m_currentSettings.m_profileScope = PM_PROFILE_SCOPE_SINGLE_EXE;
-
-        if (m_pSystemWideRadioButton->isChecked())
-        {
-            m_currentSettings.m_profileScope = PM_PROFILE_SCOPE_SYS_WIDE;
-        }
-        else if (m_pSystemWideWithFocusRadioButton->isChecked())
-        {
-            m_currentSettings.m_profileScope = PM_PROFILE_SCOPE_SYS_WIDE_FOCUS_ON_EXE;
-        }
-
         afNewProjectDialog::instance().setStoredProjectSessionType(currentProfileType);
     }
 
@@ -324,7 +239,6 @@ bool SharedProfileSettingPage::DoesProjectContainData(const gtString& projectNam
     // sort the directories by creation date, so the sessions appear chronologically
     qSort(sessionDirs.begin(), sessionDirs.end(), CompareDirOnSessionIndex);
     bool doesProfileSessionsExist = false;
-    bool doesFASessionsExist = false;
 
     foreach (QFileInfo currentSessionDir, sessionDirs)
     {
@@ -346,38 +260,18 @@ bool SharedProfileSettingPage::DoesProjectContainData(const gtString& projectNam
                 {
                     doesProfileSessionsExist = true;
                 }
-                else if (m_frameAnalyzeSessionFileTypes.contains(extension))
-                {
-                    doesFASessionsExist = true;
-                }
-
-                if (doesFASessionsExist && doesProfileSessionsExist)
-                {
-                    break;
-                }
             }
         }
     }
 
     // If sessions found, build the string describing the type of data saved for this project
-    retVal = doesFASessionsExist || doesProfileSessionsExist;
+    retVal = doesProfileSessionsExist;
 
     if (retVal)
     {
         if (doesProfileSessionsExist)
         {
             typeOfProjectSavedData.append(PM_profileSessions);
-        }
-
-        if (doesFASessionsExist)
-        {
-            if (!typeOfProjectSavedData.isEmpty())
-            {
-                typeOfProjectSavedData.append(AF_STR_Comma);
-                typeOfProjectSavedData.append(AF_STR_Space);
-            }
-
-            typeOfProjectSavedData.append(PM_frameAnalysisSessions);
         }
     }
 
@@ -386,35 +280,9 @@ bool SharedProfileSettingPage::DoesProjectContainData(const gtString& projectNam
 
 void SharedProfileSettingPage::OnProfileTypeChanged(const QString& currentText)
 {
-    bool isCPUProfile = currentText.startsWith("CPU");
-
-    bool isPowerProfile = currentText.startsWith("Power");
-
     // Sanity check:
-    GT_IF_WITH_ASSERT((m_pSingleApplicationRadioButton != NULL) && (m_pSystemWideRadioButton != NULL) && (m_pProfileTypeDescription != NULL))
+    GT_IF_WITH_ASSERT(m_pProfileTypeDescription != NULL)
     {
-        m_pSingleApplicationRadioButton->setEnabled(!isPowerProfile);
-        m_pSystemWideRadioButton->setEnabled(isCPUProfile || isPowerProfile);
-        m_pSystemWideWithFocusRadioButton->setEnabled(isCPUProfile || isPowerProfile);
-
-        if (!isCPUProfile && !isPowerProfile)
-        {
-            // GPU Profile - some of the features are not supported:
-            m_pSingleApplicationRadioButton->setChecked(true);
-            m_pSystemWideRadioButton->setChecked(false);
-            m_pSystemWideWithFocusRadioButton->setChecked(false);
-        }
-        else if (isPowerProfile)
-        {
-            // Single application option is not applicable for power profile, so we select system wide:
-            if (m_pSingleApplicationRadioButton->isChecked())
-            {
-                bool isExeLoaded = !afProjectManager::instance().currentProjectSettings().executablePath().isEmpty();
-                m_pSystemWideRadioButton->setChecked(!isExeLoaded);
-                m_pSingleApplicationRadioButton->setChecked(false);
-                m_pSystemWideWithFocusRadioButton->setChecked(isExeLoaded);
-            }
-        }
 
         // Emit a signal, so that other profile pages that are dependent on the profile type will handle the change:
         emit ProfileTypeChanged(m_previousProfileType, currentText);
@@ -429,18 +297,6 @@ void SharedProfileSettingPage::OnProfileTypeChanged(const QString& currentText)
         // a construction of the project dialog with only few of the extensions.
         // Once we create afNewProjectDialog not as a singleton (see http://ontrack-internal.amd.com/browse/CODEXL-1594), this patch can be removed, and replaced by
         // SaveCurrentSettings()
-
-        // Save the properties to the settings structure:
-        m_currentSettings.m_profileScope = PM_PROFILE_SCOPE_SINGLE_EXE;
-
-        if (m_pSystemWideRadioButton->isChecked())
-        {
-            m_currentSettings.m_profileScope = PM_PROFILE_SCOPE_SYS_WIDE;
-        }
-        else if (m_pSystemWideWithFocusRadioButton->isChecked())
-        {
-            m_currentSettings.m_profileScope = PM_PROFILE_SCOPE_SYS_WIDE_FOCUS_ON_EXE;
-        }
     }
 }
 
@@ -450,7 +306,8 @@ void SharedProfileSettingPage::OnProfileTypeChanged(const gtString& profileType)
     GT_IF_WITH_ASSERT(m_pProfileTypeCombo != NULL)
     {
         int index = m_pProfileTypeCombo->findText(acGTStringToQString(profileType));
-        GT_IF_WITH_ASSERT(index >= 0)
+
+        if (index >= 0)
         {
             m_pProfileTypeCombo->setCurrentIndex(index);
         }
@@ -468,33 +325,6 @@ void SharedProfileSettingPage::AddProfileType(const QString& profileType)
     }
 }
 
-void SharedProfileSettingPage::OnExecutableChanged(const QString& exePath, bool isChangeFinal, bool isUserModelId)
-{
-    (void)(isChangeFinal); // unused
-    (void)(isUserModelId); // unused
-
-    // Sanity check:
-    GT_IF_WITH_ASSERT((m_pSingleApplicationRadioButton != NULL) && (m_pSystemWideWithFocusRadioButton != NULL))
-    {
-        QFileInfo info(exePath);
-        QString fileName = info.fileName();
-
-        if (!fileName.isEmpty())
-        {
-            QString radioText = QString("%1 (%2)").arg(PM_STR_sharedProfileSettingsSingleApplication).arg(fileName);
-            m_pSingleApplicationRadioButton->setText(radioText);
-
-            radioText = QString("%1 (%2)").arg(PM_STR_sharedProfileSettingsSystemWideWithFocusProfile).arg(fileName);
-            m_pSystemWideWithFocusRadioButton->setText(radioText);
-        }
-        else
-        {
-            m_pSingleApplicationRadioButton->setText(PM_STR_sharedProfileSettingsSingleApplication);
-            m_pSystemWideWithFocusRadioButton->setText(PM_STR_sharedProfileSettingsSystemWideWithFocusProfile);
-        }
-    }
-}
-
 SharedProfileSettingPage* SharedProfileSettingPage::Instance()
 {
     if (m_psMySingleInstance == NULL)
@@ -503,20 +333,8 @@ SharedProfileSettingPage* SharedProfileSettingPage::Instance()
         GT_ASSERT(m_psMySingleInstance);
 
         afProjectManager::instance().registerProjectSettingsExtension(m_psMySingleInstance);
-        afProjectManager::instance().registerToListenExeChanged(m_psMySingleInstance);
-
     }
 
     return m_psMySingleInstance;
-}
-
-bool SharedProfileSettingPage::IsSystemWideRadioButtonChecked()
-{
-    bool res = false;
-    GT_IF_WITH_ASSERT(m_pSystemWideRadioButton)
-    {
-        res = m_pSystemWideRadioButton->isChecked();
-    }
-    return res;
 }
 

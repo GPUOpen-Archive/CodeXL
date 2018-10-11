@@ -27,7 +27,7 @@ public:
 
 private:
 
-    // Holds the processes whose children should be terminated if the connection is no longer alive (CodeXLGpuProfiler, RDS).
+    // Holds the processes whose children should be terminated if the connection is no longer alive (rcprof, RDS).
     gtVector<osProcessId> m_parentProcesses;
 
     // The TCP connection which is being watched.

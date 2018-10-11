@@ -183,17 +183,11 @@ exit 0
 %post
 ln -s %{CXL_examples_dir}/examples/ %{CXL_install_dir}/examples
 chmod -R 777 %{CXL_examples_dir}
-cd  %{CXL_install_dir}
-sh  CodeXLPwrProfDriver.sh install
 exit 0
 
 
 #--------------------------------------------------------------------------
 %preun
-if [ $1 -eq 0 ]; then 
-    cd  %{CXL_install_dir}
-    sh  CodeXLPwrProfDriver.sh uninstall
-fi
 exit 0
 
 

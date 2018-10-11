@@ -384,6 +384,10 @@ public:
     }
 };
 
+#if defined(__GNUC__) && (__GNUC__ > 6)
+    #pragma GCC diagnostic push
+    #pragma GCC diagnostic ignored "-Wformat-overflow"
+#endif
 bool ExpandMacros(std::string& inSourceCodeString, const std::wstring& rawSourceCodeFileName, const std::vector<std::string>& additionalMacros, std::vector<PreProcessedToken>& tokens)
 {
     bool result = false;
@@ -464,6 +468,9 @@ bool ExpandMacros(std::string& inSourceCodeString, const std::wstring& rawSource
 
     return result;
 }
+#if defined(__GNUC__) && (__GNUC__ > 6)
+    #pragma GCC diagnostic pop
+#endif
 
 bool ExpandMacros(const std::wstring& rawSourceCodeFileName, const std::vector<std::string>& additionalMacros, std::vector<PreProcessedToken>& tokens)
 {

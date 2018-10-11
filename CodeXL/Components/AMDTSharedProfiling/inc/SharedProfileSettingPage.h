@@ -89,16 +89,13 @@ public:
     /// Adds a profile type to the page:
     void AddProfileType(const QString& profileType);
 
-    /// returns true is the System Wide radio button are set to system wide
-    bool IsSystemWideRadioButtonChecked();
-
     /// return true if we in after project loading
     /// \returns the value of isInRestoreDefaultSettings
-    bool GetAfetrProjectLoadedStatus() const { return m_isAfetrProjectLoaded; };
+    bool GetAfterProjectLoadedStatus() const { return m_isAfterProjectLoaded; };
 
-    /// sets the m_isAfetrProjectLoaded member
+    /// sets the m_isAfterProjectLoaded member
     /// \param isLoaded value to be set
-    void SetAfterProjectLoadedStatus(bool isLoaded) { m_isAfetrProjectLoaded = isLoaded; };
+    void SetAfterProjectLoadedStatus(bool isLoaded) { m_isAfterProjectLoaded = isLoaded; };
 
 public slots:
 
@@ -114,8 +111,6 @@ signals:
 
 protected slots:
 
-    /// When executable is changed:
-    void OnExecutableChanged(const QString& exePath, bool isChangeFinal, bool isUserModelId);
     void OnProfileTypeChanged(const QString& currentText);
 private:
 
@@ -133,11 +128,6 @@ private:
     /// Widgets:
     QComboBox* m_pProfileTypeCombo;
 
-    // Profile scope radio buttons:
-    QRadioButton* m_pSingleApplicationRadioButton;
-    QRadioButton* m_pSystemWideRadioButton;
-    QRadioButton* m_pSystemWideWithFocusRadioButton;
-
     // Profile type description:
     QLabel* m_pProfileTypeDescription;
     QMap<QString, QString> m_profileTypeToDescriptionMap;
@@ -146,13 +136,10 @@ private:
     QString m_previousProfileType;
 
     /// is true if project loaded already
-    bool m_isAfetrProjectLoaded;
+    bool m_isAfterProjectLoaded;
 
     /// A list of extensions for profile sessions
     static QList<gtString> m_profileSessionFileTypes;
-
-    /// A list of extensions for frame analyze sessions
-    static QList<gtString> m_frameAnalyzeSessionFileTypes;
 };
 
 

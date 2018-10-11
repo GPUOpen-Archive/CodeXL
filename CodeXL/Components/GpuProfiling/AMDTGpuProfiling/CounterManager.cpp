@@ -426,7 +426,7 @@ void CounterManager::AddDeviceIdToFamily(HardwareFamily hardwareFamily, size_t d
     }
 }
 
-void CounterManager::GetCounterInfoFromAccessor(HardwareFamily hardwareFamily, GPA_ICounterAccessor* pCounterAccessor)
+void CounterManager::GetCounterInfoFromAccessor(HardwareFamily hardwareFamily, IGPACounterAccessor* pCounterAccessor)
 {
     if (pCounterAccessor != NULL)
     {
@@ -450,11 +450,10 @@ void CounterManager::GetCounterInfoFromAccessor(HardwareFamily hardwareFamily, G
             {
                 counterIndices = new CounterIndices(actualCounterCount, i);
                 counterIndexMap.insert(counterName, counterIndices);
+                QString groupName = pCounterAccessor->GetCounterGroup(i);
+                groupName = groupName.trimmed();
                 QString counterDescription = pCounterAccessor->GetCounterDescription(i);
-                QStringList counterInfo = counterDescription.split('#');
-                GT_ASSERT(counterInfo.count() == 3 && counterInfo[0] == "");
-                QString groupName = counterInfo[1].trimmed();
-                counterDescription = counterInfo[2].trimmed();
+                counterDescription = counterDescription.trimmed();
                 counterData.insert(counterName, counterDescription);
                 counterNames.append(counterName);
                 actualCounterCount++;
@@ -708,12 +707,12 @@ void CounterManager::SetupCounterData()
 
     if (m_gpa_GetAvailableCountersFuncPtr != NULL)
     {
-        GPA_ICounterAccessor* pCounterAccessor;
-        GPA_ICounterScheduler* pCounterScheduler;
+        IGPACounterAccessor* pCounterAccessor;
+        IGPACounterScheduler* pCounterScheduler;
 
         if (m_availableDevices.contains(GFX9_FAMILY) && m_availableDevices[GFX9_FAMILY].count() > 0)
         {
-            if (m_gpa_GetAvailableCountersFuncPtr(GPA_API_OPENCL, ms_AMD_VENDOR_ID, m_availableDevices[GFX9_FAMILY][0].m_deviceID, m_availableDevices[GFX9_FAMILY][0].m_revID, &pCounterAccessor, &pCounterScheduler) == GPA_STATUS_OK)
+            if (m_gpa_GetAvailableCountersFuncPtr(GPA_API_OPENCL, ms_AMD_VENDOR_ID, m_availableDevices[GFX9_FAMILY][0].m_deviceID, m_availableDevices[GFX9_FAMILY][0].m_revID, GPA_OPENCONTEXT_DEFAULT_BIT, true, &pCounterAccessor, &pCounterScheduler) == GPA_STATUS_OK)
             {
                 GetCounterInfoFromAccessor(GFX9_FAMILY, pCounterAccessor);
             }
@@ -725,7 +724,7 @@ void CounterManager::SetupCounterData()
 
         if (m_availableDevices.contains(GFX8_FAMILY) && m_availableDevices[GFX8_FAMILY].count() > 0)
         {
-            if (m_gpa_GetAvailableCountersFuncPtr(GPA_API_OPENCL, ms_AMD_VENDOR_ID, m_availableDevices[GFX8_FAMILY][0].m_deviceID, m_availableDevices[GFX8_FAMILY][0].m_revID, &pCounterAccessor, &pCounterScheduler) == GPA_STATUS_OK)
+            if (m_gpa_GetAvailableCountersFuncPtr(GPA_API_OPENCL, ms_AMD_VENDOR_ID, m_availableDevices[GFX8_FAMILY][0].m_deviceID, m_availableDevices[GFX8_FAMILY][0].m_revID, GPA_OPENCONTEXT_DEFAULT_BIT, true, &pCounterAccessor, &pCounterScheduler) == GPA_STATUS_OK)
             {
                 GetCounterInfoFromAccessor(GFX8_FAMILY, pCounterAccessor);
             }
@@ -737,7 +736,7 @@ void CounterManager::SetupCounterData()
 
         if (m_availableDevices.contains(GFX7_FAMILY) && m_availableDevices[GFX7_FAMILY].count() > 0)
         {
-            if (m_gpa_GetAvailableCountersFuncPtr(GPA_API_OPENCL, ms_AMD_VENDOR_ID, m_availableDevices[GFX7_FAMILY][0].m_deviceID, m_availableDevices[GFX7_FAMILY][0].m_revID, &pCounterAccessor, &pCounterScheduler) == GPA_STATUS_OK)
+            if (m_gpa_GetAvailableCountersFuncPtr(GPA_API_OPENCL, ms_AMD_VENDOR_ID, m_availableDevices[GFX7_FAMILY][0].m_deviceID, m_availableDevices[GFX7_FAMILY][0].m_revID, GPA_OPENCONTEXT_DEFAULT_BIT, true, &pCounterAccessor, &pCounterScheduler) == GPA_STATUS_OK)
             {
                 GetCounterInfoFromAccessor(GFX7_FAMILY, pCounterAccessor);
             }
@@ -749,7 +748,7 @@ void CounterManager::SetupCounterData()
 
         if (m_availableDevices.contains(GFX6_FAMILY) && m_availableDevices[GFX6_FAMILY].count() > 0)
         {
-            if (m_gpa_GetAvailableCountersFuncPtr(GPA_API_OPENCL, ms_AMD_VENDOR_ID, m_availableDevices[GFX6_FAMILY][0].m_deviceID, m_availableDevices[GFX6_FAMILY][0].m_revID, &pCounterAccessor, &pCounterScheduler) == GPA_STATUS_OK)
+            if (m_gpa_GetAvailableCountersFuncPtr(GPA_API_OPENCL, ms_AMD_VENDOR_ID, m_availableDevices[GFX6_FAMILY][0].m_deviceID, m_availableDevices[GFX6_FAMILY][0].m_revID, GPA_OPENCONTEXT_DEFAULT_BIT, true, &pCounterAccessor, &pCounterScheduler) == GPA_STATUS_OK)
             {
                 GetCounterInfoFromAccessor(GFX6_FAMILY, pCounterAccessor);
             }
@@ -981,12 +980,12 @@ bool CounterManager::GetHardwareFamilyPassCountDisplayList(HardwareFamily hardwa
 
         if (m_gpa_GetAvailableCountersFuncPtr != NULL)
         {
-            GPA_ICounterAccessor* pCounterAccessor;
-            GPA_ICounterScheduler* pCounterScheduler;
+            IGPACounterAccessor* pCounterAccessor;
+            IGPACounterScheduler* pCounterScheduler;
 
             foreach (DeviceAndRevInfo deviceInfo, m_availableDevices[hardwareFamily])
             {
-                if (m_gpa_GetAvailableCountersFuncPtr(GPA_API_OPENCL, ms_AMD_VENDOR_ID, deviceInfo.m_deviceID, deviceInfo.m_revID, &pCounterAccessor, &pCounterScheduler) == GPA_STATUS_OK)
+                if (m_gpa_GetAvailableCountersFuncPtr(GPA_API_OPENCL, ms_AMD_VENDOR_ID, deviceInfo.m_deviceID, deviceInfo.m_revID, GPA_OPENCONTEXT_DEFAULT_BIT, true, &pCounterAccessor, &pCounterScheduler) == GPA_STATUS_OK)
                 {
                     pCounterScheduler->SetCounterAccessor(pCounterAccessor, ms_AMD_VENDOR_ID, deviceInfo.m_deviceID, deviceInfo.m_revID);
 
@@ -1035,12 +1034,12 @@ bool CounterManager::GetHardwareFamilyPassCountLimitedCountersList(HardwareFamil
 
         if (m_gpa_GetAvailableCountersFuncPtr != NULL)
         {
-            GPA_ICounterAccessor* pCounterAccessor;
-            GPA_ICounterScheduler* pCounterScheduler;
+            IGPACounterAccessor* pCounterAccessor;
+            IGPACounterScheduler* pCounterScheduler;
 
             foreach (DeviceAndRevInfo deviceInfo, m_availableDevices[hardwareFamily])
             {
-                if (m_gpa_GetAvailableCountersFuncPtr(GPA_API_OPENCL, ms_AMD_VENDOR_ID, deviceInfo.m_deviceID, deviceInfo.m_revID, &pCounterAccessor, &pCounterScheduler) == GPA_STATUS_OK)
+                if (m_gpa_GetAvailableCountersFuncPtr(GPA_API_OPENCL, ms_AMD_VENDOR_ID, deviceInfo.m_deviceID, deviceInfo.m_revID, GPA_OPENCONTEXT_DEFAULT_BIT, true, &pCounterAccessor, &pCounterScheduler) == GPA_STATUS_OK)
                 {
                     pCounterScheduler->SetCounterAccessor(pCounterAccessor, ms_AMD_VENDOR_ID, deviceInfo.m_deviceID, deviceInfo.m_revID);
 

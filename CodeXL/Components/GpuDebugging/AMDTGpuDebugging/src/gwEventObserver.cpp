@@ -48,7 +48,6 @@
 #include <AMDTGpuDebuggingComponents/Include/gdImagesAndBuffersManager.h>
 #include <AMDTGpuDebuggingComponents/Include/gdStringConstants.h>
 #include <AMDTGpuDebuggingComponents/Include/commands/gdFlushTexturesImagesCommand.h>
-#include <AMDTGpuDebuggingComponents/Include/views/gdMultiWatchView.h>
 #include <AMDTGpuDebuggingComponents/Include/views/gdWatchView.h>
 
 // Local:
@@ -501,12 +500,6 @@ void gwEventObserver::updateLayout()
     afMainAppWindow::LayoutFormats currentLayout = afMainAppWindow::LayoutDebug;
 
     // check if this is kernel debugging:
-    afRunModes runModes = afPluginConnectionManager::instance().getCurrentRunModeMask();
-
-    if (runModes & AF_DEBUGGED_PROCESS_IN_KERNEL_DEBUGGING)
-    {
-        currentLayout = afMainAppWindow::LayoutDebugKernel;
-    }
 
     afMainAppWindow::instance()->updateLayoutMode(currentLayout);
 }
@@ -541,38 +534,18 @@ void gwEventObserver::onAddWatch(const apAddWatchEvent& addWatchEvent)
 {
     GT_IF_WITH_ASSERT(_pGDApplicationCommands != NULL)
     {
-        if (addWatchEvent.isMultiwatch())
+        _pGDApplicationCommands->addWatchVariable(addWatchEvent.watchExpression());
+        gdWatchView* pWatchView = _pGDApplicationCommands->watchView();
+        GT_IF_WITH_ASSERT(pWatchView != NULL)
         {
-            gdMultiWatchView* pMultiWatchView = _pGDApplicationCommands->multiWatchView(0);
-            GT_IF_WITH_ASSERT(pMultiWatchView != NULL)
+            pWatchView->show();
+            QDockWidget* pDockWidget = qobject_cast<QDockWidget*>(pWatchView->parent());
+            GT_IF_WITH_ASSERT(pDockWidget != NULL)
             {
-                pMultiWatchView->show();
-                pMultiWatchView->displayVariable(addWatchEvent.watchExpression());
-                QDockWidget* pDockWidget = qobject_cast<QDockWidget*>(pMultiWatchView->parent());
-                GT_IF_WITH_ASSERT(pDockWidget != NULL)
-                {
-                    pDockWidget->show();
-                    pDockWidget->setFocus();
-                    pDockWidget->raise();
-                    pDockWidget->activateWindow();
-                }
-            }
-        }
-        else
-        {
-            _pGDApplicationCommands->addWatchVariable(addWatchEvent.watchExpression());
-            gdWatchView* pWatchView = _pGDApplicationCommands->watchView();
-            GT_IF_WITH_ASSERT(pWatchView != NULL)
-            {
-                pWatchView->show();
-                QDockWidget* pDockWidget = qobject_cast<QDockWidget*>(pWatchView->parent());
-                GT_IF_WITH_ASSERT(pDockWidget != NULL)
-                {
-                    pDockWidget->show();
-                    pDockWidget->setFocus();
-                    pDockWidget->raise();
-                    pDockWidget->activateWindow();
-                }
+                pDockWidget->show();
+                pDockWidget->setFocus();
+                pDockWidget->raise();
+                pDockWidget->activateWindow();
             }
         }
     }

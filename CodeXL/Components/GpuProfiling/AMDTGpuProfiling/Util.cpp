@@ -1,16 +1,9 @@
 //=====================================================================
-// Copyright (c) 2012 Advanced Micro Devices, Inc. All rights reserved.
+// Copyright (c) 2012-2018 Advanced Micro Devices, Inc. All rights reserved.
 //
 /// \author GPU Developer Tools
-/// \file $File: //devtools/main/CodeXL/Components/GpuProfiling/AMDTGpuProfiling/Util.cpp $
-/// \version $Revision: #63 $
+/// \file
 /// \brief  This file contains Util class
-//
-//=====================================================================
-// $Id: //devtools/main/CodeXL/Components/GpuProfiling/AMDTGpuProfiling/Util.cpp#63 $
-// Last checkin:   $DateTime: 2016/04/18 06:02:03 $
-// Last edited by: $Author: salgrana $
-// Change list:    $Change: 569613 $
 //=====================================================================
 
 #include <qtIgnoreCompilerWarnings.h>
@@ -543,7 +536,6 @@ QString Util::ToString(QStandardItemModel* model, const QModelIndex& index)
 
 QString Util::GetProfileTypeName(GPUProfileType profileType)
 {
-    // TODO: use static consts instead of hardcoding these strings (and/or consolidate these with similar string literals in ProfileManager.cpp)
     switch (profileType)
     {
         case PERFORMANCE:
@@ -551,9 +543,6 @@ QString Util::GetProfileTypeName(GPUProfileType profileType)
 
         case API_TRACE:
             return PM_profileTypeApplicationTrace;
-
-        case FRAME_ANALYSIS:
-            return PM_profileTypeFrameAnalysis;
 
         default:
             return "";

@@ -98,8 +98,6 @@ protected slots:
     void OnSettingsTreeItemClicked();
 
     void OnProjectNameEdit(int oldCursor, int newCursor);
-    void OnAppTypeRadioButtonSelect();
-    void OnApplicationTypeRadioButtonSelect();
     void OnHostRadioButtonSelection(bool isSelected);
 
     void OnClickBrowseForSourceFilesDirectory();
@@ -189,13 +187,10 @@ protected:
     QLabel* m_pProjectNameTitle;
     QLineEdit* m_pProjectNameTextEdit;
 
-    QRadioButton* m_pProgramExeRadioButton;
     QLabel* m_pProgramExeLabel;
     QLineEdit* m_pProgramExeTextEdit;
     QToolButton* m_pBrowseForExeButton;
     afBrowseAction* m_pBrowseForExeButtonAction;
-
-    QRadioButton* m_pWinStoreAppRadioButton;
 
     // Remote profiling/debugging.
     QRadioButton* m_pRemoteHostRadioButton;

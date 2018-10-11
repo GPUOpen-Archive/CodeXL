@@ -1,6 +1,0 @@
-#! /bin/bash
-
-chmod -R 777 /usr/share/CodeXL_/
-cd /opt/CodeXL_/
-
-./CodeXLPwrProfDriver.sh install

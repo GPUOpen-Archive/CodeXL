@@ -552,10 +552,6 @@ void afProjectManager::FixSamplesPath()
         {
             currentSampleID = AF_TEAPOT_SAMPLE;
         }
-        else if (exeName.find(AF_STR_CodeXLMatMulExampleBinaryName) >= 0)
-        {
-            currentSampleID = AF_MATMUL_SAMPLE;
-        }
 
         if (currentSampleID != AF_SAMPLE_NONE)
         {

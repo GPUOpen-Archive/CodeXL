@@ -20,94 +20,54 @@
             document.getElementById('debug_side_image').src = './arrow.png';
             document.getElementById('profile_side_image').src = './empty.png';
             document.getElementById('analyze_side_image').src = './empty.png';
-            document.getElementById('frame_analyze_side_image').src = './empty.png';
             document.getElementById('analyze_image').src = './welcomepage_analyze.png';
             document.getElementById('profile_image').src = './welcomepage_profile.png';
-            document.getElementById('frame_analyze_image').src = './welcomepage_frame_analyze.png';
             document.getElementById('debug_image').src = './welcomepage_debug_selected.png';
             document.getElementById('debug_div').style.visibility = 'visible';
             document.getElementById('profile_div').style.visibility = 'hidden';
             document.getElementById('analyze_div').style.visibility = 'hidden';
             document.getElementById('analyze_na').style.visibility = 'hidden';
-            document.getElementById('frame_analyze_div').style.visibility = 'hidden';
             document.getElementById('profile_div').style.height = '0px';
             document.getElementById('analyze_div').style.height = '0px';
-            document.getElementById('frame_analyze_div').style.height = '0px';
             document.getElementById('debug_div').style.minHeight = '300px';
             document.getElementById('profile_div').style.minHeight = '0px';
             document.getElementById('analyze_div').style.minHeight = '0px';
-            document.getElementById('frame_analyze_div').style.minHeight = '0px';
             current_mode = 'debug';
         }
         function goprofile() {
-        
             document.getElementById('main_image').src = './welcomepage_profile_large.png';
             document.getElementById('profile_side_image').src = './arrow.png';
             document.getElementById('debug_side_image').src = './empty.png';
             document.getElementById('analyze_side_image').src = './empty.png';
-            document.getElementById('frame_analyze_side_image').src = './empty.png';
             document.getElementById('analyze_image').src = './welcomepage_analyze.png';
             document.getElementById('debug_image').src = './welcomepage_debug.png';
             document.getElementById('profile_image').src = './welcomepage_profile_selected.png';
-            document.getElementById('frame_analyze_image').src = './welcomepage_frame_analyze.png';
             document.getElementById("profile_div").style.visibility = 'visible';
             document.getElementById("debug_div").style.visibility = 'hidden';
-            document.getElementById('frame_analyze_div').style.visibility = 'hidden';
             document.getElementById("analyze_div").style.visibility = 'hidden';
             document.getElementById("analyze_na").style.visibility = 'hidden';
             document.getElementById('profile_div').style.height = 'auto';
             document.getElementById('debug_div').style.height = '0px';
             document.getElementById('analyze_na').style.height = '0px';
-            document.getElementById('frame_analyze_div').style.height = '0px';
             document.getElementById('profile_div').style.minHeight = '300px';
-            document.getElementById('frame_analyze_div').style.minHeight = '0px';
             document.getElementById('debug_div').style.minHeight = '0px';
             document.getElementById('analyze_div').style.minHeight = '0px';
-            current_mode = 'profile';		
-        }
-        function goframeanalyze() {
-            document.getElementById('main_image').src = './welcomepage_profile_large.png';
-            document.getElementById('frame_analyze_side_image').src = './arrow.png';
-            document.getElementById('debug_side_image').src = './empty.png';
-            document.getElementById('analyze_side_image').src = './empty.png';
-            document.getElementById('profile_side_image').src = './empty.png';
-            document.getElementById('analyze_image').src = './welcomepage_analyze_selected.png';
-            document.getElementById('debug_image').src = './welcomepage_debug.png';
-            document.getElementById('profile_image').src = './welcomepage_profile.png';
-            document.getElementById('frame_analyze_image').src = './welcomepage_frame_analyze.png';
-            document.getElementById("frame_analyze_div").style.visibility = 'visible';
-            document.getElementById("debug_div").style.visibility = 'hidden';
-            document.getElementById('profile_div').style.visibility = 'hidden';
-            document.getElementById("analyze_div").style.visibility = 'hidden';
-            document.getElementById("analyze_na").style.visibility = 'hidden';
-            document.getElementById('frame_analyze_div').style.height = 'auto';
-            document.getElementById('debug_div').style.height = '0px';
-            document.getElementById('analyze_na').style.height = '0px';
-            document.getElementById('profile_div').style.height = '0px';
-            document.getElementById('analyze_div').style.minHeight = '300px';
-            document.getElementById('frame_analyze_div').style.minHeight = '0px';
-            document.getElementById('debug_div').style.minHeight = '0px';
-            document.getElementById('profile_div').style.minHeight = '0px';
-            current_mode = 'frame_analyze';
+            current_mode = 'profile';
         }
         function goanalyze() {
             document.getElementById('main_image').src = './welcomepage_analyze_large.png';
             document.getElementById('analyze_side_image').src = './arrow.png';
             document.getElementById('profile_side_image').src = './empty.png';
             document.getElementById('debug_side_image').src = './empty.png';
-            document.getElementById('frame_analyze_side_image').src = './empty.png';
             document.getElementById('analyze_image').src = './welcomepage_analyze_selected.png';
-            document.getElementById('frame_analyze_image').src = './welcomepage_frame_analyze.png';
             document.getElementById('profile_image').src = './welcomepage_profile.png';
             document.getElementById('debug_image').src = './welcomepage_debug.png';
             document.getElementById("analyze_div").style.visibility = 'visible';
             document.getElementById('analyze_na').style.visibility = 'visible';
             document.getElementById("profile_div").style.visibility = 'hidden';
-            document.getElementById("frame_analyze_div").style.visibility = 'hidden';
             document.getElementById("debug_div").style.visibility = 'hidden';
             document.getElementById('analyze_na').style.height = 'auto';
             document.getElementById('profile_div').style.height = '0px';
-            document.getElementById('frame_analyze_div').style.height = '0px';
             document.getElementById('debug_div').style.height = '0px';
             document.getElementById('analyze_div').style.minHeight = '300px';
             document.getElementById('profile_div').style.minHeight = '0px';
@@ -120,11 +80,7 @@
             window.OSName = 'Linux';
             if (navigator.appVersion.indexOf("Win") != -1)
             {       
-                 window.OSName = 'Windows';    		
-            }
-            if (window.OSName == 'Linux')
-            {
-                document.getElementById('d3d12multithreading_tr').style.visibility = 'hidden';
+                 window.OSName = 'Windows';
             }
         }
     </script>
@@ -165,10 +121,6 @@
                                 <td><img id="profile_side_image" src="empty.png" /></td>
                                 <td><img id="profile_image" src="welcomepage_profile.png" onmouseover="document.getElementById('profile_image').src = './welcomepage_profile_selected.png';" onmouseout="if (current_mode != 'profile') document.getElementById('profile_image').src = './welcomepage_profile.png';" /></td>
                             </tr>
-                            <tr class='clickableRow' onclick="goframeanalyze()">
-                                    <td><img id="frame_analyze_side_image" src="empty.png" /></td>
-                                    <td><img id="frame_analyze_image" src="welcomepage_frame_analyze.png" onmouseover="document.getElementById('frame_analyze_image').src = './welcomepage_frame_analyze_selected.png';" onmouseout="    if (current_mode != 'frameanalyze') document.getElementById('frame_analyze_image').src = './welcomepage_frame_analyze.png';" /></td>
-                            </tr>
                             <tr class='clickableRow' onclick="goanalyze()">
                                 <td><img id="analyze_side_image" src="empty.png" /></td>
                                 <td><img id="analyze_image" src="welcomepage_analyze.png" onmouseover="document.getElementById('analyze_image').src = './welcomepage_analyze_selected.png';" onmouseout="    if (current_mode != 'analyze') document.getElementById('analyze_image').src = './welcomepage_analyze.png';" /></td>
@@ -186,7 +138,7 @@
                                             Create a new project for debugging
                                         </div>
                                         <div class="clickableRow_text">
-                                            Debugging allows you to set breakpoints, watch variables, step through OpenCL kernels and much more.<br> Automatically selects Debug mode.
+                                            Debugging allows you to set breakpoints, watch variables and much more.<br> Automatically selects Debug mode.
                                         </div>
                                     </td>
                                 </tr>
@@ -205,43 +157,8 @@
                                         </div>
                                     </td>
                                 </tr>
-                                <tr class='clickableRow' onclick='clickButton("attach_to_process")'>
-                                    <td><img src="profile_attach.png" /></td>
-                                    <td style="vertical-align:top; ">
-                                        <div class="clickableRow_title">
-                                            Attach to Process
-                                        </div>
-                                        <div class="clickableRow_text">
-                                            Select a currently running process and CodeXL will begin collecting CPU profiling data.<br>The type of data collected is defined by CodeXL's current profile session type.
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr class='clickableRow' onclick='clickButton("system_wide")'>
-                                    <td><img src="profile_system.png" /></td>
-                                    <td style="vertical-align:top; ">
-                                        <div class="clickableRow_title">
-                                            System-wide Profiling
-                                        </div>
-                                        <div class="clickableRow_text">CodeXL will begin collecting CPU profiling or Power profiling data from all currently running processes.<br>The type of data collected is defined by CodeXL's current profile session type.</div>
-                                    </td>
-                                </tr>
                             </table>
                         </div>
-                        <div id="frame_analyze_div" class="white_bg" style="height:0px">
-                                <table cellspacing="0" id="mode_table" class="white_bg">
-                                    <tr class='clickableRow' onclick='clickButton("new_project_debug")'>
-                                        <td><img src="frame_analyze_new.png" /></td>
-                                        <td style="vertical-align:top; ">
-                                            <div class="clickableRow_title">
-                                                Create a new project for DirectX 12 or Vulkan Frame Analysis
-                                            </div>
-                                            <div class="clickableRow_text">
-                                                Launch a DirectX 12 or Vulkan based game/graphics application, capture individual frames and analyze their CPU and GPU timeline data
-                                            </div>
-                                        </td>
-                                    </tr>
-                                </table>
-                            </div>
                         <div id="analyze_div" class="analyze_bg" style="visibility:hidden; height:0px">
                             <table cellspacing="0" id="mode_table">
                                 <tr class="clickableRow" id="analyze_na" style="visibility:hidden;">
@@ -273,8 +190,6 @@
                             <thead><img src='samples.png' /></thead>
                             <tbody>
                                 <tr><td><a onclick='clickButton("load_teapot")'>CodeXL Teapot</a></td></tr>
-                                <tr><td><a onclick='clickButton("load_matmul")'>CodeXL Matrix Multiply</a></td></tr>
-                                <tr id=d3d12multithreading_tr><td><a onclick='clickButton("load_d3d12multithreading")'>D3D12Multithreading</a></td></tr>
                             </tbody>
                         </table>
                     </td>

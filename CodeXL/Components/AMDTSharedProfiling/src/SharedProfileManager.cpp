@@ -59,25 +59,11 @@ SharedProfileManager::SharedProfileManager() : QObject(), afIExecutionMode(), af
     m_menuCmdCount(COUNT_OF_STATIC_PM_MENUS), m_profileIsRunning(false), m_profileSessionProcessCompleted(true), m_paused(false),
     m_importIsRunning(false), m_exportIsRunning(false)
 {
-    m_profileLookup.insert(ProfileMap::value_type(SPM_VS_CPU_ASSESS_PERF, acQStringToGTString(PM_profileTypeAssesPerformancePrefix)));
-    m_profileLookup.insert(ProfileMap::value_type(SPM_VS_CPU_CLU, acQStringToGTString(PM_profileTypeCLUPrefix)));
-    m_profileLookup.insert(ProfileMap::value_type(SPM_VS_CPU_CUSTOM, acQStringToGTString(PM_profileTypeCustomProfilePrefix)));
-    m_profileLookup.insert(ProfileMap::value_type(SPM_VS_CPU_IBS, acQStringToGTString(PM_profileTypeInstructionBasedSamplingPrefix)));
-    m_profileLookup.insert(ProfileMap::value_type(SPM_VS_CPU_L2, acQStringToGTString(PM_profileTypeInvestigateInstructionL2CacheAccessPrefix)));
-    m_profileLookup.insert(ProfileMap::value_type(SPM_VS_CPU_BR, acQStringToGTString(PM_profileTypeInvestigateBranchingPrefix)));
-    m_profileLookup.insert(ProfileMap::value_type(SPM_VS_CPU_DATA_ACCESS, acQStringToGTString(PM_profileTypeInvestigateDataAccessPrefix)));
-    m_profileLookup.insert(ProfileMap::value_type(SPM_VS_CPU_INST_ACCESS, acQStringToGTString(PM_profileTypeInvestigateInstructionAccessPrefix)));
-    m_profileLookup.insert(ProfileMap::value_type(SPM_VS_CPU_TIMER, acQStringToGTString(PM_profileTypeTimeBasedPrefix)));
-
-    m_profileLookup.insert(ProfileMap::value_type(SPM_VS_THREAD, acQStringToGTString(PM_profileTypeThreadProfilePrefix)));
-
     m_profileLookup.insert(ProfileMap::value_type(SPM_VS_GPU_PERF_COUNT, acQStringToGTString(PM_profileTypePerformanceCountersPrefix)));
     m_profileLookup.insert(ProfileMap::value_type(SPM_VS_GPU_APP_TRACE, acQStringToGTString(PM_profileTypeApplicationTracePrefix)));
 
-    m_profileLookup.insert(ProfileMap::value_type(SPM_VS_PP_ONLINE, acQStringToGTString(PM_profileTypePowerProfilePrefix)));
-
     // Set the default value for m_selectedProfile for the VS to prevent events on start up (bug 361693)
-    m_selectedProfile = m_profileLookup.at(SharedProfileManager::SPM_VS_CPU_TIMER);
+    m_selectedProfile = m_profileLookup.at(SharedProfileManager::SPM_VS_GPU_PERF_COUNT);
 
     // Register as an events observer
     apEventsHandler::instance().registerEventsObserver(*this, AP_APPLICATION_COMPONENTS_EVENTS_HANDLING_PRIORITY);
@@ -197,69 +183,14 @@ void SharedProfileManager::updateSelected(const gtString& selected)
     }
 }
 
-void SharedProfileManager::onInvokeAttachToProcess()
-{
-    // check if  SharedProfileSettingPage radio box is set to PM_PROFILE_SCOPE_SYS_WIDE_FOCUS_ON_EXE
-    bool isSysWideProfiling = false;
-    GT_IF_WITH_ASSERT(SharedProfileSettingPage::Instance() != NULL)
-    {
-        isSysWideProfiling = (SharedProfileSettingPage::Instance()->CurrentSharedProfileSettings().m_profileScope == PM_PROFILE_SCOPE_SYS_WIDE_FOCUS_ON_EXE);
-    }
-    afAttachToProcessDialog attachToProcess(isSysWideProfiling);
-
-    //make the dialog window modal
-    int rc = QDialog::Rejected;
-    afApplicationCommands* pApplicationCommands = afApplicationCommands::instance();
-    GT_IF_WITH_ASSERT(pApplicationCommands != NULL)
-    {
-        rc = pApplicationCommands->showModal(&attachToProcess);
-    }
-
-    // after dialog box is closed
-    if (rc == QDialog::Accepted)
-    {
-        // check if need to update Profile Setting Page - update only if different from current
-        bool isSysWide = false;
-        isSysWide = attachToProcess.IsSystemWideProfiling();
-
-        if (isSysWide != isSysWideProfiling)
-        {
-            if (isSysWide)
-            {
-                SharedProfileSettingPage::Instance()->CurrentSharedProfileSettings().m_profileScope = PM_PROFILE_SCOPE_SYS_WIDE_FOCUS_ON_EXE;
-            }
-            else
-            {
-                SharedProfileSettingPage::Instance()->CurrentSharedProfileSettings().m_profileScope = PM_PROFILE_SCOPE_SINGLE_EXE;
-            }
-
-            //update SharedProfileSettingPage UI by the changes made to m_currentSettings of settingPage
-            SharedProfileSettingPage::Instance()->RestoreCurrentSettings();
-        }
-
-        osProcessId processId = attachToProcess.GetProcessID();
-        bool isProjectLoaded = !afProjectManager::instance().currentProjectFilePath().isEmpty();
-
-        if (!isProjectLoaded)
-        {
-            afApplicationCommands::instance()->CreateDefaultProject(PM_STR_PROFILE_MODE);
-        }
-
-        onStartAction(processId);
-    }
-}
-
 void SharedProfileManager::onStartAction(osProcessId processId)
 {
     // Start the session in log file:
     osDebugLog::instance().StartSession();
 
-    // Check if project is mandatory for start action:
-    bool isProjectMandatory = !IsStartupActionSupportedWithNoProject(AF_EXECUTION_ID_START);
-
     bool isProjectLoaded = !afProjectManager::instance().currentProjectFilePath().isEmpty();
 
-    if (!isProjectLoaded && isProjectMandatory)
+    if (!isProjectLoaded)
     {
         // Display the startup dialog:
         afExecutionModeManager::instance().DisplayStartupDialog();
@@ -274,12 +205,6 @@ void SharedProfileManager::onStartAction(osProcessId processId)
         if (!isProfileSettingsOK)
         {
             HandleInvalidProjectSettings(isProfileSettingsOK, processId);
-        }
-
-        // For system wide - set the process ID to unbound:
-        if (SharedProfileSettingPage::Instance()->CurrentSharedProfileSettings().m_profileScope == PM_PROFILE_SCOPE_SYS_WIDE)
-        {
-            processId = PROCESS_ID_UNBOUND;
         }
 
         // Check if the settings are now OK:
@@ -407,24 +332,10 @@ void SharedProfileManager::execute(afExecutionCommandId commandId)
             onStartAction();
             break;
 
-        case AF_EXECUTION_ID_BREAK:
-            onPauseToggle();
-            break;
-
-        case AF_EXECUTION_ID_STOP:
-            stopCurrentRun();
-            break;
-
         default: break;
     }
 }
 
-void SharedProfileManager::onPauseToggle()
-{
-    m_paused = !m_paused;
-    emit profileBreak(m_paused, m_callbackMap[m_selectedProfile]);
-    updateApplicationTitle();
-}
 
 bool SharedProfileManager::isStartEnabled(bool& checkable, bool& checked)
 {
@@ -434,23 +345,6 @@ bool SharedProfileManager::isStartEnabled(bool& checkable, bool& checked)
            (!m_profileIsRunning) &&
            (!m_importIsRunning) &&
            (m_profileSessionProcessCompleted);
-}
-
-bool SharedProfileManager::isAttachEnabled(bool& checkable, bool& checked)
-{
-    bool retVal = isStartEnabled(checkable, checked);
-
-    if (retVal)
-    {
-        spISharedProfilerPlugin* pPlugin = m_callbackMap[m_selectedProfile];
-
-        if (NULL != pPlugin)
-        {
-            retVal = pPlugin->IsAttachEnabled();
-        }
-    }
-
-    return retVal;
 }
 
 bool SharedProfileManager::isProfileModeEnabled(bool& checkable, bool& checked)
@@ -503,30 +397,6 @@ bool SharedProfileManager::isProjectSettingsEnabled(bool& checkable, bool& check
            && (afExecutionModeManager::instance().isActiveMode(PM_STR_PROFILE_MODE));
 }
 
-bool SharedProfileManager::isPausedEnabled(bool& checkable, bool& checked, bool& shown)
-{
-    shown = !(SPM_HIDE_PAUSE & m_flags[m_selectedProfile]);
-    checkable = ((isProfilingOkay(false))
-                 && (0 != (SPM_ALLOW_PAUSE & m_flags[m_selectedProfile]))
-                 && (m_profileIsRunning));
-    checked = m_paused
-              && (m_profileIsRunning);
-    return ((isProfilingOkay(false))
-            && (0 != (SPM_ALLOW_PAUSE & m_flags[m_selectedProfile]))
-            && (m_profileIsRunning));
-}
-
-bool SharedProfileManager::isStopEnabled(bool& checkable, bool& checked)
-{
-    bool retVal = false;
-    checkable = false;
-    checked = false;
-
-    bool isStopEnabledForCurrentProfile = SPM_ALLOW_STOP & m_flags[m_selectedProfile];
-    retVal = isProfilingOkay(false) && isStopEnabledForCurrentProfile && m_profileIsRunning;
-    return retVal;
-}
-
 void SharedProfileManager::updateUI(afExecutionCommandId commandId, QAction* pAction)
 {
     // if import is running don't update UI
@@ -553,17 +423,6 @@ void SharedProfileManager::updateUI(afExecutionCommandId commandId, QAction* pAc
             }
             break;
 
-            case AF_EXECUTION_ID_BREAK:
-            {
-                isActionEnabled = isPausedEnabled(canBeToggled, isActionToggled, isActionVisible);
-                pAction->setText(AF_STR_PauseProfiling);
-            }
-            break;
-
-            case AF_EXECUTION_ID_STOP:
-                isActionEnabled = isStopEnabled(canBeToggled, isActionToggled);
-                break;
-
             case AF_EXECUTION_ID_API_STEP:
             case AF_EXECUTION_ID_DRAW_STEP:
             case AF_EXECUTION_ID_FRAME_STEP:
@@ -572,9 +431,6 @@ void SharedProfileManager::updateUI(afExecutionCommandId commandId, QAction* pAc
             case AF_EXECUTION_ID_STEP_OUT:
             case AF_EXECUTION_ID_CANCEL_BUILD:
             case AF_EXECUTION_ID_BUILD:
-            case AF_EXECUTION_ID_CAPTURE:
-            case AF_EXECUTION_ID_CAPTURE_CPU:
-            case AF_EXECUTION_ID_CAPTURE_GPU:
             {
                 isActionVisible = false;
                 isActionEnabled = false;
@@ -719,7 +575,7 @@ void SharedProfileManager::Terminate()
     // kill the gpu profile backend process since there is no other way to kill it,
     // if it started by the user and we terminated in the middle
     gtVector<gtString> processNames;
-    processNames.push_back(L"CodeXLGpuProfiler");
+    processNames.push_back(L"rcprof");
 
     osProcessId currentProcessId = osGetCurrentProcessId();
     osTerminateProcessesByName(processNames, currentProcessId, false);
@@ -729,36 +585,15 @@ void SharedProfileManager::GetToolbarStartButtonText(gtString& buttonText, bool 
 {
     buttonText = PM_STR_startButtonProfileMode;
     gtString currentType = sessionTypeName(afExecutionModeManager::instance().activeSessionType());
-    if (currentType.startsWith(L"CPU"))
-    {
-        buttonText = PM_STR_startButtonProfileCPUMode;
-    }
-    else if (currentType.startsWith(L"GPU") || currentType.startsWith(PM_profileTypeApplicationTraceWide))
+
+    if (currentType.startsWith(L"GPU") || currentType.startsWith(PM_profileTypeApplicationTraceWide))
     {
         buttonText = PM_STR_startButtonProfileGPUMode;
-    }
-    else
-    {
-        buttonText = PM_STR_startButtonProfilePowerMode;
     }
 
     gtString exeFileName;
     afProjectManager::instance().currentProjectSettings().executablePath().getFileNameAndExtension(exeFileName);
-    bool isSystemWide = (SharedProfileSettingPage::Instance()->CurrentSharedProfileSettings().m_profileScope == PM_PROFILE_SCOPE_SYS_WIDE);
-
-    // add the (..) section if in profile and full info is needed
-    if (isSystemWide && fullString)
-    {
-        if (!exeFileName.isEmpty())
-        {
-            buttonText.appendFormattedString(PM_STR_startButtonExeAndSystemWide, exeFileName.asCharArray());
-        }
-        else
-        {
-            buttonText.append(PM_STR_startButtonSystemWide);
-        }
-    }
-    else if (!exeFileName.isEmpty() && fullString)
+    if (!exeFileName.isEmpty() && fullString)
     {
         buttonText.appendFormattedString(AF_STR_playButtonExeNameOnly, exeFileName.asCharArray());
     }
@@ -777,34 +612,12 @@ bool SharedProfileManager::enableVsProfileAction(int vsId, bool& shouldCheck, bo
             enabled = isStartEnabled(checkable, shouldCheck);
             break;
 
-        case SPM_VS_ATTACH:
-            enabled = isAttachEnabled(checkable, shouldCheck);
-            break;
-
-        case SPM_VS_PAUSE:
-            enabled = isPausedEnabled(checkable, shouldCheck, shouldShow);
-            break;
-
-        case SPM_VS_STOP:
-            enabled = isStopEnabled(checkable, shouldCheck);
-            break;
-
         case SPM_VS_PROFILE_MODE:
             enabled = isProfileModeEnabled(checkable, shouldCheck);
             break;
 
-        case SPM_VS_CPU_ASSESS_PERF:
-        case SPM_VS_CPU_CLU:
-        case SPM_VS_CPU_CUSTOM:
-        case SPM_VS_CPU_IBS:
-        case SPM_VS_CPU_L2:
-        case SPM_VS_CPU_BR:
-        case SPM_VS_CPU_DATA_ACCESS:
-        case SPM_VS_CPU_INST_ACCESS:
-        case SPM_VS_CPU_TIMER:
         case SPM_VS_GPU_PERF_COUNT:
         case SPM_VS_GPU_APP_TRACE:
-        case SPM_VS_PP_ONLINE:
             enabled = isProfileEnabled(indexForSessionType(m_profileLookup.at(vsId)),
                                        checkable, shouldCheck);
             break;
@@ -839,34 +652,12 @@ void SharedProfileManager::vsProfileAction(int vsId)
             onStartAction();
             break;
 
-        case SPM_VS_ATTACH:
-            onInvokeAttachToProcess();
-            break;
-
-        case SPM_VS_PAUSE:
-            onPauseToggle();
-            break;
-
-        case SPM_VS_STOP:
-            stopCurrentRun();
-            break;
-
         case SPM_VS_PROFILE_MODE:
             onSelectProfileMode(false);
             break;
 
-        case SPM_VS_CPU_ASSESS_PERF:
-        case SPM_VS_CPU_CLU:
-        case SPM_VS_CPU_CUSTOM:
-        case SPM_VS_CPU_IBS:
-        case SPM_VS_CPU_L2:
-        case SPM_VS_CPU_BR:
-        case SPM_VS_CPU_DATA_ACCESS:
-        case SPM_VS_CPU_INST_ACCESS:
-        case SPM_VS_CPU_TIMER:
         case SPM_VS_GPU_PERF_COUNT:
         case SPM_VS_GPU_APP_TRACE:
-        case SPM_VS_PP_ONLINE:
             updateSelected(m_profileLookup.at(vsId));
             break;
 
@@ -1042,16 +833,11 @@ int SharedProfileManager::numberSessionTypes()
 QString SharedProfileManager::FindStartProfileActionText(bool getTooltip)
 {
     QString retVal = PM_STR_MENU_START_NO_PARAMS;
-    ProfileSessionScope scope = SharedProfileSettingPage::Instance()->CurrentSharedProfileSettings().m_profileScope;
     bool isExeSet = !afProjectManager::instance().currentProjectSettings().executablePath().isEmpty();
 
     QString argsStr;
 
-    if ((scope == PM_PROFILE_SCOPE_SYS_WIDE) || ((scope == PM_PROFILE_SCOPE_SYS_WIDE_FOCUS_ON_EXE) && (!isExeSet)))
-    {
-        argsStr = PM_STR_SYSTEM_WIDE;
-    }
-    else if (isExeSet)
+    if (isExeSet)
     {
         gtString fileName;
         afProjectManager::instance().currentProjectSettings().executablePath().getFileNameAndExtension(fileName);
@@ -1098,23 +884,9 @@ bool SharedProfileManager::ExecuteStartupAction(afStartupAction action)
 {
     bool retVal = false;
 
-    if ((action == AF_NO_PROJECT_USER_ACTION_CREATE_NEW_PROJECT_PROFILE) || (action == AF_NO_PROJECT_USER_ACTION_CREATE_NEW_PROJECT_FRAME_ANALYZE))
+    if ((action == AF_NO_PROJECT_USER_ACTION_CREATE_NEW_PROJECT_PROFILE))
     {
         afApplicationCommands::instance()->OnFileNewProject();
-        retVal = true;
-    }
-
-    else if (action == AF_NO_PROJECT_USER_ACTION_CPU_PROFILE_SYSTEM_WIDE)
-    {
-        afApplicationCommands::instance()->CreateDefaultProject(PM_STR_PROFILE_MODE);
-
-        SharedProfileSettingPage::Instance()->CurrentSharedProfileSettings().m_profileScope = PM_PROFILE_SCOPE_SYS_WIDE;
-        onStartAction(PROCESS_ID_UNBOUND);
-        retVal = true;
-    }
-    else if (action == AF_NO_PROJECT_USER_ACTION_CPU_PROFILE_ATTACH_TO_PROCESS)
-    {
-        onInvokeAttachToProcess();
         retVal = true;
     }
 
@@ -1125,27 +897,9 @@ bool SharedProfileManager::IsStartupActionSupported(afStartupAction action)
 {
     bool retVal = false;
 
-    if ((action == AF_NO_PROJECT_USER_ACTION_CREATE_NEW_PROJECT_PROFILE) ||
-        (action == AF_NO_PROJECT_USER_ACTION_CPU_PROFILE_SYSTEM_WIDE) ||
-        (action == AF_NO_PROJECT_USER_ACTION_CPU_PROFILE_ATTACH_TO_PROCESS))
+    if (action == AF_NO_PROJECT_USER_ACTION_CREATE_NEW_PROJECT_PROFILE)
     {
         retVal = true;
-    }
-
-    return retVal;
-}
-
-bool SharedProfileManager::IsStartupActionSupportedWithNoProject(afExecutionCommandId commandId)
-{
-    bool retVal = false;
-
-    // Power profile supports start with no project:
-    if (commandId == AF_EXECUTION_ID_START)
-    {
-        if (m_selectedProfile == m_profileLookup.at(SharedProfileManager::SPM_VS_PP_ONLINE))
-        {
-            retVal = true;
-        }
     }
 
     return retVal;
@@ -1158,7 +912,7 @@ bool SharedProfileManager::IsRemoteEnabledForSessionType(const gtString& session
     // Currently, remote host profiling is supported only for GPU profile and power profile:
     QString sessionTypeStr = acGTStringToQString(sessionType);
 
-    if ((sessionTypeStr == PM_profileTypePowerProfilePrefix) || (sessionTypeStr == PM_profileTypePerformanceCountersPrefix) || (sessionTypeStr == PM_profileTypeApplicationTracePrefix))
+    if ((sessionTypeStr == PM_profileTypePerformanceCountersPrefix) || (sessionTypeStr == PM_profileTypeApplicationTracePrefix))
     {
         retVal = true;
     }

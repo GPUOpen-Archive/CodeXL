@@ -10,7 +10,6 @@ buildDirPath = "." + '/build/' + env['CXL_arch']
 print buildDirPath
 env.VariantDir(buildDirPath, env['CXL_common_dir'] + '/Src')
 
-initGLEW(env)
 UseBoost(env)
 
 #need to overwrite compiler flags without the -Werror since some libraries are causing problems
@@ -22,6 +21,13 @@ else:
     compiler_base_flags += ' -O3 -DNDEBUG -D_LINUX'
 
 env.Replace(CPPFLAGS = compiler_base_flags)
+
+env.Append( CPPDEFINES = [
+	"CL_USE_DEPRECATED_OPENCL_2_1_APIS",
+	"CL_USE_DEPRECATED_OPENCL_2_0_APIS",
+	"CL_USE_DEPRECATED_OPENCL_1_1_APIS",
+	"CL_USE_DEPRECATED_OPENCL_1_0_APIS"
+])
 
 env.Append( CPPPATH = [ 
 	".",

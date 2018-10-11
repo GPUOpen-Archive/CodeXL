@@ -71,8 +71,8 @@ afNewProjectDialog::afNewProjectDialog()
       m_pApplicationCommands(nullptr), m_pSettingsTree(nullptr), m_pCurrentSettingsPageContainer(nullptr),
       m_pCurrentSettingsFrameLayout(nullptr), m_pGeneralPage(nullptr),
       m_pProjectNameTitle(nullptr), m_pProjectNameTextEdit(nullptr),
-      m_pProgramExeRadioButton(nullptr), m_pProgramExeLabel(nullptr), m_pProgramExeTextEdit(nullptr), m_pBrowseForExeButton(nullptr), m_pBrowseForExeButtonAction(nullptr),
-      m_pWinStoreAppRadioButton(nullptr), m_pRemoteHostRadioButton(nullptr), m_pLocalHostRadioButton(nullptr), m_pDummyRemoteWidgetA(nullptr),
+      m_pProgramExeLabel(nullptr), m_pProgramExeTextEdit(nullptr), m_pBrowseForExeButton(nullptr), m_pBrowseForExeButtonAction(nullptr),
+      m_pRemoteHostRadioButton(nullptr), m_pLocalHostRadioButton(nullptr), m_pDummyRemoteWidgetA(nullptr),
       m_pDummyRemoteWidgetB(nullptr), m_pRemoteHostLayoutA(nullptr),  m_pRemoteHostLayoutB(nullptr), m_pRemoteHostIpLineEdit(nullptr),
       m_pRemoteHostPortLabel(nullptr), m_pRemoteHostPortLineEdit(nullptr), m_pRemoteHostAddressLabel(nullptr), m_pTestConnectionButton(nullptr),
       m_pWorkingFolderTitle(nullptr), m_pWorkingFolderTextEdit(nullptr), m_pWorkingFolderPathButton(nullptr), m_pBrowseForWorkingFolderAction(nullptr),
@@ -244,19 +244,7 @@ void afNewProjectDialog::OnClickBrowseForExe()
 
 void afNewProjectDialog::OnApplicationPathBrowse()
 {
-    GT_IF_WITH_ASSERT(m_pProgramExeRadioButton != nullptr)
-    {
-        bool shouldSelectExe = m_pProgramExeRadioButton->isChecked();
-
-        if (shouldSelectExe)
-        {
-            OnClickBrowseForExe();
-        }
-        else
-        {
-            OnClickBrowseForWindowsStoreApp();
-        }
-    }
+    OnClickBrowseForExe();
 }
 
 void afNewProjectDialog::OnClickBrowseForWindowsStoreApp()
@@ -388,31 +376,10 @@ void afNewProjectDialog::onExeChanged(const QString& strExe)
     // Sanity check
     GT_IF_WITH_ASSERT(m_pProgramExeTextEdit != nullptr)
     {
-        bool isUserModelId = ((nullptr != m_pWinStoreAppRadioButton) && m_pWinStoreAppRadioButton->isChecked());
         QString strExeInner = m_pProgramExeTextEdit->text();
-        afProjectManager::instance().EmitExecutableChanged(strExeInner, false, isUserModelId);
+        afProjectManager::instance().EmitExecutableChanged(strExeInner, false, false);
     }
 }
-
-void afNewProjectDialog::OnAppTypeRadioButtonSelect()
-{
-    // Sanity check
-    GT_IF_WITH_ASSERT(m_pProgramExeTextEdit != nullptr && m_pWinStoreAppRadioButton != nullptr)
-    {
-        if (m_pWinStoreAppRadioButton->isEnabled())
-        {
-            m_pWinStoreAppRadioButton->setChecked(false);
-            m_pProgramExeTextEdit->setEnabled(!m_isRunningFromVS);
-            m_pBrowseForExeButton->setEnabled(!m_isRunningFromVS);
-            m_pRemoteHostRadioButton->setEnabled(true);
-        }
-        else
-        {
-            m_pProgramExeRadioButton->setChecked(true);
-        }
-    }
-}
-
 
 // ---------------------------------------------------------------------------
 // Name:        afNewProjectDialog::OnClickBrowseForPath
@@ -660,9 +627,7 @@ void afNewProjectDialog::OnOkButton()
     {
         // Sanity check:
         GT_IF_WITH_ASSERT((m_pProjectNameTextEdit != nullptr) &&
-                          (m_pProgramExeRadioButton != nullptr) &&
                           (m_pProgramExeTextEdit != nullptr) &&
-                          (m_pWinStoreAppRadioButton != nullptr) &&
                           (m_pWorkingFolderTextEdit != nullptr) &&
                           (m_pProgramArgs != nullptr) &&
                           (m_pEnvironmentVariablesTextEdit != nullptr))
@@ -674,14 +639,7 @@ void afNewProjectDialog::OnOkButton()
             osFilePath exePath;
             gtString userModelId;
 
-            if (m_pWinStoreAppRadioButton->isChecked())
-            {
-                acWideQStringToGTString(m_pProgramExeTextEdit->text(), userModelId);
-            }
-            else
-            {
-                acQStringToOSFilePath(m_pProgramExeTextEdit->text().trimmed(), exePath);
-            }
+            acQStringToOSFilePath(m_pProgramExeTextEdit->text().trimmed(), exePath);
 
             m_projectSettings.setWindowsStoreAppUserModelID(userModelId);
             m_projectSettings.setExecutablePath(exePath);
@@ -953,20 +911,11 @@ void afNewProjectDialog::createGeneralPage()
     currentGridRow++;
     pLayout->addWidget(pTargetAppCaptionLabel, currentGridRow, 0, 1, 3);
 
-    // Exe / User ID radio:
-    m_pProgramExeRadioButton = new QRadioButton(AF_STR_newProjectDesktopApplication);
-    m_pProgramExeRadioButton->setToolTip(AF_STR_newProjectDesktopApplicationTooltip);
-    m_pWinStoreAppRadioButton = new QRadioButton(AF_STR_newProjectWindowsStoreApp);
-    m_pWinStoreAppRadioButton->setToolTip(AF_STR_newProjectWindowsStoreAppTooltip);
-
-    QButtonGroup* pGroup = new QButtonGroup;
-    pGroup->addButton(m_pProgramExeRadioButton);
-    pGroup->addButton(m_pWinStoreAppRadioButton);
-
     m_pProgramExeLabel = new QLabel(AF_STR_newProjectProjectExePath);
 
     m_pProgramExeTextEdit = new QLineEdit;
     m_pProgramExeTextEdit->clear();
+    m_pProgramExeTextEdit->setToolTip(AF_STR_newProjectProjectEXEEditLineTooltipApp);
     m_pBrowseForExeButton = new QToolButton();
     m_pBrowseForExeButton->setContentsMargins(0, 0, 0, 0);
     m_pBrowseForExeButtonAction = new afBrowseAction(AF_Str_NewProjectBrowseForEXE);
@@ -975,27 +924,10 @@ void afNewProjectDialog::createGeneralPage()
     m_pBrowseForExeButtonAction->setIcon(style()->standardIcon(QStyle::SP_DialogOpenButton));
     m_pBrowseForExeButtonAction->setToolTip(AF_STR_newProjectProjectBrowseForExePathTooltipApp);
 
-    QHBoxLayout* pHLayout = new QHBoxLayout;
-    pHLayout->addWidget(m_pProgramExeRadioButton, 0, Qt::AlignLeft);
-    pHLayout->addWidget(m_pWinStoreAppRadioButton, 0, Qt::AlignLeft);
-    pHLayout->addStretch();
-
-    // The application type line will only be available on windows:
-#if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
-    QLabel* pLabelapplicationType = new QLabel(AF_STR_newProjectProjectApplicationType);
-    pLabelapplicationType->setEnabled(!m_isRunningFromVS);
-    currentGridRow++;
-    pLayout->addWidget(pLabelapplicationType, currentGridRow, 0);
-    pLayout->addLayout(pHLayout, currentGridRow, 1, 1, 2);
-#endif
-
     currentGridRow++;
     pLayout->addWidget(m_pProgramExeLabel, currentGridRow, 0);
     pLayout->addWidget(m_pProgramExeTextEdit, currentGridRow, 1);
     pLayout->addWidget(m_pBrowseForExeButton, currentGridRow, 2);
-
-    rc = connect(m_pProgramExeRadioButton, SIGNAL(clicked()), this, SLOT(OnAppTypeRadioButtonSelect()));
-    GT_ASSERT(rc);
 
     // Connect the browse button to its slot:
     rc = connect(m_pBrowseForExeButtonAction, SIGNAL(triggered()), this, SLOT(OnApplicationPathBrowse()));
@@ -1011,17 +943,6 @@ void afNewProjectDialog::createGeneralPage()
 
     rc = connect(m_pProgramExeTextEdit, SIGNAL(textChanged(const QString&)), this, SLOT(onExeChanged(const QString&)));
     GT_ASSERT(rc);
-
-    rc = connect(m_pWinStoreAppRadioButton, SIGNAL(clicked()), this, SLOT(OnApplicationTypeRadioButtonSelect()));
-    GT_ASSERT(rc);
-
-    rc = connect(m_pProgramExeRadioButton, SIGNAL(clicked()), this, SLOT(OnApplicationTypeRadioButtonSelect()));
-    GT_ASSERT(rc);
-
-    if (!osSupportWindowsStoreApps())
-    {
-        m_pWinStoreAppRadioButton->setEnabled(false);
-    }
 
     // Working folder:
     m_pWorkingFolderTitle = new QLabel;
@@ -1142,10 +1063,6 @@ void afNewProjectDialog::createGeneralPage()
     pLayout->setColumnStretch(2, 10);
     m_pGeneralPage->setLayout(pLayout);
 
-    // Set the Program Executable radio button to be the default:
-    m_pProgramExeRadioButton->setChecked(true);
-    OnAppTypeRadioButtonSelect();
-
     // Add the general page:
     QStringList generalList;
     generalList << AF_STR_newProjectGeneralTabName;
@@ -1154,7 +1071,6 @@ void afNewProjectDialog::createGeneralPage()
     m_pCurrentSettingsFrameLayout->addWidget(m_pGeneralPage);
     // Fit the GUI for VS:
     FitToVisualStudio();
-
 }
 
 // ---------------------------------------------------------------------------
@@ -1244,22 +1160,9 @@ void afNewProjectDialog::fillGeneralPageData()
     }
 
     // Set the program executable text:
-    GT_IF_WITH_ASSERT(m_pProgramExeRadioButton != nullptr &&
-                      m_pWinStoreAppRadioButton != nullptr &&
-                      m_pProgramExeTextEdit != nullptr)
+    GT_IF_WITH_ASSERT(m_pProgramExeTextEdit != nullptr)
     {
-        if (m_projectSettings.windowsStoreAppUserModelID().isEmpty() || isRemoteSession)
-        {
-            m_pProgramExeRadioButton->setChecked(true);
-            m_pProgramExeTextEdit->setText(QString::fromWCharArray(m_projectSettings.executablePath().asString().asCharArray()));
-        }
-        else
-        {
-            m_pWinStoreAppRadioButton->setChecked(true);
-            m_pProgramExeTextEdit->setText(QString::fromWCharArray(m_projectSettings.windowsStoreAppUserModelID().asCharArray()));
-        }
-
-        OnAppTypeRadioButtonSelect();
+        m_pProgramExeTextEdit->setText(QString::fromWCharArray(m_projectSettings.executablePath().asString().asCharArray()));
     }
 
     // Set the working folder text:
@@ -1313,7 +1216,7 @@ void afNewProjectDialog::OnRestoreDefaultSettings(bool keepProjectUnchanged)
 
         // Sanity check:
         GT_IF_WITH_ASSERT((m_pProjectNameTextEdit != nullptr) &&
-                          (m_pProgramExeTextEdit != nullptr) && (m_pProgramExeRadioButton != nullptr) &&
+                          (m_pProgramExeTextEdit != nullptr) &&
                           (m_pWorkingFolderTextEdit != nullptr) && (m_pProgramArgs != nullptr) &&
                           (m_pEnvironmentVariablesTextEdit != nullptr) &&
                           (m_pSourceFilesDirectoryTextEdit != nullptr) && (m_pSourceCodeRootDirectoryTextEdit != nullptr) &&
@@ -1337,9 +1240,6 @@ void afNewProjectDialog::OnRestoreDefaultSettings(bool keepProjectUnchanged)
                 // Local session is the default.
                 m_pRemoteHostRadioButton->setChecked(false);
                 m_pLocalHostRadioButton->setChecked(true);
-
-                m_pProgramExeRadioButton->setChecked(true);
-                OnAppTypeRadioButtonSelect();
             }
 
             m_pProgramArgs->clear();
@@ -1428,9 +1328,7 @@ bool afNewProjectDialog::AreSettingsValid(gtString& invalidMessageStr, gtString&
     {
         // If this is the standalone version, read the settings from the general page:
         GT_IF_WITH_ASSERT((m_pProjectNameTextEdit != nullptr) &&
-                          (m_pProgramExeRadioButton != nullptr) &&
                           (m_pProgramExeTextEdit != nullptr) &&
-                          (m_pWinStoreAppRadioButton != nullptr) &&
                           (m_pWorkingFolderTextEdit != nullptr) &&
                           (m_pRemoteHostRadioButton != nullptr) &&
                           (m_pLocalHostRadioButton != nullptr))
@@ -1448,15 +1346,7 @@ bool afNewProjectDialog::AreSettingsValid(gtString& invalidMessageStr, gtString&
                 if (!isAppValid)
                 {
                     retVal = false;
-
-                    if (m_pWinStoreAppRadioButton->isChecked())
-                    {
-                        invalidMessageStr = AF_STR_newProjectWindowsStoreAppInvalid;
-                    }
-                    else
-                    {
-                        invalidMessageStr = AF_STR_newProjectExeDoesNotExistOrInvalid;
-                    }
+                    invalidMessageStr = AF_STR_newProjectExeDoesNotExistOrInvalid;
                 }
                 else if (!isWorkingFolderValid)
                 {
@@ -1523,10 +1413,9 @@ bool afNewProjectDialog::AreSettingsValid(gtString& invalidMessageStr, gtString&
 void afNewProjectDialog::IsApplicationPathsValid(bool& isAppValid, bool& isWorkingFolderValid) const
 {
     isAppValid = true;
-    GT_IF_WITH_ASSERT(m_pWinStoreAppRadioButton != nullptr && m_pWorkingFolderTextEdit != nullptr && m_pRemoteHostRadioButton != nullptr)
+    GT_IF_WITH_ASSERT(m_pWorkingFolderTextEdit != nullptr && m_pRemoteHostRadioButton != nullptr)
     {
         afIsValidApplicationInfo isValidApplicationInfo;
-        isValidApplicationInfo.isWInStoreAppRadioButtonChecked = m_pWinStoreAppRadioButton->isChecked();
         isValidApplicationInfo.workingFolderPath = acQStringToGTString(m_pWorkingFolderTextEdit->text());
         isValidApplicationInfo.appFilePath = acQStringToGTString(m_pProgramExeTextEdit->text());
         isValidApplicationInfo.isRemoteSession = m_pRemoteHostRadioButton->isChecked();
@@ -1689,11 +1578,6 @@ void afNewProjectDialog::adjustGuiToHostChange(bool isRemote)
     if (isRemote)
     {
         // Enable the standard executable selection controls.
-        GT_IF_WITH_ASSERT(m_pProgramExeRadioButton != nullptr)
-        {
-            m_pProgramExeRadioButton->setChecked(true);
-        }
-
         GT_IF_WITH_ASSERT(m_pProgramExeTextEdit != nullptr)
         {
             m_pProgramExeTextEdit->setEnabled(!m_isRunningFromVS);
@@ -1732,37 +1616,6 @@ void afNewProjectDialog::OnHostRadioButtonSelection(bool isSelected)
 
     // Adjust the GUI to the host selection:
     adjustGuiToHostChange(isRemoteSelected);
-}
-
-void afNewProjectDialog::OnApplicationTypeRadioButtonSelect()
-{
-    // Sanity check:
-    GT_IF_WITH_ASSERT((m_pWinStoreAppRadioButton != nullptr) && (m_pLocalHostRadioButton != nullptr) &&
-                      (m_pProgramExeRadioButton != nullptr) && (m_pProgramExeLabel != nullptr) && 
-                      (m_pProgramExeTextEdit != nullptr) && (m_pBrowseForExeButton != nullptr))
-    {
-        bool isExe = m_pProgramExeRadioButton->isChecked();
-
-        // Adjust the Remote Host controls:
-        if (!isExe)
-        {
-            m_pLocalHostRadioButton->setChecked(true);
-        }
-
-        // Set the labels and tooltip of the relevant widgets for exe / windows store app selection
-        QString tooltip = isExe ? AF_STR_newProjectProjectBrowseForExePathTooltipApp : AF_STR_newProjectProjectBrowseForExePathTooltipWinStoreApp;
-        QString editBoxTooltip = isExe ? AF_STR_newProjectProjectEXEEditLineTooltipApp : AF_STR_newProjectProjectStoreAppEditLineTooltipApp;
-        QString label = isExe ? AF_STR_newProjectProjectExePath : AF_STR_newProjectWindowsStoreAppUserModelID;
-
-        m_pBrowseForExeButton->setToolTip(tooltip);
-        m_pBrowseForExeButtonAction->setToolTip(tooltip);
-
-        m_pProgramExeTextEdit->setToolTip(editBoxTooltip);
-
-        m_pProgramExeLabel->setText(label);
-
-        adjustGuiToHostChange(false);
-    }
 }
 
 void afNewProjectDialog::SelectTreeItemByTreePath(const QString& selectedTreeFilePath)
@@ -1909,19 +1762,17 @@ void afNewProjectDialog::SetFocusArea(afFocusArea focusArea)
 void afNewProjectDialog::FitToVisualStudio()
 {
     // Sanity check:
-    GT_IF_WITH_ASSERT((m_pProjectNameTextEdit != nullptr) && (m_pProgramExeRadioButton != nullptr) && (m_pProgramExeLabel != nullptr) &&
-                      (m_pProgramExeTextEdit != nullptr) && (m_pBrowseForExeButton != nullptr) && (m_pWinStoreAppRadioButton != nullptr) && (m_pWorkingFolderTitle != nullptr) && (m_pWorkingFolderTextEdit != nullptr) &&
+    GT_IF_WITH_ASSERT((m_pProjectNameTextEdit != nullptr) && (m_pProgramExeLabel != nullptr) &&
+                      (m_pProgramExeTextEdit != nullptr) && (m_pBrowseForExeButton != nullptr) && (m_pWorkingFolderTitle != nullptr) && (m_pWorkingFolderTextEdit != nullptr) &&
                       (m_pWorkingFolderPathButton != nullptr) && (m_pProgramArgsTitle != nullptr) && (m_pProgramArgs != nullptr) && (m_pEnvironmentVariablesTitle != nullptr) && (m_pEnvironmentVariablesTextEdit != nullptr) &&
                       (m_pEditEnvironmentVariables != nullptr) && (m_pSourceCodeRootDirectoryTitle != nullptr) && (m_pSourceCodeRootDirectoryTextEdit != nullptr) && (m_pSourceCodeRootDirectoryButton != nullptr))
     {
         if (m_isRunningFromVS)
         {
             m_pProjectNameTextEdit->setEnabled(false);
-            m_pProgramExeRadioButton->setEnabled(false);
             m_pProgramExeLabel->setEnabled(false);
             m_pProgramExeTextEdit->setEnabled(false);
             m_pBrowseForExeButton->setEnabled(false);
-            m_pWinStoreAppRadioButton->setEnabled(false);
             m_pWorkingFolderTitle->setEnabled(false);
             m_pWorkingFolderTextEdit->setEnabled(false);
             m_pWorkingFolderPathButton->setEnabled(false);

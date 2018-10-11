@@ -9,7 +9,7 @@
   </PropertyGroup>
   <ImportGroup Label="AMDTBaseProjects">
     <Import Project="$(SolutionDir)\..\Components\CodeXLComponent.props" />
-    <Import Project="$(AMDTCommonExt)\Qt\Global-QT.props" />
+    <Import Project="$(CommonProjectsDir)\Qt\Global-QT.props" />
     <Import Project="$(AMDTCommonExt)\QScintilla\Global-QScintilla.props" />
     <Import Project="$(AMDTCommonExt)\tinyxml\Global-TinyXML-2015.props" />
   </ImportGroup>

@@ -58,7 +58,6 @@
 #include <AMDTGpuDebuggingComponents/Include/views/gdAPICallsHistoryView.h>
 #include <AMDTGpuDebuggingComponents/Include/views/gdCallStackView.h>
 #include <AMDTGpuDebuggingComponents/Include/views/gdDebuggedProcessEventsView.h>
-#include <AMDTGpuDebuggingComponents/Include/views/gdMultiWatchView.h>
 #include <AMDTGpuDebuggingComponents/Include/views/gdStateVariablesView.h>
 #include <AMDTGpuDebuggingComponents/Include/views/gdWatchView.h>
 
@@ -1264,22 +1263,6 @@ bool gdApplicationCommands::raiseMemoryView()
 }
 
 // ---------------------------------------------------------------------------
-// Name:        gdApplicationCommands::raiseMultiWatchView
-// Description: Raise the requested multiwatch view
-// Arguments:   gdMultiWatchView* pMultiWatchView
-// Return Val:  bool - Success / failure.
-// Author:      Sigal Algranaty
-// Date:        26/9/2011
-// ---------------------------------------------------------------------------
-bool gdApplicationCommands::raiseMultiWatchView(gdMultiWatchView* pMultiWatchView)
-{
-    (void)(pMultiWatchView);  // unused
-    bool retVal = false;
-    GT_ASSERT_EX(false, L"We should not get here");
-    return retVal;
-}
-
-// ---------------------------------------------------------------------------
 // Name:        gdApplicationCommands::showMessageBox
 // Description: Shows a default (WX) message box
 // Author:      Sigal Algranaty
@@ -1587,47 +1570,6 @@ gdLocalsView* gdApplicationCommands::localsView()
     return NULL;
 }
 
-
-// ---------------------------------------------------------------------------
-// Name:        gdApplicationCommands::multiWatchView
-// Description: Get the application multi watch view
-// Return Val:  gdMultiWatchView*
-// Author:      Sigal Algranaty
-// Date:        26/9/2011
-// ---------------------------------------------------------------------------
-gdMultiWatchView* gdApplicationCommands::multiWatchView(int viewIndex)
-{
-    (void)(viewIndex);  // unused
-    GT_ASSERT_EX(false, L"Not supposed to get here");
-    return NULL;
-}
-
-
-// ---------------------------------------------------------------------------
-// Name:        gdApplicationCommands::displayMultiwatchVariable
-// Description: Display a multi watch variable
-// Arguments:   const gtString& watchVariable
-// Return Val:  bool - Success / failure.
-// Author:      Sigal Algranaty
-// Date:        26/9/2011
-// ---------------------------------------------------------------------------
-bool gdApplicationCommands::displayMultiwatchVariable(const gtString& watchVariable)
-{
-    bool retVal = false;
-
-    gdMultiWatchView* pMultiWatchView = multiWatchView(0);
-    GT_IF_WITH_ASSERT(pMultiWatchView != NULL)
-    {
-        retVal = pMultiWatchView->displayVariable(watchVariable);
-
-        // Raise the multiwatch view:
-        raiseMultiWatchView(pMultiWatchView);
-    }
-
-    return retVal;
-}
-
-
 // ---------------------------------------------------------------------------
 // Name:        gdApplicationCommands::addWatchVariable
 // Description: Add a watch variable to watch view
@@ -1672,9 +1614,9 @@ bool gdApplicationCommands::openFileAtLineWithAdditionSourceDir(const osFilePath
         // Get the file extension:
         gtString ext;
         filePath.getFileExtension(ext);
-        bool sourceFile = ((ext != AF_STR_CodeXMLImageBuffersFilesExtension) && (ext != AF_STR_CpuProfileFileExtension) &&
-                           (ext != AF_STR_GpuProfileTraceFileExtension) && (ext != AF_STR_GpuProfileSessionFileExtension) &&
-                           (ext != AF_STR_FrameAnalysisTraceFileExtension) && (ext != AF_STR_FrameAnalysisPerfCountersFileExtension));
+        bool sourceFile = ((ext != AF_STR_CodeXMLImageBuffersFilesExtension) &&
+                           (ext != AF_STR_GpuProfileTraceFileExtension) &&
+                           (ext != AF_STR_GpuProfileSessionFileExtension));
 
         if (!sourceFile)
         {

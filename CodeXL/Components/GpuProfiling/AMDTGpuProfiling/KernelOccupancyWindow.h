@@ -20,7 +20,7 @@
 
 #include <QtCore>
 #include <QtWidgets>
-#include <QtWebKitWidgets/QWebView>
+#include <QtWebEngineWidgets/QWebEngineView>
 
 /// UI for Kernel Occupancy view
 class KernelOccupancyWindow : public QWidget
@@ -43,7 +43,7 @@ protected:
 
 private:
     /// Widget for viewing kernel occupancy
-    QWebView* m_pWebBrowser;
+    QWebEngineView* m_pWebBrowser;
 };
 
 

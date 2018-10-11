@@ -2,7 +2,7 @@
 
 // Qt:
 #include <QtWidgets>
-#include <QWebView>
+#include <QWebEngineView>
 
 #include <iomanip>
 
@@ -43,15 +43,16 @@ kaSourceCodeTableView::kaSourceCodeTableView(QWidget* pParent) : m_platformIndic
     QFrame* pISATableFrame = new QFrame;
     pISATableFrame->setStyleSheet(QString(KA_STR_ISATABLE_FRAME_STYLE));
     QHBoxLayout* pFrameLayout = new QHBoxLayout;
-    m_pSourceTableViewHtml = new QWebView(nullptr);
-    m_pSourceTableViewHtml->page()->setLinkDelegationPolicy(QWebPage::DontDelegateLinks);
+    m_pSourceTableViewHtml = new QWebEngineView(nullptr);
+	// TODO: setLinkDelegationPolicy deprecated, find alternatives
+    // m_pSourceTableViewHtml->page()->setLinkDelegationPolicy(QWebPage::DontDelegateLinks);
     pFrameLayout->addWidget(m_pSourceTableViewHtml);
     m_pSourceTableViewHtml->setCursor(QCursor(Qt::ArrowCursor));
     pISATableFrame->setLayout(pFrameLayout);
     pLayout->addWidget(pISATableFrame);
     setLayout(pLayout);
 
-    // Set the zoom factor to fit the resolution. QWebView assumes 96 DPI.
+    // Set the zoom factor to fit the resolution. QWebEngineView assumes 96 DPI.
     QWidget* pScreen = QApplication::desktop()->screen();
 
     if (pScreen != nullptr)
@@ -444,7 +445,8 @@ void kaSourceCodeTableView::FillSourceTableView(const std::vector<Instruction*>&
 
             QString cssPathStr = acGTStringToQString(cssFilePath.asString());
 
-            m_pSourceTableViewHtml->page()->settings()->setUserStyleSheetUrl(QUrl::fromLocalFile(cssPathStr));
+            // TODO: QWebEngineSettings class does not support loading .css anymore.
+            // m_pSourceTableViewHtml->page()->settings()->setUserStyleSheetUrl(QUrl::fromLocalFile(cssPathStr));
 
             // set hidden attribute on Windows - these files begin with dot which makes them hidden on Linux
 #if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
@@ -521,7 +523,7 @@ void kaSourceCodeTableView::OnCopy()
 {
     if (m_pSourceTableViewHtml != nullptr)
     {
-        m_pSourceTableViewHtml->page()->triggerAction(QWebPage::Copy);
+        m_pSourceTableViewHtml->page()->triggerAction(QWebEnginePage::Copy);
     }
 }
 
@@ -529,7 +531,7 @@ void kaSourceCodeTableView::OnSelectAll()
 {
     if (m_pSourceTableViewHtml != nullptr)
     {
-        m_pSourceTableViewHtml->page()->triggerAction(QWebPage::SelectAll);
+        m_pSourceTableViewHtml->page()->triggerAction(QWebEnginePage::SelectAll);
     }
 }
 
@@ -542,15 +544,15 @@ void kaSourceCodeTableView::OnFindClick()
         if (!acFindParameters::Instance().m_findExpr.isEmpty())
         {
             // Define the Qt find flags matching the user selection:
-            QWebPage::FindFlags findFlags = 0;
+            QWebEnginePage::FindFlags findFlags = 0;
 
             if (acFindParameters::Instance().m_isCaseSensitive)
             {
-                findFlags = findFlags | QWebPage::FindCaseSensitively;
+                findFlags = findFlags | QWebEnginePage::FindCaseSensitively;
             }
 
             // Check if there is another appearance of the text:
-            acFindParameters::Instance().m_lastResult = m_pSourceTableViewHtml->page()->findText(acFindParameters::Instance().m_findExpr, findFlags);
+            m_pSourceTableViewHtml->page()->findText(acFindParameters::Instance().m_findExpr, findFlags, [&](bool found) { acFindParameters::Instance().m_lastResult = found; });
         }
 
         // After results are updated, ask the find widget to update the UI:
@@ -760,7 +762,7 @@ void kaSourceCodeTableView::keyPressEvent(QKeyEvent* pE)
         {
             if (m_pSourceTableViewHtml != nullptr && m_pSourceTableViewHtml->page() != nullptr)
             {
-                m_pSourceTableViewHtml->page()->triggerAction(QWebPage::SelectAll);
+                m_pSourceTableViewHtml->page()->triggerAction(QWebEnginePage::SelectAll);
             }
         }
     }

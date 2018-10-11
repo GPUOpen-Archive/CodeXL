@@ -66,7 +66,6 @@ moc_files = Split(
                 + " Include/views/gdLocalsView.h"
                 + " Include/views/gdMemoryAnalysisDetailsView.h"
                 + " Include/views/gdMemoryView.h"
-                + " Include/views/gdMultiWatchView.h"
                 + " Include/views/gdStateVariablesView.h"
                 + " Include/views/gdStatisticsView.h"
                 + " Include/views/gdStatisticsViewBase.h"
@@ -143,7 +142,6 @@ sources = \
     objDir + "/views/src/gdMemoryAnalysisDetailsView.cpp",
     objDir + "/views/src/gdMemoryView.cpp",
     objDir + "/views/src/gdMemoryViewBase.cpp",
-    objDir + "/views/src/gdMultiWatchView.cpp",
     objDir + "/views/src/gdPBufferImageProxy.cpp",
     objDir + "/views/src/gdRenderBufferImageProxy.cpp",
     objDir + "/views/src/gdStateChangeStatisticsView.cpp",

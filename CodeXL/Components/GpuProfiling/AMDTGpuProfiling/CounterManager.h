@@ -253,7 +253,7 @@ private:
     /// Gets the counter info (name/description) for the specified hardware family
     /// \param hardwareFamily the hardware family whose counters are needed
     /// \param pCounterAccessor the counter accessor object to be used to get the counter information
-    void GetCounterInfoFromAccessor(HardwareFamily hardwareFamily, GPA_ICounterAccessor* pCounterAccessor);
+    void GetCounterInfoFromAccessor(HardwareFamily hardwareFamily, IGPACounterAccessor* pCounterAccessor);
 
     /// Adds the specified device id to the list of devices for its hardware family.
     /// If the family can not be gleaned from the device id, then it will be added to the

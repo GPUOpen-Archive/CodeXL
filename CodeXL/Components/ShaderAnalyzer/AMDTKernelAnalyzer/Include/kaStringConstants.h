@@ -196,6 +196,17 @@
 #define KA_STR_applyUpdateLoops "Apply changes to all kernels in project"
 #define KA_STR_mustSelectDeviceError "At least one device must be selected"
 
+// Names of GFX6, GFX7 and GFX8 generations in the device list.
+#define  KA_STR_GFX6_GEN_NAME  "Graphics IP v6"
+#define  KA_STR_GFX7_GEN_NAME  "Graphics IP v7"
+#define  KA_STR_GFX8_GEN_NAME  "Graphics IP v8"
+
+// Default architectures for the GFX6, GFX7 & GFX8 generations.
+#define  KA_STR_DEFAULT_GFX6_ARCH  "Tahiti"
+#define  KA_STR_DEFAULT_GFX7_ARCH  "Bonaire"
+#define  KA_STR_DEFAULT_GFX8_ARCH  "Ellesmere"
+
+
 // Global settings xml file
 #define KA_STR_analysisSettingsXMLSectionPageTitle L"Analyze"
 #define KA_STR_analsisSettingDefaultExecutionValuesNode L"DefaultExecutionValues"

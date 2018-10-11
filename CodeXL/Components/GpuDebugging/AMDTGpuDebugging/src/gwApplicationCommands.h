@@ -56,9 +56,6 @@ public:
     virtual gdBreakpointsView* breakpointsView();
     virtual gdWatchView* watchView();
     virtual gdLocalsView* localsView();
-    virtual gdMultiWatchView* multiWatchView(int viewIndex);
-    virtual gdMultiWatchView* multiWatchView2();
-    virtual gdMultiWatchView* multiWatchView3();
 
     // Update UI:
     virtual void updateToolbarCommands();
@@ -68,7 +65,6 @@ public:
     virtual bool raiseStatisticsView();
     virtual bool raiseCommandQueuesView();
     virtual bool raiseMemoryView();
-    virtual bool raiseMultiWatchView(gdMultiWatchView* pMultiWatchView);
 
 protected:
     // Do not allow the use of my constructor:

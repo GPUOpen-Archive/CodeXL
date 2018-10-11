@@ -121,6 +121,9 @@ const QString HSAAPIDefs::GroupToString(HSAAPIGroup group)
         case HSAAPIGroup_ExtensionsAMD:
             return "Extensions AMD";
 
+        case HSAAPIGroup_VendorExtensionsAMD:
+            return "Vendor Extensions AMD";
+
         default:
             return "Other";
     }
@@ -173,6 +176,7 @@ void HSAAPIDefs::BuildAPIGroupsMap()
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_system_major_extension_supported, HSAAPIGroup_ExtensionsGeneral);
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_system_get_major_extension_table, HSAAPIGroup_ExtensionsGeneral);
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_agent_major_extension_supported, HSAAPIGroup_ExtensionsGeneral);
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_extension_get_name, HSAAPIGroup_ExtensionsGeneral);
 
     // HSAAPIGroup_ExtensionsFinalizer:
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_ext_program_create, HSAAPIGroup_ExtensionsFinalizer);
@@ -191,6 +195,9 @@ void HSAAPIDefs::BuildAPIGroupsMap()
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_ext_image_copy, HSAAPIGroup_ExtensionsImage);
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_ext_image_clear, HSAAPIGroup_ExtensionsImage);
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_ext_image_destroy, HSAAPIGroup_ExtensionsImage);
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_ext_image_get_capability_with_layout, HSAAPIGroup_ExtensionsImage);
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_ext_image_data_get_info_with_layout, HSAAPIGroup_ExtensionsImage);
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_ext_image_create_with_layout, HSAAPIGroup_ExtensionsImage);
 
     // HSAAPIGroup_ExtensionsAMD:
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_amd_coherency_get_type, HSAAPIGroup_ExtensionsAMD);
@@ -223,18 +230,25 @@ void HSAAPIDefs::BuildAPIGroupsMap()
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_amd_image_create, HSAAPIGroup_ExtensionsAMD);
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_amd_ipc_signal_create, HSAAPIGroup_ExtensionsAMD);
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_amd_ipc_signal_attach, HSAAPIGroup_ExtensionsAMD);
-    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_ven_amd_loader_query_host_address, HSAAPIGroup_ExtensionsAMD);
-    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_ven_amd_loader_query_segment_descriptors, HSAAPIGroup_ExtensionsAMD);
-    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_ven_amd_loader_query_executable, HSAAPIGroup_ExtensionsAMD);
-    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_ven_amd_loader_executable_iterate_loaded_code_objects, HSAAPIGroup_ExtensionsAMD);
-    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_ven_amd_loader_loaded_code_object_get_info, HSAAPIGroup_ExtensionsAMD);
-    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_ven_amd_aqlprofile_validate_event, HSAAPIGroup_ExtensionsAMD);
-    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_ven_amd_aqlprofile_start, HSAAPIGroup_ExtensionsAMD);
-    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_ven_amd_aqlprofile_stop, HSAAPIGroup_ExtensionsAMD);
-    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_ven_amd_aqlprofile_legacy_get_pm4, HSAAPIGroup_ExtensionsAMD);
-    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_ven_amd_aqlprofile_get_info, HSAAPIGroup_ExtensionsAMD);
-    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_ven_amd_aqlprofile_iterate_data, HSAAPIGroup_ExtensionsAMD);
-    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_ven_amd_aqlprofile_error_string, HSAAPIGroup_ExtensionsAMD);
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_amd_pointer_info, HSAAPIGroup_ExtensionsAMD);
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_amd_pointer_info_set_userdata, HSAAPIGroup_ExtensionsAMD);
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_amd_ipc_memory_create, HSAAPIGroup_ExtensionsAMD);
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_amd_ipc_memory_attach, HSAAPIGroup_ExtensionsAMD);
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_amd_ipc_memory_detach, HSAAPIGroup_ExtensionsAMD);
+
+    // HSAAPIGroup_VendorExtensionsAMD
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_ven_amd_loader_query_host_address, HSAAPIGroup_VendorExtensionsAMD);
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_ven_amd_loader_query_segment_descriptors, HSAAPIGroup_VendorExtensionsAMD);
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_ven_amd_loader_query_executable, HSAAPIGroup_VendorExtensionsAMD);
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_ven_amd_loader_executable_iterate_loaded_code_objects, HSAAPIGroup_VendorExtensionsAMD);
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_ven_amd_loader_loaded_code_object_get_info, HSAAPIGroup_VendorExtensionsAMD);
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_ven_amd_aqlprofile_validate_event, HSAAPIGroup_VendorExtensionsAMD);
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_ven_amd_aqlprofile_start, HSAAPIGroup_VendorExtensionsAMD);
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_ven_amd_aqlprofile_stop, HSAAPIGroup_VendorExtensionsAMD);
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_ven_amd_aqlprofile_legacy_get_pm4, HSAAPIGroup_VendorExtensionsAMD);
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_ven_amd_aqlprofile_get_info, HSAAPIGroup_VendorExtensionsAMD);
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_ven_amd_aqlprofile_iterate_data, HSAAPIGroup_VendorExtensionsAMD);
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_ven_amd_aqlprofile_error_string, HSAAPIGroup_VendorExtensionsAMD);
 
     // HSAAPIGroup_ExtensionsSampler:
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_ext_sampler_create, HSAAPIGroup_ExtensionsSampler);
@@ -336,6 +350,8 @@ void HSAAPIDefs::BuildAPIGroupsMap()
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_signal_cas_scacquire, HSAAPIGroup_Signal);
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_signal_cas_screlease, HSAAPIGroup_Signal);
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_signal_cas_scacq_screl, HSAAPIGroup_Signal);
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_signal_silent_store_relaxed, HSAAPIGroup_Signal);
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_signal_silent_store_screlease, HSAAPIGroup_Signal);
 }
 
 void HSAAPIDefs::BuildAPIFunctionNamesMap()

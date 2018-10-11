@@ -1,4 +1,0 @@
-REVIEWBOARD_URL = 'http://adt-review.amd.com/'
-REPOSITORY = 'github CodeXL'
-TARGET_GROUPS = 'CodeXL'
-OPEN_BROWSER = 1

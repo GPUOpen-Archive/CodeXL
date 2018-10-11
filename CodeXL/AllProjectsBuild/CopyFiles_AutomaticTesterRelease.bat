@@ -10,18 +10,6 @@ echo =============================
 XCopy /y "..\..\Common\Lib\Ext\Detours\x64\detoured.dll" "..\Output\Release\bin\spies64\"
 XCopy /y "..\..\Common\Lib\Ext\Detours\x86\detoured.dll" "..\Output\Release\bin\spies\"
 
-echo Copying Hardware Debugger .dll files
-echo =====================================
-XCopy /y "..\..\Common\Lib\AMD\HWDebugger\HwDbgFacilities\0.2\Lib\x86\AMDHwDbgFacilities.pdb" "..\Output\Release\bin\"
-XCopy /y "..\..\Common\Lib\AMD\HWDebugger\HwDbgFacilities\0.2\Lib\x86\AMDHwDbgFacilities.dll" "..\Output\Release\bin\"
-XCopy /y "..\..\Common\Lib\AMD\HWDebugger\HwDbgFacilities\0.2\Lib\x64\AMDHwDbgFacilities-x64.pdb" "..\Output\Release\bin\"
-XCopy /y "..\..\Common\Lib\AMD\HWDebugger\HwDbgFacilities\0.2\Lib\x64\AMDHwDbgFacilities-x64.dll" "..\Output\Release\bin\"
-XCopy /y "..\..\Common\Lib\AMD\HWDebugger\HwDbg\0.19\Lib\x86\AMDGPUDebugHSA.dll" "..\Output\Release\bin\"
-XCopy /y "..\..\Common\Lib\AMD\HWDebugger\HwDbg\0.19\Lib\x86\AMDGPUDebugHSA.pdb" "..\Output\Release\bin\"
-XCopy /y "..\..\Common\Lib\AMD\HWDebugger\HwDbg\0.19\Lib\x64\AMDGPUDebugHSA-x64.dll" "..\Output\Release\bin\"
-XCopy /y "..\..\Common\Lib\AMD\HWDebugger\HwDbg\0.19\Lib\x64\AMDGPUDebugHSA-x64.pdb" "..\Output\Release\bin\"
-
-
 echo Copying DbgHelp.dll
 echo ===================
 echo.

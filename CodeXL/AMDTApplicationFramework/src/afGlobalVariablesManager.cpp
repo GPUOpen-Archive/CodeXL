@@ -1069,12 +1069,6 @@ void afGlobalVariablesManager::FindInstalledAMDComponents()
         OS_OUTPUT_DEBUG_LOG(AF_STR_AMD_GPU_COMPONENT_NOT_INSTALLED, OS_DEBUG_LOG_INFO);
     }
 
-    if (!(m_installedAMDComponentsBitmask & AF_AMD_CPU_COMPONENT))
-    {
-        m_missingInstalledAMDComponentsMessage += AF_STR_AMD_CPU_COMPONENT_NOT_INSTALLED;
-        OS_OUTPUT_DEBUG_LOG(AF_STR_AMD_CPU_COMPONENT_NOT_INSTALLED, OS_DEBUG_LOG_INFO);
-    }
-
     if (!(m_installedAMDComponentsBitmask & AF_AMD_CATALYST_COMPONENT))
     {
         m_missingInstalledAMDComponentsMessage += AF_STR_AMD_CATALYST_COMPONENT_NOT_INSTALLED;
@@ -1266,11 +1260,6 @@ void afGlobalVariablesManager::AddInstalledAMDComponents(afInstalledAMDComponent
         if (installedComponent == AF_AMD_GPU_COMPONENT)
         {
             m_missingInstalledAMDComponentsMessage.replace(AF_STR_AMD_GPU_COMPONENT_NOT_INSTALLED, L"");
-        }
-
-        if (installedComponent == AF_AMD_CPU_COMPONENT)
-        {
-            m_missingInstalledAMDComponentsMessage.replace(AF_STR_AMD_CPU_COMPONENT_NOT_INSTALLED, L"");
         }
 
         if (installedComponent == AF_AMD_CATALYST_COMPONENT)

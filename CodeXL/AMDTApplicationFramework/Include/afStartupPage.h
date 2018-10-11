@@ -10,8 +10,8 @@
 #define __AFSTARTUPPAGE_H
 
 // Qt:
-#include <QWebView>
-#include <QWebPage>
+#include <QWebEngineView>
+#include <QWebEnginePage>
 
 // Infra:
 #include <AMDTOSWrappers/Include/osFilePath.h>
@@ -23,14 +23,14 @@
 class afApplicationCommands;
 
 // ----------------------------------------------------------------------------------
-// Class Name:          afWebPage: public QWebPage
-// General Description: Inherit QWebPage. We need this class to override the JavaScript
+// Class Name:          afWebPage: public QWebEnginePage
+// General Description: Inherit QWebEnginePage. We need this class to override the JavaScript
 //                      events since in the current HTML design, we need to use JS to
 //                      execute CodeXL actions
 // Author:              Sigal Algranaty
 // Creation Date:       23/9/2014
 // ----------------------------------------------------------------------------------
-class afWebPage : public QWebPage
+class afWebPage : public QWebEnginePage
 {
     Q_OBJECT
 public:
@@ -40,11 +40,15 @@ public:
 
 protected:
 
-    // Overrides QWebPage: is used for catching requests from welcome page, and implement in Qt:
-    virtual void javaScriptConsoleMessage(const QString& message, int lineNumber, const QString& sourceID);
+    // Overrides QWebEnginePage: is used for catching requests from welcome page, and implement in Qt:
+    virtual void javaScriptConsoleMessage(JavaScriptConsoleMessageLevel level, const QString& message, int lineNumber, const QString& sourceID);
 
-    virtual bool acceptNavigationRequest(QWebFrame* frame, const QNetworkRequest& request, QWebPage::NavigationType type);
+    // Overrides QWebEnginePage: is used to accept navigation request from welcom page
+    virtual bool acceptNavigationRequest(const QUrl &url, NavigationType type, bool isMainFrame);
 
+signals:
+
+    void linkClicked(const QUrl&);
 
 protected:
 
@@ -53,12 +57,12 @@ protected:
 };
 
 // ----------------------------------------------------------------------------------
-// Class Name:          afStartupPage: public QWebView
-// General Description: Inherit QWebView and is used for displaying the CodeXL HTML welcome page
+// Class Name:          afStartupPage: public QWebEngineView
+// General Description: Inherit QWebEngineView and is used for displaying the CodeXL HTML welcome page
 // Author:              Sigal Algranaty
 // Creation Date:       23/9/2014
 // ----------------------------------------------------------------------------------
-class AF_API afStartupPage : public QWebView
+class AF_API afStartupPage : public QWebEngineView
 {
     Q_OBJECT
 
@@ -76,6 +80,7 @@ public slots:
 protected:
 
     bool CanLinkBeClicked(const QUrl& url);
+    afWebPage* m_pPage;
 
 protected slots:
 

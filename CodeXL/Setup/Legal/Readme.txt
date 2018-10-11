@@ -3,106 +3,66 @@
 //                 CodeXL                 //
 ////////////////////////////////////////////
 
-This version supports Windows 7 64-bit, Windows 8.1 64-bit,  Windows 10 64-bit and Linux x86_64 architectures. 
+This version supports Windows 7 64-bit, Windows 8.1 64-bit, Windows 10 64-bit and Linux x86_64 architectures.
 
 Download
 ========
 CodeXL can be downloaded from:
-http://developer.amd.com/tools-and-sdks/opencl-zone/codexl/
+https://github.com/GPUOpen-Tools/CodeXL/releases
 
 Install
 =======
 On Windows:
-To install CodeXL, use the provided executable file AMD_CodeXL_*.exe
+To install CodeXL, use the provided executable file CodeXL_*.exe
 
 On Linux:
 To install CodeXL, use the provided RPM file, Debian file, or simply extract the compressed archive onto your hard drive.
 
-For further installation instructions see the CodeXL Quick Start Guide here on the CodeXL web page http://developer.amd.com/tools-and-sdks/opencl-zone/codexl/
+For further installation instructions see the CodeXL Quick Start Guide here on the CodeXL release page: https://github.com/GPUOpen-Tools/CodeXL/releases
 
 Run
 ===
 On Windows:
-Use the Start menu and select All Programs -> AMD Developer Tools -> AMD CodeXL -> AMD CodeXL, or if you chose to enable the desktop shortcut installer option during installation, double click the AMD CodeXL icon on your desktop.
-If you chose to install the CodeXL Visual Studio extension, launch Visual Studio and click the CodeXL menu from the menu bar.
+Use the Start menu and select All Programs -> CodeXL -> CodeXL, or if you chose to enable the desktop shortcut installer option during installation, double click the CodeXL icon on your desktop.
 
 On Linux:
 To run CodeXL, launch the CodeXL script from a command shell or double-click it in a file browser window in the installed location.
 
 Updates and support
 ===================
-For support, please visit the AMD CodeXL forum:
-http://devgurus.amd.com/community/codexl
+For support, please visit the Issues page on CodeXL's GitHub page:
+https://github.com/GPUOpen-Tools/CodeXL/issues
 
 The latest version and updates for CodeXL can be found at the AMD Developer Central:
-http://developer.amd.com/tools-and-sdks/opencl-zone/codexl/
+https://github.com/GPUOpen-Tools/CodeXL/releases
 
 Open-Source Components
 ======================
 CodeXL uses several open-source components (see Legal section below).
-CodeXL uses QT 5.3.0. Source code for QT is available here: http://qt-project.org/downloads
-The QT source code has not been tempered with and the built binaries are identical to what any user that downloads the source code from the web and builds them will produce, with the exception of the DLL names.
+CodeXL uses QT 5.9.5. Source code for QT is available here: https://www.qt.io/download
+The QT binaries have not been tampered with and the included binaries are identical to what is contained in the Qt 5.9.5 installers downloaded from the web.
 
 Legal Information
 =================
 
-LGPL:
-    (Copyright (C) 1991, 1999 Free Software Foundation, Inc.  51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA)  Everyone is permitted to copy and distribute verbatim copies of this license document, but changing it is not allowed. Use of the Qt library is governed by the GNU Lesser General Public License version 2.1 (LGPL v 2.1).
+OpenCL is a trademark of Apple Inc. used by permission by Khronos. OpenGL is a registered trademark of Silicon Graphics, Inc. in the United States and/or other countries worldwide. Microsoft, Windows, DirectX and Visual Studio are registered trademarks of Microsoft Corporation in the United States and/or other jurisdictions. Vulkan is a registered trademark of Khronos Group Inc. in the United States and/or other jurisdictions. Linux is the registered trademark of Linus Torvalds in the United States and/or other jurisdictions.
 
-jqPlot:
-    copyright © 2009-2011 Chris Leonello
+LGPL (Copyright ©1991, 1999 Free Software Foundation, Inc.  51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA). Use of the Qt library is governed by the GNU Lesser General Public License version 2.1 (LGPL v 2.1). CodeXL uses Qt 5.5.1. Source code for Qt is available here: http://qt-project.org/downloads. The Qt source code has not been tampered with and the built binaries are identical to that which any user that downloading the Qt source code from the web would build.
 
-Boost:
-    Copyright Beman Dawes, 2003.
-
-TinyXML:
-    TinyXML is released under the zlib license
-    Files: *
-    Copyright: 2000-2007, Lee Thomason 
-               2002-2004, Yves Berquin 
-
-    Files: tinystr.*
-    Copyright: 2000-2007, Lee Thomason 
-               2002-2004, Yves Berquin 
-               2005, Tyge Lovset
-
-QScintilla:
-    Copyright 2005 by Riverbank Computing Limited <info@riverbankcomputing.co.uk>
-
-LibDwarf:
-    Copyright (c) 2007 John Birrell (jb@freebsd.org),  Copyright (c) 2010 Kai Wang,  All rights reserved.  
-
-    1)    Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
-
-    2)    THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS “AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-Microsoft Detours (CodeXL Windows version only):
-    © 2012 Microsoft Corporation
-    
-glew:
-	The OpenGL Extension Wrangler Library
-	Copyright (C) 2002-2007, Milan Ikits <milan ikits[]ieee org>
-	Copyright (C) 2002-2007, Marcelo E. Magallon <mmagallo[]debian org>
-	Copyright (C) 2002, Lev Povalahev
-	All rights reserved.
-	
-	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
-	AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
-	IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-	ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE 
-	LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR 
-	CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF 
-	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
-	THE POSSIBILITY OF SUCH DAMAGE.
-    
-OpenCL:
-    Copyright (c) 2008-2015 The Khronos Group Inc.
+* Boost is Copyright © Beman Dawes, 2003.
+* [CR]LunarG, Inc. is Copyright © 2015 LunarG, Inc.
+* jqPlot is copyright © 2009-2011 Chris Leonello.
+* glew - The OpenGL Extension Wrangler Library is Copyright © 2002-2007, Milan Ikits <milan ikits[]ieee org>, Copyright © 2002-2007, Marcelo E. Magallon <mmagallo[]debian org>, Copyright © 2002, Lev Povalahev, All rights reserved.
+* jpglib is Copyright © 1994-1998, Thomas G. Lane., Copyright © 1991-2013, Thomas G. Lane, Guido Vollbeding.
+* LibDwarf (BSD) is Copyright © 2007 John Birrell (jb@freebsd.org),  Copyright © 2010 Kai Wang,  All rights reserved.
+* libpng is Copyright © 1998-2014 Glenn Randers-Pehrson, (Version 0.96 Copyright © 1996, 1997 Andreas Dilger) (Version 0.88 Copyright © 1995, 1996 Guy Eric Schalnat, Group 42, Inc.).
+* QScintilla is Copyright © 2005 by Riverbank Computing Limited <info@riverbankcomputing.co.uk>.
+* TinyXML is released under the zlib license © 2000-2007, Lee Thomason, © 2002-2004, Yves Berquin © 2005, Tyge Lovset.
+* UTF8cpp is Copyright © 2006 Nemanja Trifunovic.
+* zlib is Copyright © 1995-2010 Jean-loup Gailly and Mark Adler, Copyright © 2003 Chris Anderson <christop@charm.net>, Copyright © 1998-2010 Gilles Vollant (minizip) ( http://www.winimage.com/zLibDll/minizip.html ), Copyright © 2009-2010 Mathias Svensson ( http://result42.com ), Copyright © 2007-2008 Even Rouault.
+* QCustomPlot, an easy to use, modern plotting widget for Qt, Copyright (C) 2011-2015 Emanuel Eichhammer
 
 Sincerely,
 
 The CodeXL team
-Advanced Micro Devices, Inc.
-http://developer.amd.com
+http://gpuopen.com

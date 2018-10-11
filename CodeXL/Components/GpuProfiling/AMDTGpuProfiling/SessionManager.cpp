@@ -1,16 +1,9 @@
 //=====================================================================
-// Copyright (c) 2012 Advanced Micro Devices, Inc. All rights reserved.
+// Copyright (c) 2012-2018 Advanced Micro Devices, Inc. All rights reserved.
 //
 /// \author GPU Developer Tools
-/// \file $File: //devtools/main/CodeXL/Components/GpuProfiling/AMDTGpuProfiling/SessionManager.cpp $
-/// \version $Revision: #45 $
+/// \file
 /// \brief :  This file contains SessionManager class
-//
-//=====================================================================
-// $Id: //devtools/main/CodeXL/Components/GpuProfiling/AMDTGpuProfiling/SessionManager.cpp#45 $
-// Last checkin:   $DateTime: 2016/04/18 06:02:03 $
-// Last edited by: $Author: salgrana $
-// Change list:    $Change: 569613 $
 //=====================================================================
 
 // Qt:
@@ -34,7 +27,6 @@
 #include <AMDTSharedProfiling/inc/SessionExplorerDefs.h>
 
 // Local:
-#include <AMDTGpuProfiling/gpUIManager.h>
 #include <AMDTGpuProfiling/gpViewsCreator.h>
 #include <AMDTGpuProfiling/AMDTGpuProfilerDefs.h>
 #include <AMDTGpuProfiling/ListViewWindow.h>
@@ -81,10 +73,6 @@ GPUSessionTreeItemData* SessionManager::AddSession(const QString& strSessionDisp
             {
                 pRetVal = new PerformanceCounterSession(strSessionDisplayName, strWorkingDirectory, strSessionOutputFile, strProjName, isImported);
             }
-            else if (profileType == FRAME_ANALYSIS)
-            {
-                pRetVal = new gpSessionTreeNodeData(strSessionDisplayName, strWorkingDirectory, strSessionOutputFile, strProjName, isImported);
-            }
 
             // Sanity check:
             GT_IF_WITH_ASSERT(pRetVal != nullptr)
@@ -118,10 +106,6 @@ GPUProfileType SessionManager::GetProfileType(const QString& strFileName)
     else if (strFileName.endsWith(".atp"))
     {
         profileType = API_TRACE;
-    }
-    else if (strFileName.endsWith("." + acGTStringToQString(AF_STR_frameAnalysisArchivedFileExtension)))
-    {
-        profileType = FRAME_ANALYSIS;
     }
     else
     {
@@ -361,14 +345,6 @@ QList<GPUSessionTreeItemData*> SessionManager::LoadProjectProfileSessions(QStrin
                     profileType = API_TRACE;
                 }
 
-                else if (fFile.fileName().endsWith(GP_Dashbord_FileExtension))
-                {
-                    // For frame analysis we show only session with frames
-                    bool doesSessionContainFrames = gpUIManager::Instance()->DoesSessionHasFrames(dSession);
-                    isSessionFile = doesSessionContainFrames;
-                    profileType = FRAME_ANALYSIS;
-                }
-
                 if (isSessionFile)
                 {
                     // use the dir name as the default session name (same behavior as APP Profiler)
@@ -469,4 +445,3 @@ void SessionManager::CheckAndDeleteSessionFiles()
         }
     }
 }
-

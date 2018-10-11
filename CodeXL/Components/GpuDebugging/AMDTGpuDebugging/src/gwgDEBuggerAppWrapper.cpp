@@ -402,64 +402,6 @@ gdCommandQueuesView* gwgDEBuggerAppWrapper::commandQueuesView()
 }
 
 // ---------------------------------------------------------------------------
-// Name:        gwgDEBuggerAppWrapper::multiWatchView1
-// Description: Return the application multi watch view 1
-// Return Val:  gdMultiWatchView*
-// Author:      Sigal Algranaty
-// Date:        24/8/2011
-// ---------------------------------------------------------------------------
-gdMultiWatchView* gwgDEBuggerAppWrapper::multiWatchView1()
-{
-    gdMultiWatchView* pRetVal = NULL;
-    GT_IF_WITH_ASSERT(m_pDebugViewsCreator != NULL)
-    {
-        pRetVal = m_pDebugViewsCreator->multiWatchView1();
-    }
-
-    return pRetVal;
-}
-
-
-// ---------------------------------------------------------------------------
-// Name:        gwgDEBuggerAppWrapper::multiWatchView2
-// Description: Return the application multi watch view 2
-// Return Val:  gdMultiWatchView*
-// Author:      Sigal Algranaty
-// Date:        24/8/2011
-// ---------------------------------------------------------------------------
-gdMultiWatchView* gwgDEBuggerAppWrapper::multiWatchView2()
-{
-    gdMultiWatchView* pRetVal = NULL;
-    GT_IF_WITH_ASSERT(m_pDebugViewsCreator != NULL)
-    {
-        pRetVal = m_pDebugViewsCreator->multiWatchView2();
-    }
-
-    return pRetVal;
-}
-
-
-// ---------------------------------------------------------------------------
-// Name:        gwgDEBuggerAppWrapper::multiWatchView3
-// Description: Return the application multi watch view 3
-// Return Val:  gdMultiWatchView*
-// Author:      Sigal Algranaty
-// Date:        24/8/2011
-// ---------------------------------------------------------------------------
-gdMultiWatchView* gwgDEBuggerAppWrapper::multiWatchView3()
-{
-    gdMultiWatchView* pRetVal = NULL;
-    GT_IF_WITH_ASSERT(m_pDebugViewsCreator != NULL)
-    {
-        pRetVal = m_pDebugViewsCreator->multiWatchView3();
-    }
-
-    return pRetVal;
-}
-
-
-
-// ---------------------------------------------------------------------------
 // Name:        gwgDEBuggerAppWrapper::kernelWorkItemToolbar
 // Description: Return the application kernel work item toolbar
 // Return Val:  gwKernelWorkItemToolbar*

@@ -1,5 +1,9 @@
-//=============================================================
-// Copyright (c) 2013 Advanced Micro Devices, Inc.
+//=====================================================================
+// Copyright (c) 2013-2018 Advanced Micro Devices, Inc. All rights reserved.
+//
+/// \author GPU Developer Tools
+/// \file
+/// \brief String Constants used by the GPU Profiler
 //=============================================================
 
 #ifndef __GPSTRINGCONSTANTS_H
@@ -7,46 +11,19 @@
 
 #define GP_Str_ProfileSessionGPUPrefix "GPU: "
 #define GP_Str_ProfileSessionHTMLHeading L"GPU Profile Session"
-#define GP_Str_FrameAnalysisSessionHTMLHeading L"Frame Analysis Session"
 #define GP_Str_HSA "HSA"
 #define GP_Str_CL "CL"
 #define GP_Str_LocalHost "Local host"
 
-
-// Session and other file name
-#define GP_Str_SessionFileNameFormat "Profile %1:%2:%3"
-#define GPU_STR_FrameTraceFileNameFormatSingle "%1_Frame_%2"
-#define GPU_STR_FrameTraceFileNameFormatMulti "%1_Frame_%2-%3"
-#define GPU_STR_FrameTraceFileNameFormatSingleW L"%ls_Frame_%d"
-#define GPU_STR_FrameTraceFileNameFormatMultiW L"%ls_Frame_%d-%d"
-#define GPU_STR_FrameFileNameFormat "%1_Frame_%2.%3"
-#define GPU_STR_FrameMultipleFileNameFormat "%1_Frame_%2-%3.%4"
-#define GPU_STR_FramePerfCountersFileNameSingleFormat "%1_Frame_%2_Profile_%3_%4_%5"
-#define GPU_STR_FramePerfCountersFileNameMultiFormat "%1_Frame_%2-%3_Profile_%4_%5_%6"
-#define GPU_STR_FrameSubFolderNameSingleFormat L"Frame%d"
-#define GPU_STR_FrameSubFolderNameSingleFormatA "Frame%1"
-#define GPU_STR_FrameSubFolderNameMultipleFormat L"Frame%d-%d"
-#define GPU_STR_FrameSubFolderNameMultipleFormatA "Frame%1-%2"
-
-#define GPU_STR_FrameSubFolderNamePrefix "Frame"
-#define GPU_STR_FullObjectDatabase L"\\FullObjectDatabase.xml"
-
 // Session views names
 #define GP_Str_PerfCountersViewName "Performance Counter View"
 #define GP_Str_AppTraceViewName "Application Trace View"
-#define GP_Str_DXAppTraceViewName "DX Application Trace View"
 #define GP_Str_OccupancyViewName "Kernel Occupancy Viewer"
 #define GP_Str_OccupancyCodeViewerName "Code Viewer"
 #define GP_Str_OccupancyWindowCaption "Kernel Occupancy (%1)"
 
 /// Atp file properties
 #define GP_Str_ATPPropertyDisplayName "DisplayName"
-
-/// Command list types
-#define GP_Str_CommandListTypeDirect "Direct"
-#define GP_Str_CommandListTypeBundle "Bundle"
-#define GP_Str_CommandListTypeCompute "Compute"
-#define GP_Str_CommandListTypeCopy "Copy"
 
 // Counter selection settings
 #define GP_Str_CounterSelectionMainCaptionGeneral "General"
@@ -79,16 +56,7 @@
 #define GP_Str_ErrorInsufficientMemory "Insufficient memory"
 #define GP_Str_ErrorUnableToLoad "Unable to load %1."
 #define GP_Str_ErrorWhileLoadingSession "Failed to load the session data"
-#define GP_Str_ErrorWhileLoadingFrame "Failed to load the frame data"
 #define GP_Str_MessageDeleted "Deleted"
-#define GP_Str_ErrorFailedToConnectToGraphicServer "Failed to connect to the graphic server"
-#define GP_Str_ErrorFailedToOpenFrameAnalysisArchive L"Failed to open frame analysis archive %1"
-#define GP_Str_ErrorTimelineCannotBeRetrievedWhileProcessIsRunning L"Timeline data cannot be retrieved from the server while profiling is in progress."
-#define GP_Str_WarningRaptrProcessIsRunning "%1 is running and may conflict with CodeXL graphics profiling. Raptr is not required for system operation. Would you like to kill raptr.exe?"
-#define GP_Str_WarningProjectProcessIsRunning "Project executable %1 is already running and may conflict with CodeXL graphics profiling. Would you like to kill it?"
-#define GP_Str_ErrorCannotRenameServerUnavailable "The session cannot be renamed. CodeXL remote server must be available when a session is renamed. Please make sure that CodeXL remote agent is running on %1."
-#define GP_Str_WarningMaxItems "Max items limitation reached, Some data may be missing, try closing unnecessary sessions."
-#define GP_Str_WarningCantDisplayDetailedRibbon "Number of API calls exceeds detailed ribbon capacity"
 
 // Application trace settings
 #define GP_Str_ProjectSettingsMainCaption       "Application Timeline Trace"
@@ -114,7 +82,7 @@
 #define GP_Str_ProjectSettingsHSAAPI            "HSA"
 #define GP_Str_ProjectSettingsAPITypeDesc       "Profile applications that use:"
 #define GP_Str_ProjectSettingsOpenCLAPITooltip  "Profile applications that use OpenCL"
-#define GP_Str_ProjectSettingsHSAAPITooltip     "Profile applications that use HSA-enabled languages (C++ AMP, OpenMP, etc'). Currently available only on Linux"
+#define GP_Str_ProjectSettingsHSAAPITooltip     "Profile applications that use HSA-enabled languages (HCC, HIP, etc.). Currently available only on Linux"
 
 
 #define GP_Str_ProjectSettingsAllCLRulesItemName "All OpenCL Rules"
@@ -236,6 +204,8 @@
 #define GPU_STR_FileHeader_CLRuntimeVersion     "CLRuntime Version"
 #define GPU_STR_FileHeader_NumberAppAddressBits "NumberAppAddressBits"
 #define GPU_STR_FileHeader_OSVersion            "OS Version"
+#define GPU_STR_FileHeader_BoardName            "Board Name"
+#define GPU_STR_FileHeader_PCIEDeviceId         "PCIE device id"
 
 // Trace View:
 #define GPU_STR_TraceViewclGetEventInfo "clGetEventInfo"
@@ -249,22 +219,9 @@
 #define GPU_STR_TraceViewOpenCL "OpenCL"
 #define GPU_STR_TraceViewHSA "HSA"
 #define GPU_STR_TraceViewHSADataTransfers "Data Transfers"
-#define GPU_STR_DX12Api "DX12"
-#define GPU_STR_VulkanApi "Vulkan"
-#define GPU_STR_TraceViewGPU "GPU Queues"
-#define GPU_STR_TraceViewCPU "CPU"
-#define GPU_STR_TraceViewThread "Thread"
 #define GPU_STR_TraceViewHSAPerfMarker "HSAPerfMarker"
 #define GPU_STR_TraceViewQueueRow "Queue %1 - %2 (%3)"
 #define GPU_STR_HSATraceViewQueueRow "Queue %1 - Device %2 (%3)"
-#define GPU_STR_TraceViewCPUThreads "CPU Threads (%1 of %2)"
-#define GPU_STR_TraceViewCPULaterFull "CPU PROCESSING LATER FRAME/S"
-#define GPU_STR_TraceViewCPULaterShort "LATER FRAME/S"
-#define GPU_STR_TraceViewGPUEarlierFull "GPU PROCESSING EARLIER FRAME/S"
-#define GPU_STR_TraceViewGPUEarlierShort "EARLIER FRAME/S"
-
-// WholeCmdBuf
-#define GPU_STR_TraceViewWholeBufferTraceStr "Vulkan_WholeCmdBuf"
 
 // Trace table captions
 #define GP_STR_TraceTableColumnIndex "Index"
@@ -289,9 +246,6 @@
 #define GPU_STR_TraceViewLoadingAPITimelineItems L"Loading API items to timeline..."
 #define GPU_STR_TraceViewLoadingGPUTimelineItems L"Loading GPU items to timeline..."
 #define GPU_STR_TraceViewLoadingPerfMarkersTimelineItems L"Loading Performance Markers to timeline..."
-#define GPU_STR_TraceViewLoadingThreadsConcurrency L"Calculating threads concurrency..."
-#define GPU_STR_TraceViewLoadingFASession L"Loading Frame analysis session..."
-#define GPU_STR_TraceViewLoadingCanceledByUser "Loading was canceled by the user"
 
 // Profile Manager error messages
 #define GPU_STR_ERR_NoCountersSelected "Unable to profile. At least one counter needs to be selected.\nCounter selection can be modified in the Project Settings dialog."
@@ -302,7 +256,6 @@
 // User messages:
 #define GPU_STR_APICallsAmountExceedsTheLimitQuestion "The session contains more than %1 API calls.\n" \
     "Do you want to analyze only the first %1 API calls (recommended for performance reasons)?\n Selecting 'No' will analyze all API calls."
-#define GPU_STR_SessionStopConfirm "Closing this window will stop the running frame analysis session. Click 'Yes' to close the window and end the session, or 'No' to keep the session running."
 
 /// CSV export file names:
 #define GPU_CSV_FileNameFormat "CodeXL%1_%2"
@@ -329,182 +282,17 @@
 /// GPU Profile file extensions
 #define GP_CSV_FileExtension ".csv"
 #define GP_ATP_FileExtension ".atp"
-#define GP_LTR_FileExtension ".ltr"
-#define GP_AOR_FileExtension ".aor"
-#define GP_OVR_FileExtension ".cxlfovr"
 #define GP_HTML_FileExtension ".html"
 #define GP_Occupancy_FileExtension ".occupancy"
-#define GP_Dashbord_FileExtension ".cxldsh"
-#define GP_HTML_FileExtensionW L"html"
-#define GP_Occupancy_FileExtensionW L"occupancy"
-#define GP_PerformanceCounters_FileExtension "cxlfc"
-#define GP_thumbnailImageExtension "png"
-
 #define GP_CSV_FileExtensionW L"csv"
 #define GP_ATP_FileExtensionW L"atp"
-#define GP_LTR_FileExtensionW L"ltr"
-#define GP_AOR_FileExtensionW L"aor"
-#define GP_Dashbord_FileExtensionW L"cxldsh"
-#define GP_Overview_FileExtensionW L"cxlfovr"
-#define GP_Overview_FileExtension "cxlfovr"
-#define GP_PerformanceCounters_FileExtensionW L"cxlfc"
-#define GP_Image_FileExtensionW L"jpg"
-#define GP_ThumbnailFileExtension "png"
-#define GP_ThumbnailFileExtensionW L"png"
+#define GP_HTML_FileExtensionW L"html"
+#define GP_Occupancy_FileExtensionW L"occupancy"
 
 // Process Monitor Types
 #define GPU_STR_ProcessMonitorRunType_Profile L"GPU profile in progress"
 #define GPU_STR_ProcessMonitorRunType_GenSummary L"Generating Summary Pages"
 #define GPU_STR_ProcessMonitorRunType_GenOccupancy L"Generating Occupancy Page"
-#define GPU_STR_ProcessMonitorRunType_Geneneric L"Executing Application"
-
-// Frame Analysis Mode
-#define GPU_STR_executionMode L"Frame Analysis Mode"
-#define GPU_STR_executionModeMenu L"&Frame Analysis Mode"
-#define GPU_STR_SwitchToAnalyzeMode L"Switch to &Frame Analysis Mode"
-#define GPU_STR_executionModeAction L"Frame Analysis"
-#define GPU_STR_executionModeVerb   L"Frame Analysis"
-#define GPU_STR_executionSesionType L"Frame Analysis"
-#define GPU_STR_executionModeStatusbarString L"Frame Analysis Mode - Switch to Frame Analysis Mode"
-#define GPU_STR_executionModeDescription L"Capture and analyze frames from graphic apps."
-#define GPU_STR_executionModeStart L"&Start Frame Analysis"
-#define GPU_STR_executionModeStartStatus L"Start an application and capture a frame for analysis"
-#define GPU_STR_executionModeCapture L"&Capture a Frame"
-#define GPU_STR_executionModeCaptureStatus L"&Capture a frame for analysis"
-#define GPU_STR_executionModeStop L"Sto&p Frame Analysis"
-#define GPU_STR_executionModeStopStatus L"Stop the executed application"
-#define GPU_STR_executionModeRefreshFromServer L"&Refresh sessions from server"
-#define GPU_STR_executionModeRefreshFromServerStatus L"Refresh sessions from server"
-#define GPU_STR_executionModeSetting L"Frame Analysis Se&ttings"
-#define GPU_STR_executionModeSettingsStatus L"Open the Frame Analysis settings dialog"
-#define GPU_STR_executionStartButton L"Frame Analysis"
-
-/// Tree item text:
-#define GPU_STR_TreeNodeDashboard L"Dashboard"
-#define GPU_STR_TreeNodeTimeline L"Timeline"
-#define GPU_STR_TreeNodeOverview L"Overview"
-#define GPU_STR_TreeNodeFrameSingle "Frame # %1"
-#define GPU_STR_TreeNodeFrameMultiple "Frame # %1-%2"
-#define GPU_STR_TreeNodePerformanceProfile L"Performance Profile"
-#define GPU_STR_TreeNodeImage L"Image"
-#define GPU_STR_TreeNodeObjectInspector L"Object Inspector"
-
-/// Mode settings settings
-#define GPU_STR_projectSettingExtensionDisplayName L"Frame Analysis"
-
-/// Project settings:
-#define GPU_STR_projectSettingExtensionName L"FrameAnalysis"
-#define GPU_STR_projectSettingExtensionNameASCII "FrameAnalysis"
-#define GPU_STR_projectSettingsAutomaticXMLField L"AutoSelect"
-#define GPU_STR_projectSettingsConnectionXMLField L"Connection"
-#define GPU_STR_projectSettingsPortNumberXMLField L"PortNumber"
-#define GPU_STR_projectSettingsProcessNumberXMLField L"ProcessNumber"
-#define GPU_STR_projectSettingsProcessNameXMLField L"ProcessName"
-#define GPU_STR_projectSettingsNumberFramesToCaptureXMLField L"NumberFrames"
-#define GPU_STR_projectSettingsAPISelection "API Selection"
-#define GPU_STR_projectSettingsAutomaticConnect "Automatically connect to"
-#define GPU_STR_projectSettingNumberOfFramesToCapture "Number of frames to Capture at once"
-#define GPU_STR_projectSettingsServerConnectionPort "Server connection port"
-#define GPU_STR_projectSettingsComboProcessNumberOption "Launched Process #"
-#define GPU_STR_projectSettingsComboAPIInProcessOption "First active API in [ProcessName]"
-#define GPU_STR_projectSettingsComboAPIOption "First active [API]"
-
-#define GPU_STR_PropertiesExecutionInformationSA L"To start Frame Analysis, select 'Start Frame Analysis' from the Frame Analysis menu, or click the 'Start Frame Analysis' toolbar button."
-#define GPU_STR_PropertiesExecutionInformationVS L"To start Frame Analysis, select 'Start Frame Analysis' from CodeXL menu, or click the 'Start Frame Analysis' toolbar button."
-
-#define GPU_STR_atrHeader L"//API:DX12\n=====CodeXL dx12 API Trace Output=====\n"
-
-//when running CXL client on linux below isn't defined, thus we add it(for remote windows agent)
-#ifndef AMDT_DEBUG_SUFFIX_W
-    #ifdef _DEBUG
-        #define AMDT_DEBUG_SUFFIX_W L"-d"
-    #else
-        #define AMDT_DEBUG_SUFFIX_W 
-    #endif
-#endif
-
-#define GPU_STR_perfStudioServer64_WIN L"CXLGraphicsServer-x64" AMDT_DEBUG_SUFFIX_W
-#define GPU_STR_CodeXLAgent_WIN L"CodeXLRemoteAgent" AMDT_DEBUG_SUFFIX_W   L"." AF_STR_exeFileExtension
-#define GPU_STR_GraphicsCapturePlayer64_WIN L"CXLGraphicsServerPlayer-x64" AMDT_DEBUG_SUFFIX_W
-
-#define GPU_STR_perfStudioServer64_LNX L"CXLGraphicsServer"
-#define GPU_STR_CodeXLAgent_LNX L"CodeXLRemoteAgent-bin"
-#define GPU_STR_GraphicsCapturePlayer64_LNX L"CXLGraphicsServerPlayer"
-
-#define GPU_STR_CodeXLAgentHomeIP L"127.0.0.1"
-#define GPU_STR_RaptrExeName L"raptr.exe"
-#define GPU_STR_FrapsExeName L"fraps.exe"
-#define GPU_STR_RaptrExeNameA "raptr.exe"
-#define GPU_STR_FrapsExeNameA "fraps.exe"
-
-// Dashboard
-#define GPU_STR_dashboard_FrameAnalysisCaption "Frame Analysis"
-#define GPU_STR_dashboard_CapturedFramesCaption "Captured Frames"
-#define GPU_STR_dashboard_CaptureTooltip "Capture %1 frames for analysis"
-#define GPU_STR_dashboard_StopTooltip "Stop the analyzed application and review any captured frames"
-#define GPU_STR_dashboard_OpenTimelineTooltip "Open the selected captured frame timeline for review"
-#define GPU_STR_dashboard_MainImageCaptionRunning "Running Frame"
-#define GPU_STR_dashboard_MainImageCaptionStopped "Selected Frame"
-#define GPU_STR_dashboard_ExecutionCaption "Execution"
-#define GPU_STR_dashboard_CaptureButton "&Capture"
-#define GPU_STR_dashboard_CaptureCPUButton "&Capture CPU"
-#define GPU_STR_dashboard_CaptureGPUButton "&Capture GPU"
-#define GPU_STR_dashboard_StopButton "&Stop"
-#define GPU_STR_dashboard_OpenTimelineButton "&Open\nTimeline"
-#define GPU_STR_dashboard_FrameDetailsLabel "Frame #%1       Elapsed: %2        %3 FPS"
-#define GPU_STR_dashboard_FrameNumber "Frame #%1"
-#define GPU_STR_dashboard_CapturedAt "Captured: %1"
-#define GPU_STR_dashboard_FPS "FPS: %1"
-#define GPU_STR_dashboard_Duration "Duration: %1"
-#define GPU_STR_dashboard_APICalls "API Calls: %1"
-#define GPU_STR_dashboard_DrawCalls "Profiled GPU Cmds: %1"
-#define GPU_STR_dashboard_RunTimeDoubleClickMessage "Frame trace can be opened only after the session stops.\nDo you want to stop the session and open the timeline?"
-#define GPU_STR_dashboard_ItemTooltip "Double click to review frame data"
-#define GPU_STR_dashboard_serverdisconnectedError "The session was stopped because:\n- The application being analyzed was closed.\n- The analyzed application needs to be raised into focus."
-#define GPU_STR_dashboard_failedToLaunchError "Application failed to launch:\n- Please validate application exists at specified location\n- Please validate application can be launched."
-#if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
-    #define GPU_STR_dashboard_failedToConnectError "Target application failed to launch. This may be caused by:\n1. Server failed to hook into the application.\n2. Application does not use DX12/Vulkan.\n3. Application's window needs to be restored into focus."
-#else
-    #define GPU_STR_dashboard_failedToConnectError "Target application failed to launch. This may be caused by:\n1. Server failed to hook into the application.\n2. Application does not use Vulkan.\n3. Application's window needs to be restored into focus."
-#endif
-#define GPU_STR_dashboard_CapturedFramesCaptionNumFrames " (%1 Frames)"
-
-// Dashboard HTML description
-#define GPU_STR_dashboard_HTMLHost L"Host:"
-#define GPU_STR_dashboard_HTMLHostLocal L"Local"
-#define GPU_STR_dashboard_HTMLTargetPath L"Target Path:"
-#define GPU_STR_dashboard_HTMLWorkingDirectory L"Working Directory:"
-#define GPU_STR_dashboard_HTMLCommandLineArguments L"Command Line Arguments:"
-
-// Frame view
-#define GPU_STR_FrameViewOverview "Overview"
-#define GPU_STR_FrameViewTimeline "Timeline"
-#define GPU_STR_FrameViewProfile "Profile %1"
-#define GPU_STR_FrameViewImage "Image"
-#define GPU_STR_FrameViewObject "Objects"
-
-// Overview
-#define GPU_STR_overview_FrameAnalysisDescriptionCaption "Frame Analysis - frame #%1, %2"
-#define GPU_STR_overviewRenderAgain "&Render Again"
-#define GPU_STR_overviewTimelineLabel "<a href=timeline>Timeline</a>"
-#define GPU_STR_overviewObjectLabel "<a href=object>Object</a>"
-#define GPU_STR_overviewProfileLabel "<a href=profile>Profile %1</a>"
-#define GPU_STR_overview_PerfCounterProfileCaption "Performance Counters Profile"
-#define GPU_STR_overview_PerfCounterCheckBox "Performance Counters Profile - %1 passes %2"
-#define GPU_STR_overview_PerfCounterCheckBoxTime "(up to 1 minute)"
-#define GPU_STR_overview_PresetLabel "Use preset selection: "
-#define GPU_STR_overview_CountersSelectedLabel "%1 counters selected (%2 available counters), %3 passes required"
-#define GPU_STR_overview_AddRemoveButton "Add/Remove Counters..."
-#define GPU_STR_overview_FrameStatCaption "Frame Statistics"
-
-/// Overview frame statistics HTML
-#define GPU_STR_overview_HTMLCPUTime L"CPU Time"
-#define GPU_STR_overview_HTMLGPUTime L"GPU Time"
-#define GPU_STR_overview_HTMLGPUTimeBusy L"% GPU Time busy"
-#define GPU_STR_overview_HTMLCPUTimeDrawCalls L"% CPU time in Draw calls"
-#define GPU_STR_overview_HTMLAPICallsCount L"# of API calls"
-#define GPU_STR_overview_HTMLDrawCallsCount L"# of Draw calls"
-#define GPU_STR_overview_FramDetailsLabel L"Frame #%1   Time: %2   %3 FPS"
 
 // Timeline strings
 #define GPU_STR_timeline_CPU_ThreadBranchName "Thread %1"
@@ -523,185 +311,6 @@
 #define GPU_STR_timeline_CmdBuffersBranchName "Command Buffers"
 #define GPU_STR_timeline_ContextBranchNameWithParam "Queue %1 - %2 (%3)"
 
-#define GPU_STR_DXAPITimeline_tooltipLine1 "Call #%1<br>%2"
 #define GPU_STR_APITimeline_TimeTooltipLine "Time: %3 - %4 (%5)"
 
-// Frame info xml
-#define GPU_STR_frameInfoXMLLocation "Location"
-#define GPU_STR_frameInfoXMLFrameNumber "FrameNumber"
-#define GPU_STR_frameInfoXMLServerXMLFullPath "ServerXMLFullPath"
-#define GPU_STR_frameInfoXMLContents "Contents"
-#define GPU_STR_frameInfoXMLLinkedTrace "LinkedTrace"
-#define GPU_STR_frameInfoXMLFrameBufferImage "FrameBufferImage"
-#define GPU_STR_frameInfoXMLFrameElapsedTime "ElapsedTime"
-#define GPU_STR_frameInfoXMLFrameFPS "FPS"
-#define GPU_STR_frameInfoXMLFrameCPUFrameDuration "CPUFrameDuration"
-#define GPU_STR_frameInfoXMLFrameAPICallCount "APICallCount"
-#define GPU_STR_frameInfoXMLFrameDrawCallCount "DrawCallCount"
-#define GPU_STR_frameInfoXMLFrameTracedFramesCount "TracedFramesCount"
-#define GPU_STR_frameInfoXMLObjectTree "ObjectTree"
-#define GPU_STR_frameInfoXMLObjectDBase "ObjectDBase"
-
-// Session frames XML
-#define GPU_STR_sessionInfoXMLSessions "Sessions"
-#define GPU_STR_sessionInfoXMLSession "Session"
-#define GPU_STR_sessionInfoXMLFrame "Frame"
-#define GPU_STR_sessionInfoXMLIndex "index"
-#define GPU_STR_sessionInfoXMLLoadProgressMessage L"Updating the project sessions from the graphics server"
-
-#define GPU_STR_frameInfoXMLFileFormat "<Root>\n<Location>%1</Location>\n"\
-    "<FrameNumber>%2</FrameNumber><Contents>\n"\
-    "<LinkedTrace>%3</LinkedTrace>\n"\
-    "<ServerXMLFullPath>%4</ServerXMLFullPath>\n"\
-    "<FrameBufferImage></FrameBufferImage>\n"\
-    "<ElapsedTime>%5</ElapsedTime>\n"\
-    "<FPS>%6</FPS>\n"\
-    "<CPUFrameDuration>%7</CPUFrameDuration>\n"\
-    "<APICallCount>%8</APICallCount>\n"\
-    "<DrawCallCount>%9</DrawCallCount>\n"\
-    "<TracedFramesCount>%10</TracedFramesCount>\n"\
-    "</Contents></Root>"
-
-// Perf Studio xml file
-#define GPU_STR_perfXMLCounterSetNode "counterset"
-#define GPU_STR_perfXMLCounterNode "counter"
-#define GPU_STR_perfXMLNameNode "name"
-#define GPU_STR_perfXMLDescriptionNode "description"
-#define GPU_STR_perfXMLDatatypeNode "datatype"
-#define GPU_STR_perfXMLUsageNode "usage"
-
-// Performance counters xml file
-#define GPU_STR_perfCountersXMLFrameNode "frame"
-#define GPU_STR_perfCountersXMLDrawCallNode "DrawCall"
-#define GPU_STR_perfCountersXMLDrawCallNodeSmall "drawcall"
-#define GPU_STR_perfCountersXMLIndexNode "Index"
-#define GPU_STR_perfCountersXMLIndexNodeSmall "index"
-#define GPU_STR_perfCountersXMLCallNodeSmall "call"
-#define GPU_STR_perfCountersXMLGPUTimeNode "GPUTime"
-#define GPU_STR_perfCountersXMLPSBusyNode "PSBusy"
-
-// Counters data tree strings
-#define GPU_STR_perfCountersTreeStateBucket "State bucket"
-#define GPU_STR_perfCountersTreeDrawCallIndex "Draw call #"
-
-#define GPU_STR_presetFileName L"FrameAnalysisDefaultCounterSets"
-#define GPU_STR_presetFileExt L"cfg"
-
-// Counter selection dialog
-#define GPU_STR_counterSelectionDialogTitle                           "Counters Selection"
-#define GPU_STR_counterSelectionDialogDescription                     "Add a performance counter to the 'Selected Counters' list to view it's usage"
-#define GPU_STR_counterSelectionDialogAvailableCountersTitle          "Available Counters"
-#define GPU_STR_counterSelectionDialogActiveCountersTitle             "Selected Counters"
-#define GPU_STR_counterSelectionDialogGroupBoxTitle                   "Performance Counters"
-#define GPU_STR_counterSelectionDialogMultipleCountersSelectedHeading "Multiple Counters Selected"
-#define GPU_STR_counterSelectionDialogMultipleCountersSelectedMsg     "Select a single item to see its description"
-#define GPU_STR_counterSelectionDialogCounterDescriptionCaption        "<font color=blue>%1</font><br>%2"
-#define GPU_STR_counterSelectionDialogPresetLabel                      "New preset name"
-#define GPU_STR_counterSelectionDialogMustEnterNameError               "Please enter preset name"
-#define GPU_STR_counterSelectionDialogMustEnterNewNameError            "Preset name already exists, please select a new one."
-
-// Debug log messages
-#define GPU_STR_Attempting_To_Connect_To_Frame_Analysis_Server L"Attempting to connect to frame analysis server %ls:%d"
-// connection dialog
-#define GPU_STR_connectionDialogTitle "Frame Analysis API Selection"
-#define GPU_STR_connectionDialogHeader "Please select an API to connect to:"
-#define GPU_STR_connectionDialogTableHeader "#,Process,PID,API,Status,Time loaded"
-#define GPU_STR_connectionDialogMonitoring "Monitoring..."
-#define GPU_STR_connectionDialogAutoCheckBox "Automatically connect next session to"
-#define GPU_STR_connectionDialogComboOptionsDefault  GPU_STR_projectSettingsComboProcessNumberOption "," GPU_STR_projectSettingsComboAPIInProcessOption "," GPU_STR_projectSettingsComboAPIOption
-#define GPU_STR_connectionDialogComboOptionsSelected "Process %1,First active API in %1,First active %1"
-#define GPU_STR_connectionDialogOKCaption L"Connect"
-#define GPU_STR_connectionDialogStarted "Started"
-#define GPU_STR_connectionDialogAttached "Attached"
-
-#define GPU_STR_connectionDialogProcessNode "Process"
-#define GPU_STR_connectionDialogPIDNode "PID"
-#define GPU_STR_connectionDialogNameNode "Name"
-#define GPU_STR_connectionDialogAPINode "API"
-#define GPU_STR_connectionDialogAttachedAttribute "attached"
-#define GPU_STR_connectionDialogWrongAPI "Cannot connect to Process #%1 (%2) since it does not use the DX12 API.\nChange automatic connection rules."
-
-// Navigation chart
-#define GPU_STR_navigationByCaption "Navigate by:"
-#define GPU_STR_navigationGroupCount "Count"
-#define GPU_STR_navigationGroupDuration "Duration"
-#define GPU_STR_navigationGroupThreads "Concurrency"
-
-#define GPU_STR_navigationLayerApiCalls "API Calls Count"
-#define GPU_STR_navigationLayerDrawCalls "Draw Calls Count"
-#define GPU_STR_navigationLayerCPUApi "All CPU API Calls"
-#define GPU_STR_navigationLayerGPUCmds "All GPU Cmds"
-#define GPU_STR_navigationLayerTopCPUDrawCalls "Top 20 CPU API Calls"
-#define GPU_STR_navigationLayerTopGPUOps "Top 20 GPU Cmds"
-#define GPU_STR_navigationLayerMaxSimultaneaus "Max # of busy threads"
-#define GPU_STR_navigationLayerAvgSimultaneaus "Avg. # of busy threads"
-#define GPU_STR_navigationLayerTotalSimultaneaus "Total # of threads"
-#define GPU_STR_navigationLayerDisplayFiltersLink "<a href=display>Display Filters...</a>"
-
-// ribbon names
-#define GPU_STR_ribbonNameDrawCalls "CPU Draw Calls"
-#define GPU_STR_ribbonNameTimeLine "Timeline"
-#define GPU_STR_ribbonNameAPICalls "Call History"
-#define GPU_STR_ribbonNameSummary "Hotspot Summary"
-
-// Dashboard Summary
-#define GPU_STR_API_Summary "CPU API Summary"
-#define GPU_STR_GPU_Summary "GPU Commands Summary"
-#define GPU_STR_Command_Lists_Summary "Command Lists Summary"
-#define GPU_STR_Command_Buffers_Summary "Command Buffers Summary"
-#define GPU_STR_API_Call_Summary "Call History Aggregated Data"
-#define GPU_STR_GPU_Call_Summary "GPU Cmds Aggregated Data"
-#define GPU_STR_Command_List_Call_Summary "%1 Command Lists"
-#define GPU_STR_Command_Buffers_Call_Summary "%1 Command Buffers"
-#define GPU_STR_Use_Scope_Summary "Use timeline selection scope"
-#define GPU_STR_Top_20_Cpu_Calls_Summary "Top %1 %2 calls (CPU)"
-#define GPU_STR_Top_Cpu_Calls_Summary "Top %1 calls (CPU)"
-#define GPU_STR_Top_20_Gpu_Calls_Summary "Top %1 %2 calls (GPU)"
-#define GPU_STR_Top_Gpu_Calls_Summary "Top %1 calls (GPU)"
-
-#define GPU_STR_Top_20_CommandLists_Summary "Top %1 %2 commands"
-#define GPU_STR_Top_CommandLists_Summary "Top %1 commands"
-
-
-// Summary table captions
-#define GP_STR_SummaryTableColumnInterface "Interface"
-#define GP_STR_SummaryTableColumnCall "Call"
-#define GP_STR_SummaryTableColumnCumulativeTime "Cumulative Time"
-#define GP_STR_SummaryTableColumnPercentageOfTotalTime "% of total Time"
-#define GP_STR_SummaryTableColumnNumberOfCalls "# of Calls"
-#define GP_STR_SummaryTableColumnAvgTime "Average Time"
-#define GP_STR_SummaryTableColumnMaxTime "Max Time"
-#define GP_STR_SummaryTableColumnMinTime "Min Time"
-
-#define GP_STR_SummaryTableCommandBufferType "Command Buffer"
-#define GP_STR_SummaryTableCommandListType "Command List"
-#define GP_STR_SummaryTableCommandListStartTime "Start time"
-#define GP_STR_SummaryTableCommandListEndTime "End time"
-#define GP_STR_SummaryTableCommandListExecutionTime "Execution time"
-#define GP_STR_SummaryTableCommandListNumCommands "# of commands"
-#define GP_STR_SummaryTableCommandListGPUQueue "GPU queue"
-#define GP_STR_SummaryTableCommandListAddress "Address"
-#define GP_STR_SummaryTableCommandListHandle "Handle"
-
-#define GP_STR_SummaryTop20TableColumnCallIndex "index"
-#define GP_STR_SummaryTop20TableColumnThreadId "Thread Id"
-#define GP_STR_SummaryTop20TableColumnTime "Time"
-#define GP_STR_SummaryTop20TableShowAll "Show all..."
-#define GP_STR_SummaryCmdBufferToolTip "Command buffer was constructed in a previous frame."
-
-// draw calls ribbon
-#define GP_STR_DrawCallToolTip "%1: %2"
-#define GPU_STR_navigationLayerTooltips "API Calls Count,Draw Calls Count,Top GPU Op,Top CPU Api Call,GPU Commands,CPU API Calls,Max busy threads,Avg. busy threads,Total threads"
-
-// Export frame analysis
-#define GP_STR_FrameAnalysisExportProgressHeader L"Exporting Frame Analysis Session"
-#define GP_STR_FrameAnalysisExportProgressMsg L"Capturing frames..."
-#define GP_STR_FrameAnalysisExportCapturingFrameSingleMsg L"Capturing frame %d"
-#define GP_STR_FrameAnalysisExportCapturingFrameMultiMsg L"Capturing frames %d-%d"
-
-// Navigation chart
-#define GP_STR_NavigationChartNoCPUDataTitle "Error: No CPU data"
-#define GP_STR_NavigationChartNoCPUDataMsg "Filtering is available only for frame traces that include CPU data. Use the 'Capture' or 'Capture CPU' buttons to include CPU data in the frame trace."
-
 #endif //__GPSTRINGCONSTANTS_H
-

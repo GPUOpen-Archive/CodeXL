@@ -53,7 +53,8 @@ enum HSAAPIGroup
     HSAAPIGroup_QueryInfo,
     HSAAPIGroup_Queue,
     HSAAPIGroup_Signal,
-    HSAAPIGroup_ExtensionsAMD
+    HSAAPIGroup_ExtensionsAMD,
+    HSAAPIGroup_VendorExtensionsAMD
 };
 
 /// a type representing a set of HSAAPIGroup values

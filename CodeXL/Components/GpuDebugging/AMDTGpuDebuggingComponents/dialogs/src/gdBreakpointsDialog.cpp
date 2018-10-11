@@ -74,14 +74,13 @@ static int s_LastFocusedPage = 0;    // which list (page) was the active one. st
 gdBreakpointsDialog::gdBreakpointsDialog(QWidget* pParent)
     : acDialog(afMainAppWindow::instance(), true, true, QDialogButtonBox::Ok),
       m_pMainGroupBox(NULL), m_pTopLayoutV(NULL), m_pMainLayoutH(NULL), m_pCenterButtonsLayoutV(NULL), m_pRightLayoutV(NULL),
-      m_pAPILayoutV(NULL), m_pKernelLayoutV(NULL), m_pBreakpointsLayoutV(NULL),
+      m_pAPILayoutV(NULL), m_pBreakpointsLayoutV(NULL),
       m_pBottomButtonsLayoutH(NULL),
       m_pAddButton(NULL), m_pRemoveButton(NULL), m_pRemoveAllButton(NULL),
       m_pCheckBox(NULL),
-      m_pAPIList(NULL), m_pKernelList(NULL), m_pGenericBreakpointsList(NULL),
-      m_pChosenList(NULL), m_pFunctionsFilter(NULL), m_pKernelFilter(NULL),
+      m_pAPIList(NULL),
       m_pDescription(NULL), m_pChosenListText(NULL),
-      m_pTabs(NULL), m_pAPITab(NULL), m_pKernelTab(NULL), m_pBreakpointsTab(NULL),
+      m_pTabs(NULL), m_pAPITab(NULL), m_pBreakpointsTab(NULL),
       m_pLastChosenRow(NULL), m_LastChosenRowOnEdit(false),
       m_updatingCheckStatus(false), m_amountOfMonitoredFunctions(0)
 {
@@ -110,9 +109,6 @@ gdBreakpointsDialog::gdBreakpointsDialog(QWidget* pParent)
 
     // Build final dialog layout:
     buildFinalLayout();
-
-    // Add the first row:
-    addKernelEditLine();
 
     // Put the filter line in focus:
     m_pFunctionsFilter->setFocus(Qt::ActiveWindowFocusReason);
@@ -147,23 +143,6 @@ gdBreakpointsDialog::~gdBreakpointsDialog()
         m_pAPIList->clearList();
     }
 
-    GT_IF_WITH_ASSERT(m_pKernelList != NULL)
-    {
-        // Delete the item data from the kernel function list:
-        int listSize = m_pKernelList->rowCount();
-
-        for (int i = 0; i < listSize; i++)
-        {
-            gdBreakpointsItemData* pCurrentKernelFunctionData = getBreakpointData(m_pKernelList->item(i, 0));
-            GT_IF_WITH_ASSERT(pCurrentKernelFunctionData != NULL)
-            {
-                delete pCurrentKernelFunctionData;
-            }
-        }
-
-        m_pKernelList->clearList();
-    }
-
     GT_IF_WITH_ASSERT(m_pGenericBreakpointsList != NULL)
     {
         // Delete the item data from the error / warning list:
@@ -191,9 +170,6 @@ gdBreakpointsDialog::~gdBreakpointsDialog()
 // ---------------------------------------------------------------------------
 void gdBreakpointsDialog::onOk()
 {
-    // No need for the kernel edit line from here:
-    removeKernelEditLine();
-
     // Removing all the breakpoints from the infrastructure:
     bool rc1 = gaRemoveAllBreakpointsByType(OS_TOBJ_ID_KERNEL_FUNC_NAME_BREAKPOINT);
     bool rc2 = gaRemoveAllBreakpointsByType(OS_TOBJ_ID_MONITORED_FUNC_BREAKPOINT);
@@ -342,18 +318,6 @@ void gdBreakpointsDialog::setDialogLayout()
     m_pAPIList->setTabKeyNavigation(false);
     m_pAPIList->setFocusPolicy(Qt::StrongFocus);
 
-    // Kernels:
-    m_pKernelTab = new QWidget();
-    m_pKernelList = new acListCtrl(m_pKernelTab, AC_DEFAULT_LINE_HEIGHT, false);
-    m_pKernelList->setMinimumSize(listsWidth, availableListHeight);
-    m_pKernelList->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
-    m_pKernelList->setAutoScroll(true);
-    m_pKernelList->setColumnCount(1);
-    m_pKernelList->horizontalHeader()->hide();
-    m_pKernelList->verticalHeader()->hide();
-    m_pKernelList->setTabKeyNavigation(false);
-    m_pKernelList->setFocusPolicy(Qt::StrongFocus);
-
     // Generic BPs:
     m_pBreakpointsTab = new QWidget();
     m_pGenericBreakpointsList = new acListCtrl(m_pBreakpointsTab, AC_DEFAULT_LINE_HEIGHT, false);
@@ -388,20 +352,11 @@ void gdBreakpointsDialog::setDialogLayout()
     m_pFunctionsFilter->setMinimumWidth(listsWidth);
     m_pFunctionsFilter->setFocusPolicy(Qt::StrongFocus);
 
-    m_pKernelFilter = new acQTextFilterCtrl();
-    m_pKernelFilter->setMinimumWidth(listsWidth);
-    m_pKernelFilter->setFocusPolicy(Qt::StrongFocus);
-
     //Initialize main tab view;
     m_pAPILayoutV = new QVBoxLayout();
     m_pAPILayoutV->addWidget(m_pAPIList, 1);
     m_pAPILayoutV->addWidget(m_pFunctionsFilter, 0, Qt::AlignTop);
     m_pAPITab->setLayout(m_pAPILayoutV);
-
-    m_pKernelLayoutV = new QVBoxLayout();
-    m_pKernelLayoutV->addWidget(m_pKernelList, 1);
-    m_pKernelLayoutV->addWidget(m_pKernelFilter, 0, Qt::AlignTop);
-    m_pKernelTab->setLayout(m_pKernelLayoutV);
 
     m_pBreakpointsLayoutV = new QVBoxLayout();
     m_pBreakpointsLayoutV->addWidget(m_pGenericBreakpointsList, 0);
@@ -411,7 +366,6 @@ void gdBreakpointsDialog::setDialogLayout()
 
     // Set the tab texts:
     m_pTabs->addTab(m_pAPITab, GD_STR_BreakpointsListText);
-    m_pTabs->addTab(m_pKernelTab, GD_STR_BreakpointsKernelListText);
     m_pTabs->addTab(m_pBreakpointsTab, GD_STR_BreakPointsGenericText);
 
     // Set the current tab
@@ -459,15 +413,11 @@ void gdBreakpointsDialog::setInitialValues()
     // Initialize the left list control functions list:
     initAPIFunctionsList();
 
-    // Initialize the kernel list control function list:
-    initKernelList();
-
     // Initialize the generic breakpoints list:
     initGenericBreakpointsList();
 
     // Apply the text filter on the left list control:
     m_pFunctionsFilter->initialize(m_pAPIList);
-    m_pKernelFilter->initialize(m_pKernelList);
 
     // Mark the currently active breakpoints:
     setDialogActiveBreakpoints();
@@ -486,17 +436,9 @@ void gdBreakpointsDialog::buildFinalLayout()
     GT_ASSERT(rc);
     rc = connect(m_pFunctionsFilter, SIGNAL(focused(bool)), this, SLOT(onFunctionsFilterFocused(bool)));
     GT_ASSERT(rc);
-    rc = connect(m_pKernelFilter, SIGNAL(textChanged(const QString&)), this, SLOT(onKernelFilterTextChanged(const QString&)));
-    GT_ASSERT(rc);
-    rc = connect(m_pKernelFilter, SIGNAL(focused(bool)), this, SLOT(onKernelFilterFocused(bool)));
-    GT_ASSERT(rc);
-    rc = connect(m_pChosenList, SIGNAL(removingRow(int)), this, SLOT(onBeforeRemoveRow(int)));
-    GT_ASSERT(rc);
     rc = connect(m_pChosenList, SIGNAL(afterRemovingRow(int)), this, SLOT(onAfterRemoveRow(int)));
     GT_ASSERT(rc);
     rc = connect(m_pAPIList, SIGNAL(cellDoubleClicked(int, int)), this, SLOT(onAdd()));
-    GT_ASSERT(rc);
-    rc = connect(m_pKernelList, SIGNAL(cellDoubleClicked(int, int)), this, SLOT(onAdd()));
     GT_ASSERT(rc);
     rc = connect(m_pGenericBreakpointsList, SIGNAL(cellDoubleClicked(int, int)), this, SLOT(onAdd()));
     GT_ASSERT(rc);
@@ -509,8 +451,6 @@ void gdBreakpointsDialog::buildFinalLayout()
     rc = connect(m_pChosenList, SIGNAL(itemChanged(QTableWidgetItem*)), this, SLOT(onChosenItemChanged(QTableWidgetItem*)));
     GT_ASSERT(rc);
     rc = connect(m_pAPIList, SIGNAL(itemSelectionChanged()), this, SLOT(onLeftListSelectionChanged()));
-    GT_ASSERT(rc);
-    rc = connect(m_pKernelList, SIGNAL(itemSelectionChanged()), this, SLOT(onLeftListSelectionChanged()));
     GT_ASSERT(rc);
     rc = connect(m_pGenericBreakpointsList, SIGNAL(itemSelectionChanged()), this, SLOT(onLeftListSelectionChanged()));
     GT_ASSERT(rc);
@@ -564,10 +504,6 @@ void gdBreakpointsDialog::onTabChanged(int index)
             break;
 
         case 1:
-            m_pKernelFilter->setFocus(Qt::TabFocusReason);
-            break;
-
-        case 2:
             m_pGenericBreakpointsList->setFocus(Qt::TabFocusReason);
             break;
 
@@ -599,25 +535,6 @@ void gdBreakpointsDialog::onFunctionsFilterFocused(bool hasFocus)
 }
 
 // ---------------------------------------------------------------------------
-// Name:        gdBreakpointsDialog::onKernelFilterFocused
-// Description: If the filter has been clicked while it is in initial state, remove text
-// Return Val:  void
-// Author:      Yoni Rabin
-// Date:        27/6/2012
-// ---------------------------------------------------------------------------
-void gdBreakpointsDialog::onKernelFilterFocused(bool hasFocus)
-{
-    if (hasFocus)
-    {
-        if (m_pKernelFilter->isDefaultString())
-        {
-            m_pKernelFilter->clear();
-        }
-    }
-}
-
-
-// ---------------------------------------------------------------------------
 // Name:        gdBreakpointsDialog::onAdd
 // Description: Event handler for the "Add breakpoint" button
 // Author:      Sigal Algranaty
@@ -631,9 +548,6 @@ void gdBreakpointsDialog::onAdd()
     pActiveList->blockSignals(true);
     GT_IF_WITH_ASSERT(pActiveList != NULL && m_pChosenList != NULL)
     {
-        // Remove the kernel function name edit line:
-        removeKernelEditLine();
-
         // Iterate over the selected items in the left list:
         foreach (QTableWidgetItem* pItem, pActiveList->selectedItems())
         {
@@ -656,8 +570,6 @@ void gdBreakpointsDialog::onAdd()
             }
         }
     }
-    // Add the kernel edit line back to the chosen list;
-    addKernelEditLine();
 
     // Update the select / deselect all checkBox
     updateSelectAllCheckBoxStatus();
@@ -743,10 +655,6 @@ void gdBreakpointsDialog::onRemove()
                 {
                     pListCtrl = m_pAPIList;
                 }
-                else if (pRemovedBreakpointItemData->_breakpointType == OS_TOBJ_ID_KERNEL_FUNC_NAME_BREAKPOINT)
-                {
-                    pListCtrl = m_pKernelList;
-                }
                 else if (pRemovedBreakpointItemData->_breakpointType == OS_TOBJ_ID_GENERIC_BREAKPOINT)
                 {
                     pListCtrl = m_pGenericBreakpointsList;
@@ -809,18 +717,14 @@ void gdBreakpointsDialog::onRemove()
 void gdBreakpointsDialog::onRemoveAll()
 {
     // Sanity check
-    GT_IF_WITH_ASSERT((m_pChosenList != NULL) && (m_pAPIList != NULL) && (m_pKernelList != NULL) && (m_pGenericBreakpointsList != NULL))
+    GT_IF_WITH_ASSERT((m_pChosenList != NULL) && (m_pAPIList != NULL) && (m_pGenericBreakpointsList != NULL))
     {
         // Remove all selected breakpoints from the right list control:
-        removeKernelEditLine();
         m_pChosenList->clearList();
 
         // Color all left list control items in black:
         resetListColor(m_pAPIList);
-        resetListColor(m_pKernelList);
         resetListColor(m_pGenericBreakpointsList);
-        // Add extra line:
-        addKernelEditLine();
         // Clearing the Select / Deselect all checkBox:
         updateSelectAllCheckBoxStatus();
         // Update button states:
@@ -944,94 +848,6 @@ bool gdBreakpointsDialog::initAPIFunctionsList()
 }
 
 // ---------------------------------------------------------------------------
-// Name:        gdBreakpointsDialog::initKernelList
-// Description: Fill the list control with kernel functions names
-// Return Val:  void
-// Author:      Yoni Rabin
-// Date:        17/6/2012
-// ---------------------------------------------------------------------------
-void gdBreakpointsDialog::initKernelList()
-{
-    int currentContextsAmount = 0;
-
-    // Get amount of OpenCL contexts:
-    bool rc = gaGetAmountOfOpenCLContexts(currentContextsAmount);
-
-    for (int nContext = 1; nContext < currentContextsAmount; nContext++)
-    {
-        // Get amount of program objects:
-        int numberOfPrograms = 0;
-        rc = gaGetAmountOfOpenCLProgramObjects(nContext, numberOfPrograms);
-        GT_IF_WITH_ASSERT(rc)
-        {
-            for (int nProgram = 0; nProgram < numberOfPrograms; nProgram++)
-            {
-                // Get the program details:
-                apCLProgram currentProgram(0);
-                rc = gaGetOpenCLProgramObjectDetails(nContext, nProgram, currentProgram);
-
-                if (!currentProgram.wasMarkedForDeletion())
-                {
-                    const gtVector<oaCLKernelHandle>& progKernelHandles = currentProgram.kernelHandles();
-
-                    // Iterate the kernelHandles:
-                    int numberOfKernels = (int)progKernelHandles.size();
-
-                    for (int nKernel = 0; nKernel < numberOfKernels; nKernel++)
-                    {
-                        // Get the kernel details:
-                        apCLKernel kernelDetails;
-                        bool rcKernel = gaGetOpenCLKernelObjectDetails(nContext, progKernelHandles[nKernel], kernelDetails);
-                        GT_IF_WITH_ASSERT(rcKernel)
-                        {
-                            gtString kernelDisplayName = kernelDetails.kernelFunctionName();
-
-                            GT_IF_WITH_ASSERT(m_pKernelList)
-                            {
-                                // Check that function name dose not already exists in the list:
-                                int numberItems = m_pKernelList->rowCount();
-                                bool itemFound = false;
-
-                                for (int nItems = 0 ; nItems < numberItems ; nItems++)
-                                {
-                                    gtString curItemName;
-                                    bool rc1 = m_pKernelList->getItemText(nItems, 0, curItemName);
-                                    GT_IF_WITH_ASSERT(rc1)
-                                    {
-                                        if (curItemName == kernelDisplayName)
-                                        {
-                                            itemFound = true;
-                                            break;
-                                        }
-                                    }
-                                }
-
-                                if (!itemFound)
-                                {
-                                    // Prepare the data item:
-                                    gdBreakpointsItemData* pItemData = new gdBreakpointsItemData;
-
-                                    // Set the breakpoint type:
-                                    pItemData->_breakpointType = OS_TOBJ_ID_KERNEL_FUNC_NAME_BREAKPOINT;
-                                    pItemData->_kernelFunctionName = kernelDisplayName;
-                                    // Add the item to the list:
-                                    QTableWidgetItem* pItem = addListItem(m_pKernelList, kernelDisplayName, pItemData);
-                                    bool rc2 = (NULL != pItem);
-                                    GT_ASSERT(rc2);
-                                }
-                            }
-                        }
-                    }
-
-                    // Sort the list items:
-                    m_pKernelList->sortByColumn(0, Qt::AscendingOrder);
-                }
-            }
-        }
-    }
-}
-
-// ---------------------------------------------------------------------------
 // Name:        gdBreakpointsDialog::initGenericBreakpointsList
 // Description: Initialize the list of generic breakpoints
 // Return Val:  bool - Success / failure.
@@ -1132,14 +948,6 @@ void gdBreakpointsDialog::addActiveBreakpointsToRightListCtrl()
                         pBreakpointData->_hitCount = aptrBreakpoint->hitCount();
                     }
                 }
-                else
-                {
-                    if (aptrBreakpoint->type() == OS_TOBJ_ID_KERNEL_FUNC_NAME_BREAKPOINT)
-                    {
-                        // It must be kernel - add it to the right list control:
-                        addKernelToRightListCtrl(aptrBreakpoint);
-                    }
-                }
             }
         }
     }
@@ -1189,34 +997,6 @@ gdBreakpointsItemData* gdBreakpointsDialog::findBreakpointMatchingItemData(gtAut
             }
         }
     }
-    // Kernel function BP:
-    else if (breakpointType == OS_TOBJ_ID_KERNEL_FUNC_NAME_BREAKPOINT)
-    {
-        // Down cast it to kernel breakpoint:
-        apKernelFunctionNameBreakpoint* pKernelBreakpoint = (apKernelFunctionNameBreakpoint*)(aptrBreakpoint.pointedObject());
-        GT_IF_WITH_ASSERT(pKernelBreakpoint != NULL)
-        {
-            GT_IF_WITH_ASSERT(m_pKernelList != NULL)
-            {
-                int numItems = m_pKernelList->rowCount();
-
-                for (int i = 0 ; i < numItems; i++)
-                {
-                    // Get the current item data:
-                    gdBreakpointsItemData* pBreakpointData = (gdBreakpointsItemData*)m_pKernelList->getItemData(i);
-                    GT_IF_WITH_ASSERT(pBreakpointData != NULL)
-                    {
-                        if (pBreakpointData->_kernelFunctionName == pKernelBreakpoint->kernelFunctionName())
-                        {
-                            // The breakpoint is found:
-                            pRetVal = pBreakpointData;
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-    }
     // Generic BP:
     else if (breakpointType == OS_TOBJ_ID_GENERIC_BREAKPOINT)
     {
@@ -1226,7 +1006,7 @@ gdBreakpointsItemData* gdBreakpointsDialog::findBreakpointMatchingItemData(gtAut
         {
             GT_IF_WITH_ASSERT(m_pGenericBreakpointsList != NULL)
             {
-                int numItems = m_pKernelList->rowCount();
+                int numItems = m_pGenericBreakpointsList->rowCount();
 
                 for (int i = 0 ; i < numItems; i++)
                 {
@@ -1294,34 +1074,6 @@ QTableWidgetItem* gdBreakpointsDialog::findBreakpointMatchingItem(gtAutoPtr<apBr
             }
         }
     }
-    // Kernel function BP:
-    else if (breakpointType == OS_TOBJ_ID_KERNEL_FUNC_NAME_BREAKPOINT)
-    {
-        // Down cast it to kernel breakpoint:
-        apKernelFunctionNameBreakpoint* pKernelBreakpoint = (apKernelFunctionNameBreakpoint*)(aptrBreakpoint.pointedObject());
-        GT_IF_WITH_ASSERT(pKernelBreakpoint != NULL)
-        {
-            GT_IF_WITH_ASSERT(m_pKernelList != NULL)
-            {
-                int numItems = m_pKernelList->rowCount();
-
-                for (int i = 0 ; i < numItems; i++)
-                {
-                    QTableWidgetItem* pItem = m_pKernelList->item(i, 0);
-                    gdBreakpointsItemData* pBreakpointData = getBreakpointData(pItem);
-                    GT_IF_WITH_ASSERT(pBreakpointData != NULL)
-                    {
-                        if (pBreakpointData->_kernelFunctionName == pKernelBreakpoint->kernelFunctionName())
-                        {
-                            // The breakpoint is found:
-                            pRetVal = pItem;
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-    }
     // Generic BP:
     else if (breakpointType == OS_TOBJ_ID_GENERIC_BREAKPOINT)
     {
@@ -1379,10 +1131,6 @@ void gdBreakpointsDialog::colorActiveBreakpointsInLeftListCtrl()
             if (pSelectedItemData->_breakpointType == OS_TOBJ_ID_MONITORED_FUNC_BREAKPOINT)
             {
                 pActiveList = m_pAPIList;
-            }
-            else if (pSelectedItemData->_breakpointType == OS_TOBJ_ID_KERNEL_FUNC_NAME_BREAKPOINT)
-            {
-                pActiveList = m_pKernelList;
             }
             else if (pSelectedItemData->_breakpointType == OS_TOBJ_ID_GENERIC_BREAKPOINT)
             {
@@ -1512,10 +1260,6 @@ void gdBreakpointsDialog::removeSelectedBreakpoint(QTableWidgetItem* pItem)
         {
             pListCtrl = m_pAPIList;
         }
-        else if (pRemovedBreakpointItemData->_breakpointType == OS_TOBJ_ID_KERNEL_FUNC_NAME_BREAKPOINT)
-        {
-            pListCtrl = m_pKernelList;
-        }
         else if (pRemovedBreakpointItemData->_breakpointType == OS_TOBJ_ID_GENERIC_BREAKPOINT)
         {
             pListCtrl = m_pGenericBreakpointsList;
@@ -1558,20 +1302,6 @@ void gdBreakpointsDialog::onBreakpointsFilterTextChanged(const QString& filterTe
 {
     (void)(filterText); // unused
     colorActiveBreakpointsInLeftListCtrl();
-}
-
-// ---------------------------------------------------------------------------
-// Name:        gdBreakpointsDialog::onKernelFilterTextChanged
-// Description: Process the filter-change event
-// Arguments:   const QString & filterText
-// Return Val:  void
-// Author:      Yoni Rabin
-// Date:        19/6/2012
-// ---------------------------------------------------------------------------
-void gdBreakpointsDialog::onKernelFilterTextChanged(const QString& filterText)
-{
-    (void)(filterText); // unused
-    colorActiveKernelInLeftListCtrl();
 }
 
 // ---------------------------------------------------------------------------
@@ -1742,48 +1472,6 @@ void gdBreakpointsDialog::updateSelectAllCheckBoxStatus(bool ignoreLastItem /* =
 }
 
 // ---------------------------------------------------------------------------
-// Name:        gdBreakpointsDialog::addKernelToRightListCtrl
-// Description: Add a kernel function Item to the chosen list of functions
-// Arguments:   gtAutoPtr<apBreakPoint>& aptrBreakpoint
-// Return Val:  void
-// Author:      Yoni Rabin
-// Date:        19/6/2012
-// ---------------------------------------------------------------------------
-void gdBreakpointsDialog::addKernelToRightListCtrl(gtAutoPtr<apBreakPoint>& aptrBreakpoint)
-{
-    // This function should only be called with kernel breakpoints:
-    GT_IF_WITH_ASSERT(aptrBreakpoint->type() == OS_TOBJ_ID_KERNEL_FUNC_NAME_BREAKPOINT)
-    {
-        // Down cast it to kernel breakpoint:
-        apKernelFunctionNameBreakpoint* pKernelBreakpoint = (apKernelFunctionNameBreakpoint*)(aptrBreakpoint.pointedObject());
-        GT_IF_WITH_ASSERT(pKernelBreakpoint != NULL)
-        {
-            // Check whether the specified function was not already chosen:
-            QTableWidgetItem* pBreakPointItem = NULL;
-
-            if (!isKernelMarkedAsBreakpoint(pKernelBreakpoint->kernelFunctionName(), pBreakPointItem))
-            {
-                // Item data should be in the map:
-                gdBreakpointsItemData* pKernelBreakpointItemData = new gdBreakpointsItemData;
-
-                // Set the details for the item data:
-                pKernelBreakpointItemData->_kernelFunctionName = pKernelBreakpoint->kernelFunctionName();
-                pKernelBreakpointItemData->_breakpointType = OS_TOBJ_ID_KERNEL_FUNC_NAME_BREAKPOINT;
-
-                // Add this item data for deletion:
-                m_rightListBreakpointsDataVector.push_back(pKernelBreakpointItemData);
-
-                QString breakpointType;
-                getBreakpointTypeString(pKernelBreakpointItemData, breakpointType);
-                // Add it into the chosen breakpoints list:
-                QTableWidgetItem* pItem = addChosenListItem(acGTStringToQString(pKernelBreakpointItemData->_kernelFunctionName), breakpointType, pKernelBreakpointItemData, pKernelBreakpoint->isEnabled());
-                GT_ASSERT(pItem != NULL);
-            }
-        }
-    }
-}
-
-// ---------------------------------------------------------------------------
 // Name:        gdBreakpointsDialog::getBreakpointTypeString
 // Description: Gets the type screen to be put in the second column of the chosen list
 // Arguments:   gdBreakpointsItemData* pNewBreapointData
@@ -1839,106 +1527,6 @@ void gdBreakpointsDialog::getBreakpointTypeString(gdBreakpointsItemData* pNewBre
 }
 
 // ---------------------------------------------------------------------------
-// Name:        gdBreakpointsDialog::isKernelMarkedAsBreakpoint
-// Description: checks if a kernel function name is already in breakpoint list
-// Arguments:   const gtString& kernelName
-//              QTableWidgetItem* pRetItem
-// Return Val:  bool - Success / failure.
-// Author:      Yoni Rabin
-// Date:        19/6/2012
-// ---------------------------------------------------------------------------
-bool gdBreakpointsDialog::isKernelMarkedAsBreakpoint(const gtString& kernelName, QTableWidgetItem*& pRetItem)
-{
-    bool retVal = false;
-    pRetItem = NULL;
-
-    int numItems = m_pChosenList->rowCount() - 1;
-
-    // Iterate over the right list
-    for (int nItem = 0; nItem < numItems; nItem++)
-    {
-        QTableWidgetItem* pItem = m_pChosenList->item(nItem, 0);
-        GT_IF_WITH_ASSERT(pItem != NULL)
-        {
-            gdBreakpointsItemData* pItemData = getBreakpointData(pItem);
-            GT_IF_WITH_ASSERT(pItemData != NULL)
-            {
-                // Compare by function id
-                if ((pItemData->_breakpointType == OS_TOBJ_ID_KERNEL_FUNC_NAME_BREAKPOINT) && (pItem->text() ==  acGTStringToQString(kernelName)))
-                {
-                    retVal = true;
-                    pRetItem = pItem;
-                    break;
-                }
-            }
-        }
-    }
-
-    return retVal;
-}
-
-// ---------------------------------------------------------------------------
-// Name:        gdBreakpointsDialog::colorActiveKernelInLeftListCtrl
-// Description: Color kernel functions in the list based on chosen kernelHandles
-// Author:      Yoni Rabin
-// Date:        19/6/2012
-// ---------------------------------------------------------------------------
-void gdBreakpointsDialog::colorActiveKernelInLeftListCtrl()
-{
-    // Iterate the right list control selected breakpoints:
-    int selectedKernelsAmount = m_pChosenList->rowCount();
-
-    for (int nChosen = 0; nChosen < selectedKernelsAmount; nChosen++)
-    {
-        // Get the kernel function name:
-        gtString chosenName;
-        m_pChosenList->getItemText(nChosen, 0, chosenName);
-
-        // Iterate the left list control:
-        int amountOfListItems = m_pKernelList->rowCount();
-
-        for (int nKernels = 0; nKernels < amountOfListItems; nKernels++)
-        {
-            // Get the current left list item data:
-            gtString kernelName;
-            m_pKernelList->getItemText(nKernels, 0, kernelName);
-
-            // If the current left list item represents the same function as the
-            // current breakpoint represents:
-            if (kernelName == chosenName)
-            {
-                // Changing the left list item color:
-                m_pKernelList->setItemTextColor(nKernels, 0, Qt::blue);
-                break;
-            }
-        } // for nKernel
-    } // for nChosen
-}
-
-// ---------------------------------------------------------------------------
-// Name:        gdBreakpointsDialog::addKernelEditLine
-// Description: Add the "Type.." line to the right list
-// Return Val:  void
-// Author:      Yoni Rabin
-// Date:        21/6/2012
-// ---------------------------------------------------------------------------
-void gdBreakpointsDialog::addKernelEditLine()
-{
-    GT_IF_WITH_ASSERT(m_pChosenList)
-    {
-        m_pChosenList->blockSignals(true);
-        // Add the "Type.." message to the kernel chosen list
-        QString addMessage = GD_STR_BreakpointsKernelAddMessage;
-        m_pLastChosenRow = addChosenListItem(addMessage, "", NULL, false);
-        m_pLastChosenRow->setTextColor(Qt::gray);
-        Qt::ItemFlags flags = m_pLastChosenRow->flags() & ~Qt::ItemIsUserCheckable;
-        flags |= Qt::ItemIsEditable;
-        m_pLastChosenRow->setFlags(flags);
-        m_pChosenList->blockSignals(false);
-    }
-}
-
-// ---------------------------------------------------------------------------
 void gdBreakpointsDialog::verifyChosenListLastRow()
 {
     GT_ASSERT(NULL != m_pChosenList)
@@ -1946,8 +1534,6 @@ void gdBreakpointsDialog::verifyChosenListLastRow()
         if (m_LastChosenRowOnEdit)
         {
             m_pChosenList->blockSignals(true);
-            removeKernelEditLine();
-            addKernelEditLine();
             // chosen list last row is no longer on edit, stop listening to focus change events
             disconnect(qApp, SIGNAL(focusChanged(QWidget*, QWidget*)), this, SLOT(onFocusChange(QWidget*, QWidget*)));
             // reset flag
@@ -1963,28 +1549,6 @@ void gdBreakpointsDialog::onFocusChange(QWidget* pOldItem, QWidget* pNewItem)
     if (pOldItem != pNewItem)
     {
         verifyChosenListLastRow();
-    }
-}
-
-// ---------------------------------------------------------------------------
-// Name:        gdBreakpointsDialog::removeKernelEditLine
-// Description: Remove the "Type.." line from the right list
-// Return Val:  void
-// Author:      Yoni Rabin
-// Date:        21/6/2012
-// ---------------------------------------------------------------------------
-void gdBreakpointsDialog::removeKernelEditLine()
-{
-    GT_IF_WITH_ASSERT(m_pChosenList && m_pLastChosenRow)
-    {
-        m_pChosenList->blockSignals(true);
-        int row = m_pLastChosenRow->row();
-        GT_IF_WITH_ASSERT(row < m_pChosenList->rowCount())
-        {
-            m_pChosenList->removeRow(m_pLastChosenRow->row());
-            m_pLastChosenRow = NULL;
-        }
-        m_pChosenList->blockSignals(false);
     }
 }
 
@@ -2035,22 +1599,6 @@ gdBreakpointsItemData* gdBreakpointsDialog::getBreakpointData(QTableWidgetItem* 
 }
 
 // ---------------------------------------------------------------------------
-// Name:        gdBreakpointsDialog::onBeforeRemoveRow
-// Description: Called before a row is removed
-// Author:      Uri Shomroni
-// Date:        15/9/2011
-// ---------------------------------------------------------------------------
-void gdBreakpointsDialog::onBeforeRemoveRow(int row)
-{
-    // If this is the last row:
-    if (row == (m_pChosenList->rowCount() - 1))
-    {
-        // Add a new "enter expression" row to replace it:
-        addKernelEditLine();
-    }
-}
-
-// ---------------------------------------------------------------------------
 // Name:        gdBreakpointsDialog::onAfterRemoveRow
 // Description: Called after a row is removed
 // Author:      Yoni Rabin
@@ -2087,10 +1635,6 @@ void gdBreakpointsDialog::onChosenItemChanged(QTableWidgetItem* pItem)
             {
                 updateSelectAllCheckBoxStatus(true);
             }
-            else
-            {
-                onKernelEndEditLabel();
-            }
 
             m_pChosenList->blockSignals(false);
         }
@@ -2107,17 +1651,13 @@ void gdBreakpointsDialog::onChosenItemChanged(QTableWidgetItem* pItem)
 acListCtrl* gdBreakpointsDialog::getActiveList()
 {
     acListCtrl* pActiveList = NULL;
-    GT_IF_WITH_ASSERT(m_pTabs != NULL && m_pAPIList != NULL && m_pKernelList != NULL && m_pGenericBreakpointsList != NULL)
+    GT_IF_WITH_ASSERT(m_pTabs != NULL && m_pAPIList != NULL && m_pGenericBreakpointsList != NULL)
     {
         QWidget* currentTab = m_pTabs->currentWidget();
 
         if (currentTab == m_pAPITab)
         {
             pActiveList = m_pAPIList;
-        }
-        else if (currentTab == m_pKernelTab)
-        {
-            pActiveList = m_pKernelList;
         }
         else if (currentTab == m_pBreakpointsTab)
         {
@@ -2248,129 +1788,3 @@ void gdBreakpointsDialog::setButtonStates()
     }
 }
 
-// ---------------------------------------------------------------------------
-// Name:        gdBreakpointsDialog::onKernelEndEditLabel
-// Description: Called when we finish editing the right list label
-// Return Val:  void
-// Author:      Yoni Rabin
-// Date:        24/6/2012
-// ---------------------------------------------------------------------------
-void gdBreakpointsDialog::onKernelEndEditLabel()
-{
-    bool isFunctionNameValid = true;
-    bool popupMessageForInvalidName = true;
-    bool duplicateName = false;
-    // Get the edited kernel function name:
-    QString functionName = m_pLastChosenRow->text();
-
-    // Valid function name should contain only alpha numeric characters:
-    for (int i = 0; i < functionName.size(); i++)
-    {
-        const QChar currentChar = functionName.at(i);
-
-        if (!currentChar.isLetterOrNumber())
-        {
-            if ((currentChar != '_') &&
-                ((currentChar != '&') || (0 != i)))
-            {
-                isFunctionNameValid = false;
-                break;
-            }
-        }
-    }
-
-    // Special cases for invalid name:
-    if (functionName.isEmpty() || (functionName == GD_STR_BreakpointsKernelAddMessage))
-    {
-        isFunctionNameValid = false;
-        popupMessageForInvalidName = false;
-    }
-
-    // Check that the function name does not already appear in the list:
-    if (isFunctionNameValid)
-    {
-        int numberItems = m_pChosenList->rowCount() - 1;
-        QString currText;
-
-        for (int nItem = 0; nItem < numberItems; nItem++)
-        {
-            bool rc = m_pChosenList->getItemText(nItem, 0, currText);
-            GT_IF_WITH_ASSERT(rc)
-            {
-                if (functionName == currText)
-                {
-                    isFunctionNameValid = false;
-                    duplicateName = true;
-                    break;
-                }
-            }
-        }
-    }
-
-    // Check if it is in the kernel list to paint it blue:
-    if (isFunctionNameValid)
-    {
-        int numberItems = m_pKernelList->rowCount();
-        QString currText ;
-
-        for (int nItem = 0; nItem < numberItems; nItem++)
-        {
-            bool rc = m_pKernelList->getItemText(nItem, 0, currText);
-            GT_IF_WITH_ASSERT(rc)
-            {
-                if (functionName == currText)
-                {
-                    m_pKernelList->setItemTextColor(nItem, 0, Qt::blue);
-                    break;
-                }
-            }
-        }
-    }
-
-    // If valid name add a new "Type.." in the end, if not do not except the change:
-    if (isFunctionNameValid)
-    {
-        // Set the item check status & color:
-        m_pLastChosenRow->setCheckState(Qt::Checked);
-        m_pLastChosenRow->setTextColor(Qt::black);
-
-        // Allocate a new item data:
-        gdBreakpointsItemData* pNewBreakpointItemData = new gdBreakpointsItemData;
-
-        // Set the details for the item data:
-        pNewBreakpointItemData->_kernelFunctionName = acQStringToGTString(functionName);
-        pNewBreakpointItemData->_breakpointType = OS_TOBJ_ID_KERNEL_FUNC_NAME_BREAKPOINT;
-
-        // Add this item data for deletion:
-        m_rightListBreakpointsDataVector.push_back(pNewBreakpointItemData);
-
-        // Remove the temp row:
-        removeKernelEditLine();
-
-        // Add the breakpoint row:
-        // Add the item type and information:
-        QString bpType;
-        getBreakpointTypeString(pNewBreakpointItemData, bpType);
-        addChosenListItem(functionName, bpType, pNewBreakpointItemData, true);
-
-        // Add the kernel edit line:
-        addKernelEditLine();
-    }
-    else
-    {
-        // Popup message only if needed:
-        if (popupMessageForInvalidName)
-        {
-            QString message = duplicateName ? GD_STR_BreakPointsDuplicateKernelName : GD_STR_BreakPointsInvalidKernelName;
-            acMessageBox::instance().warning(AF_STR_WarningA, message, QMessageBox::Ok);
-        }
-
-        // Remove the kernel edit line (the empty line):
-        removeKernelEditLine();
-
-        // Add the kernel edit line again:
-        addKernelEditLine();
-    }
-
-    updateSelectAllCheckBoxStatus(true);
-}

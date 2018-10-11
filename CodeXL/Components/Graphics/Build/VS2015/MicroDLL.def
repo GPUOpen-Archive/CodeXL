@@ -1,4 +1,0 @@
-; External function needed by the dll Injector code. This function needs exporting so
-; it can be called from rundll32.dll
-EXPORTS
-    InjectDLL

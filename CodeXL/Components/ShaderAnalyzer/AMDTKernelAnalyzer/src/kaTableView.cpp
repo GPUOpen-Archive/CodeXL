@@ -23,9 +23,26 @@
 #include <AMDTKernelAnalyzer/src/kaDataAnalyzerFunctions.h>
 #include <AMDTKernelAnalyzer/src/kaGlobalVariableManager.h>
 #include <AMDTKernelAnalyzer/src/kaTreeModel.h>
+#include <AMDTKernelAnalyzer/src/kaBackendManager.h>
 #include <AMDTKernelAnalyzer/Include/kaStringConstants.h>
 
 #define KA_ANALYSIS_INSTRUCTION_CHACHE_SIZE 32768
+
+static const char* KA_STATS_TAG_DEVICE          = "DEVICE";
+static const char* KA_STATS_TAG_SCRATCH_MEM     = "SCRATCH_MEM";
+static const char* KA_STATS_TAG_SCRATCH_REGS    = "SCRATCH_REGS";
+static const char* KA_STATS_TAG_THREADS_PER_WG  = "THREADS_PER_WORKGROUP";
+static const char* KA_STATS_TAG_WAVEFRONT_SIZE  = "WAVEFRONT_SIZE";
+static const char* KA_STATS_TAG_AVAILABLE_LDS   = "AVAILABLE_LDS_BYTES";
+static const char* KA_STATS_TAG_USED_LDS        = "USED_LDS_BYTES";
+static const char* KA_STATS_TAG_AVAILABLE_SGPRS = "AVAILABLE_SGPRs";
+static const char* KA_STATS_TAG_USED_SGPRS      = "USED_SGPRs";
+static const char* KA_STATS_TAG_AVAILABLE_VGPRS = "AVAILABLE_VGPRs";
+static const char* KA_STATS_TAG_USED_VGPRS      = "USED_VGPRs";
+static const char* KA_STATS_TAG_CL_WG_X_DIM     = "CL_WORKGROUP_X_DIMENSION";
+static const char* KA_STATS_TAG_CL_WG_Y_DIM     = "CL_WORKGROUP_Y_DIMENSION";
+static const char* KA_STATS_TAG_CL_WG_Z_DIM     = "CL_WORKGROUP_Z_DIMENSION";
+static const char* KA_STATS_TAG_ISA_SIZE        = "ISA_SIZE";
 
 // ---------------------------------------------------------------------------
 // Name:        kaTableView::kaTableView
@@ -102,6 +119,100 @@ kaTableView::~kaTableView()
 }
 
 // ---------------------------------------------------------------------------
+// Parse the statistics data and extract only needed values.
+// Output values are returned in "outData".
+// Note: output data string does not include device name.
+// ---------------------------------------------------------------------------
+static bool FilterDeviceInfo(const QString& header, const QString& data, QString& outData)
+{
+    bool ret = false;
+    std::vector<QString> values(kaBackendManager::kaStatNUM);
+    QStringList  headerTags = header.split(',');
+    QStringList  dataValues = data.split(',');
+
+    GT_IF_WITH_ASSERT(headerTags.size() == dataValues.size())
+    {
+        // Read all stats header tags, identify needed ones and gather corresponding values to "values" list.
+        for (int i = 0; i < headerTags.size(); i++)
+        {
+            const QString& tag = headerTags[i];
+            const QString& val = dataValues[i];
+
+            if (tag == KA_STATS_TAG_DEVICE)
+            {
+                // Don't put device to the output string.
+            }
+            else if (tag == KA_STATS_TAG_SCRATCH_MEM || tag == KA_STATS_TAG_SCRATCH_REGS)
+            {
+                values[kaBackendManager::kaStatScratchRegs] = val;
+            }
+            else if (tag == KA_STATS_TAG_THREADS_PER_WG)
+            {
+                values[kaBackendManager::kaStatThreadsPerWorkGroup] = val;
+            }
+            else if (tag == KA_STATS_TAG_WAVEFRONT_SIZE)
+            {
+                values[kaBackendManager::kaStatWavefrontSize] = val;
+            }
+            else if (tag == KA_STATS_TAG_AVAILABLE_LDS)
+            {
+                values[kaBackendManager::kaStatMaxLDSSize] = val;
+            }
+            else if (tag == KA_STATS_TAG_USED_LDS)
+            {
+                values[kaBackendManager::kaStatLDSSize] = val;
+            }
+            else if (tag == KA_STATS_TAG_AVAILABLE_SGPRS)
+            {
+                values[kaBackendManager::kaStatMaxSGPRs] = val;
+            }
+            else if (tag == KA_STATS_TAG_USED_SGPRS)
+            {
+                values[kaBackendManager::kaStatSGPRs] = val;
+            }
+            else if (tag == KA_STATS_TAG_AVAILABLE_VGPRS)
+            {
+                values[kaBackendManager::kaStatMaxVGPRs] = val;
+            }
+            else if (tag == KA_STATS_TAG_USED_VGPRS)
+            {
+                values[kaBackendManager::kaStatVGPRs] = val;
+            }
+            else if (tag == KA_STATS_TAG_CL_WG_X_DIM)
+            {
+                values[kaBackendManager::kaStatReqdWorkGroupX] = val;
+            }
+            else if (tag == KA_STATS_TAG_CL_WG_Y_DIM)
+            {
+                values[kaBackendManager::kaStatReqdWorkGroupY] = val;
+            }
+            else if (tag == KA_STATS_TAG_CL_WG_Z_DIM)
+            {
+                values[kaBackendManager::kaStatReqdWorkGroupZ] = val;
+            }
+            else if (tag == KA_STATS_TAG_ISA_SIZE)
+            {
+                values[kaBackendManager::kaStatISASize] = val;
+            }
+        }
+
+        // Dump the content of "values" vector to the output data string.
+        GT_IF_WITH_ASSERT(values.size() > 0)
+        {
+            outData = values[0];
+            for (size_t i = 1; i < values.size(); i++)
+            {
+                outData += ",";
+                outData += values[i];
+            }
+            ret = true;
+        }
+    }
+
+    return ret;
+}
+
+// ---------------------------------------------------------------------------
 // Name:        kaTableView::readDataFile
 // Description: read the data file and add it to the table
 // Author:      Gilad Yarnitzky
@@ -118,29 +229,33 @@ void kaTableView::readDataFile()
     int numDevices = 0;
     GT_IF_WITH_ASSERT(rc)
     {
-        gtASCIIString lineRead;
+        gtASCIIString header, lineRead;
 
-        bool isFirstLineRead = fileToRead.readLine(lineRead);
+        bool isHeaderRead = fileToRead.readLine(header);
 
-        if (isFirstLineRead)
+        if (isHeaderRead)
         {
+            QString qHeader = acGTASCIIStringToQString(header);
+
             while (fileToRead.readLine(lineRead))
             {
-                gtString lineConverted;
-                lineConverted.fromASCIIString(lineRead.asCharArray());
+                gtString deviceName;
+                QString  qDeviceInfo;
+                QString  qLine = acGTASCIIStringToQString(lineRead);
 
                 // Extract the device name.
                 size_t deviceStrEnd = lineRead.find(",");
                 gtASCIIString deviceNameAscii = lineRead.substr(0, deviceStrEnd);
-                gtASCIIString deviceInfoAscii = lineRead.substr(deviceStrEnd + 1);
-
-                gtString deviceName;
-                gtString deviceInfo;
                 deviceName.fromASCIIString(deviceNameAscii.asCharArray());
-                deviceInfo.fromASCIIString(deviceInfoAscii.asCharArray());
+
+                // Extract required statistics values.
+                if (!FilterDeviceInfo(qHeader, qLine, qDeviceInfo))
+                {
+                    continue;
+                }
 
                 // Split the line to elements.
-                QStringList lineAsList = acGTStringToQString(lineConverted).split(",");
+                QStringList lineAsList = qDeviceInfo.split(",");
 
                 // Check if there are none zero items in the line at all, if not do not insert it to the table (probably a CPU or a buggy device)
                 bool emptyList = true;
@@ -162,7 +277,7 @@ void kaTableView::readDataFile()
 
                 // Find the family from the device name
                 QString familyName;
-                QString deviceInfoAsQstr = acGTStringToQString(deviceInfo);
+                QString deviceInfoAsQstr = qDeviceInfo;
                 QString deviceNameAsQstr = acGTStringToQString(deviceName);
                 rc = kaFindFamilyName(deviceNameAsQstr, familyName);
                 GT_IF_WITH_ASSERT(rc)

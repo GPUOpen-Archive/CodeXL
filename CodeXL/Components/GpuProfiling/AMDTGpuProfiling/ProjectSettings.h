@@ -73,13 +73,13 @@ class APITraceOptions
 public:
 
     /// Initializes a new instance of the APITraceOptions class
-    APITraceOptions();
+    APITraceOptions(const APIToTrace& apiType = APIToTrace_OPENCL);
 
     /// Destructor
     ~APITraceOptions();
 
     /// Restore the settings to the default values:
-    void RestoreDefault();
+    void RestoreDefault(const APIToTrace& apiType);
 
     /// Append the list of rules as string to listOfRules:
     void GetListOfRules(QStringList& listOfRules) const;
@@ -199,9 +199,12 @@ public:
     /// Initializes a new instance of the CounterSettingOption class
     CounterSettingOption();
 
+    /// Initializes a new instance of the CounterSettingOption class with API type
+    CounterSettingOption(const APIToTrace& apiType);
+
     /// Restore the settings to the default values:
     /// \param counterNames list of counters to add to the settings
-    void RestoreDefault(const QStringList& counterNames);
+    void RestoreDefault(const QStringList& counterNames, const APIToTrace& apiType);
 
     bool m_generateKernelOccupancy; ///< Indicates whether or not generate occupancy information
     gtString m_specificKernels;     ///< List of specific kernels to profile, when empty profile all kernels

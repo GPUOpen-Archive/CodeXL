@@ -31,17 +31,11 @@ SessionTreeNodeData::SessionTreeNodeData()
     : afTreeDataExtension(),
       m_name(""), m_displayName(""), m_sessionId(SESSION_ID_ERROR), m_profileTypeStr(""),
       m_isImported(false), m_projectName(""), m_commandArguments(""), m_workingDirectory(""), m_exeName(""), m_exeFullPath(""), m_envVariables(L""),
-      m_startTime(""), m_endTime(""), m_profileScope(PM_PROFILE_SCOPE_SINGLE_EXE), m_shouldProfileEntireDuration(true), m_isProfilePaused(false),
-      m_startDelay(-1), m_profileDuration(-1), m_terminateAfterDataCollectionIsDone(false), m_isSessionRunning(false)
+      m_startTime(""), m_endTime(""), m_shouldProfileEntireDuration(true), m_isProfilePaused(false),
+      m_startDelay(-1), m_profileDuration(-1)
 {
     // Set the profile type to be the current profile type:
     m_profileTypeStr = acGTStringToQString(SharedProfileManager::instance().selectedSessionTypeName());
-
-    // For power sessions, default scope will be PM_PROFILE_SCOPE_SYS_WIDE_FOCUS_ON_EXE:
-    if (m_profileTypeStr == PM_profileTypePowerProfilePrefix)
-    {
-        m_profileScope = PM_PROFILE_SCOPE_SYS_WIDE_FOCUS_ON_EXE;
-    }
 }
 
 
@@ -64,19 +58,6 @@ SessionTreeNodeData::SessionTreeNodeData(ExplorerSessionId sessionId, const QStr
         m_profileTypeStr = QString(" - %1").arg(strNodeSuffix);
     }
 
-    /// Profile scope (single application by default):
-    m_profileScope = PM_PROFILE_SCOPE_SINGLE_EXE;
-
-    if (m_profileTypeStr == PM_profileTypePowerProfile)
-    {
-        m_profileScope = PM_PROFILE_SCOPE_SYS_WIDE;
-    }
-
-    // For power sessions, default scope will be PM_PROFILE_SCOPE_SYS_WIDE_FOCUS_ON_EXE:
-    if (m_profileTypeStr == PM_profileTypePowerProfilePrefix)
-    {
-        m_profileScope = PM_PROFILE_SCOPE_SYS_WIDE_FOCUS_ON_EXE;
-    }
 
     /// Profile entire duration:
     m_shouldProfileEntireDuration = true;
@@ -90,11 +71,6 @@ SessionTreeNodeData::SessionTreeNodeData(ExplorerSessionId sessionId, const QStr
     /// End after (seconds):
     m_profileDuration = -1;
 
-    // Should terminate after data collection is done:
-    m_terminateAfterDataCollectionIsDone = false;
-
-    // By default the session is not running:
-    m_isSessionRunning = false;
 }
 
 SessionTreeNodeData::SessionTreeNodeData(const SessionTreeNodeData& other)
@@ -112,13 +88,10 @@ SessionTreeNodeData::SessionTreeNodeData(const SessionTreeNodeData& other)
     m_workingDirectory = other.m_workingDirectory;
     m_exeName = other.m_exeName;
     m_exeFullPath = other.m_exeFullPath;
-    m_profileScope = other.m_profileScope;
     m_shouldProfileEntireDuration = other.m_shouldProfileEntireDuration;
     m_isProfilePaused = other.m_isProfilePaused;
     m_startDelay = other.m_startDelay;
     m_profileDuration = other.m_profileDuration;
-    m_terminateAfterDataCollectionIsDone = other.m_terminateAfterDataCollectionIsDone;
-    m_isSessionRunning = other.m_isSessionRunning;
     m_envVariables = other.m_envVariables;
     m_startTime = other.m_startTime;
     m_endTime = other.m_endTime;
@@ -139,13 +112,10 @@ SessionTreeNodeData& SessionTreeNodeData::operator=(const SessionTreeNodeData& o
     m_workingDirectory = other.m_workingDirectory;
     m_exeName = other.m_exeName;
     m_exeFullPath = other.m_exeFullPath;
-    m_profileScope = other.m_profileScope;
     m_shouldProfileEntireDuration = other.m_shouldProfileEntireDuration;
     m_isProfilePaused = other.m_isProfilePaused;
     m_startDelay = other.m_startDelay;
     m_profileDuration = other.m_profileDuration;
-    m_terminateAfterDataCollectionIsDone = other.m_terminateAfterDataCollectionIsDone;
-    m_isSessionRunning = other.m_isSessionRunning;
     m_envVariables = other.m_envVariables;
     m_startTime = other.m_startTime;
     m_endTime = other.m_endTime;
@@ -170,13 +140,10 @@ void SessionTreeNodeData::CopyFrom(const SessionTreeNodeData* pOther)
         m_workingDirectory = pOther->m_workingDirectory;
         m_exeName = pOther->m_exeName;
         m_exeFullPath = pOther->m_exeFullPath;
-        m_profileScope = pOther->m_profileScope;
         m_shouldProfileEntireDuration = pOther->m_shouldProfileEntireDuration;
         m_isProfilePaused = pOther->m_isProfilePaused;
         m_startDelay = pOther->m_startDelay;
         m_profileDuration = pOther->m_profileDuration;
-        m_terminateAfterDataCollectionIsDone = pOther->m_terminateAfterDataCollectionIsDone;
-        m_isSessionRunning = pOther->m_isSessionRunning;
         m_envVariables = pOther->m_envVariables;
         m_startTime = pOther->m_startTime;
         m_endTime = pOther->m_endTime;
@@ -351,27 +318,6 @@ void SessionTreeNodeData::BuildSessionHTML(afHTMLContent& htmlContent) const
         htmlContent.addHTMLItem(afHTMLContent::AP_HTML_LINE, content);
     }
 
-    if (m_profileTypeStr != PM_profileTypeFrameAnalysis)
-    {
-        gtString scopeStr = PM_STR_ProfileScopeSystemWide;
-
-        if (m_profileScope == PM_PROFILE_SCOPE_SYS_WIDE_FOCUS_ON_EXE)
-        {
-            scopeStr = PM_STR_ProfileScopeSystemWideWithFocus;
-        }
-        else if (m_profileScope == PM_PROFILE_SCOPE_SINGLE_EXE)
-        {
-            scopeStr = PM_STR_ProfileScopeSingleApplication;
-        }
-
-        gtString scopeTitleStr = PM_Str_HTMLProfileScope;
-        scopeTitleStr.append(AF_STR_ColonW);
-        scopeTitleStr.append(AF_STR_Space);
-        strContent = scopeTitleStr;
-        strContent.append(scopeStr);
-        htmlContent.addHTMLItem(afHTMLContent::AP_HTML_LINE, strContent);
-    }
-
     if ((!m_startTime.isEmpty()) && (!m_endTime.isEmpty()))
     {
         htmlContent.addHTMLItem(afHTMLContent::AP_HTML_LINE, PM_Str_HTMLProfileStartTime, acQStringToGTString(m_startTime));
@@ -407,15 +353,10 @@ bool SessionTreeNodeData::InitFromXML(const gtString& xmlString)
     {
         retVal = true;
 
-        int numVal = 0;
-        afUtils::getFieldFromXML(*pProfileNode, PM_STR_xmlProfileScope, numVal);
-        m_profileScope = (ProfileSessionScope)numVal;
         afUtils::getFieldFromXML(*pProfileNode, PM_STR_xmlProfileEntireDuration, m_shouldProfileEntireDuration);
         afUtils::getFieldFromXML(*pProfileNode, PM_STR_xmlProfilePaused, m_isProfilePaused);
         afUtils::getFieldFromXML(*pProfileNode, PM_STR_xmlProfileStartDelay, m_startDelay);
         afUtils::getFieldFromXML(*pProfileNode, PM_STR_xmlProfileEndAfter, m_profileDuration);
-        afUtils::getFieldFromXML(*pProfileNode, PM_STR_xmlProfileTerminateAfter, m_terminateAfterDataCollectionIsDone);
-
     }
 
     return retVal;
@@ -425,12 +366,10 @@ bool SessionTreeNodeData::ToXMLString(gtString& projectAsXMLString)
 {
     projectAsXMLString.appendFormattedString(L"<%ls>", PM_STR_SharedProfileExtensionName);
 
-    afUtils::addFieldToXML(projectAsXMLString, PM_STR_xmlProfileScope, m_profileScope);
     afUtils::addFieldToXML(projectAsXMLString, PM_STR_xmlProfileEntireDuration, m_shouldProfileEntireDuration);
     afUtils::addFieldToXML(projectAsXMLString, PM_STR_xmlProfilePaused, m_isProfilePaused);
     afUtils::addFieldToXML(projectAsXMLString, PM_STR_xmlProfileStartDelay, m_startDelay);
     afUtils::addFieldToXML(projectAsXMLString, PM_STR_xmlProfileEndAfter, m_profileDuration);
-    afUtils::addFieldToXML(projectAsXMLString, PM_STR_xmlProfileTerminateAfter, m_terminateAfterDataCollectionIsDone);
 
     projectAsXMLString.appendFormattedString(L"</%ls>", PM_STR_SharedProfileExtensionName);
 
@@ -441,34 +380,10 @@ gtString SessionTreeNodeData::ProfileTypePrefix() const
 {
     gtString retVal;
 
-    if ((m_profileTypeStr == PM_profileTypeTimeBased) ||
-        (m_profileTypeStr == PM_profileTypeCustomProfile) ||
-        (m_profileTypeStr == PM_profileTypeCLU) ||
-        (m_profileTypeStr == PM_profileTypeAssesPerformance) ||
-        (m_profileTypeStr == PM_profileTypeInstructionBasedSampling) ||
-        (m_profileTypeStr == PM_profileTypeInvestigateBranching) ||
-        (m_profileTypeStr == PM_profileTypeInvestigateDataAccess) ||
-        (m_profileTypeStr == PM_profileTypeInvestigateInstructionAccess) ||
-        (m_profileTypeStr == PM_profileTypeInvestigateInstructionL2CacheAccess))
-    {
-        retVal = PM_Str_HTMLProfileCPUPrefix;
-    }
-    else if ((m_profileTypeStr == PM_profileTypePerformanceCounters) ||
+    if ((m_profileTypeStr == PM_profileTypePerformanceCounters) ||
              (m_profileTypeStr == PM_profileTypeApplicationTrace))
     {
         retVal = PM_Str_HTMLProfileGPUPrefix;
-    }
-    else if (m_profileTypeStr == PM_profileTypePowerProfile)
-    {
-        retVal = PM_Str_HTMLProfilePowerPrefix;
-    }
-    else if (m_profileTypeStr == PM_profileTypeThreadProfile)
-    {
-        retVal = PM_Str_HTMLProfileThreadPrefix;
-    }
-    else if (m_profileTypeStr == PM_profileTypeFrameAnalysis)
-    {
-        retVal = PM_Str_HTMLProfileFrameAnalysisPrefix;
     }
     else
     {

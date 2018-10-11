@@ -36,23 +36,23 @@
     <ClCompile>
       <AdditionalIncludeDirectories>$(AMDTCommonExt)tinyxml\2.6.2;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>QT_NO_OPENGL;QT_LARGEFILE_SUPPORT;QT_DLL;QT_GUI_LIB;QT_CORE_LIB;QT_THREAD_SUPPORT;AMDTGPUDEBUGGING_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalOptions> /wd4005 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Include\gwgDEBuggerAppWrapper.h" />
     <ClInclude Include="Include\gwgDEBuggerAppWrapperDLLBuild.h" />
     <CustomBuild Include="Include\gwKernelWorkItemToolbar.h">
-      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "Include\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Command>"$(QTBINDIR)\moc.exe" "Include\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
       <Message>moc creation</Message>
       <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
-      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+      <AdditionalInputs>$(QTBINDIR)\moc.exe;src\%(Filename).cpp</AdditionalInputs>
     </CustomBuild>
     <ClInclude Include="Include\gwStringConstants.h" />
     <ClInclude Include="src\gwApplicationCommands.h" />
     <ClInclude Include="src\gwDebugActionsCreator.h" />
     <ClInclude Include="src\gwDebugViewsCreator.h" />
     <ClInclude Include="src\gwEventObserver.h" />
-    <ClInclude Include="Include\gwKernelWorkItemToolbar.h" />
     <ClInclude Include="src\gwImagesAndBuffersActionsCreator.h" />
     <ClInclude Include="src\gwImagesAndBuffersMDIViewCreator.h" />
     <ClInclude Include="src\gwMenuActionsExecutor.h" />

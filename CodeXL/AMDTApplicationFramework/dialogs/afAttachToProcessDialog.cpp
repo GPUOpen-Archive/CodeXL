@@ -273,7 +273,7 @@ void afAttachToProcessDialog::fillProcessesList()
             rowTexts << processType;
             rowTexts << acGTStringToQString(userName);
 
-            if (m_pProcessesCtrl->addRow(rowTexts, nullptr, Qt::AlignVCenter | Qt::AlignLeft))
+            if (m_pProcessesCtrl->addRow(rowTexts, static_cast<QPixmap*>(nullptr), Qt::AlignVCenter | Qt::AlignLeft))
             {
                 QTableWidgetItem* pRowItem = m_pProcessesCtrl->item(row, 1);
 

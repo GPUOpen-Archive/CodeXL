@@ -1163,7 +1163,11 @@ bool afSystemInformationCommand::CollectAllOpenCLDevicesInformation(gtList< gtLi
     // collect first the 64 bit since it will work on all machines due to the way it is built
     // then collect the 32 bit that might not work on some machines. doing it the other way will prevent collecting the 64 bit because of timeout in collecting the 32 bit
     bool res64bit = CollectOpenCLDevicesInformation(listOf64BitRows, af64BitApp);
+#if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
     bool res32bit = CollectOpenCLDevicesInformation(listOf32BitRows, af32BitApp);
+#else
+    bool res32bit = true;
+#endif
 
     // Merge results to one table
     GT_IF_WITH_ASSERT(res32bit || res64bit)

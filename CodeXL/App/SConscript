@@ -55,13 +55,18 @@ commonLinkedLibraries = \
 otherResources = \
 [
     "./LinuxResources/CodeXL",
-    "./LinuxResources/Readme.txt",
-    "./LinuxResources/CodeXL_Release_Notes.pdf"
 ]
 
 linkedLibraries = commonLinkedLibraries
 env.Prepend (LIBS = linkedLibraries)
 
+# Move the link path of CXL_boost_lib_dir to the last one
+boost_lib_dir = env['CXL_boost_lib_dir']
+if (boost_lib_dir != ''):
+    libPath = env['LIBPATH']
+    libPath.remove(boost_lib_dir)
+    libPath += [ boost_lib_dir ]
+    env.Replace( LIBPATH = libPath )
 
 # Set the ELF hash generation mode:
 # - When building on new systems, we would like to generate both sysv and gnu ELF hashes.
@@ -70,7 +75,9 @@ env.Prepend (LIBS = linkedLibraries)
 #   variable (preferably in the .bashrc file). Otherwise the link will fail when trying to
 #   generate an ELF hash type that the old linker does not recognize.
 # [Yaki 7/7/2009]
-linkerFlags = [] 
+linkerFlags = []
+qtLinkPath = env['CXL_common_dir'] + "/Lib/Ext/Qt/5.9/Build/Linux/" + "/release/lib"
+linkerFlags += [ "-Wl,-rpath-link," + qtLinkPath ]
 shouldGenerateOnlyDefaultELFHash = os.environ.get('GR_GENERATE_ONLY_DEFAULT_ELF_HASH')
 if shouldGenerateOnlyDefaultELFHash is None:
     linkerFlags += [ "-Wl,--hash-style=both" ]

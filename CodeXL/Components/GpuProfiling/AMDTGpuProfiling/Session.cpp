@@ -1,16 +1,10 @@
 //=====================================================================
-// Copyright (c) 2012 Advanced Micro Devices, Inc. All rights reserved.
+// Copyright (c) 2012-2018 Advanced Micro Devices, Inc. All rights reserved.
 //
 /// \author GPU Developer Tools
-/// \file $File: //devtools/main/CodeXL/Components/GpuProfiling/AMDTGpuProfiling/Session.cpp $
-/// \version $Revision: #62 $
+/// \file
 /// \brief :  This file contains GPUSessionTreeItemData class
 //
-//=====================================================================
-// $Id: //devtools/main/CodeXL/Components/GpuProfiling/AMDTGpuProfiling/Session.cpp#62 $
-// Last checkin:   $DateTime: 2016/04/18 06:02:03 $
-// Last edited by: $Author: salgrana $
-// Change list:    $Change: 569613 $
 //=====================================================================
 
 // Qt:
@@ -28,14 +22,11 @@
 #include <AMDTApplicationFramework/Include/afProgressBarWrapper.h>
 
 // Local:
-#include <AMDTGpuProfiling/gpExecutionMode.h>
 #include <AMDTGpuProfiling/gpStringConstants.h>
 #include <AMDTGpuProfiling/gpViewsCreator.h>
 #include <AMDTGpuProfiling/Session.h>
 #include <AMDTGpuProfiling/ProfileManager.h>
 #include "AtpUtils.h"
-
-static int allocCounter = 0;
 
 
 GPUSessionTreeItemData::GPUSessionTreeItemData() : SessionTreeNodeData()
@@ -278,10 +269,6 @@ bool GPUSessionTreeItemData::IsSessionFileValid()
     if (!strRequiredSessionProperty.isEmpty())
     {
         retVal = GetProperty(strRequiredSessionProperty, strPropVal);
-    }
-    else if (m_profileType == FRAME_ANALYSIS)
-    {
-        retVal = true;
     }
 
     return retVal;
@@ -873,53 +860,3 @@ osDirectory PerformanceCounterSession::SessionDir() const
 
     return retVal;
 }
-
-//--------------------------------------------------------
-// gpSessionTreeNodeData
-//--------------------------------------------------------
-gpSessionTreeNodeData::gpSessionTreeNodeData(const QString& strName,
-                                             const QString& strWorkingDirectory,
-                                             const QString& strSessionFilePath,
-                                             const QString& strProjName,
-                                             bool isImported)
-    : GPUSessionTreeItemData(strName,
-                             strWorkingDirectory,
-                             strSessionFilePath,
-                             strProjName,
-                             FRAME_ANALYSIS,
-                             isImported)
-{
-    m_frameIndex.first = -1;
-    m_frameIndex.second = -1;
-    m_strSessionFilePath = strSessionFilePath;
-
-    allocCounter++;
-}
-
-gpSessionTreeNodeData::~gpSessionTreeNodeData()
-{
-    allocCounter--;
-}
-
-void gpSessionTreeNodeData::StartSessionHTML(afHTMLContent& htmlContent) const
-{
-    htmlContent.setTitle(GP_Str_FrameAnalysisSessionHTMLHeading);
-}
-
-bool gpSessionTreeNodeData::DeleteSessionFilesFromDisk(QString& report)
-{
-    bool retVal = false;
-
-    // Make sure that session files are deleted on the server
-    GT_IF_WITH_ASSERT((ProfileManager::Instance() != nullptr) && (ProfileManager::Instance()->GetFrameAnalysisModeManager() != nullptr))
-    {
-        // Make sure that frame analysis sessions are deleted from the server
-        ProfileManager::Instance()->GetFrameAnalysisModeManager()->HandleSessionDeletion(this);
-    }
-
-    // Call the base class implementation
-    SessionTreeNodeData::DeleteSessionFilesFromDisk(report);
-    return retVal;
-
-}
-

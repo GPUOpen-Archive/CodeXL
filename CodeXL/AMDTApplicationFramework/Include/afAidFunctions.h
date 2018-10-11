@@ -45,7 +45,6 @@ struct AF_API afIsValidApplicationInfo
     osPortAddress* portAddress = nullptr;
     gtString appFilePath;
     gtString workingFolderPath;
-    bool isWInStoreAppRadioButtonChecked = false;
 };
 AF_API void afIsApplicationPathsValid(const afIsValidApplicationInfo& isValidApplicationInfo, bool &isAppValid, bool &isWorkingFolderValid);
 

@@ -1,8 +1,8 @@
 //==================================================================================
-// Copyright (c) 2016 , Advanced Micro Devices, Inc.  All rights reserved.
+// Copyright (c) 2016-2018, Advanced Micro Devices, Inc.  All rights reserved.
 //
 /// \author AMD Developer Tools Team
-/// \file ProfileApplicationTreeHandler.cpp
+/// \file
 ///
 //==================================================================================
 
@@ -61,7 +61,7 @@ ExplorerSessionId ProfileApplicationTreeHandler::m_sSessionCount = 0;
 ProfileApplicationTreeHandler* ProfileApplicationTreeHandler::m_pMySingleInstance = nullptr;
 
 ProfileApplicationTreeHandler::ProfileApplicationTreeHandler() : afApplicationTreeHandler(),
-    afBaseView(&afProgressBarWrapper::instance()), m_pEmptySessionItemData(nullptr)
+    afBaseView(&afProgressBarWrapper::instance())
 {
     m_pApplicationTree = nullptr;
 
@@ -88,16 +88,9 @@ ProfileApplicationTreeHandler::ProfileApplicationTreeHandler() : afApplicationTr
     // global context menu items
     m_pDeleteAllSessionsAction = new QAction(PM_STR_TREE_DELETE_ALL_SESSIONS, m_pApplicationTree);
 
-    m_pImportSessionAction = new afBrowseAction(PM_STR_lastBrowsedExportFolder);
+    m_pImportSessionAction = new afBrowseAction(PM_STR_lastBrowsedImportFolder);
     m_pImportSessionAction->setText(PM_STR_TREE_IMPORT_SESSION);
     m_pImportSessionAction->setParent(m_pApplicationTree);
-
-    m_pExportSessionAction = new afBrowseAction(PM_STR_lastBrowsedExportFolder);
-    m_pExportSessionAction->setText(PM_STR_TREE_EXPORT_SESSION);
-    m_pExportSessionAction->setParent(m_pApplicationTree);
-
-    m_pRefreshFromServerAction = new QAction(PM_STR_TREE_REFRESH_FROM_SERVER, m_pApplicationTree);
-    m_pRefreshFromServerAction->setParent(m_pApplicationTree);
 
     bool rc = connect(m_pOpenItemAction, SIGNAL(triggered()), this, SLOT(OnItemOpen()));
     GT_ASSERT(rc);
@@ -115,12 +108,6 @@ ProfileApplicationTreeHandler::ProfileApplicationTreeHandler() : afApplicationTr
     GT_ASSERT(rc);
 
     rc = connect(m_pImportSessionAction, SIGNAL(triggered()), this, SLOT(OnImportSession()));
-    GT_ASSERT(rc);
-
-    rc = connect(m_pExportSessionAction, SIGNAL(triggered()), this, SLOT(OnExportSession()));
-    GT_ASSERT(rc);
-
-    rc = connect(m_pRefreshFromServerAction, SIGNAL(triggered()), this, SLOT(OnRefreshFromServer()));
     GT_ASSERT(rc);
 
     rc = connect(m_pDeleteAllSessionsAction, SIGNAL(triggered()), this, SLOT(OnDeleteAllSessions()));
@@ -157,7 +144,6 @@ ProfileApplicationTreeHandler::~ProfileApplicationTreeHandler()
     apEventsHandler::instance().unregisterEventsObserver(*this);
 
     delete m_pImportSessionAction;
-    delete m_pExportSessionAction;
 }
 
 void ProfileApplicationTreeHandler::OnDeleteAllSessions()
@@ -245,18 +231,12 @@ void ProfileApplicationTreeHandler::DeleteAllSessions(QTreeWidgetItem* pProfileT
                                 afApplicationTreeItemData* pItemData = m_pApplicationTree->getTreeItemData(pSessionItem);
                                 GT_IF_WITH_ASSERT(nullptr != pItemData)
                                 {
-                                    // Do not delete empty session:
-                                    bool isEmptySession = (AF_TREE_ITEM_PROFILE_EMPTY_SESSION == pItemData->m_itemType);
+                                    // Check if this is a session node:
+                                    SessionTreeNodeData* pSessionData = qobject_cast<SessionTreeNodeData*>(pItemData->extendedItemData());
 
-                                    if (!isEmptySession)
+                                    if ((nullptr != pSessionData) || (AF_TREE_ITEM_PROFILE_SESSION == pItemData->m_itemType))
                                     {
-                                        // Check if this is a session node:
-                                        SessionTreeNodeData* pSessionData = qobject_cast<SessionTreeNodeData*>(pItemData->extendedItemData());
-
-                                        if ((nullptr != pSessionData) || (AF_TREE_ITEM_PROFILE_SESSION == pItemData->m_itemType))
-                                        {
-                                            DeleteSessionNode(pItemData, deleteType, false);
-                                        }
+                                        DeleteSessionNode(pItemData, deleteType, false);
                                     }
                                 }
                             }
@@ -313,67 +293,38 @@ void ProfileApplicationTreeHandler::OnImportSession()
     QString filters;
     QString allFilters;
 
-    bool isFrameAnalysisSession = afExecutionModeManager::instance().isActiveMode(PM_STR_FrameAnalysisMode);
-
-    if (isFrameAnalysisSession)
+    for (QList<FileFilter*>::const_iterator i = m_profileFilterList.begin(); i != m_profileFilterList.end(); ++i)
     {
-        for (QList<FileFilter*>::const_iterator i = m_frameAnalysisFilterList.begin(); i != m_frameAnalysisFilterList.end(); ++i)
-        {
-            if (!filters.isEmpty())
-            {
-                filters.append(";;");
-            }
-
-            filters.append(QString("%1 (%2)").arg((*i)->m_strDescription).arg((*i)->m_strMask));
-        }
-
-        if (!allFilters.isEmpty())
-        {
-            if (!filters.isEmpty())
-            {
-                filters.prepend(";;");
-            }
-
-            filters.prepend(QString(tr("Frame Analysis Session Files (%1)")).arg(allFilters));
-        }
-    }
-    else
-    {
-        for (QList<FileFilter*>::const_iterator i = m_profileFilterList.begin(); i != m_profileFilterList.end(); ++i)
-        {
-            if (!filters.isEmpty())
-            {
-                filters.append(";;");
-            }
-
-            filters.append(QString("%1 (%2)").arg((*i)->m_strDescription).arg((*i)->m_strMask));
-
-            if (!allFilters.isEmpty())
-            {
-                allFilters.append(" ");
-            }
-
-            allFilters += (*i)->m_strMask;
-        }
-
-        if (!allFilters.isEmpty())
-        {
-            if (!filters.isEmpty())
-            {
-                filters.prepend(";;");
-            }
-
-            filters.prepend(QString(tr("Profile Session Files (%1)")).arg(allFilters));
-        }
-
         if (!filters.isEmpty())
         {
             filters.append(";;");
-            filters.append(AF_STR_allFileDetails);
         }
+
+        filters.append(QString("%1 (%2)").arg((*i)->m_strDescription).arg((*i)->m_strMask));
+
+        if (!allFilters.isEmpty())
+        {
+            allFilters.append(" ");
+        }
+
+        allFilters += (*i)->m_strMask;
     }
 
+    if (!allFilters.isEmpty())
+    {
+        if (!filters.isEmpty())
+        {
+            filters.prepend(";;");
+        }
 
+        filters.prepend(QString(tr("Profile Session Files (%1)")).arg(allFilters));
+    }
+
+    if (!filters.isEmpty())
+    {
+        filters.append(";;");
+        filters.append(AF_STR_allFileDetails);
+    }
 
     QString strDir;
     strDir = QString::fromWCharArray(afProjectManager::instance().currentProjectFilePath().fileDirectoryAsString().asCharArray());
@@ -385,7 +336,7 @@ void ProfileApplicationTreeHandler::OnImportSession()
         m_pImportSessionAction->SetLastBrowsedFolder(currentProjectPath);
     }
 
-    QString dialogTitle(isFrameAnalysisSession ? PM_STR_ImportFrameAnalysisDialogTitle : PM_STR_ImportDialogTitle);
+    QString dialogTitle(PM_STR_ImportDialogTitle);
     QString defaultPath("");
     QString importFilePath = afApplicationCommands::instance()->ShowFileSelectionDialog(dialogTitle, defaultPath, filters, m_pImportSessionAction);
 
@@ -429,91 +380,6 @@ bool ProfileApplicationTreeHandler::ImportFile(const QString& importFilePath)
     return success;
 }
 
-void ProfileApplicationTreeHandler::OnExportSession()
-{
-    GT_IF_WITH_ASSERT(nullptr != m_pApplicationTree && nullptr != m_pApplicationTree->treeControl())
-    {
-        QList<QTreeWidgetItem*> treeSelectedItems = m_pApplicationTree->treeControl()->selectedItems();
-
-        if (treeSelectedItems.count() == 1)
-        {
-            QTreeWidgetItem* pContextMenuItem = treeSelectedItems.at(0);
-            GT_IF_WITH_ASSERT(nullptr != pContextMenuItem)
-            {
-                afApplicationTreeItemData* pTreeItemData = m_pApplicationTree->getTreeItemData(pContextMenuItem);
-                GT_IF_WITH_ASSERT(nullptr != pTreeItemData)
-                {
-                    afApplicationTreeItemData* pNodeData = FindParentSessionItemData(pTreeItemData);
-
-                    GT_IF_WITH_ASSERT(nullptr != pNodeData)
-                    {
-                        QString report;
-                        osDirectory sessionDir;
-                        pNodeData->m_filePath.getFileDirectory(sessionDir);
-                        SessionTreeNodeData* pSessionData = qobject_cast<SessionTreeNodeData*>(pNodeData->extendedItemData());
-
-                        if (nullptr != pSessionData && nullptr != m_pExportSessionAction)
-                        {
-                            QString sessionName = pSessionData->m_displayName;
-
-                            QString strDir;
-                            strDir = QString::fromWCharArray(afProjectManager::instance().currentProjectFilePath().fileDirectoryAsString().asCharArray());
-
-                            // Set the CodeXL projects location as default browse path for the exported file:
-                            if (m_pExportSessionAction->LastBrowsedFolder().isEmpty())
-                            {
-                                QString currentProjectPath = acGTStringToQString(afProjectManager::instance().currentProjectFilePath().fileDirectoryAsString());
-                                m_pExportSessionAction->SetLastBrowsedFolder(currentProjectPath);
-                            }
-
-                            QString dialogTitle(PM_STR_ExportDialogTitle);
-                            QString defaultPath("");
-                            QString fullFileName = sessionName;
-                            fullFileName.append(AF_STR_HyphenA);
-                            fullFileName.append(afGlobalVariablesManager::ProductNameA());
-                            fullFileName.append("." + acGTStringToQString(AF_STR_frameAnalysisArchivedFileExtension));
-
-                            bool ret = afApplicationCommands::instance()->ShowQTSaveFileDialog(defaultPath, fullFileName, m_pExportSessionAction->LastBrowsedFolder(), m_pApplicationTree, "", dialogTitle);
-
-                            if (ret == true)
-                            {
-                                QString pathToSave = defaultPath;
-                                int lastIndex = pathToSave.lastIndexOf("/");
-                                pathToSave.chop(pathToSave.length() - lastIndex);
-                                m_pExportSessionAction->SetLastBrowsedFolder(pathToSave);
-
-                                gtList<SessionTypeTreeHandlerAbstract*>::iterator it = m_sessionTypeToTreeHandlerList.begin();
-
-                                for (; (it != m_sessionTypeToTreeHandlerList.end()); it++)
-                                {
-                                    ret = (*it)->ExportFile(sessionDir, defaultPath, pSessionData);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-void ProfileApplicationTreeHandler::OnRefreshFromServer()
-{
-    // This is an ugly workaround. Currently, the only object that can build and handle context menus is ProfileApplicationTreeHandler.
-    // It is supposed to handle context menus for all profilers, and for the frame analysis mode.
-    // In the future we will need to refine this implementation, until then we will need to find the tree handler that handles frame analysis, and call it
-    gtList<SessionTypeTreeHandlerAbstract*>::iterator it = m_sessionTypeToTreeHandlerList.begin();
-
-    for (; (it != m_sessionTypeToTreeHandlerList.end()); it++)
-    {
-        // Break on the first handler that handles it
-        if ((*it)->RefreshSessionsFromServer())
-        {
-            break;
-        }
-    }
-}
-
 void ProfileApplicationTreeHandler::OnSessionDelete()
 {
     // Get the clicked item from application tree:
@@ -534,17 +400,14 @@ void ProfileApplicationTreeHandler::OnSessionDelete()
                     if ((nullptr != pSessionItemData) && (nullptr != pSessionItemData->m_pTreeWidgetItem))
                     {
                         // Disable the deletion of the empty session:
-                        if (AF_TREE_ITEM_PROFILE_EMPTY_SESSION != pSessionItemData->m_itemType)
-                        {
-                            QMessageBox::StandardButton result;
-                            QString message(QString(PS_STR_TREE_DELETE_QUESTION).arg(pSessionItemData->m_pTreeWidgetItem->text(0)));
-                            result = acMessageBox::instance().question(afGlobalVariablesManager::ProductNameA(), message, QMessageBox::Yes | QMessageBox::No);
+                        QMessageBox::StandardButton result;
+                        QString message(QString(PS_STR_TREE_DELETE_QUESTION).arg(pSessionItemData->m_pTreeWidgetItem->text(0)));
+                        result = acMessageBox::instance().question(afGlobalVariablesManager::ProductNameA(), message, QMessageBox::Yes | QMessageBox::No);
 
-                            if (QMessageBox::Yes == result)
-                            {
-                                // Delete the session, and save the project:
-                                DeleteSessionNode(pSessionItemData, SESSION_EXPLORER_REMOVE_FILES, true);
-                            }
+                        if (QMessageBox::Yes == result)
+                        {
+                            // Delete the session, and save the project:
+                            DeleteSessionNode(pSessionItemData, SESSION_EXPLORER_REMOVE_FILES, true);
                         }
                     }
                 }
@@ -704,12 +567,6 @@ ExplorerSessionId ProfileApplicationTreeHandler::AddSession(SessionTreeNodeData*
                     }
                 }
             }
-
-            // Add empty session node to tree for power profile sessions:
-            if (pNewItemSessionData->m_profileTypeStr == PM_STR_OnlineProfileName)
-            {
-                AddEmptySessionCreationNode(false);
-            }
         }
 
         if (m_bImportInProgress)
@@ -725,18 +582,11 @@ ExplorerSessionId ProfileApplicationTreeHandler::AddSession(SessionTreeNodeData*
     return retVal;
 }
 
-void ProfileApplicationTreeHandler::AddImportFileFilter(const QString& strDescription, const QString& strFileMask, const gtString& modeName)
+void ProfileApplicationTreeHandler::AddImportFileFilter(const QString& strDescription, const QString& strFileMask, const gtString& /*modeName*/)
 {
     FileFilter* fileFilter = new FileFilter(strDescription, strFileMask);
 
-    if (modeName.compare(PM_STR_FrameAnalysisMode) == 0)
-    {
-        m_frameAnalysisFilterList.push_back(fileFilter);
-    }
-    else
-    {
-        m_profileFilterList.push_back(fileFilter);
-    }
+    m_profileFilterList.push_back(fileFilter);
 }
 
 bool ProfileApplicationTreeHandler::IsDragDropSupported(QWidget* receiver, QDropEvent* event, QString& dragDropFile, bool& shouldAccpet)
@@ -808,7 +658,7 @@ bool ProfileApplicationTreeHandler::isImportingOkWithCurrentMode(QString& msg)
     }
 
     // Disable import while not in profile mode (check mode only when a project is loaded):
-    else if (!(afExecutionModeManager::instance().isActiveMode(PM_STR_PROFILE_MODE) || afExecutionModeManager::instance().isActiveMode(PM_STR_FrameAnalysisMode)) && isProjectLoaded)
+    else if (!(afExecutionModeManager::instance().isActiveMode(PM_STR_PROFILE_MODE)) && isProjectLoaded)
     {
         msg = PM_STR_ImportWarning;
     }
@@ -850,22 +700,6 @@ bool ProfileApplicationTreeHandler::CheckFilterList(const QString& fileExt)
                 {
                     return true;
                 }
-            }
-        }
-    }
-
-
-    bool isInFrameAnalysisMode = afExecutionModeManager::instance().isActiveMode(PM_STR_FrameAnalysisMode);
-
-    if (m_frameAnalysisFilterList.count() > 0 && isInFrameAnalysisMode)
-    {
-        foreach (FileFilter* filter, m_frameAnalysisFilterList)
-        {
-            QFileInfo fileInfo(filter->m_strMask);
-
-            if (fileInfo.suffix() == fileExt)
-            {
-                return true;
             }
         }
     }
@@ -950,7 +784,6 @@ void ProfileApplicationTreeHandler::onEvent(const apEvent& eve, bool& vetoEvent)
     }
 
     bool isInProfileMode = afExecutionModeManager::instance().isActiveMode(PM_STR_PROFILE_MODE);
-    bool isInFrameAnalysisMode = afExecutionModeManager::instance().isActiveMode(PM_STR_FrameAnalysisMode);
 
     // Get the event type:
     apEvent::EventType eventType = eve.eventType();
@@ -966,7 +799,7 @@ void ProfileApplicationTreeHandler::onEvent(const apEvent& eve, bool& vetoEvent)
 
         case apEvent::GD_MONITORED_OBJECT_SELECTED_EVENT:
         {
-            if (isInProfileMode || isInFrameAnalysisMode)
+            if (isInProfileMode)
             {
                 // Bug fix: We should make sure that we are in Profile mode, otherwise
                 // we should not enter this block (makes the system hang in some scenarios).
@@ -1011,34 +844,10 @@ void ProfileApplicationTreeHandler::onEvent(const apEvent& eve, bool& vetoEvent)
                 sessionType = SharedProfileManager::instance().sessionTypeName(execChangedEvent.sessionTypeIndex());
             }
 
-            // Enable empty session node:
-            EnableEmptySessionNode(sessionType);
-
             if (WasTreeCreated())
             {
                 // Expand the sessions according to the session type
-                ExpandCurrentSessionType(execChangedEvent.modeType(), sessionType);
-            }
-        }
-        break;
-
-        case apEvent::GD_MONITORED_OBJECT_ACTIVATED_EVENT:
-        {
-            // Get the activation event:
-            const apMonitoredObjectsTreeActivatedEvent& activationEvent = (const apMonitoredObjectsTreeActivatedEvent&)eve;
-
-            // Get the item data;
-            afApplicationTreeItemData* pItemData = (afApplicationTreeItemData*)activationEvent.selectedItemData();
-
-            if (nullptr != pItemData)
-            {
-                // Check if a profile session is currently running:
-                if (AF_TREE_ITEM_PROFILE_EMPTY_SESSION == pItemData->m_itemType)
-                {
-                    // Create an empty session:
-                    OnCreateEmptySession();
-                }
-
+                ExpandCurrentSessionType(sessionType);
             }
         }
         break;
@@ -1060,7 +869,7 @@ void ProfileApplicationTreeHandler::onEvent(const apEvent& eve, bool& vetoEvent)
 }
 
 
-void ProfileApplicationTreeHandler::ExpandCurrentSessionType(const gtString& mode, const gtString& sessionType)
+void ProfileApplicationTreeHandler::ExpandCurrentSessionType(const gtString& sessionType)
 {
     // Collapse all profile type items
     GT_IF_WITH_ASSERT((m_pApplicationTree != nullptr) && (m_pApplicationTree->treeControl() != nullptr))
@@ -1082,7 +891,7 @@ void ProfileApplicationTreeHandler::ExpandCurrentSessionType(const gtString& mod
 
     // Find the session type item. Notice, in frame analysis mode there is no session type, so
     // we look for the frame analysis node
-    QString typeToSearch = (mode == PM_STR_FrameAnalysisMode) ? PM_profileTypeFrameAnalysis : acGTStringToQString(sessionType);
+    QString typeToSearch = acGTStringToQString(sessionType);
     QTreeWidgetItem* pTypeItem = GetProfileTypeNode(typeToSearch, false);
 
     if ((pTypeItem != nullptr) && (pTypeItem->childCount() > 0))
@@ -1091,15 +900,6 @@ void ProfileApplicationTreeHandler::ExpandCurrentSessionType(const gtString& mod
         pTypeItem->setExpanded(true);
 
         pTypeItem->child(0)->setExpanded(true);
-
-        // Expand the first session in tree
-        if (mode == PM_STR_FrameAnalysisMode)
-        {
-            if (pTypeItem->child(0)->childCount() > 0)
-            {
-                pTypeItem->child(0)->child(0)->setExpanded(true);
-            }
-        }
     }
 }
 
@@ -1116,9 +916,8 @@ void ProfileApplicationTreeHandler::OnMdiActivateEvent(const apMDIViewActivatedE
     {
         // Do nothing when the mode is not profile or frame analysis
         bool isInProfileMode = afExecutionModeManager::instance().isActiveMode(PM_STR_PROFILE_MODE);
-        bool isInFrameAnalysisMode = afExecutionModeManager::instance().isActiveMode(PM_STR_FrameAnalysisMode);
 
-        if (isInProfileMode || isInFrameAnalysisMode)
+        if (isInProfileMode)
         {
             // Find the item that is related to the file selected
             afApplicationTreeItemData* pItemToSelect = m_pApplicationTree->FindItemByFilePath(activateEvent.filePath());
@@ -1235,9 +1034,8 @@ bool ProfileApplicationTreeHandler::BuildContextMenuForItems(const gtList<const 
         {
             // Add multiple deletion of sessions action
             bool isInProfileMode = afExecutionModeManager::instance().isActiveMode(PM_STR_PROFILE_MODE);
-            bool isInFrameAnalysisMode = afExecutionModeManager::instance().isActiveMode(PM_STR_FrameAnalysisMode);
 
-            if (isInProfileMode || isInFrameAnalysisMode)
+            if (isInProfileMode)
             {
                 retVal = true;
                 gtList<const afApplicationTreeItemData*>::const_iterator iter = contextMenuItemsList.begin();
@@ -1415,7 +1213,6 @@ void ProfileApplicationTreeHandler::OnEditorClosed(const QString& newValue)
 {
     // Handle editing only when the mode is profile:
     bool shouldHandle = afExecutionModeManager::instance().isActiveMode(PM_STR_PROFILE_MODE);
-    shouldHandle = shouldHandle || afExecutionModeManager::instance().isActiveMode(PM_STR_FrameAnalysisMode);
 
     if (shouldHandle)
     {
@@ -1620,7 +1417,6 @@ void ProfileApplicationTreeHandler::SetItemsVisibility()
 {
     // Check if the profile mode is currently active, and show / hide all the profile session items in according with:
     bool isInProfileMode = afExecutionModeManager::instance().isActiveMode(PM_STR_PROFILE_MODE);
-    bool isInFrameAnalysisMode = afExecutionModeManager::instance().isActiveMode(PM_STR_FrameAnalysisMode);
 
     GT_IF_WITH_ASSERT(nullptr != m_pApplicationTree)
     {
@@ -1640,8 +1436,7 @@ void ProfileApplicationTreeHandler::SetItemsVisibility()
                     {
                         if (nullptr != pChildData->m_pTreeWidgetItem)
                         {
-                            bool isFrameAnalysisNode = pChildData->m_pTreeWidgetItem->text(0).contains(PM_profileTypeFrameAnalysisPrefix);
-                            bool shouldShow = (isInFrameAnalysisMode && isFrameAnalysisNode) || (isInProfileMode && !isFrameAnalysisNode);
+                            bool shouldShow = isInProfileMode;
 
                             // Show / hide the child
                             pChildData->m_pTreeWidgetItem->setHidden(!shouldShow);
@@ -1767,14 +1562,6 @@ QTreeWidgetItem* ProfileApplicationTreeHandler::CreateItemForSession(SessionTree
                         // Check if there is an empty session (if there is, it should always be the last):
                         QTreeWidgetItem* pPreceding = nullptr;
 
-                        if (DoesEmptySessionNodeExist())
-                        {
-                            if (m_pEmptySessionItemData->m_pTreeWidgetItem->parent() == pProfileTypeItem)
-                            {
-                                pPreceding = m_pEmptySessionItemData->m_pTreeWidgetItem;
-                            }
-                        }
-
                         // Add the session to the tree (in frame analysis text will be replaced later, when we add the child frames)
                         pRetVal = m_pApplicationTree->insertTreeItem(acQStringToGTString(pNewItemSessionData->m_displayName), pNewItemSessionData->m_pParentData, pProfileTypeItem, pPreceding);
                         GT_IF_WITH_ASSERT((nullptr != pRetVal) && (nullptr != pPixmap))
@@ -1806,7 +1593,7 @@ afApplicationTreeItemData* ProfileApplicationTreeHandler::FindParentSessionItemD
 
         while ((nullptr == pRetVal) && (nullptr != pTempItem) && (nullptr != pTempItem->m_pTreeWidgetItem) && (pHeaderItem != pTempItem->m_pTreeWidgetItem))
         {
-            if ((AF_TREE_ITEM_PROFILE_SESSION == pTempItem->m_itemType) || (AF_TREE_ITEM_PROFILE_EMPTY_SESSION == pTempItem->m_itemType))
+            if (AF_TREE_ITEM_PROFILE_SESSION == pTempItem->m_itemType)
             {
                 pRetVal = (afApplicationTreeItemData*)pTempItem;
                 break;
@@ -1841,7 +1628,7 @@ afApplicationTreeItemData* ProfileApplicationTreeHandler::FindParentItemForSelec
 
         while ((nullptr == pRetVal) && (nullptr != pTempItem) && (nullptr != pTempItem->m_pTreeWidgetItem) && (pHeaderItem != pTempItem->m_pTreeWidgetItem))
         {
-            if ((AF_TREE_ITEM_PROFILE_SESSION == pTempItem->m_itemType) || (AF_TREE_ITEM_PROFILE_EMPTY_SESSION == pTempItem->m_itemType) || (AF_TREE_ITEM_GP_FRAME == pTempItem->m_itemType))
+            if (AF_TREE_ITEM_PROFILE_SESSION == pTempItem->m_itemType)
             {
                 pRetVal = (afApplicationTreeItemData*)pTempItem;
                 break;
@@ -2187,7 +1974,6 @@ bool ProfileApplicationTreeHandler::GetNextSessionNameAndDir(const gtString& str
     int newSessionId = 1;
 
     // Check if this is a new / imported session:
-    bool isNewSession = (strSessionDisplayName == PM_STR_NewSessionName);
     bool isSessionImported = !strSessionDisplayName.isEmpty();
     gtString strSessionFolderName;
 
@@ -2209,10 +1995,7 @@ bool ProfileApplicationTreeHandler::GetNextSessionNameAndDir(const gtString& str
     }
     else
     {
-        if (!isNewSession)
-        {
-            strSessionFolderName.append(L"_Imported");
-        }
+        strSessionFolderName.append(L"_Imported");
     }
 
     // Set the folder name to be the session display name:
@@ -2248,7 +2031,7 @@ bool ProfileApplicationTreeHandler::GetNextSessionNameAndDir(const gtString& str
             outputDir.appendSubDirectory(strSessionFolderName);
             outputDir.getFileDirectory(sessionDir);
 
-            if (sessionDir.exists() && !isNewSession)
+            if (sessionDir.exists())
             {
                 gtString strNameBase(strSessionFolderName);
 
@@ -2327,13 +2110,9 @@ bool ProfileApplicationTreeHandler::BuildContextMenuForSingleItem(const afApplic
         //
         bool shouldMenuBeOpened = false;
         bool doesSessionExist = false;
-        bool isSessionRunning = false;
-        afRunModes currentRunModes = afPluginConnectionManager::instance().getCurrentRunModeMask();
-        bool isSessionInExport = (0 != (currentRunModes & AF_FRAME_ANALYZE_CURRENTLY_EXPORTING));
-        bool isSessionInImport = (0 != (currentRunModes & AF_FRAME_ANALYZE_CURRENTLY_IMPORTING));
 
         // Check if this item can be opened:
-        bool canOpen = canItemBeOpened(pItemData) && !isSessionInExport && !isSessionInImport;
+        bool canOpen = canItemBeOpened(pItemData);
 
         QString sessionDisplayName;
 
@@ -2350,7 +2129,6 @@ bool ProfileApplicationTreeHandler::BuildContextMenuForSingleItem(const afApplic
             {
                 sessionDisplayName = pTreeNodeData->m_displayName;
                 doesSessionExist = pTreeNodeData->SessionDir().exists();
-                isSessionRunning = pTreeNodeData->m_isSessionRunning;
             }
         }
         else
@@ -2369,11 +2147,11 @@ bool ProfileApplicationTreeHandler::BuildContextMenuForSingleItem(const afApplic
 
             bool isProcessRunning = (afPluginConnectionManager::instance().getCurrentRunModeMask() & AF_DEBUGGED_PROCESS_EXISTS);
 
-            m_pSessionDeleteAction->setEnabled(isSession && !isSessionRunning && !isSessionInExport && !isSessionInImport);
+            m_pSessionDeleteAction->setEnabled(isSession);
             m_pSessionDeleteAction->setVisible(isSession);
 
             // Enable rename session only for the session node:
-            m_pSessionRenameAction->setEnabled(isSession && !isSessionRunning && !isSessionInExport && !isSessionInImport);
+            m_pSessionRenameAction->setEnabled(isSession);
             m_pSessionRenameAction->setVisible(isSession);
 
             m_pOpenFolderAction->setEnabled(doesSessionExist);
@@ -2402,7 +2180,7 @@ bool ProfileApplicationTreeHandler::BuildContextMenuForSingleItem(const afApplic
 
             shouldDeleteAll &= hasVisibleChildren;
 
-            m_pDeleteAllSessionsAction->setEnabled(shouldDeleteAll && !isSessionInExport && !isSessionInImport);
+            m_pDeleteAllSessionsAction->setEnabled(shouldDeleteAll);
             m_pDeleteAllSessionsAction->setVisible(shouldDeleteAll);
 
             if (isSessionType && shouldDeleteAll)
@@ -2423,7 +2201,7 @@ bool ProfileApplicationTreeHandler::BuildContextMenuForSingleItem(const afApplic
 
             bool isImportEnabledForNode = isSessionType || (AF_TREE_ITEM_APP_ROOT == pItemData->m_itemType);
             bool isImportEnabled = canImport && isImportingOkWithCurrentMode(msg) && isImportEnabledForNode;
-            m_pImportSessionAction->setEnabled(isImportEnabled && !isSessionInExport && !isSessionInImport);
+            m_pImportSessionAction->setEnabled(isImportEnabled);
             m_pImportSessionAction->setVisible(isImportEnabled);
 
             if (canOpen)
@@ -2453,14 +2231,6 @@ bool ProfileApplicationTreeHandler::BuildContextMenuForSingleItem(const afApplic
 
             isExportEnabledForNode &= canOpen;
 
-            m_pExportSessionAction->setEnabled(isExportEnabledForNode && !isSessionInExport && !isSessionInImport);
-            m_pExportSessionAction->setVisible(isExportEnabledForNode);
-
-            bool isRefreshEnabled = isImportEnabled;
-            isRefreshEnabled = isRefreshEnabled && (afProjectManager::instance().currentProjectSettings().isRemoteTarget());
-            m_pRefreshFromServerAction->setEnabled(isRefreshEnabled);
-            m_pRefreshFromServerAction->setVisible(isRefreshEnabled);
-
             // Set the menu:
             menu.addAction(m_pSessionRenameAction);
             menu.addAction(m_pSessionDeleteAction);
@@ -2472,18 +2242,6 @@ bool ProfileApplicationTreeHandler::BuildContextMenuForSingleItem(const afApplic
                 menu.addAction(m_pImportSessionAction);
                 menu.addAction(m_pDeleteAllSessionsAction);
             }
-
-            if (m_pExportSessionAction->isVisible())
-            {
-                menu.addAction(m_pExportSessionAction);
-            }
-
-            if (m_pRefreshFromServerAction->isVisible())
-            {
-                menu.addSeparator();
-                menu.addAction(m_pRefreshFromServerAction);
-            }
-
             retVal = true;
 
         }
@@ -2587,108 +2345,6 @@ QTreeWidgetItem* ProfileApplicationTreeHandler::GetProfileTypeNode(const QString
     return pRetVal;
 }
 
-void ProfileApplicationTreeHandler::AddEmptySessionCreationNode(bool shouldSelect)
-{
-    // Check if the item exists:
-    if (nullptr == m_pEmptySessionItemData)
-    {
-        // Get the power profile type node:
-        QTreeWidgetItem* pPowerProfileTypeNode = ProfileApplicationTreeHandler::instance()->GetProfileTypeNode(PM_STR_OnlineProfileName);
-        GT_IF_WITH_ASSERT(nullptr != pPowerProfileTypeNode)
-        {
-            // Add an item:
-            m_pEmptySessionItemData = new afApplicationTreeItemData;
-            m_pEmptySessionItemData->m_itemType = AF_TREE_ITEM_PROFILE_EMPTY_SESSION;
-            m_pEmptySessionItemData->m_isItemRemovable = false;
-
-            // Add the item to the tree:
-            QTreeWidgetItem* pNewItem = afApplicationCommands::instance()->applicationTree()->addTreeItem(PM_STR_NewSessionNodeName, m_pEmptySessionItemData, pPowerProfileTypeNode);
-
-            // Set the item icon:
-            GT_IF_WITH_ASSERT(nullptr != pNewItem)
-            {
-                QPixmap* pPixmap = new QPixmap;
-                bool rc = acSetIconInPixmap(*pPixmap, AC_ICON_PROFILE_PWR_APPTREE_NEW);
-                GT_IF_WITH_ASSERT(rc)
-                {
-                    pNewItem->setIcon(0, QIcon(*pPixmap));
-                }
-            }
-        }
-    }
-
-    // Make sure that the empty session is visible:
-    GT_IF_WITH_ASSERT(DoesEmptySessionNodeExist())
-    {
-        QTreeWidgetItem* pEmptySessionParent = m_pEmptySessionItemData->m_pTreeWidgetItem->parent();
-        GT_IF_WITH_ASSERT(nullptr != pEmptySessionParent)
-        {
-            bool isInProfileMode = afExecutionModeManager::instance().isActiveMode(PM_STR_PROFILE_MODE);
-            pEmptySessionParent->setHidden(!isInProfileMode);
-        }
-
-        if (shouldSelect)
-        {
-            afApplicationCommands::instance()->applicationTree()->selectItem(m_pEmptySessionItemData, false);
-        }
-    }
-}
-
-void ProfileApplicationTreeHandler::OnCreateEmptySession()
-{
-    // Check if the empty session node can be activated:
-    gtString message;
-    gtString currentSessionType = SharedProfileManager::instance().sessionTypeName(afExecutionModeManager::instance().activeSessionType());
-
-    bool isEmptySessionEnabled = IsEmptySessionEnabled(message, currentSessionType, true);
-
-    if (isEmptySessionEnabled)
-    {
-        bool doesExist = DoesEmptySessionExist();
-
-        if (!doesExist)
-        {
-            // If there is no project loaded, create a default one:
-            if (afProjectManager::instance().currentProjectSettings().projectName().isEmpty())
-            {
-                afApplicationCommands::instance()->CreateDefaultProject(PM_STR_PROFILE_MODE, PM_STR_OnlineProfileNameW);
-
-                // Set the scope as system wide:
-                SharedProfileSettingPage::Instance()->CurrentSharedProfileSettings().m_profileScope = PM_PROFILE_SCOPE_SYS_WIDE;
-            }
-
-            // If the empty session was not created, create it:
-            GT_IF_WITH_ASSERT(DoesEmptySessionNodeExist())
-            {
-                // Find the matching session type tree handler, and build the tree item:
-                SessionTypeTreeHandlerAbstract* pSessionTreeHandler = GetSessionTypeTreeHandler(PM_STR_OnlineProfileName);
-
-                // Once the handler found, create the empty session:
-                GT_IF_WITH_ASSERT(nullptr != pSessionTreeHandler)
-                {
-                    SessionTreeNodeData* pEmptySessionData = pSessionTreeHandler->CreateEmptySessionData(m_pEmptySessionItemData);
-
-                    if (nullptr != pEmptySessionData)
-                    {
-                        pSessionTreeHandler->BuildSessionTree(*pEmptySessionData, m_pEmptySessionItemData->m_pTreeWidgetItem);
-
-                        // Set the session id to the empty session:
-                        pEmptySessionData->m_sessionId = ++m_sSessionCount;
-
-                        // select the item and expend it only if it was created if not this will cause infinite loop and crash.
-                        GT_IF_WITH_ASSERT(DoesEmptySessionNodeExist() && nullptr != m_pApplicationTree)
-                        {
-                            // Select the session node and expand it:
-                            afApplicationCommands::instance()->applicationTree()->selectItem(m_pEmptySessionItemData, true);
-                            m_pApplicationTree->expandItem(m_pEmptySessionItemData->m_pTreeWidgetItem);
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
 void ProfileApplicationTreeHandler::RenameSession(afApplicationTreeItemData* pItemData, const QString& newNameAfterRevision)
 {
     SessionTreeNodeData* pSessionData = qobject_cast<SessionTreeNodeData*>(pItemData->extendedItemData());
@@ -2790,139 +2446,11 @@ void ProfileApplicationTreeHandler::RenameSession(afApplicationTreeItemData* pIt
     }
 }
 
-afApplicationTreeItemData* ProfileApplicationTreeHandler::RenameEmptySession(const QString& newSessionName)
-{
-    afApplicationTreeItemData* pRetVal = nullptr;
-
-    // Check if an empty session exists in tree:
-    bool doesEmptySessionExists = false;
-
-    if (DoesEmptySessionNodeExist())
-    {
-        doesEmptySessionExists = (m_pEmptySessionItemData->m_pTreeWidgetItem->childCount() > 0);
-
-        if (doesEmptySessionExists)
-        {
-            // Get the old name before rename:
-            m_nameBeforeRename = m_pEmptySessionItemData->m_pTreeWidgetItem->text(0);
-
-            // Rename the empty session:
-            RenameSession(m_pEmptySessionItemData, newSessionName);
-
-            // Set the tree widget item icon:
-            QPixmap* pPixmap = TreeItemTypeToPixmap(AF_TREE_ITEM_PROFILE_SESSION, PM_STR_OnlineProfileName);
-            GT_IF_WITH_ASSERT(nullptr != pPixmap)
-            {
-                m_pEmptySessionItemData->m_pTreeWidgetItem->setIcon(0, QIcon(*pPixmap));
-            }
-
-            // Make the item enabled for name change editing:
-            Qt::ItemFlags itemFlags = m_pEmptySessionItemData->m_pTreeWidgetItem->flags();
-            itemFlags |= Qt::ItemIsEditable;
-            m_pEmptySessionItemData->m_pTreeWidgetItem->setFlags(itemFlags);
-
-            pRetVal = m_pEmptySessionItemData;
-
-            // Mark the previously empty session as a session:
-            pRetVal->m_itemType = AF_TREE_ITEM_PROFILE_SESSION;
-            m_pEmptySessionItemData = nullptr;
-        }
-
-        // Add another empty node creation:
-        AddEmptySessionCreationNode(false);
-    }
-
-    return pRetVal;
-}
-
-bool ProfileApplicationTreeHandler::DoesEmptySessionExist() const
-{
-    bool retVal = false;
-
-    // Check if an empty session exists in tree:
-    if (DoesEmptySessionNodeExist())
-    {
-        retVal = (0 < m_pEmptySessionItemData->m_pTreeWidgetItem->childCount());
-    }
-
-    return retVal;
-}
-
-bool ProfileApplicationTreeHandler::IsEmptySessionEnabled(gtString& message, const gtString& sessionType, bool shouldPopupUserMessage)
-{
-    bool retVal = false;
-
-    bool isProcessRunning = (afPluginConnectionManager::instance().getCurrentRunModeMask() & AF_DEBUGGED_PROCESS_EXISTS);
-    bool isPower = (sessionType == PM_STR_OnlineProfileNameW);
-
-    if (isProcessRunning)
-    {
-        message = PM_STR_NewSessionCreationErrorProcessRunning;
-    }
-
-    // When the process is running, disable the new session activation (do not popup the user):
-    if (!isPower && !isProcessRunning)
-    {
-        if (shouldPopupUserMessage)
-        {
-            // The current profile type is not power profile. Ask the user if he wants to switch to power profile:
-            QMessageBox::StandardButton userAnswer = acMessageBox::instance().question(afGlobalVariablesManager::ProductNameA(), PM_STR_NewSessionCreationOtherProfileTypeQuestion, QMessageBox::Yes | QMessageBox::No);
-
-            if (userAnswer == QMessageBox::Yes)
-            {
-                // Create a session type changed event, and make sure it is executed immediately (call handleDebugEvent, not registerPendingDebugEvent):
-                apExecutionModeChangedEvent executionModeEvent(PM_STR_PROFILE_MODE, PM_STR_OnlineProfileNameW);
-                apEventsHandler::instance().handleDebugEvent(executionModeEvent);
-
-                // Enable creation of empty session:
-                retVal = true;
-            }
-        }
-        else
-        {
-            message = PM_STR_NewSessionCreationErrorOtherProfileType;
-        }
-    }
-
-    if (!isProcessRunning && isPower)
-    {
-        retVal = true;
-    }
-
-    return retVal;
-}
-
-void ProfileApplicationTreeHandler::EnableEmptySessionNode(const gtString& sessionType)
-{
-    gtString message;
-    bool isEnabled = IsEmptySessionEnabled(message, sessionType, false);
-
-    if (isEnabled)
-    {
-        // Add an empty session creation node:
-        AddEmptySessionCreationNode(true);
-
-        GT_IF_WITH_ASSERT(DoesEmptySessionNodeExist() && nullptr != m_pApplicationTree)
-        {
-            m_pEmptySessionItemData->m_pTreeWidgetItem->setForeground(0, Qt::black);
-            m_pApplicationTree->selectItem(m_pEmptySessionItemData, false);
-            m_pApplicationTree->treeControl()->scrollToItem(m_pEmptySessionItemData->m_pTreeWidgetItem, QAbstractItemView::EnsureVisible);
-        }
-    }
-    else
-    {
-        if (DoesEmptySessionNodeExist())
-        {
-            m_pEmptySessionItemData->m_pTreeWidgetItem->setForeground(0, Qt::gray);
-        }
-    }
-}
-
 bool ProfileApplicationTreeHandler::CurrentModeIsSupported()
 {
     bool retVal = false;
 
-    retVal = afExecutionModeManager::instance().isActiveMode(PM_STR_PROFILE_MODE) || afExecutionModeManager::instance().isActiveMode(PM_STR_FrameAnalysisMode);
+    retVal = afExecutionModeManager::instance().isActiveMode(PM_STR_PROFILE_MODE);
     return retVal;
 
 }

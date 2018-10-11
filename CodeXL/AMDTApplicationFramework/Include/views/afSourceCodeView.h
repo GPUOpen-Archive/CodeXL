@@ -124,7 +124,6 @@ protected:
 protected slots:
 
     void onAddWatch();
-    void onAddMultiWatch();
     void onAboutToShowTextContextMenu();
     void onShowLineNumbers(bool show);
 protected:
@@ -137,7 +136,6 @@ protected:
 
     // Actions for context menu:
     QAction* _pAddWatchAction;
-    QAction* _pAddMultiWatchAction;
 
     QPoint _currentMousePosition;
 

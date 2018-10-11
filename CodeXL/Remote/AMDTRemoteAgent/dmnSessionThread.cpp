@@ -79,8 +79,8 @@ const gtString COMPRESSED_FILE_SUFFIX = L"_zipped";
     #define DMN_REMOTE_DEBUGGING_SERVER_EXECUTABLE_EXTENSION L"exe"
     #define DMN_PROFILER_BACKEND_32_BIT_SUBFOLDER OS_STR_32BitDirectoryName
     #define DMN_PROFILER_BACKEND_64_BIT_SUBFOLDER OS_STR_64BitDirectoryName
-    #define DMN_PROFILER_BACKEND_EXECUTABLE_NAME L"CodeXLGpuProfiler" AMDT_PROJECT_SUFFIX_W
-    #define DMN_PROFILER_BACKEND_64_BIT_EXECUTABLE_NAME L"CodeXLGpuProfiler-x64" AMDT_PROJECT_SUFFIX_W
+    #define DMN_PROFILER_BACKEND_EXECUTABLE_NAME L"rcprof" AMDT_PROJECT_SUFFIX_W
+    #define DMN_PROFILER_BACKEND_64_BIT_EXECUTABLE_NAME L"rcprof-x64" AMDT_PROJECT_SUFFIX_W
     #define DMN_PROFILER_BACKEND_EXECUTABLE_EXTENSION L"exe"
 #elif AMDT_BUILD_TARGET == AMDT_LINUX_OS
     // Linux version has same name for both debug and release builds:
@@ -89,8 +89,8 @@ const gtString COMPRESSED_FILE_SUFFIX = L"_zipped";
     // Linux does not currently support 32-bit profiling, so we do not have an L"x86" option:
     #define DMN_PROFILER_BACKEND_32_BIT_SUBFOLDER OS_STR_64BitDirectoryName
     #define DMN_PROFILER_BACKEND_64_BIT_SUBFOLDER OS_STR_64BitDirectoryName
-    #define DMN_PROFILER_BACKEND_INTERNAL_EXECUTABLE_NAME L"CodeXLGpuProfiler-internal"
-    #define DMN_PROFILER_BACKEND_NORMAL_EXECUTABLE_NAME L"CodeXLGpuProfiler"
+    #define DMN_PROFILER_BACKEND_INTERNAL_EXECUTABLE_NAME L"rcprof-internal"
+    #define DMN_PROFILER_BACKEND_NORMAL_EXECUTABLE_NAME L"rcprof"
 
     #define DMN_PROFILER_BACKEND_EXECUTABLE_EXTENSION L""
 #else
@@ -110,7 +110,7 @@ static bool FillPathBuffers(REMOTE_OPERATION_MODE mode, bool is64BitTarget, osFi
 
     // Creating a full path for the application.
     // In the production daemon, we should read from the config file the
-    // full path of CodeXLGpuProfiler and RDS, and write one function that fills the osFilePath
+    // full path of rcprof and RDS, and write one function that fills the osFilePath
     // structures according to the opcode received from the client.
     gtString dirPath;
     gtString exePath;
@@ -455,13 +455,13 @@ static bool FixTokenizedPathString(const gtString& tokenizedPath, gtString& fixe
 }
 
 
-static bool FixCodeXLGpuProfilerCmdLineArgs(const gtString& originalCmdLineArgs, gtString& fixedRemotePath)
+static bool FixGpuProfilerCmdLineArgs(const gtString& originalCmdLineArgs, gtString& fixedRemotePath)
 {
     return FixTokenizedPathString(originalCmdLineArgs, fixedRemotePath);
 }
 
 
-static gtString ExtractDirFromCodeXLGpuProfilerCmdLineArgsString(const gtString& fixedCmdLineStr)
+static gtString ExtractDirFromGpuProfilerCmdLineArgsString(const gtString& fixedCmdLineStr)
 {
     gtString ret = L"";
 
@@ -495,25 +495,25 @@ static gtString ExtractDirFromCodeXLGpuProfilerCmdLineArgsString(const gtString&
     return ret;
 }
 
-static bool SetupCodeXLGpuProfilerOutputDir(const gtString& fixedCmdLineArgs, osDirectory& outDirBuffer)
+static bool SetupGpuProfilerOutputDir(const gtString& fixedCmdLineArgs, osDirectory& outDirBuffer)
 {
-    gtString codeXLGpuProfilerOutDirStr = ExtractDirFromCodeXLGpuProfilerCmdLineArgsString(fixedCmdLineArgs);
-    bool isOk = !codeXLGpuProfilerOutDirStr.isEmpty();
-    GT_ASSERT_EX(isOk, L"DMN: Extracted empty CodeXLGpuProfiler output dir from cmd line args.");
+    gtString gpuProfilerOutDirStr = ExtractDirFromGpuProfilerCmdLineArgsString(fixedCmdLineArgs);
+    bool isOk = !gpuProfilerOutDirStr.isEmpty();
+    GT_ASSERT_EX(isOk, L"DMN: Extracted empty rcprof output dir from cmd line args.");
 
     if (isOk)
     {
-        osFilePath codeXLGpuProfilerOutDirPath(codeXLGpuProfilerOutDirStr);
-        osDirectory codeXLGpuProfilerOutDir(codeXLGpuProfilerOutDirPath);
+        osFilePath gpuProfilerOutDirPath(gpuProfilerOutDirStr);
+        osDirectory gpuProfilerOutDir(gpuProfilerOutDirPath);
 
-        if (!codeXLGpuProfilerOutDir.exists())
+        if (!gpuProfilerOutDir.exists())
         {
-            isOk = dmnUtils::CreateDirHierarchy(codeXLGpuProfilerOutDirStr);
-            GT_ASSERT_EX(isOk, L"DMN: Failed to create output directory for CodeXLGpuProfiler.");
+            isOk = dmnUtils::CreateDirHierarchy(gpuProfilerOutDirStr);
+            GT_ASSERT_EX(isOk, L"DMN: Failed to create output directory for rcprof.");
 
             if (isOk)
             {
-                outDirBuffer = osDirectory(codeXLGpuProfilerOutDir);
+                outDirBuffer = osDirectory(gpuProfilerOutDir);
             }
         }
     }
@@ -637,7 +637,7 @@ gtSet<gtString> dmnSessionThread::m_ProcessNamesTerminationSet;
 
 dmnSessionThread::dmnSessionThread(osTCPSocketServerConnectionHandler* pConnHandler,
                                    const gtString& threadName, bool syncTermination) : osThread(threadName, syncTermination), m_pConnHandler(pConnHandler), m_rdsProcId(0), m_sProfProcId(0), m_sGraphicsProcId(0),
-    m_powerBackendAdapter(this, m_pConnHandler), m_isForcedTerminationRequired(false)
+    m_isForcedTerminationRequired(false)
 
 {
     GT_ASSERT(pConnHandler != NULL);
@@ -710,12 +710,12 @@ static bool ReceiveRemoteFile(osChannel* pChannel, osDirectory& localTargetDir)
     gtInt32 fileTypeBuffer = 0;
     (*pChannel) >> fileTypeBuffer;
 
-    // Receive file name as CodeXLGpuProfiler knows it.
+    // Receive file name as rcprof knows it.
     if (fileTypeBuffer != dftMissingFile)
     {
         gtString expectedFileName;
         ret = pChannel->readString(expectedFileName);
-        GT_ASSERT_EX(ret, L"Getting expected file name for CodeXLGpuProfiler file.");
+        GT_ASSERT_EX(ret, L"Getting expected file name for rcprof file.");
 
         // Ack.
         ReportResult(ret, pChannel);
@@ -754,7 +754,7 @@ static bool ReceiveRemoteFile(osChannel* pChannel, osDirectory& localTargetDir)
                 {
                     osDirectory dirToCreate;
                     ret = outputFilePath.getFileDirectory(dirToCreate);
-                    GT_ASSERT_EX(ret, L"Failed getting file directory for CodeXLGpuProfiler files.");
+                    GT_ASSERT_EX(ret, L"Failed getting file directory for rcprof files.");
 
                     if (ret)
                     {
@@ -766,7 +766,7 @@ static bool ReceiveRemoteFile(osChannel* pChannel, osDirectory& localTargetDir)
                 outputFilePath.setFileName(fileNameNoPath);
 
                 ret = tmpBuffer.toFile(outputFilePath);
-                GT_ASSERT_EX(ret, L"DMN: Failed saving file to disk for CodeXLGpuProfiler.");
+                GT_ASSERT_EX(ret, L"DMN: Failed saving file to disk for rcprof.");
 
                 // Trace the status.
                 std::wstringstream msgStream;
@@ -876,133 +876,6 @@ int dmnSessionThread::entryPoint()
                     case docGetDaemonCXLVersion:
                     {
                         isOk = GetDaemonCXLVersion();
-                        break;
-                    }
-
-                    // RT Power Profiling.
-                    case docPowerInit:
-                    {
-                        isOk = m_powerBackendAdapter.handlePowerSessionInitRequest();
-                        GT_ASSERT_EX(isOk, L"DMN: Failed to init power profiling backend.");
-                        break;
-                    }
-
-                    case docPowerSetSamplingConfig:
-                    {
-                        isOk = m_powerBackendAdapter.handlePowerSessionConfigRequest();
-                        GT_ASSERT_EX(isOk, L"DMN: Failed to set power profiling sampling configuration.");
-                        break;
-                    }
-
-                    case docPowerSetSamplingInterval:
-                    {
-                        isOk = m_powerBackendAdapter.handleSetSamplingIntervalMsRequest();
-                        GT_ASSERT_EX(isOk, L"DMN: Failed to set the power profiling sampling interval.");
-                        break;
-                    }
-
-                    case docPowerGetSystemTopology:
-                    {
-                        isOk = m_powerBackendAdapter.handleGetSystemTopologyRequest();
-                        GT_ASSERT_EX(isOk, L"DMN: Failed to get the system topology.");
-                        break;
-                    }
-
-                    case docPowerGetMinimumSamplingInterval:
-                    {
-                        isOk = m_powerBackendAdapter.handleGetSMinSamplingIntervalMsRequest();
-                        GT_ASSERT_EX(isOk, L"DMN: Failed to get the min sampling interval.");
-                        break;
-                    }
-
-                    case docPowerGetCurrentSamplingPeriod:
-                    {
-                        isOk = m_powerBackendAdapter.handleGetSCurrentSamplingIntervalMsRequest();
-                        GT_ASSERT_EX(isOk, L"DMN: Failed to get the current sampling interval.");
-                        break;
-                    }
-
-                    case docPowerEnableCounter:
-                    {
-                        isOk = m_powerBackendAdapter.handleEnableCounterRequest();
-                        GT_ASSERT_EX(isOk, L"DMN: Failed to enable a power profiling counter.");
-                        break;
-                    }
-
-                    case docPowerDisableCounter:
-                    {
-                        isOk = m_powerBackendAdapter.handleDisableCounterRequest();
-                        GT_ASSERT_EX(isOk, L"DMN: Failed to disable a power profiling counter.");
-                        break;
-                    }
-
-                    case docPowerIsCounterEnabled:
-                    {
-                        isOk = m_powerBackendAdapter.handleIsCounterEnabledRequest();
-                        GT_ASSERT_EX(isOk, L"DMN: Failed to check if a power profiling counter is enabled.");
-                        break;
-                    }
-
-                    case docPowerStartProfiling:
-                    {
-                        isOk = m_powerBackendAdapter.handleStartPowerProfilingRequest();
-                        GT_ASSERT_EX(isOk, L"DMN: Failed to start the power profiling session.");
-                        break;
-                    }
-
-                    case docPowerStopProfiling:
-                    {
-                        isOk = m_powerBackendAdapter.handleStopPowerProfilingRequest();
-                        GT_ASSERT_EX(isOk, L"DMN: Failed to stop the power profiling session.");
-
-                        // Terminate this session.
-                        isTerminationRequired = true;
-                        notifyUserAboutDisconnection();
-
-                        break;
-                    }
-
-                    case docPowerDisconnectWithoutClosing:
-                    {
-                        // Terminate this session.
-                        isTerminationRequired = true;
-                        notifyUserAboutDisconnection();
-
-                        break;
-                    }
-
-                    case docPowerPauseProfiling:
-                    {
-                        isOk = m_powerBackendAdapter.handlePausePowerProfilingRequest();
-                        GT_ASSERT_EX(isOk, L"DMN: Failed to pause the power profiling session.");
-                        break;
-                    }
-
-                    case docPowerResumeProfiling:
-                    {
-                        isOk = m_powerBackendAdapter.handleResumePowerProfilingRequest();
-                        GT_ASSERT_EX(isOk, L"DMN: Failed to resume the power profiling session.");
-                        break;
-                    }
-
-                    case docPowerClose:
-                    {
-                        isOk = m_powerBackendAdapter.handleClosePowerProfilingSessionRequest();
-                        GT_ASSERT_EX(isOk, L"DMN: Failed to close the power profiling session.");
-                        break;
-                    }
-
-                    case docPowerGetSamplesBatch:
-                    {
-                        isOk = m_powerBackendAdapter.handleReadAllEnabledCountersRequest();
-                        GT_ASSERT_EX(isOk, L"DMN: Failed to read enabled counters.");
-                        break;
-                    }
-
-                    case docPowerGetDeviceCounters:
-                    {
-                        isOk = m_powerBackendAdapter.handleGetDeviceCountersRequest();
-                        GT_ASSERT_EX(isOk, L"DMN: Failed to get a power device's counters.");
                         break;
                     }
 
@@ -1140,7 +1013,7 @@ bool dmnSessionThread::TerminateProfilingSession()
     dmnUtils::LogMessage(L"DMN: RECEIVED REMOTE OPCODE -> TERMINATE PROFILING SESSION REQUEST.", OS_DEBUG_LOG_DEBUG);
 
     isOk = HandleProcessTerminationRequest(m_sProfProcId);
-    GT_ASSERT_EX(isOk, L"CodeXLGpuProfiler Termination.");
+    GT_ASSERT_EX(isOk, L"rcprof Termination.");
 
     // Respond.
     ReportResult(isOk, m_pConnHandler);
@@ -1279,14 +1152,14 @@ void dmnSessionThread::LaunchProfiler(bool& isTerminationRequired)
     {
         gtString cmdLineArgsBuffer;
         isOk = m_pConnHandler->readString(cmdLineArgsBuffer);
-        GT_ASSERT_EX(isOk, L"Reading cmd line args string for CodeXLGpuProfiler.");
+        GT_ASSERT_EX(isOk, L"Reading cmd line args string for rcprof.");
         ReportResult(isOk, m_pConnHandler);
 
         if (isOk)
         {
             gtString fixedCmdLineArgs;
-            isOk = FixCodeXLGpuProfilerCmdLineArgs(cmdLineArgsBuffer, fixedCmdLineArgs);
-            GT_ASSERT_EX(isOk, L"Fixing CodeXLGpuProfiler cmd line args.");
+            isOk = FixGpuProfilerCmdLineArgs(cmdLineArgsBuffer, fixedCmdLineArgs);
+            GT_ASSERT_EX(isOk, L"Fixing rcprof cmd line args.");
 
             if (isOk)
             {
@@ -1304,17 +1177,17 @@ void dmnSessionThread::LaunchProfiler(bool& isTerminationRequired)
 
                 // Then make sure you get a string with the file type before each file.
                 isOk = ReceiveRemoteFile(m_pConnHandler, profFilesDir);
-                GT_ASSERT_EX(isOk, L"Receiving counters file for CodeXLGpuProfiler.");
+                GT_ASSERT_EX(isOk, L"Receiving counters file for rcprof.");
                 isOk = ReceiveRemoteFile(m_pConnHandler, profFilesDir);
-                GT_ASSERT_EX(isOk, L"Receiving env vars file for CodeXLGpuProfiler.");
+                GT_ASSERT_EX(isOk, L"Receiving env vars file for rcprof.");
                 isOk = ReceiveRemoteFile(m_pConnHandler, profFilesDir);
-                GT_ASSERT_EX(isOk, L"Receiving api filters for CodeXLGpuProfiler.");
+                GT_ASSERT_EX(isOk, L"Receiving api filters for rcprof.");
                 isOk = ReceiveRemoteFile(m_pConnHandler, profFilesDir);
-                GT_ASSERT_EX(isOk, L"Receiving api rules file for CodeXLGpuProfiler.");
+                GT_ASSERT_EX(isOk, L"Receiving api rules file for rcprof.");
 
                 // Check if we still need to create the output directory.
                 // This will happen in case no files are sent by the client.
-                isOk = SetupCodeXLGpuProfilerOutputDir(fixedCmdLineArgs, profFilesDir);
+                isOk = SetupGpuProfilerOutputDir(fixedCmdLineArgs, profFilesDir);
 
                 // Ack.
                 ReportResult(isOk, m_pConnHandler);
@@ -1348,7 +1221,7 @@ void dmnSessionThread::LaunchProfiler(bool& isTerminationRequired)
                         }
                     }
 
-                    // Append the kernel specific section CodeXLGpuProfiler's command line arguments.
+                    // Append the kernel specific section rcprof's command line arguments.
                     gtString kernelSpecificCmd = L" --kernellistfile ";
                     osFilePath kernelListFilePath = profFilesDir.directoryPath();
                     kernelListFilePath.setFileName(L"specificKernels");
@@ -1386,11 +1259,11 @@ void dmnSessionThread::LaunchProfiler(bool& isTerminationRequired)
                 {
                     // Trace.
                     std::wstringstream logMsgStream;
-                    logMsgStream << L"CodeXLGpuProfiler command line args string: ";
+                    logMsgStream << L"rcprof command line args string: ";
                     logMsgStream << fixedCmdLineArgs.asCharArray();
                     dmnUtils::LogMessage(logMsgStream.str(), OS_DEBUG_LOG_DEBUG);
 
-                    // Currently env vars for CodeXLGpuProfiler are empty.
+                    // Currently env vars for rcprof are empty.
                     std::vector<osEnvironmentVariable> envVars;
 
                     // Create the process.
@@ -1442,7 +1315,7 @@ void dmnSessionThread::LaunchProfiler(bool& isTerminationRequired)
 
                         // Let the filesystem update.
                         // Without this sleep, it happens that the getContainedFilePaths() function
-                        // captures the former state of the file system (the state before CodeXLGpuProfiler's execution).
+                        // captures the former state of the file system (the state before rcprof's execution).
                         dmnConfigManager* pConfigMgr = dmnConfigManager::Instance();
                         GT_IF_WITH_ASSERT(pConfigMgr != NULL)
                         {
@@ -1453,7 +1326,7 @@ void dmnSessionThread::LaunchProfiler(bool& isTerminationRequired)
                             isOk = profFilesDir.getContainedFilePaths(fileFilter,
                                                                       osDirectory::SORT_BY_NAME_ASCENDING, containedFiles);
 
-                            GT_ASSERT_EX(isOk, L"Failed retrieving the number of CodeXLGpuProfiler output files.");
+                            GT_ASSERT_EX(isOk, L"Failed retrieving the number of rcprof output files.");
 
                             // Notify the client how many files are required.
                             gtInt32 numOfFiles = containedFiles.size();
@@ -1491,7 +1364,7 @@ void dmnSessionThread::LaunchProfiler(bool& isTerminationRequired)
                                 }
 
                                 isOk = m_pConnHandler->writeString(sprofOutfileName);
-                                GT_ASSERT_EX(isOk, L"DMN: Failed transferring CodeXLGpuProfiler file name to the client.");
+                                GT_ASSERT_EX(isOk, L"DMN: Failed transferring rcprof file name to the client.");
 
                                 // Transfer the file.
                                 TransferFile(*iter, m_pConnHandler);
@@ -1500,7 +1373,7 @@ void dmnSessionThread::LaunchProfiler(bool& isTerminationRequired)
                                 opStatus = dosFailure;
                                 (*m_pConnHandler) >> opStatus;
                                 isOk = (opStatus == dosSuccess);
-                                GT_ASSERT_EX(isOk, L"DMN: Verifying that the client successfully received an CodeXLGpuProfiler output files.");
+                                GT_ASSERT_EX(isOk, L"DMN: Verifying that the client successfully received an rcprof output files.");
                             }
                         }
                     }// if (!isTerminationRequired)
@@ -1579,9 +1452,9 @@ bool dmnSessionThread::LaunchGraphicsBeckendServer()
             ExtractCmdLineString(m_pConnHandler, cmdLineArgsBuffer);
 
             gtString fixedCmdLineArgs;
-            isOk = FixCodeXLGpuProfilerCmdLineArgs(cmdLineArgsBuffer, fixedCmdLineArgs);
+            isOk = FixGpuProfilerCmdLineArgs(cmdLineArgsBuffer, fixedCmdLineArgs);
 
-            GT_ASSERT_EX(isOk, L"Fixing CodeXLGpuProfiler cmd line args.");
+            GT_ASSERT_EX(isOk, L"Fixing rcprof cmd line args.");
 
             const auto port = GetGraphicServerPortFromArgs(fixedCmdLineArgs);
             bool isGraphicServerPortAvailable = true;
@@ -1732,7 +1605,7 @@ bool dmnSessionThread::CreateProcess(REMOTE_OPERATION_MODE mode, const gtString&
         shouldDisplayWindow = true;
 #endif
 
-    // Create the RDS/CodeXLGpuProfiler as a suspended process.
+    // Create the RDS/rcprof as a suspended process.
     // Note no regressions occur for the debugging scenario (which worked correctly with L"" for the cmdLineArgs.
     isOk = osLaunchSuspendedProcess(filePathTemp, cmdLineArgs, dirPathTemp, procId, procHandle, procThreadHandle, shouldDisplayWindow);
 

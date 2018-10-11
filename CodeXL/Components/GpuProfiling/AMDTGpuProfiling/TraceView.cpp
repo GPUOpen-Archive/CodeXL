@@ -880,7 +880,8 @@ bool TraceView::CheckStopParsing(quint64 curEndTime)
     {
         stopParsing = m_shouldStopParsing;
     }
-
+#else
+    (void)(curEndTime); // unused
 #endif
 
     return stopParsing;
@@ -1116,21 +1117,6 @@ void TraceView::HandleCLAPIInfo(ICLAPIInfoDataHandler* pClApiInfo)
     acTimelineItem* deviceBlockItem = nullptr;
     IOccupancyInfoDataHandler* occupancyInfo = nullptr;
 
-    const QList<const IOccupancyInfoDataHandler*>* pOccupancyInfosList = nullptr;
-    int nOccIndex = 0;
-
-    if (m_pCurrentSession->LoadAndGetOccupancyTable().contains(threadId))
-    {
-        // temp member is needed to prevent class rvalue used as lvalue warning
-        const QList<const IOccupancyInfoDataHandler*> tempInfosList = m_pCurrentSession->GetOccupancyTable()[threadId];
-        pOccupancyInfosList = &tempInfosList;
-
-        if (m_oclThreadOccIndexMap.contains(threadId))
-        {
-            nOccIndex = m_oclThreadOccIndexMap[threadId];
-        }
-    }
-
     if (m_modelMap.contains(threadId))
     {
         tableModel = m_modelMap[threadId];
@@ -1285,6 +1271,13 @@ void TraceView::HandleCLAPIInfo(ICLAPIInfoDataHandler* pClApiInfo)
 
             QString deviceNameStr = QString::fromStdString(enqueueApiInfo->GetCLDeviceNameString());
 
+            int nOccIndex = 0;
+
+            if (m_oclThreadOccIndexMap.contains(threadId))
+            {
+                nOccIndex = m_oclThreadOccIndexMap[threadId];
+            }
+
             if ((gpuEnd < gpuStart && (apiID < CL_FUNC_TYPE_clEnqueueMapBuffer || apiID > CL_FUNC_TYPE_clEnqueueUnmapMemObject)) ||  gpuStart < gpuSubmit || gpuSubmit < gpuQueued)
             {
                 if (cmdType <= CL_COMMAND_TASK && (deviceNameStr != GPU_STR_TraceViewCpuDevice))
@@ -1333,16 +1326,26 @@ void TraceView::HandleCLAPIInfo(ICLAPIInfoDataHandler* pClApiInfo)
 
                         deviceBlockItem = gpuItem;
 
-                        if (pOccupancyInfosList != nullptr && nOccIndex < pOccupancyInfosList->count())
+                        if (m_pCurrentSession->LoadAndGetOccupancyTable().contains(threadId))
                         {
-                            std::string tempString((*pOccupancyInfosList)[nOccIndex]->GetDeviceName());
-                            QString deviceName = QString::fromStdString(tempString);
+                            const QList<const IOccupancyInfoDataHandler*> occupancyInfosList = m_pCurrentSession->GetOccupancyTable()[threadId];
 
-                            if (Util::CheckOccupancyDeviceName(deviceName, deviceNameStr))
+                            if (m_oclThreadOccIndexMap.contains(threadId))
                             {
-                                occupancyInfo = const_cast<IOccupancyInfoDataHandler*>((*pOccupancyInfosList)[nOccIndex]);
-                                gpuItem->setOccupancyInfo(occupancyInfo);
-                                nOccIndex++;
+                                nOccIndex = m_oclThreadOccIndexMap[threadId];
+                            }
+
+                            if (nOccIndex < occupancyInfosList.count())
+                            {
+                                std::string tempString(occupancyInfosList[nOccIndex]->GetDeviceName());
+                                QString deviceName = QString::fromStdString(tempString);
+
+                                if (Util::CheckOccupancyDeviceName(deviceName, deviceNameStr))
+                                {
+                                    occupancyInfo = const_cast<IOccupancyInfoDataHandler*>(occupancyInfosList[nOccIndex]);
+                                    gpuItem->setOccupancyInfo(occupancyInfo);
+                                    nOccIndex++;
+                                }
                             }
                         }
 

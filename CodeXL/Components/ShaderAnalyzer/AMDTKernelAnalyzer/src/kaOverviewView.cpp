@@ -168,7 +168,7 @@ void kaOverviewView::insertKernelsToTable()
                 // Disable editing of the kernel name:
                 QTableWidgetItem* pCurrentItem = m_pAnalyzeInputTable->item(nKernel, 0);
                 Qt::ItemFlags itemFlags = pCurrentItem->flags();
-                itemFlags &= !Qt::ItemIsEditable;
+                itemFlags &= !(Qt::ItemIsEditable != 0);
                 pCurrentItem->setFlags(itemFlags);
                 m_doNotCheckVality = false;
             }

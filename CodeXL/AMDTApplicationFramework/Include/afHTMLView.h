@@ -10,7 +10,7 @@
 #define __AFHTMLVIEW_H
 
 // Qt:
-#include <QWebView>
+#include <QWebEngineView>
 
 // Infra:
 #include <AMDTOSWrappers/Include/osFilePath.h>
@@ -18,7 +18,7 @@
 // Local:
 #include <AMDTApplicationFramework/Include/afApplicationFrameworkDLLBuild.h>
 
-class AF_API afHTMLView : public QWebView
+class AF_API afHTMLView : public QWebEngineView
 {
     Q_OBJECT
 

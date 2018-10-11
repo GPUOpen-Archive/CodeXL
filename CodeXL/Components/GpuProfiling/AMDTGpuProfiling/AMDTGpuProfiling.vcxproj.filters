@@ -135,9 +135,6 @@
     <ClCompile Include="CLTimelineItems.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="DXTimelineItems.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="SymbolInfo.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -273,224 +270,14 @@
     <ClCompile Include="..\..\..\..\Common\Src\AMDTMutex\AMDTMutex.cpp">
       <Filter>Common Source</Filter>
     </ClCompile>
-    <ClCompile Include="gpProjectSettingsExtension.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="gpMenuActionsExecutor.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gpBaseSessionView.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gpTraceView.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gpTraceSummaryWidget.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gpSummaryTab.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gpTraceSummaryTab.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gpCommandListSummaryTab.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gpSummaryTable.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gpTraceSummaryTable.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gpCommandListSummaryTable.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gpPerformanceCountersDataView.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gpSessionView.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gpSessionUpdaterThread.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gpFrameView.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gpNavigationRibbon.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gpDetailedDataRibbon.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gpCountersSelectionDialog.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gpOverview.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gpProjectSettingsExtension.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gpUIManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="gpBaseSessionView.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="gpTraceView.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="gpTraceSummaryWidget.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="gpSummaryTab.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="gpTraceSummaryTab.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="gpCommandListSummaryTab.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="gpSummaryTable.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="gpTraceSummaryTable.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="gpCommandListSummaryTable.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="gpPerformanceCountersDataView.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="gpTraceDataContainer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="gpTraceDataParser.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ProfileSessionDataItem.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="gpTimeline.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="gpTraceModels.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="gpTraceTable.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="gpTraceTree.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="gpTraceDataModel.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gpTimeline.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gpTraceModels.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gpTraceTable.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gpTraceTree.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="gpExecutionMode.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="gpTreeHandler.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="gpFrameView.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="gpUIManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="gpOverview.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="gpTraceModels.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="gpCountersSelectionDialog.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="gpConnectDialog.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gpConnectDialog.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="gpNavigationRibbon.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="gpProjectSettings.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="gpSessionView.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="gpSessionUpdaterThread.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="gpRemoteGraphicsBackendHandler.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\..\Common\Src\DeviceInfo\DeviceInfoInternal.cpp">
       <Filter>Common Source</Filter>
-    </ClCompile>
-    <ClCompile Include="gpRibbonDataCalculator.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="gpDetailedDataRibbon.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="gpObjectDataContainer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="gpObjectDataModel.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="gpObjectDataParser.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="gpObjectModels.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="gpObjectView.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gpObjectView.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gpObjectModels.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="DX12Trace\DX12APIInfo.cpp">
-      <Filter>Backend</Filter>
-    </ClCompile>
-    <ClCompile Include="DX12Trace\DX12AtpFile.cpp">
-      <Filter>Backend</Filter>
-    </ClCompile>
-    <ClCompile Include="DX12Trace\DX12FunctionDefs.cpp">
-      <Filter>Backend</Filter>
-    </ClCompile>
-    <ClCompile Include="VulkanTrace\VulkanAPIInfo.cpp">
-      <Filter>Backend</Filter>
-    </ClCompile>
-    <ClCompile Include="VulkanTrace\VulkanAtpFile.cpp">
-      <Filter>Backend</Filter>
-    </ClCompile>
-    <ClCompile Include="VulkanTrace\VulkanFunctionDefs.cpp">
-      <Filter>Backend</Filter>
     </ClCompile>
     <ClCompile Include="AtpUtils.cpp">
       <Filter>Backend</Filter>
@@ -500,6 +287,9 @@
     </ClCompile>
     <ClCompile Include="CXLAnalyzerHTMLUtils.cpp">
       <Filter>Backend</Filter>
+    </ClCompile>
+    <ClCompile Include="gpTreeHandler.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -575,9 +365,6 @@
     <ClInclude Include="CLTimelineItems.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="DXTimelineItems.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="SymbolInfo.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -596,77 +383,11 @@
     <ClInclude Include="AsyncRemoteGpuProfilingTask.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="gpStringConstants.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="GpuSessionActionsCreator.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="gpMenuActionsExecutor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="gpAbstractTraceDataAccessInterface.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="gpTraceDataContainer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="gpTraceDataParser.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ProfileSessionDataItem.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="gpTraceDataModel.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="gpExecutionMode.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="gpTreeHandler.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\Common\Src\qcustomplot\1.3.1\qcustomplot.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="gpProjectSettings.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="gpRemoteGraphicsBackendHandler.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="gpRibbonDataCalculator.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <CustomBuild Include="gpDetailedDataRibbon.h">
-      <Filter>Header Files</Filter>
-    </CustomBuild>
-    <ClInclude Include="gpObjectDataContainer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="gpObjectDataModel.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="gpObjectDataParser.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="DX12Trace\DX12APIInfo.h">
-      <Filter>Backend</Filter>
-    </ClInclude>
-    <ClInclude Include="DX12Trace\DX12AtpFile.h">
-      <Filter>Backend</Filter>
-    </ClInclude>
-    <ClInclude Include="DX12Trace\DX12FunctionDefs.h">
-      <Filter>Backend</Filter>
-    </ClInclude>
-    <ClInclude Include="VulkanTrace\VulkanAPIInfo.h">
-      <Filter>Backend</Filter>
-    </ClInclude>
-    <ClInclude Include="VulkanTrace\VulkanAtpFile.h">
-      <Filter>Backend</Filter>
-    </ClInclude>
-    <ClInclude Include="VulkanTrace\VulkanFunctionDefs.h">
-      <Filter>Backend</Filter>
     </ClInclude>
     <ClInclude Include="AtpUtils.h">
       <Filter>Backend</Filter>
@@ -685,6 +406,9 @@
     </ClInclude>
     <ClInclude Include="CXLAnalyzerHTMLUtils.h">
       <Filter>Backend</Filter>
+    </ClInclude>
+    <ClInclude Include="gpStringConstants.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -755,78 +479,6 @@
       <Filter>Header Files</Filter>
     </CustomBuild>
     <CustomBuild Include="gpBaseSessionView.h">
-      <Filter>Header Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="gpTraceView.h">
-      <Filter>Header Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="gpTraceSummaryWidget.h">
-      <Filter>Header Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="gpSummaryTab.h">
-      <Filter>Header Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="gpTraceSummaryTab.h">
-      <Filter>Header Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="gpCommandListSummaryTab.h">
-      <Filter>Header Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="gpSummaryTable.h">
-      <Filter>Header Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="gpTraceSummaryTable.h">
-      <Filter>Header Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="gpCommandListSummaryTable.h">
-      <Filter>Header Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="gpPerformanceCountersDataView.h">
-      <Filter>Header Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="gpProjectSettingsExtension.h">
-      <Filter>Header Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="gpTimeline.h">
-      <Filter>Header Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="gpTraceModels.h">
-      <Filter>Header Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="gpTraceTable.h">
-      <Filter>Header Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="gpTraceTree.h">
-      <Filter>Header Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="gpFrameView.h">
-      <Filter>Header Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="gpUIManager.h">
-      <Filter>Header Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="gpNavigationRibbon.h">
-      <Filter>Header Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="gpCountersSelectionDialog.h">
-      <Filter>Header Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="gpConnectDialog.h">
-      <Filter>Header Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="gpOverview.h">
-      <Filter>Header Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="gpSessionView.h">
-      <Filter>Header Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="gpSessionUpdaterThread.h">
-      <Filter>Header Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="gpObjectView.h">
-      <Filter>Header Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="gpObjectModels.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
   </ItemGroup>

@@ -21,7 +21,6 @@
 #define AF_STR_TitleModeSessionFormatA "| %1 (%2)"
 #define AF_STR_TitleRunModeRunning L"Running"
 #define AF_STR_TitleRunModeSuspended L"Suspended"
-#define AF_STR_TitleRunModeKernel L"Kernel Debugging"
 #define AF_STR_TitleRunModePaused L"Paused"
 #define AF_STR_TitleRunModeDataTranslating L"Translating Data"
 #define AF_STR_TitleNoProjectLoaded L"No Project Loaded"
@@ -118,8 +117,6 @@
 #define AF_STR_WelcomeFileCSSExtension L"css"
 
 
-// ID is the correct abbreviation, says Merriam-Webster. "Id" is a term from Freudian psychology. See http://www.merriam-webster.com/dictionary/id%5b2%5d
-//
 #define AF_STR_Id L"ID"
 #define AF_STR_Platform L"Platform"
 #define AF_STR_Device L"Device"
@@ -175,10 +172,7 @@
 #define AF_STR_LayoutDebug L"Debug"
 #define AF_STR_LayoutDebugKernel L"DebugKernel"
 #define AF_STR_LayoutProfileGPU L"ProfileGPU"
-#define AF_STR_LayoutProfileCPU L"ProfileCPU"
-#define AF_STR_LayoutProfilePP L"ProfilePP"
 #define AF_STR_LayoutKernelAnalyze L"KernelAnalyze"
-#define AF_STR_LayoutFrameAnalysis L"FrameAnalysis"
 
 #define AF_STR_SettingsOrganization "AMD"
 #define AF_STR_SettingsApplication "AMDTApplication"
@@ -270,14 +264,6 @@
 #define AF_STR_profileFileExtension3 L"caperf"
 #define AF_STR_profileFileExtension4 L"csv"
 #define AF_STR_profileFileExtension5 L"atp"
-#define AF_STR_profileFileExtension6 L"cxldb"
-#define AF_STR_profileFileExtension7 L"etw"
-#define AF_STR_profileFileExtension8 L"ltr"
-#define AF_STR_profileFileExtension9 L"cxlfc"
-#define AF_STR_profileFileExtension10 L"aor"
-#define AF_STR_frameAnalysisDashboardFileExtension L"cxldsh"
-#define AF_STR_frameAnalysisOverviewFileExtension L"cxlfovr"
-#define AF_STR_frameAnalysisArchivedFileExtension L"cxlsession"
 #define AF_STR_pngFileExtension L"png"
 #define AF_STR_htmlFileExtension L"html"
 
@@ -288,9 +274,6 @@
 #define AF_STR_GenericMDIViewsCreatorID L"GenericInfra"
 #define AF_STR_KernelAnalyzerViewsCreatorID L"KernelAnalyzer"
 #define AF_STR_GPUProfileViewsCreatorID L"GPUProfile"
-#define AF_STR_CPUProfileViewsCreatorID L"CPUProfile"
-#define AF_STR_ThreadProfileViewsCreatorID L"ThreadProfile"
-#define AF_STR_PowerProfileViewsCreatorID L"PowerProfile"
 #define AF_STR_CodeXMLImageBuffersFilesExtension L"gdcxl"
 #define AF_STR_clSourceFileExtension L"cl"
 #define AF_STR_hsailSourceFileExtension L"hsail"
@@ -318,19 +301,11 @@
 #define AF_STR_STAGE "stage:"
 #define AF_STR_COMPILING "Compiling"
 
-#define AF_STR_CpuProfileFileExtension L"cxlcpdb"
 #define AF_STR_GpuProfileSessionFileExtension L"gpsession"
 #define AF_STR_GpuPerformanceCountersSessionFileExtension L"csv"
-#define AF_STR_PowerProfileSessionFileExtension L"cxldb"
 #define AF_STR_GpuProfileTraceFileExtension L"atp"
-#define AF_STR_FrameAnalysisTraceFileExtension L"ltr"
-#define AF_STR_FrameAnalysisTraceFileImageExtension L"png"
-#define AF_STR_FrameAnalysisPerfCountersFileExtension L"cxlfc"
-#define AF_STR_D3D12MultithreadingSampleProjectName L"D3D12Multithreading"
 #define AF_STR_TeapotSampleProjectName L"CodeXL Teapot"
 #define AF_STR_TeapotSampleVSProjectName L"CXLTeaPot"
-#define AF_STR_MatMulSampleProjectName L"CodeXL Matrix Multiply"
-#define AF_STR_D3D12MultithreadingSampleProjectName L"D3D12Multithreading"
 #define AF_STR_ProfileDirExtension L"_ProfilerOutput"
 #define AF_STR_KernelOutputExtension L"_KernelOutput"
 
@@ -371,9 +346,6 @@
 #define AF_STR_newProjectProjectExePath "Executable Path:"
 #define AF_STR_newProjectProjectBrowseForExePathTooltipApp "Click to browse for an executable path"
 #define AF_STR_newProjectProjectEXEEditLineTooltipApp "Type the full path of the selected Desktop Application, or click the browse button"
-#define AF_STR_newProjectProjectStoreAppEditLineTooltipApp "Type a Windows Store App User Model ID or click the browse button"
-#define AF_STR_newProjectProjectBrowseForExePathTooltipWinStoreApp "Click to browse for a Windows Store App"
-#define AF_STR_newProjectProjectApplicationType "Application Type:"
 #define AF_STR_newProjectWindowsStoreApp "Windows Store App"
 #define AF_STR_newProjectWindowsStoreAppTooltip "Click for a selection of a Windows Store App"
 #define AF_STR_newProjectDesktopApplication "Desktop Application"
@@ -512,7 +484,6 @@
 #define AF_STR_ProfileMenuString L"&Profile"
 #define AF_STR_AnalyzeMenuString L"&Analyze"
 #define AF_STR_BreakPointsMenuString L"&Breakpoints"
-#define AF_STR_FrameAnalysisMenuString L"F&rame Analysis"
 
 // "View" menu:
 #define AF_STR_ViewMenuString L"&View"
@@ -530,16 +501,12 @@
 #define AF_STR_HelpDevToolsSupportForum L"&CodeXL Support and Issues Page"
 #define AF_STR_HelpUpdates L"Check for &Updates"
 #define AF_STR_LoadTeapotSample L"Load the Teapot &Sample"
-#define AF_STR_LoadMatMulSample L"Load the &Matrix Multiply Sample"
-#define AF_STR_LoadD3D12MTSample L"Load the &D3D12Multithreading Sample"
 #define AF_STR_HelpAbout L"&About CodeXL"
 #define AF_STR_HelpUserGuideStatusbarString L"Display CodeXL User Guide"
 #define AF_STR_HelpQuickStartStatusbarString L"Display the CodeXL Quick Start Guide"
 #define AF_STR_HelpDevToolsSupportForumStatusbarString L"Go to the CodeXL Support and Issues Page"
 #define AF_STR_HelpUpdatesStatusbarString L"Check for new CodeXL versions"
 #define AF_STR_LoadTeapotSampleStatusbarString L"Load the Teapot sample"
-#define AF_STR_LoadMatMulSampleStatusbarString L"Load the Matric Multiply sample"
-#define AF_STR_LoadD3D12MTSampleStatusbarString L"Load the D3D12Multithreading sample"
 #define AF_STR_HelpAboutStatusbarString L"Display the program information and copyright"
 #define AF_STR_HelpDevToolsSupportForumURL L"https://github.com/GPUOpen-Tools/CodeXL/issues"
 #define AF_STR_HelpCodeXLWebPage L"http://gpuopen.com/compute-product/codexl/"
@@ -873,7 +840,6 @@
 #define AF_STR_SourceCodeTextWasNotFound L"The specified text was not found: "
 #define AF_STR_SourceCodePassedEndOfDocument L"Passed the end of the document"
 #define AF_STR_SourceCodeAddWatch "Add Watch"
-#define AF_STR_SourceCodeAddMultiWatch "OpenCL MultiWatch..."
 #define AF_STR_sourceCodeShowLineNumbers "Show Line Numbers"
 #define AF_STR_sourceCodeSaveAs "Save as"
 
@@ -887,30 +853,20 @@
 //  directory names on disk in the source tree.
 #define AF_STR_CodeXLImagesDirName L"Images"
 #define AF_STR_CodeXLTeapotExampleProjectName L"CodeXL Teapot"
-#define AF_STR_CodeXLMatMulExampleProjectName L"CodeXL Matrix Multiply"
 
-#define AF_STR_CodeXLD3D12MultithreadingExampleBinaryName L"D3D12Multithreading"
 #define AF_STR_CodeXLTeapotExampleSourceFileFolder1 L"AMDTTeapot"
 #define AF_STR_CodeXLTeapotExampleSourceFileFolder2 L"AMDTTeapotLib"
 #define AF_STR_CodeXLTeapotExampleSrcFolder L"src"
 #if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
     #define AF_STR_CodeXLTeapotExampleBinaryName L"CXLTeaPot"
-    #define AF_STR_CodeXLMatMulExampleBinaryName L"CXLClassicMatMul"
-    #define AF_STR_CodeXLMatMulSourceFolderName L"AMDTClassicMatMul"
     #define AF_STR_CodeXLSampleBinaryExtension L"exe"
     #define AF_STR_CODEXLExampleReleaseDirName L"Release"
 #elif AMDT_BUILD_TARGET == AMDT_LINUX_OS
     #define AF_STR_CodeXLTeapotExampleBinaryName L"CXLTeaPot-bin"
-    #define AF_STR_CodeXLMatMulExampleBinaryName L"CXLClassicMatMul-bin"
-    #define AF_STR_CodeXLMatMulSourceFolderName L"src"
     #define AF_STR_CodeXLSampleBinaryExtension L""
     #define AF_STR_CODEXLExampleReleaseDirName L"release"
 #endif
 #define AF_STR_CodeXLTeapotLastMode L"Debug Mode"
-#define AF_STR_CodeXLD3DMTLastMode L"Frame Analysis Mode"
-#define AF_STR_CodeXLMatMulLastMode L"Profile Mode"
-#define AF_STR_CodeXLD3DMTLastMode L"Frame Analysis Mode"
-#define AF_STR_CodeXLMatMulLastSessionType L"CPU: Time-based Sampling"
 #if AMDT_BUILD_TARGET == AMDT_LINUX_OS
     // The scons build layout puts content into debug rather than debug/bin
     #define AF_STR_CodeXLTeapotDebugBinDirName L"debug"
@@ -925,8 +881,6 @@
 #define AF_STR_CodeXLVSPackageWindowsHelpFileName L"CodeXL_User_Guide.chm"
 #define AF_STR_CodeXLWindowsTutorialFileName L"CodeXLTutorial"
 #define AF_STR_CodeXLWindowTeapotSolutionName L"AMDTTeaPot%ls.sln"
-#define AF_STR_CodeXLWindowMatMulSolutionName L"AMDTClassicMatMul%ls.sln"
-#define AF_STR_CodeXLWindowD3D12MTSolutionName L"D3D12Multithreading%ls.sln"
 #define AF_STR_VS2010 L"VS2010"
 #define AF_STR_VS2012 L"VS2012"
 #define AF_STR_VS2013 L"VS2013"
@@ -934,8 +888,6 @@
 #define AF_STR_OldSampleProjectQuestion "The project contains a CodeXL sample with a path that no longer exists. Do you want to relocate the sample path to the new CodeXL samples location?"
 
 /// Samples source file names
-#define AF_STR_MatMulSrc1 "amdtclassicmatmul.cpp"
-#define AF_STR_D3DMTSrc1  "d3d12multithreading.cpp"
 #define AF_STR_TeapotSrc1 "amdtmainwin.cpp"
 #define AF_STR_TeapotSrc2 "amdtteapot.cpp"
 #define AF_STR_TeapotSrc3 "teapot.cpp"
@@ -1135,7 +1087,6 @@
 #define AF_STR_StartTooltip "Start %1 (" AF_STR_StartDebuggingShortcut ")"
 #define AF_STR_Build "Build (" AF_STR_BuildShortcut ")"
 #define AF_STR_CancelBuild "Cancel Build (" AF_STR_CancelBuildShortcut ")"
-#define AF_STR_CaptureFrame "Capture Frame"
 #define AF_STR_StartDebuggingShortcut "F5"
 #define AF_STR_PauseDebuggingShortcut "F6"
 #define AF_STR_StopDebuggingShortcut "Shift+F5"
@@ -1201,12 +1152,6 @@
 #define AF_STR_CLKernelVariable L"Kernel variable"
 #define AF_STR_ProfileSession L"Profile session"
 #define AF_STR_ProfileSessionType L"Profile session type"
-#define AF_STR_ProfileSessionCPUOverview L"CPU Profile session overview"
-#define AF_STR_ProfileSessionCPUModules L"CPU Profile session modules"
-#define AF_STR_ProfileSessionCPUCallGraph L"CPU Profile session call graph"
-#define AF_STR_ProfileSessionCPUFunctions L"CPU Profile session functions"
-#define AF_STR_ProfileSessionCPUSourceCodes L"CPU Profile session source codes"
-#define AF_STR_ProfileSessionCPUSourceCode L"CPU Profile session source code"
 #define AF_STR_ProfileSessionGPUSummary L"GPU Profile session summary"
 #define AF_STR_ProfileSessionGPUAPISummary L"GPU Profile session API summary"
 #define AF_STR_ProfileSessionGPUContextSummary  L"GPU Profile session context summary"
@@ -1216,8 +1161,6 @@
 #define AF_STR_ProfileSessionGPUBestPracticeSummary L"GPU Profile session best practice summary"
 #define AF_STR_ProfileSessionGPUKernels L"GPU Profile session kernels"
 #define AF_STR_ProfileSessionGPUKernel L"GPU Profile session kernel"
-#define AF_STR_ProfileSessionPPSummary L"Power profile Session summary"
-#define AF_STR_ProfileSessionPPTimeline L"Power profile Timeline"
 #define AF_STR_AnalyzerExeFile L"Analyzer executable file"
 #define AF_STR_AnalyzerOpenCLSource L"Analyzer OpenCL source code"
 #define AF_STR_AnalyzerKernel L"Analyzer kernel"
@@ -1235,14 +1178,6 @@
     #define AF_STR_AnalyzerAddFile L"Analyzer add existing OpenCL file"
     #define AF_STR_AnalyzerNewFile L"Analyzer create new OpenCL file"
 #endif // AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
-
-// Multi watch load status messages:
-#define AF_STR_MultiWatchViewVariableNameTitle L"Kernel multi-watch view"
-#define AF_STR_MultiWatchViewVariableNameMessage L"Please select or type the variable name"
-#define AF_STR_MultiWatchViewKernelVariableLoadFailureMessage L"Kernel variable data is unavailable"
-#define AF_STR_MultiWatchViewKernelVariableUnsupportedType L"Kernel variable type is not supported"
-#define AF_STR_MultiWatchViewKernelVariableInvalidExpression L"Invalid expression"
-
 
 // Images and buffers load status messages:
 #define AF_STR_ImagesAndBuffersViewLoadFailure L"Object is currently unavailable"
@@ -1306,25 +1241,15 @@
 #define AF_STR_StartupDialogDescription "To start working with CodeXL, please select one of the following:"
 #define AF_STR_StartupDialogDebugCaption "<font size=+1>DEBUG<font>"
 #define AF_STR_StartupDialogProfileCaption "<font size=+1>PROFILE<font>"
-#define AF_STR_StartupDialogFrameAnalyzeCaption "<font size=+1>FRAME ANALYSIS<font>"
 #define AF_STR_StartupDialogAnalyzeCaption "<font size=+1>ANALYZE<font>"
 #define AF_STR_StartupButtonTableHTML "<table cellpadding=0 cellspacing=0><tr><td style='vertical-align: middle;'><img src ='mydata://image.jpg' style='float:left;'></img></td><td style='padding-left:10px;'>%1</td></tr><table>"
 #define AF_STR_StartupDialogButtonTableHTML "<table cellpadding=0 cellspacing=0><tr><td style='vertical-align: middle;'><img src ='mydata://image.jpg' style='float:left;'></img></td><td style='padding-left:10px;'>%1</td></tr><table>"
 #define AF_STR_StartupDialogNewProjectTitle "Create new project"
-#define AF_STR_StartupDialogNewProjectDescription "<br>After creating a new project you can select the desired mode to debug or profile your application,<br>analyze graphic frames or to statically analyze your shaders and kernels."
+#define AF_STR_StartupDialogNewProjectDescription "<br>After creating a new project you can select the desired mode to debug or profile your application,<br>or to statically analyze your shaders and kernels."
 #define AF_STR_StartupDialogNewProjectDebuggingTitle "Create new project for Debugging"
-#define AF_STR_StartupDialogNewProjectDebuggingDescription "<br>Debugging allows you to set breakpoints, watch variables, step through OpenCL kernels and much more.<br>Automatically selects Debug mode."
+#define AF_STR_StartupDialogNewProjectDebuggingDescription "<br>Debugging allows you to set breakpoints, watch variables and much more.<br>Automatically selects Debug mode."
 #define AF_STR_StartupDialogNewProjectProfilingTitle "Create new project for Profiling"
-#define AF_STR_StartupDialogNewProjectProfilingDescription "<br>Profile code that runs on the CPU or the GPU. Select a session type to define what data is collected.<br>Automatically selects Profile mode."
-#define AF_STR_StartupDialogAttachToProcessTitle "Attach to Process"
-#define AF_STR_StartupDialogAttachToProcessDescription "<br>Select a currently running process and CodeXL will begin collecting CPU profiling data.<br>The type of data collected is defined by CodeXL's current profile session type."
-#define AF_STR_StartupDialogSystemWideTitle "System-wide Profiling"
-#define AF_STR_StartupDialogSystemWideDescription "<br>CodeXL will begin collecting CPU profiling or Power profiling data from all currently running processes.<br>The type of data collected is defined by CodeXL's current profile session type."
-#define AF_STR_StartupDialogNewProjectFrameAnalyzeTitle "Create a new project for DirectX 12 or Vulkan Frame Analysis"
-#define AF_STR_StartupDialogNewProjectFrameAnalyzeDescription "<br>Launch a DirectX 12 or Vulkan based game/graphics application, capture individual frames and analyze their CPU and GPU timeline data"
-// Note: The following 4 string literals are also defined in the file \CommonProjects\AMDTApplicationFramework\Include\res\welcome\Welcome.html
-// The definitions below are used in the new project dialog. The definitions in the HTML file are used in the CodeXL welcome page.
-// Any changes made in the following lines should be applied to the HTML file too.
+#define AF_STR_StartupDialogNewProjectProfilingDescription "<br>Profile code that runs on the GPU. Select a session type to define what data is collected.<br>Automatically selects Profile mode."
 #if (AMDT_BUILD_TARGET == AMDT_WINDOWS_OS)
     #define AF_STR_StartupDialogNewProjectAnalyzeTitle "Create a new source file for analysis"
     #define AF_STR_StartupDialogNewProjectAnalyzeDescription "<br>Create and build an OpenCL/DirectX kernel for multiple hardware targets and analyze the ISA result to gain insight into<br>optimizing its performance."
@@ -1337,13 +1262,8 @@
     #define AF_STR_StartupDialogAddCLFileAnalyzeDescription "<br>Compile an OpenCL file for multiple hardware targets and analyze the ISA result to gain insight into<br>optimizing its performance."
 #endif // (AMDT_BUILD_TARGET == AMDT_WINDOWS_OS)
 
-// Global settings:
-#define AF_STR_GLOBAL_SETTINGS_CPU_INVALID_DISASSEMBLY_BLOCK_SIZE_TITLE "Invalid disassembly block size."
-#define AF_STR_GLOBAL_SETTINGS_CPU_INVALID_DISASSEMBLY_BLOCK_SIZE_BODY "The default block size (1024 Byte) will be used."
-
 // Aid functions
-#define AF_STR_AMD_GPU_COMPONENT_NOT_INSTALLED L"CodeXL GPU Profiler: AMD GPU was not detected. Local GPU Profiling will be disabled.\n"
-#define AF_STR_AMD_CPU_COMPONENT_NOT_INSTALLED L"CodeXL CPU Profiler: AMD CPU was not detected. Only time-based profiling will be enabled.\n"
+#define AF_STR_AMD_GPU_COMPONENT_NOT_INSTALLED L"CodeXL GPU Profiler: An AMD GPU was not detected. Local GPU Profiling will be disabled.\n"
 #define AF_STR_AMD_CATALYST_COMPONENT_NOT_INSTALLED L"CodeXL Static Analyzer: AMD Radeon Software was not detected. Static Analysis will be disabled.\n"
 // Memory Error messages
 #define AF_STR_memAllocFailureHeadline "CodeXL - Memory Allocation Failure"

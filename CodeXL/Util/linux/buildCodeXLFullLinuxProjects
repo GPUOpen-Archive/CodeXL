@@ -4,22 +4,44 @@
 if [ "$1" = "--help" ]; then
 	echo "Usage: buildCodeXLFullLinuxProjects [scons arguments]"
 	echo "basic Scons arguments:"
-	echo "target build group (Framework,CpuProfiling,GpuProfiling,GpuDebugging,KernelAnalyzer,PowerProfiler,ThreadProfiler)"
+	echo "target build group (Framework,GpuProfiling,GpuDebugging,KernelAnalyzer,ThreadProfiler)"
 	echo "clean -c"
 	echo "Number of concurrent jobs -j(number of jobs)"
 	echo "Debug CXL_build=debug"
 	echo "x86 - set "x86" as the first argument"
 	echo "CXL_boost_lib_dir = [path to boost libraries] - override the bundled boost libraries with files in given path"
- 	echo "CXL_boost_include_dir = [path to boost headers] - override the bundled boost headers with files in given path"
+	echo "CXL_boost_include_dir = [path to boost headers] - override the bundled boost headers with files in given path"
+	echo "CXL_qt_dir = [path to Qt installation] - override the default Qt install location with files in given path"
 	exit 0
 fi 
 commandLineArgs=$*
+
+jenkinsBuild="false"
+if [ "$1" = "jenkins" ]
+then
+	jenkinsBuild="true"
+	shift
+	commandLineArgs=$*
+fi
+
 if [ "$1" = "x86" ]
 then
 	x86="true"
 	shift
 	commandLineArgs=$*
 fi
+
+mode="release"
+for i in "$@"; do
+	if [ "$i" = "CXL_build=debug" ]; then
+		mode="debug"
+		break
+	fi
+	if [ "$i" = "CXL_build=release" ]; then
+		mode="release"
+		break
+	fi
+done
 
 # Usage: buildCodeXLFullLinuxProjects [scons arguments]
 
@@ -33,6 +55,49 @@ if [ -z "$AMD_CODEXL" ]; then
 	AMD_CODEXL=$(readlink -e "${SCRIPTFOLDER}/../../")
 fi
 echo "AMD_CODEXL dir = ${AMD_CODEXL}"
+
+CODEXL_COMMON_DIR=${AMD_CODEXL}/../Common
+CODEXL_COMMON_RCP_DIR=${CODEXL_COMMON_DIR}/Lib/AMD/RCP
+CODEXL_COMMON_RGA_DIR=${CODEXL_COMMON_DIR}/Lib/AMD/RGA/rga*
+CODEXL_OUTPUT_DIR=${AMD_CODEXL}/../Output_x86_64/${mode}/bin/
+
+PackageTheBuild()
+{
+	cp -f ${CODEXL_COMMON_RCP_DIR}/bin/libRCPCLOccupancyAgent32.so                 ${CODEXL_OUTPUT_DIR}
+	cp -f ${CODEXL_COMMON_RCP_DIR}/bin/libRCPCLProfileAgent32.so                   ${CODEXL_OUTPUT_DIR}
+	cp -f ${CODEXL_COMMON_RCP_DIR}/bin/libRCPCLTraceAgent32.so                     ${CODEXL_OUTPUT_DIR}
+	cp -f ${CODEXL_COMMON_RCP_DIR}/bin/libRCPPreloadXInitThreads32.so              ${CODEXL_OUTPUT_DIR}
+	cp -f ${CODEXL_COMMON_RCP_DIR}/bin/rcprof32                                    ${CODEXL_OUTPUT_DIR}
+	cp -f ${CODEXL_COMMON_RCP_DIR}/bin/libGPUPerfAPICL32.so                        ${CODEXL_OUTPUT_DIR}
+	cp -f ${CODEXL_COMMON_RCP_DIR}/bin/libGPUPerfAPICounters32.so                  ${CODEXL_OUTPUT_DIR}
+	cp -f ${CODEXL_COMMON_RCP_DIR}/bin/libRCPCLOccupancyAgent.so                   ${CODEXL_OUTPUT_DIR}
+	cp -f ${CODEXL_COMMON_RCP_DIR}/bin/libRCPCLProfileAgent.so                     ${CODEXL_OUTPUT_DIR}
+	cp -f ${CODEXL_COMMON_RCP_DIR}/bin/libRCPCLTraceAgent.so                       ${CODEXL_OUTPUT_DIR}
+	cp -f ${CODEXL_COMMON_RCP_DIR}/bin/libRCPHSAProfileAgent.so                    ${CODEXL_OUTPUT_DIR}
+	cp -f ${CODEXL_COMMON_RCP_DIR}/bin/libRCPHSATraceAgent.so                      ${CODEXL_OUTPUT_DIR}
+	cp -f ${CODEXL_COMMON_RCP_DIR}/bin/libRCPPreloadXInitThreads.so                ${CODEXL_OUTPUT_DIR}
+	cp -f ${CODEXL_COMMON_RCP_DIR}/bin/rcprof                                      ${CODEXL_OUTPUT_DIR}
+	cp -f ${CODEXL_COMMON_RCP_DIR}/bin/VkStableClocks                              ${CODEXL_OUTPUT_DIR}
+	cp -f ${CODEXL_COMMON_RCP_DIR}/bin/libGPUPerfAPICL.so                          ${CODEXL_OUTPUT_DIR}
+	cp -f ${CODEXL_COMMON_RCP_DIR}/bin/libGPUPerfAPICounters.so                    ${CODEXL_OUTPUT_DIR}
+	cp -f ${CODEXL_COMMON_RCP_DIR}/bin/libGPUPerfAPIHSA.so                         ${CODEXL_OUTPUT_DIR}
+	cp -f ${CODEXL_COMMON_RCP_DIR}/repo/RCP/Output/bin/libRCPProfileDataParser.so  ${CODEXL_OUTPUT_DIR}
+        mkdir -p ${CODEXL_OUTPUT_DIR}/jqPlot
+	cp -f ${CODEXL_COMMON_RCP_DIR}/jqPlot/excanvas.min.js                          ${CODEXL_OUTPUT_DIR}/jqPlot
+	cp -f ${CODEXL_COMMON_RCP_DIR}/jqPlot/jqplot.canvasAxisLabelRenderer.min.js    ${CODEXL_OUTPUT_DIR}/jqPlot
+	cp -f ${CODEXL_COMMON_RCP_DIR}/jqPlot/jqplot.canvasTextRenderer.min.js         ${CODEXL_OUTPUT_DIR}/jqPlot
+	cp -f ${CODEXL_COMMON_RCP_DIR}/jqPlot/jqplot.highlighter.min.js                ${CODEXL_OUTPUT_DIR}/jqPlot
+	cp -f ${CODEXL_COMMON_RCP_DIR}/jqPlot/jquery.jqplot.min.css                    ${CODEXL_OUTPUT_DIR}/jqPlot
+	cp -f ${CODEXL_COMMON_RCP_DIR}/jqPlot/jquery.jqplot.min.js                     ${CODEXL_OUTPUT_DIR}/jqPlot
+	cp -f ${CODEXL_COMMON_RCP_DIR}/jqPlot/jquery.min.js                            ${CODEXL_OUTPUT_DIR}/jqPlot
+
+	cp -f ${CODEXL_COMMON_RGA_DIR}/amdspv                              ${CODEXL_OUTPUT_DIR}
+	cp -f ${CODEXL_COMMON_RGA_DIR}/spvgen.so                           ${CODEXL_OUTPUT_DIR}
+	cp -f ${CODEXL_COMMON_RGA_DIR}/VirtualContext                      ${CODEXL_OUTPUT_DIR}
+	cp -f ${CODEXL_COMMON_RGA_DIR}/shae                                ${CODEXL_OUTPUT_DIR}
+	cp -f ${CODEXL_COMMON_RGA_DIR}/rga                                 ${CODEXL_OUTPUT_DIR}
+	cp -f ${CODEXL_COMMON_RGA_DIR}/rga-bin                             ${CODEXL_OUTPUT_DIR}
+}
 
 NUM_ERRORS=0
 checkforerror ()
@@ -55,7 +120,7 @@ checkforerror ()
 		echo "*** the build failed - see the logs for details ***"
 		exit 1
 	else
-		echo "*** SUCCESS ***" 
+		echo "*** SUCCESS ***"
 	fi
 }
 
@@ -104,4 +169,13 @@ then
 	eval "scons -C ${AMD_CODEXL}/Utils/AMDTSystemInformationHelper CXL_common_dir=${AMD_CODEXL}/../Common CXL_arch=x86 CXL_build_type=static CXL_prefix=$AMD_OUTPUT $commandLineArgs | perl $AMD_CODEXL/Util/linux/BuildFilter.pl"
 	checkforerror
 fi
+
+if [ "$jenkinsBuild" = "false" ]
+then
+	cd $CODEXL_COMMON_RCP_DIR/repo/RCP/Build/Linux
+	sh build_rcp.sh parser-only skip-32bitbuild
+
+	PackageTheBuild
+fi
+
 exit 0

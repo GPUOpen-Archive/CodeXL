@@ -42,7 +42,7 @@
 // ---------------------------------------------------------------------------
 gdLocalsView::gdLocalsView(QWidget* pParent)
     : acTreeCtrl(pParent, 3, false),
-      m_pAddWatchAction(NULL), m_pAddMultiWatchAction(NULL),
+      m_pAddWatchAction(NULL),
       m_stackDepth(-2),
       m_pApplicationCommands(NULL)
 {
@@ -353,7 +353,7 @@ void gdLocalsView::updateValueColumnHeader()
 
 // ---------------------------------------------------------------------------
 // Name:        gdLocalsView::extendContextMenu
-// Description: Extend the context menu (add watch & multiwatch actions)
+// Description: Extend the context menu (add watch actions)
 // Author:      Sigal Algranaty
 // Date:        26/9/2011
 // ---------------------------------------------------------------------------
@@ -372,16 +372,6 @@ void gdLocalsView::extendContextMenu()
 
         // Connect the action to its handler:
         bool rcConnect = connect(m_pAddWatchAction, SIGNAL(triggered()), this, SLOT(onAddWatch()));
-        GT_ASSERT(rcConnect);
-
-        // Create an action for the "Add Multi Watch" menu item:
-        m_pAddMultiWatchAction = new QAction(AF_STR_SourceCodeAddMultiWatch, _pContextMenu);
-
-        // Add the action to the context menu:
-        _pContextMenu->addAction(m_pAddMultiWatchAction);
-
-        // Connect the action to its handler:
-        rcConnect = connect(m_pAddMultiWatchAction, SIGNAL(triggered()), this, SLOT(onAddMultiWatch()));
         GT_ASSERT(rcConnect);
 
         // Connect the menu to an about to show slot:
@@ -474,36 +464,6 @@ void gdLocalsView::onAddWatch()
 }
 
 // ---------------------------------------------------------------------------
-// Name:        gdLocalsView::onAddMultiWatch
-// Description: Handling the "Add Multi Watch" command
-// Author:      Sigal Algranaty
-// Date:        25/9/2011
-// ---------------------------------------------------------------------------
-void gdLocalsView::onAddMultiWatch()
-{
-    // Get the item at the context menu position:
-    QTreeWidgetItem* pItemAtContextMenu = itemAt(_contextMenuPosition);
-    GT_IF_WITH_ASSERT(pItemAtContextMenu != NULL)
-    {
-        // Get the current selected item:
-        QString textSelected = pItemAtContextMenu->text(0);
-
-        gtString textForWatch;
-        textForWatch.fromASCIIString(textSelected.toLatin1());
-
-        if (!textForWatch.isEmpty())
-        {
-            // Get the watch view:
-            GT_IF_WITH_ASSERT(m_pApplicationCommands != NULL)
-            {
-                bool rc = m_pApplicationCommands->displayMultiwatchVariable(textForWatch);
-                GT_ASSERT(rc);
-            }
-        }
-    }
-}
-
-// ---------------------------------------------------------------------------
 // Name:        gdLocalsView::onAboutToShowTextContextMenu
 // Description: Is called when the text context menu is shown - enable / disable
 //              the context menu actions according to the current debug situation
@@ -513,14 +473,13 @@ void gdLocalsView::onAddMultiWatch()
 void gdLocalsView::onAboutToShowTextContextMenu()
 {
     // Sanity check:
-    GT_IF_WITH_ASSERT((m_pAddWatchAction != NULL) && (m_pAddMultiWatchAction != NULL))
+    GT_IF_WITH_ASSERT((m_pAddWatchAction != NULL))
     {
         // Check if add watch actions should be enabled:
         bool isEnabled = gaIsDebuggedProcessSuspended() && (gaIsInKernelDebugging() || gaIsInHSAKernelBreakpoint() || gaCanGetHostVariables());
 
         // Set the actions enable state:
         m_pAddWatchAction->setEnabled(isEnabled);
-        m_pAddMultiWatchAction->setEnabled(isEnabled);
     }
 }
 

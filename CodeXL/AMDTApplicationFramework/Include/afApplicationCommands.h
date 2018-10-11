@@ -101,8 +101,6 @@ enum afCodeXLSampleID
 {
     AF_SAMPLE_NONE = -1,
     AF_TEAPOT_SAMPLE = 0,
-    AF_MATMUL_SAMPLE,
-    AF_D3D12MULTITHREADING_SAMPLE
 };
 
 // ----------------------------------------------------------------------------------

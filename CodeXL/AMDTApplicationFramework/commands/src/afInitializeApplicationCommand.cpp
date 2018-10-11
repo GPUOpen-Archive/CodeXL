@@ -136,8 +136,8 @@ bool afInitializeApplicationCommand::executeSpecificCommand()
         /// NOTICE: Currently, in VS10, web page cannot be initialized when debugging the VS package.
         /// We skip this line as a workaround, to enable the debugging.
         // Initiate Updater to check automatic check for update
-        afSoftwareUpdaterWindow dlg;
-        dlg.performAutoCheckForUpdate();
+        //afSoftwareUpdaterWindow dlg;
+        //dlg.performAutoCheckForUpdate();
 #endif
     }
 

@@ -55,9 +55,6 @@ public:
     /// Return true iff the plug in can start profile with no project loaded:
     virtual bool CanRunWithoutProject() { return false; }
 
-    /// Is attach allowed for this type of profiling
-    virtual bool IsAttachEnabled() { return false; }
-
     /// returns if profile
     virtual bool IsProfileEnabled() { return true; }
 
@@ -83,11 +80,11 @@ enum pmMenuItemCommands
     /// Starts a new profile
     ID_PM_START_PROFILE,
     /// Pause or resume the profile
-    ID_PM_PAUSE_PROFILE,
+    //ID_PM_PAUSE_PROFILE,
     /// Stop the profile
-    ID_PM_STOP_PROFILE,
+    //ID_PM_STOP_PROFILE,
     /// Attach to process and start profile
-    ID_PM_ATTACH_PROFILE,
+    //ID_PM_ATTACH_PROFILE,
     /// Display the currently selected profile
     ID_PM_SELECTED_PROFILE,
 
@@ -175,9 +172,6 @@ public:
     /// Return true iff the execution mode supports remote host scenario for the requested session type:
     virtual bool IsRemoteEnabledForSessionType(const gtString& sessionType);
 
-    // Does the current selected profile type support run with no project?
-    virtual bool IsStartupActionSupportedWithNoProject(afExecutionCommandId commandId);
-
     // Get the name of each session type
     virtual gtString selectedSessionTypeName() {return m_selectedProfile;};
 
@@ -223,8 +217,6 @@ public:
     /// Show the appropriate project settings tab
     void onInvokeProjectSettings();
 
-    void onInvokeAttachToProcess();
-
     // Start profiling
     void onStartAction(osProcessId processId = 0);
 
@@ -232,8 +224,6 @@ public:
 
     //Select "Profiling mode"
     void onSelectProfileMode(bool updateOnlySessionIndex);
-    //Pause or resume the profiling
-    void onPauseToggle();
     /// Handle all gui actions needed when the selection changes
     void updateSelected(const gtString& selected);
 
@@ -247,11 +237,8 @@ public:
 
     /// returns the profile index for a profile string
     bool isStartEnabled(bool& checkable, bool& checked);
-    bool isAttachEnabled(bool& checkable, bool& checked);
     bool isProfileModeEnabled(bool& checkable, bool& checked);
     bool isProfileEnabled(int profileIndex, bool& checkable, bool& checked);
-    bool isPausedEnabled(bool& checkable, bool& checked, bool& hidden);
-    bool isStopEnabled(bool& checkable, bool& checked);
     bool isProjectSettingsEnabled(bool& checkable, bool& checked);
 
 
@@ -265,24 +252,9 @@ public:
     enum
     {
         SPM_VS_START = 0,
-        SPM_VS_ATTACH,
-        SPM_VS_PAUSE,
-        SPM_VS_STOP,
         SPM_VS_PROFILE_MODE,
-        SPM_VS_CPU_ASSESS_PERF,
-        SPM_VS_CPU_CLU,
-        SPM_VS_CPU_CUSTOM,
-        SPM_VS_CPU_IBS,
-        SPM_VS_CPU_L2,
-        SPM_VS_CPU_BR,
-        SPM_VS_CPU_DATA_ACCESS,
-        SPM_VS_CPU_INST_ACCESS,
-        SPM_VS_CPU_TIMER,
-        SPM_VS_THREAD,
         SPM_VS_GPU_PERF_COUNT,
         SPM_VS_GPU_APP_TRACE,
-        SPM_VS_PP_ONLINE,
-        SPM_VS_DX,
     };
 
     ///Visual studio direct action

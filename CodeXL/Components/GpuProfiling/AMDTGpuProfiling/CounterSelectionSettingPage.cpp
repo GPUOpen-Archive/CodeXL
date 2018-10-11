@@ -362,7 +362,7 @@ bool CounterSelectionSettingWindow::setProjectSettingsXML(const gtString& projec
 void CounterSelectionSettingWindow::RestoreDefaultProjectSettings()
 {
     // Restore the settings to default values:
-    m_currentSettings.RestoreDefault(m_fullCounterNamesList);
+    m_currentSettings.RestoreDefault(m_fullCounterNamesList, m_currentSettings.m_api);
 
     // Select the maximal counters set that don't require more multi-pass:
     DisableCountersForSinglePass();

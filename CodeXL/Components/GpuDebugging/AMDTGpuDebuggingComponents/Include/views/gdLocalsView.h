@@ -52,7 +52,6 @@ protected:
 protected slots:
 
     void onAddWatch();
-    void onAddMultiWatch();
     void onAboutToShowTextContextMenu();
     void onItemSelected(QTreeWidgetItem* pCurrent, QTreeWidgetItem* pPrevious);
 
@@ -67,7 +66,6 @@ private:
 protected:
     // Actions for context menu:
     QAction* m_pAddWatchAction;
-    QAction* m_pAddMultiWatchAction;
 
     int m_stackDepth;
 

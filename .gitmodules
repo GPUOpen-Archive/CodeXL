@@ -16,9 +16,6 @@
 [submodule "Common/Src/TSingleton"]
 	path = Common/Src/TSingleton
 	url = ../common-src-TSingleton.git
-[submodule "Common/Src/GPUPerfAPIUtils"]
-	path = Common/Src/GPUPerfAPIUtils
-	url = ../common-src-GPUPerfAPIUtils.git
 [submodule "Common/Src/AMDTMutex"]
 	path = Common/Src/AMDTMutex
 	url = ../common-src-AMDTMutex.git
@@ -49,15 +46,9 @@
 [submodule "Common/Src/AMDTAssertionHandlers"]
 	path = Common/Src/AMDTAssertionHandlers
 	url = ../common-src-AMDTAssertionHandlers.git
-[submodule "Common/Src/AMDTInterceptor"]
-	path = Common/Src/AMDTInterceptor
-	url = ../common-src-AMDTInterceptor.git
 [submodule "Common/Src/CElf"]
 	path = Common/Src/CElf
 	url = ../common-src-CElf.git
-[submodule "Common/Src/DDS"]
-	path = Common/Src/DDS
-	url = ../common-src-DDS.git
 [submodule "Common/Src/DebugHelpers"]
 	path = Common/Src/DebugHelpers
 	url = ../common-src-DebugHelpers.git
@@ -67,9 +58,6 @@
 [submodule "Common/Src/VersionInfo"]
 	path = Common/Src/VersionInfo
 	url = ../common-src-VersionInfo.git
-[submodule "Common/Src/Vulkan"]
-	path = Common/Src/Vulkan
-	url = ../common-src-Vulkan-1.0.21.1.git
 [submodule "Common/Src/SCons"]
 	path = Common/Src/SCons
 	url = ../common-src-SCons.git
@@ -100,15 +88,9 @@
 [submodule "Common/Lib/Ext/qcustomplot"]
 	path = Common/Lib/Ext/qcustomplot
 	url = ../common-lib-ext-qcustomplot-1.3.1.git
-[submodule "Common/Lib/Ext/Qt"]
-	path = Common/Lib/Ext/Qt
-	url = ../common-lib-ext-Qt-5.5.git
 [submodule "Common/Lib/Ext/QScintilla"]
 	path = Common/Lib/Ext/QScintilla
 	url = ../common-lib-ext-QScintilla-2.8.git
-[submodule "Common/Lib/Ext/Vulkan"]
-	path = Common/Lib/Ext/Vulkan
-	url = ../common-lib-ext-Vulkan-1.0.21.1.git
 [submodule "Common/Lib/AMD/ACL"]
 	path = Common/Lib/AMD/ACL
 	url = ../common-lib-AMD-ACL.git
@@ -121,15 +103,6 @@
 [submodule "Common/Lib/Ext/GRLibDWARF"]
 	path = Common/Lib/Ext/GRLibDWARF
 	url = ../common-lib-ext-GRLibDWARF.git
-[submodule "Common/Lib/Ext/libpng"]
-	path = Common/Lib/Ext/libpng
-	url = ../common-lib-ext-libpng-1.6.19.git
-[submodule "Common/Lib/Ext/mhook"]
-	path = Common/Lib/Ext/mhook
-	url = ../common-lib-ext-mhook.git
-[submodule "Common/Lib/AMD/ags"]
-	path = Common/Lib/AMD/ags
-	url = ../common-lib-amd-ags-4.0.0.git
 [submodule "Common/Src/Misc"]
 	path = Common/Src/Misc
 	url = ../common-src-Misc.git

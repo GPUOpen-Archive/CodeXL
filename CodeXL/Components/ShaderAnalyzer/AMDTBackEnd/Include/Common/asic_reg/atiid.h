@@ -1,21 +1,4 @@
-/*****************************************************************************\
-*
-*  Module Name    atiid.h
-*  Project        R128/M3/R6 WindowsNT
-*  Device         R128/M3/R6
-*
-*  Description    Common Family ID file for R128/M3/R6 driver
-*
-*
-*  Copyright (c) 1999-2004 ATI Technologies Inc. (unpublished)
-*
-*  All rights reserved.  This notice is intended as a precaution against
-*  inadvertent publication and does not imply publication or any waiver
-*  of confidentiality.  The year included in the foregoing notice is the
-*  year of creation of the work.
-*
-\*****************************************************************************/
-
+// Copyright (c) 1999-2017 Advanced Micro Devices, Inc. All rights reserved.
 #ifndef _ATIID_H
 #define _ATIID_H
 

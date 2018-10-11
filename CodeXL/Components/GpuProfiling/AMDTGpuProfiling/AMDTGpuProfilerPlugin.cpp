@@ -1,16 +1,9 @@
 //=====================================================================
-// Copyright (c) 2012 Advanced Micro Devices, Inc. All rights reserved.
+// Copyright (c) 2013-2018 Advanced Micro Devices, Inc. All rights reserved.
 //
 /// \author GPU Developer Tools
-/// \file $File: //devtools/main/CodeXL/Components/GpuProfiling/AMDTGpuProfiling/AMDTGpuProfilerPlugin.cpp $
-/// \version $Revision: #26 $
+/// \file
 /// \brief  This file implements the main plugin for the GPU Profiler
-//
-//=====================================================================
-// $Id: //devtools/main/CodeXL/Components/GpuProfiling/AMDTGpuProfiling/AMDTGpuProfilerPlugin.cpp#26 $
-// Last checkin:   $DateTime: 2016/04/18 06:02:03 $
-// Last edited by: $Author: salgrana $
-// Change list:    $Change: 569613 $
 //=====================================================================
 
 #include <qtIgnoreCompilerWarnings.h>
@@ -48,8 +41,6 @@
 #include <AMDTGpuProfiling/ProjectSettings.h>
 #include <AMDTGpuProfiling/APIColorMap.h>
 #include <AMDTGpuProfiling/CLAPIFilterManager.h>
-#include <AMDTGpuProfiling/gpMenuActionsExecutor.h>
-#include <AMDTGpuProfiling/gpProjectSettingsExtension.h>
 
 bool GpuProfilerPlugin::s_loadEnabled = true;
 
@@ -116,17 +107,6 @@ void GpuProfilerPlugin::Initialize()
 
     afProjectManager::instance().registerProjectSettingsExtension(CounterSelectionSettingWindow::Instance());
 
-    // Create and register the project settings object:
-    gpProjectSettingsExtension* pProjectSettingsExtension = new gpProjectSettingsExtension;
-
-    afProjectManager::instance().registerProjectSettingsExtension(pProjectSettingsExtension);
-
-
-    // Create the main menu actions creator:
-    gpMenuActionsExecutor* pActionsCreator = new gpMenuActionsExecutor;
-
-    // Register the actions creator:
-    afQtCreatorsManager::instance().registerActionExecutor(pActionsCreator);
 }
 
 GpuProfilerSingletonsDelete::~GpuProfilerSingletonsDelete()

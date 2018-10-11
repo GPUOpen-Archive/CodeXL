@@ -1,6 +1,0 @@
-LIBRARY		"CXLClrProfAgent.dll"
-
-EXPORTS
-	DllRegisterServer      PRIVATE
-	DllUnregisterServer    PRIVATE
-	DllGetClassObject      PRIVATE

@@ -32,7 +32,7 @@ ProjectSettings::ProjectSettings()
 // APITraceOptions
 //-------------------------------------------------------------------
 
-APITraceOptions::APITraceOptions() :
+APITraceOptions::APITraceOptions(const APIToTrace& apiType) :
     m_defaultMaxAPIs(DEFAULT_NUM_OF_API_CALLS_TO_TRACE),
 #ifdef _LINUX
     m_mode(TIMEOUT),  //timeout is the default on Linux
@@ -50,7 +50,7 @@ APITraceOptions::APITraceOptions() :
     m_filterAPIsToTrace(false),
     m_writeDataTimeOut(false),
     m_pFilterManager(NULL),
-    m_apiToTrace(APIToTrace_OPENCL)
+    m_apiToTrace(apiType)
 {
 
     osFilePath filterFileName;
@@ -87,9 +87,9 @@ void APITraceOptions::ClearRules()
     m_rules.clear();
 }
 
-void APITraceOptions::RestoreDefault()
+void APITraceOptions::RestoreDefault(const APIToTrace& apiType)
 {
-    APITraceOptions opts;
+    APITraceOptions opts(apiType);
     (*this) = opts;
 }
 
@@ -229,9 +229,15 @@ CounterSettingOption::CounterSettingOption() :
     m_checkedCounterList.clear();
 }
 
-void CounterSettingOption::RestoreDefault(const QStringList& counterNames)
+CounterSettingOption::CounterSettingOption(const APIToTrace& apiType) :
+    m_generateKernelOccupancy(true), m_specificKernels(L""), m_measureKernelExecutionTime(true), m_api(apiType), m_shouldCallXInitThread(false)
 {
-    CounterSettingOption restore;
+    m_checkedCounterList.clear();
+}
+
+void CounterSettingOption::RestoreDefault(const QStringList& counterNames, const APIToTrace& apiType)
+{
+    CounterSettingOption restore(apiType);
     (*this) = restore;
 
     //in internal builds disable check boxes by default

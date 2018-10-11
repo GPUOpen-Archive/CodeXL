@@ -1,6 +1,0 @@
-#! /bin/bash
-
-cd /opt/CodeXL_/
-
-chmod +x CodeXLPwrProfDriver.sh
-./CodeXLPwrProfDriver.sh uninstall 

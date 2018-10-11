@@ -28,7 +28,7 @@
     <Import Project="$(SolutionDir)\CodeXLCommonProjects.props" />
     <Import Project="$(CommonProjectsDir)\VersionInfo\VersionInfo.props" />
     <Import Project="$(AMDTCommonExt)\QScintilla\Global-QScintilla.props" />
-    <Import Project="$(AMDTCommonExt)\Qt\Global-QT.props" />
+    <Import Project="$(CommonProjectsDir)\Qt\Global-QT.props" />
   </ImportGroup>
   <PropertyGroup>
     <TargetName>CodeXL$(AMDTProjectSuffix)</TargetName>
@@ -47,7 +47,7 @@
       <PreprocessorDefinitions>WIN32;_WINDOWS;_CRT_SECURE_NO_WARNINGS;_USRDLL;NOMINMAX;QT_LARGEFILE_SUPPORT;QT_DLL;QT_GUI_LIB;QT_CORE_LIB;QT_THREAD_SUPPORT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <AdditionalOptions> /MP %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions> /MP /wd4005 %(AdditionalOptions)</AdditionalOptions>
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
     </ClCompile>
     <Link>

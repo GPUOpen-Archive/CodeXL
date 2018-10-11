@@ -130,14 +130,14 @@ public:
     // Return value is true iff the process was launched successfully.
     bool LaunchRDS(const gtString& cmdLineArgs,  const std::vector<osEnvironmentVariable>& envVars);
 
-    // Launches CodeXLGpuProfiler on the remote machine, waits for it to finish processing, and takes care
+    // Launches rcprof on the remote machine, waits for it to finish processing, and takes care
     // to all required file transfers between the machines.
     // Return value is true iff the profiling session completed successfully successfully.
     // Note that the function is currently blocking. An async implementation will be available
     // in the future.
-    bool LaunchGPUProfiler(const gtString& cmdLineArgs, const gtString& localCodeXLGpuProfilerBaseDir,
+    bool LaunchGPUProfiler(const gtString& cmdLineArgs, const gtString& localGpuProfilerBaseDir,
                            const gtString& counterFileName, const gtString& envVarsFileName,
-                           const gtString& ApiFilterFileName, const gtString& ApiRulesFileName,
+                           const gtString& apiFilterFileName, const gtString& apiRulesFileName,
                            const gtVector<gtString>& specificKernels, RemoteClientError& errorCode);
 
     // Launches PerfStudio on the remote machine.
@@ -160,7 +160,7 @@ public:
     bool DeleteFrameAnalysisSession(const gtString& projectName, const gtString& sessionName, RemoteClientError& errorCode);
 
     // Terminates the requested process on the remote machine.
-    // The requested process (RDS, CodeXLGpuProfiler) is determined according to
+    // The requested process (RDS, rcprof) is determined according to
     // the REMOTE_OPERATION_MODE received as a parameter.
     // Return value is true iff the process was terminated successfully.
     bool TerminateRemoteProcess(REMOTE_OPERATION_MODE mode);
@@ -197,60 +197,6 @@ public:
     // If the operation succeeds (return value is true), errorStrBuffer indicates
     // the mismatch cause.
     bool PerformHandshake(bool& resultBuffer, gtString& errorStrBuffer);
-
-    // **********************************
-    // Real-Time Power Profiling section
-    // **********************************
-    // Initialize a power profiling session.
-    bool InitPowerProfilingSession(gtUInt32& beRetVal);
-
-    // Set a power profiling sampling configuration.
-    bool SetPowerProfilingSamplingOption(gtInt32 samplingOption, gtUInt32& beRetVal);
-
-    // Set the sampling interval for the power profiling session.
-    bool SetPowerSamplingInterval(gtUInt32 samplingInterval, gtUInt32& beApiRetVal);
-
-    // Get the system topology.
-    bool GetSystemTopology(AMDTPwrDevice*& pTreeRoot, gtUInt32& beApiRetVal);
-
-    // Get a device's supported counters.
-    bool GetDeviceSupportedCounters(gtUInt32 deviceId, gtUInt32& beApiRetVal, gtUInt32& numOfSupportedCounters, AMDTPwrCounterDesc*& pSupportedCounters);
-
-    // Get the minimum sampling interval.
-    bool GetMinSamplingIntervalMs(gtUInt32& minSamplingIntervalMs, gtUInt32& beApiRetVal);
-
-    // Get the current sampling interval.
-    bool GetCurrentSamplingIntervalMs(gtUInt32& currentSamplingIntervalMs, gtUInt32& beApiRetVal);
-
-    // Enable counter.
-    bool EnableCounter(gtUInt32 counterId, gtUInt32& beApiRetVal);
-
-    // Disable counter.
-    bool DisableCounter(gtUInt32 counterId, gtUInt32& beApiRetVal);
-
-    // Is counter enabled.
-    bool IsCounterEnabled(gtUInt32 counterId, gtUInt32& beApiRetVal);
-
-    // Start power profiling.
-    // remoteAppDetails - details about the target application.
-    // beApiRetVal - return type of the API on the remote machine.
-    // remoteAppLaunchStatus - PPResult value indicating the status of the remote application's launch.
-    bool StartPowerProfiling(const ApplicationLaunchDetails& remoteAppDetails, gtUInt32& beApiRetVal, AppLaunchStatus& remoteAppLaunchStatus);
-
-    // Stop power profiling.
-    bool StopPowerProfiling(gtUInt32& beApiRetVal);
-
-    // Pause power profiling.
-    bool PausePowerProfiling(gtUInt32& beApiRetVal);
-
-    // Resume power profiling.
-    bool ResumePowerProfiling(gtUInt32& beApiRetVal);
-
-    // Close power profiling session.
-    bool ClosePowerProfiling(gtUInt32& beApiRetVal);
-
-    // Get the consecutive sample.
-    bool ReadAllEnabledCounters(gtUInt32& numOfSamples, AMDTPwrSample*& pSamples, gtUInt32& beApiRetVal);
 
     // Disconnects from the client, without closing active sessions.
     bool DisconnectWithoutClosing();

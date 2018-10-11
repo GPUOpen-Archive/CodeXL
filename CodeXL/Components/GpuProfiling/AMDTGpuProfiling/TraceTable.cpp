@@ -956,11 +956,11 @@ bool TraceTableModel::ExportToCSV(const QString& outputFilePath)
             for (int i = 0; i < TRACE_COLUMN_COUNT; ++i)
             {
                 QString headerString = headerData(i, Qt::Horizontal, Qt::DisplayRole).toString();
-                strList << AC_STR_QuotSpace + headerString + AC_STR_QuotSpace;
+                strList << AC_STR_Quot + headerString + AC_STR_Quot;
             }
 
             // Write a new line:
-            data << strList.join(AC_STR_Tab) << AC_STR_NewLineA;
+            data << strList.join(AC_STR_CommaA) << AC_STR_NewLineA;
             strList.clear();
 
             // Go through the rows and export each of them:
@@ -972,10 +972,11 @@ bool TraceTableModel::ExportToCSV(const QString& outputFilePath)
                 for (int column = 0; column < TRACE_COLUMN_COUNT; ++column)
                 {
                     QString colString = pRowItem->GetColumnData(column).toString();
-                    strList << AC_STR_QuotSpace + colString + AC_STR_QuotSpace;
+                    colString.replace("\"", "\"\"");
+                    strList << AC_STR_Quot + colString + AC_STR_Quot;
                 }
 
-                data << strList.join(AC_STR_Tab) << AC_STR_NewLineA;
+                data << strList.join(AC_STR_CommaA) << AC_STR_NewLineA;
                 strList.clear();
             }
 

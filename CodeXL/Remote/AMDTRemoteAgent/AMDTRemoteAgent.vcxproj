@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -101,7 +101,6 @@
     <ClInclude Include="dmnAppWatcherThread.h" />
     <ClInclude Include="dmnConnectionWatcherThread.h" />
     <ClInclude Include="dmnConfigManager.h" />
-    <ClInclude Include="dmnPowerBackendAdapter.h" />
     <ClInclude Include="dmnServerThread.h" />
     <ClInclude Include="dmnServerThreadConfig.h" />
     <ClInclude Include="dmnSessionThread.h" />
@@ -122,7 +121,6 @@
     <ClCompile Include="dmnAppWatcherThread.cpp" />
     <ClCompile Include="dmnConnectionWatcherThread.cpp" />
     <ClCompile Include="dmnConfigManager.cpp" />
-    <ClCompile Include="dmnPowerBackendAdapter.cpp" />
     <ClCompile Include="dmnServerThread.cpp" />
     <ClCompile Include="dmnServerThreadConfig.cpp" />
     <ClCompile Include="dmnSessionThread.cpp" />
@@ -143,9 +141,6 @@
     </ProjectReference>
     <ProjectReference Include="..\..\..\Common\Src\AMDTOSWrappers\AMDTOSWrappersVS14.vcxproj">
       <Project>{5d9222ac-39fb-4123-9497-78cea5be58ad}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Components\PowerProfiling\Backend\AMDTPowerProfileAPI\AMDTPowerProfileAPI.vcxproj">
-      <Project>{5b9ef4de-1d94-43fa-9b28-5452055b8749}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

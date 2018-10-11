@@ -112,11 +112,6 @@ void afGetCodeXLTitleBarString(gtString& titleBarString, afRunModes runModes)
             else if (runModes & AF_DEBUGGED_PROCESS_SUSPENDED)
             {
                 runModeTitle = AF_STR_TitleRunModeSuspended;
-
-                if (runModes & AF_DEBUGGED_PROCESS_IN_KERNEL_DEBUGGING)
-                {
-                    runModeTitle = AF_STR_TitleRunModeKernel;
-                }
             }
             else if (runModes & AF_DEBUGGED_PROCESS_DATA_TRANSLATING)
             {
@@ -438,15 +433,11 @@ void afIsApplicationPathsValid(const afIsValidApplicationInfo& isValidApplicatio
     }
     else
     {
-        if (isValidApplicationInfo.isWInStoreAppRadioButtonChecked)
-        {
-            isAppValid = !isValidApplicationInfo.appFilePath.isEmpty();
-        }
-        else if (!isValidApplicationInfo.appFilePath.isEmpty())
+        if (!isValidApplicationInfo.appFilePath.isEmpty())
         {
             const osFile file(isValidApplicationInfo.appFilePath);
             //for local files: if windows store application just check if file exists, for regular binaries check if it's an executable
-            isAppValid = isValidApplicationInfo.isWInStoreAppRadioButtonChecked ? file.exists() : file.IsExecutable();
+            isAppValid = file.IsExecutable();
         }
 
         const osFile  dir(isValidApplicationInfo.workingFolderPath);

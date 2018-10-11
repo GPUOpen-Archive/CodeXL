@@ -1,15 +1,4 @@
-/*
-***************************************************************************************************
-*
-*  Trade secret of Advanced Micro Devices, Inc.
-*  Copyright (c) 2012 Advanced Micro Devices, Inc. (unpublished)
-*
-*  All rights reserved.  This notice is intended as a precaution against inadvertent publication and
-*  does not imply publication or any waiver of confidentiality.  The year included in the foregoing
-*  notice is the year of creation of the work.
-*
-***************************************************************************************************
-*/
+// Copyright (c) 2012-2017 Advanced Micro Devices, Inc. All rights reserved.
 /**
 ***************************************************************************************************
 * @file  AmdDxGsaCompile.h

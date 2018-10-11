@@ -52,7 +52,7 @@ afGlobalSettingsDialog* afGlobalSettingsDialog::m_spMySingleInstance = nullptr;
 // Date:        19/4/2012
 // ---------------------------------------------------------------------------
 afGlobalSettingsDialog::afGlobalSettingsDialog()
-    : QDialog(afMainAppWindow::instance()), m_pMainTabWidget(nullptr), m_pGeneralPage(nullptr), m_pFloatingPointPrecisionSpinBox(nullptr), m_pAlertMissingSourceFile(nullptr)
+    : QDialog(afMainAppWindow::instance()), m_pMainTabWidget(nullptr), m_pGeneralPage(nullptr), m_pFloatingPointPrecisionSpinBox(nullptr)
 {
     // Create the dialog layout:
     createDialogLayout();
@@ -120,7 +120,7 @@ void afGlobalSettingsDialog::onOkButton()
     GT_IF_WITH_ASSERT((nullptr != m_pLogFilesPathLineEdit) && (nullptr != m_pLogLevelComboBox) && (nullptr != m_pLogFilesPathLineEdit) &&
                       (nullptr != m_pProxyAddress) && (nullptr != m_pProxyPort) && (m_pFloatingPointPrecisionSpinBox != nullptr) &&
                       (m_pSpyAPIPortSpinBox != nullptr) && (m_pSpyEventsPortSpinBox != nullptr) &&
-                      (m_pRDSPortSpinBox != nullptr) && (m_pRDSEventsPortSpinBox != nullptr) && (m_pAlertMissingSourceFile != nullptr))
+                      (m_pRDSPortSpinBox != nullptr) && (m_pRDSEventsPortSpinBox != nullptr))
     {
         afGlobalVariablesManager& theGlobalVariablesManager = afGlobalVariablesManager::instance();
 
@@ -132,9 +132,6 @@ void afGlobalSettingsDialog::onOkButton()
         int fpPrecision = m_pFloatingPointPrecisionSpinBox->value();
         theGlobalVariablesManager.setFloatingPointPrecision(fpPrecision);
         apSetFloatParamsDisplayPrecision(m_pFloatingPointPrecisionSpinBox->value());
-
-        // Set missing source alert:
-        theGlobalVariablesManager.SetShouldAlertMissingSourceFile(m_pAlertMissingSourceFile->isChecked());
 
         // Get the current log directory:
         gtString newLogFilesPath;
@@ -483,14 +480,6 @@ void afGlobalSettingsDialog::createGeneralPage()
 
     pLayout->addWidget(pAdvancedGroupBox);
     m_pGeneralPage->setLayout(pLayout);
-
-    QGroupBox* pSourceFileGroup = new QGroupBox(AF_STR_projectSettingsSourceFiles);
-    QVBoxLayout* pSourceLayout = new QVBoxLayout;
-    m_pAlertMissingSourceFile = new QCheckBox(AF_STR_globalSettingsAlertMissingSourceFiles);
-    pSourceLayout->addWidget(m_pAlertMissingSourceFile);
-    pSourceFileGroup->setLayout(pSourceLayout);
-
-    pLayout->addWidget(pSourceFileGroup);
 
     pLayout->addStretch(1);
 

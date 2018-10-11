@@ -24,7 +24,7 @@
 class acToolBar;
 class afMainAppWindow;
 
-class AF_API afExecutionModeManager : QObject
+class AF_API afExecutionModeManager : public QObject
 {
     Q_OBJECT
 

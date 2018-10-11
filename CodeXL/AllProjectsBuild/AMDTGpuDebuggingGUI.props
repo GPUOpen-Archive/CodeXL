@@ -4,6 +4,6 @@
     <Import Project="$(SolutionDir)\AMDTGpuDebugging.props" />
   </ImportGroup>
   <ImportGroup Label="AMDTApplicationFrameworkProjects">
-    <Import Project="$(AMDTCommonExt)\Qt\Global-QT.props" />
+    <Import Project="$(CommonProjectsDir)\Qt\Global-QT.props" />
   </ImportGroup>
 </Project>
