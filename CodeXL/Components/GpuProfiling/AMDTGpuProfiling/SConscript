@@ -41,7 +41,7 @@ GPUProf_env.Append( CPPPATH = [
     GPUProf_env['CXL_common_dir'] + '/Src/AMDTMutex',
     GPUProf_env['CXL_common_dir'] + '/Lib/Ext/utf8cpp/source',
     GPUProf_env['CXL_common_dir'] + '/Lib/AMD/RCP/include',
-    GPUProf_env['CXL_common_dir'] + '/Lib/AMD/GPUPerfAPI/3_2/Include',
+    GPUProf_env['CXL_common_dir'] + '/Lib/AMD/GPUPerfAPI/3_3/Include',
     GPUProf_env['CXL_commonproj_dir'],
     GPUProf_env['CXL_common_dir'] + '/../CodeXL',
     GPUProf_env['CXL_common_dir'] + '/../CodeXL/Components',
