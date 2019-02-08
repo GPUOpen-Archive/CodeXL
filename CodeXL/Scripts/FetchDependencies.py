@@ -19,19 +19,19 @@ if isPython3OrAbove:
 downloadMappingWin = {
     "https://github.com/GPUOpen-Tools/RGA/releases/download/2.0.1/rga-windows-x86-2.0.1-cli-only.zip" : "../../Common/Lib/AMD/RGA/x86",
     "https://github.com/GPUOpen-Tools/RGA/releases/download/2.0.1/rga-windows-x64-2.0.1.zip" : "../../Common/Lib/AMD/RGA/x64",
-    "https://github.com/GPUOpen-Tools/RCP/releases/download/v5.5/RadeonComputeProfiler-v5.5.6980.zip" : "../../Common/Lib/AMD/RCP",
-    "https://github.com/GPUOpen-Tools/RCP/releases/download/v5.5/RCPProfileDataParser-v5.5.6980.zip" : "../../Common/Lib/AMD/RCP",
-    "https://github.com/GPUOpen-Tools/GPA/releases/download/v3.2/GPUPerfAPI-3.2.623.0.zip" : "../../Common/Lib/AMD/GPUPerfAPI"
+    "https://github.com/GPUOpen-Tools/RCP/releases/download/v5.6/RadeonComputeProfiler-v5.6.7246.zip" : "../../Common/Lib/AMD/RCP",
+    "https://github.com/GPUOpen-Tools/RCP/releases/download/v5.6/RCPProfileDataParser-v5.6.7246.zip" : "../../Common/Lib/AMD/RCP",
+    "https://github.com/GPUOpen-Tools/GPA/releases/download/v3.3/GPUPerfAPI-3.3.799.zip" : "../../Common/Lib/AMD/GPUPerfAPI"
 }
 downloadMappingLin = {
     "https://github.com/GPUOpen-Tools/RGA/releases/download/2.0.1/rga-linux-2.0.1.tgz" : "../../Common/Lib/AMD/RGA",
-    "https://github.com/GPUOpen-Tools/RCP/releases/download/v5.5/RadeonComputeProfiler-v5.5.6947.tgz" : "../../Common/Lib/AMD/RCP",
-    "https://github.com/GPUOpen-Tools/RCP/releases/download/v5.5/RCPProfileDataParser-v5.5.6947.tgz" : "../../Common/Lib/AMD/RCP",
-    "https://github.com/GPUOpen-Tools/GPA/releases/download/v3.2/GPUPerfAPI.3.2.858-lnx.tgz" : "../../Common/Lib/AMD/GPUPerfAPI"
+    "https://github.com/GPUOpen-Tools/RCP/releases/download/v5.6/RadeonComputeProfiler-v5.6.7254.tgz" : "../../Common/Lib/AMD/RCP",
+    "https://github.com/GPUOpen-Tools/RCP/releases/download/v5.6/RCPProfileDataParser-v5.6.7254.tgz" : "../../Common/Lib/AMD/RCP",
+    "https://github.com/GPUOpen-Tools/GPA/releases/download/v3.3/GPUPerfAPI-3.3.1078.tgz" : "../../Common/Lib/AMD/GPUPerfAPI"
 }
 
 githubMappingLin = {
-    "https://github.com/GPUOpen-Tools/RCP" : ["v5.5", "../../Common/Lib/AMD/RCP/repo/RCP", "Scripts", "UpdateCommon.py"]
+    "https://github.com/GPUOpen-Tools/RCP" : ["v5.6", "../../Common/Lib/AMD/RCP/repo/RCP", "Scripts", "UpdateCommon.py"]
 }
 
 # to allow the script to be run from anywhere - not just the cwd - store the absolute path to the script file
