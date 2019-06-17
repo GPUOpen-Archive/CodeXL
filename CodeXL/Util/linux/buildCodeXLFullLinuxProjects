@@ -63,13 +63,6 @@ CODEXL_OUTPUT_DIR=${AMD_CODEXL}/../Output_x86_64/${mode}/bin/
 
 PackageTheBuild()
 {
-	cp -f ${CODEXL_COMMON_RCP_DIR}/bin/libRCPCLOccupancyAgent32.so                 ${CODEXL_OUTPUT_DIR}
-	cp -f ${CODEXL_COMMON_RCP_DIR}/bin/libRCPCLProfileAgent32.so                   ${CODEXL_OUTPUT_DIR}
-	cp -f ${CODEXL_COMMON_RCP_DIR}/bin/libRCPCLTraceAgent32.so                     ${CODEXL_OUTPUT_DIR}
-	cp -f ${CODEXL_COMMON_RCP_DIR}/bin/libRCPPreloadXInitThreads32.so              ${CODEXL_OUTPUT_DIR}
-	cp -f ${CODEXL_COMMON_RCP_DIR}/bin/rcprof32                                    ${CODEXL_OUTPUT_DIR}
-	cp -f ${CODEXL_COMMON_RCP_DIR}/bin/libGPUPerfAPICL32.so                        ${CODEXL_OUTPUT_DIR}
-	cp -f ${CODEXL_COMMON_RCP_DIR}/bin/libGPUPerfAPICounters32.so                  ${CODEXL_OUTPUT_DIR}
 	cp -f ${CODEXL_COMMON_RCP_DIR}/bin/libRCPCLOccupancyAgent.so                   ${CODEXL_OUTPUT_DIR}
 	cp -f ${CODEXL_COMMON_RCP_DIR}/bin/libRCPCLProfileAgent.so                     ${CODEXL_OUTPUT_DIR}
 	cp -f ${CODEXL_COMMON_RCP_DIR}/bin/libRCPCLTraceAgent.so                       ${CODEXL_OUTPUT_DIR}
@@ -80,7 +73,7 @@ PackageTheBuild()
 	cp -f ${CODEXL_COMMON_RCP_DIR}/bin/VkStableClocks                              ${CODEXL_OUTPUT_DIR}
 	cp -f ${CODEXL_COMMON_RCP_DIR}/bin/libGPUPerfAPICL.so                          ${CODEXL_OUTPUT_DIR}
 	cp -f ${CODEXL_COMMON_RCP_DIR}/bin/libGPUPerfAPICounters.so                    ${CODEXL_OUTPUT_DIR}
-	cp -f ${CODEXL_COMMON_RCP_DIR}/bin/libGPUPerfAPIHSA.so                         ${CODEXL_OUTPUT_DIR}
+	cp -f ${CODEXL_COMMON_RCP_DIR}/bin/libGPUPerfAPIROCm.so                         ${CODEXL_OUTPUT_DIR}
 	cp -f ${CODEXL_COMMON_RCP_DIR}/repo/RCP/Output/bin/libRCPProfileDataParser.so  ${CODEXL_OUTPUT_DIR}
         mkdir -p ${CODEXL_OUTPUT_DIR}/jqPlot
 	cp -f ${CODEXL_COMMON_RCP_DIR}/jqPlot/excanvas.min.js                          ${CODEXL_OUTPUT_DIR}/jqPlot

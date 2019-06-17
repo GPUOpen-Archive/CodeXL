@@ -567,13 +567,6 @@ PackageTheBuild()
 		mkdir -p ${PKG_NAME}/webhelp
 		cp -drf Output_x86_64/release/bin/webhelp/*	${PKG_NAME}/webhelp
 
-		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RCP/bin/libRCPCLOccupancyAgent32.so         ${PKG_NAME}
-		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RCP/bin/libRCPCLProfileAgent32.so           ${PKG_NAME}
-		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RCP/bin/libRCPCLTraceAgent32.so             ${PKG_NAME}
-		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RCP/bin/libRCPPreloadXInitThreads32.so      ${PKG_NAME}
-		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RCP/bin/rcprof32                            ${PKG_NAME}
-		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RCP/bin/libGPUPerfAPICL32.so                ${PKG_NAME}
-		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RCP/bin/libGPUPerfAPICounters32.so          ${PKG_NAME}
 
 		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RCP/bin/libRCPCLOccupancyAgent.so        ${PKG_NAME}
 		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RCP/bin/libRCPCLProfileAgent.so          ${PKG_NAME}
@@ -585,7 +578,7 @@ PackageTheBuild()
 		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RCP/bin/VkStableClocks                   ${PKG_NAME}
 		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RCP/bin/libGPUPerfAPICL.so               ${PKG_NAME}
 		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RCP/bin/libGPUPerfAPICounters.so         ${PKG_NAME}
-		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RCP/bin/libGPUPerfAPIHSA.so              ${PKG_NAME}
+		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RCP/bin/libGPUPerfAPIROCm.so              ${PKG_NAME}
 		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RCP/bin/libRCPProfileDataParser.so       ${PKG_NAME}
    
 		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RGA/rga-2.0.1.69/amdspv               ${PKG_NAME}
@@ -1023,13 +1016,6 @@ PackageTheBuild()
 		mkdir -p ${PKG_NAME}/webhelp
 		cp -drf Output_x86_64/release/bin/webhelp/*	${PKG_NAME}/webhelp
 
-		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RCP/bin/libRCPCLOccupancyAgent32.so         ${PKG_NAME}
-		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RCP/bin/libRCPCLProfileAgent32.so           ${PKG_NAME}
-		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RCP/bin/libRCPCLTraceAgent32.so             ${PKG_NAME}		
-		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RCP/bin/libRCPPreloadXInitThreads32.so      ${PKG_NAME}
-		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RCP/bin/rcprof32                            ${PKG_NAME}
-		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RCP/bin/libGPUPerfAPICL32.so                ${PKG_NAME}
-		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RCP/bin/libGPUPerfAPICounters32.so          ${PKG_NAME}
 
 		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RCP/bin/libRCPCLOccupancyAgent.so           ${PKG_NAME}
 		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RCP/bin/libRCPCLProfileAgent.so             ${PKG_NAME}
@@ -1041,7 +1027,7 @@ PackageTheBuild()
 		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RCP/bin/VkStableClocks                      ${PKG_NAME}
 		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RCP/bin/libGPUPerfAPICL.so                  ${PKG_NAME}
 		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RCP/bin/libGPUPerfAPICounters.so            ${PKG_NAME}
-		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RCP/bin/libGPUPerfAPIHSA.so                 ${PKG_NAME}
+		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RCP/bin/libGPUPerfAPIROCm.so                 ${PKG_NAME}
 
 		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/Vulkan/rev_1_0_0/Release/lnx64/amdspv               ${PKG_NAME}
 		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/Vulkan/rev_1_0_0/Release/lnx64/spvgen.so            ${PKG_NAME}
@@ -1472,13 +1458,6 @@ PackageTheBuild()
 		mkdir -p ${PKG_NAME}/webhelp
 		cp -drf Output_x86_64/release/bin/webhelp/*	${PKG_NAME}/webhelp
 
-		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RCP/bin/libRCPCLOccupancyAgent32.so         ${PKG_NAME}
-		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RCP/bin/libRCPCLProfileAgent32.so           ${PKG_NAME}
-		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RCP/bin/libRCPCLTraceAgent32.so             ${PKG_NAME}		
-		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RCP/bin/libRCPPreloadXInitThreads32.so      ${PKG_NAME}
-		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RCP/bin/rcprof32                            ${PKG_NAME}
-		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RCP/bin/libGPUPerfAPICL32.so                ${PKG_NAME}
-		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RCP/bin/libGPUPerfAPICounters32.so          ${PKG_NAME}
 
 		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RCP/bin/libRCPCLOccupancyAgent.so        ${PKG_NAME}
 		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RCP/bin/libRCPCLProfileAgent.so          ${PKG_NAME}
@@ -1490,7 +1469,7 @@ PackageTheBuild()
 		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RCP/bin/VkStableClocks                   ${PKG_NAME}
 		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RCP/bin/libGPUPerfAPICL.so               ${PKG_NAME}
 		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RCP/bin/libGPUPerfAPICounters.so         ${PKG_NAME}
-		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RCP/bin/libGPUPerfAPIHSA.so              ${PKG_NAME}
+		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RCP/bin/libGPUPerfAPIROCm.so              ${PKG_NAME}
 
 		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RGA/rga-2.0.1.69/amdspv               ${PKG_NAME}
 		cp -f ${CODEXL_COMMON_DIR}/Lib/AMD/RGA/rga-2.0.1.69/spvgen.so            ${PKG_NAME}
