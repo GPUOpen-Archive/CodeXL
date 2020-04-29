@@ -1,3 +1,15 @@
+## CodeXL Retirement
+
+CodeXL is no longer being actively developed or supported by AMD and is being archived. For the latest tools from AMD please visit one of the following links:
+ 
+  * for ROCm Development https://github.com/RadeonOpenCompute/ROCm
+  * for Gaming/Graphics Development https://gpuopen.com
+  
+Some of our partners will continue to develop and support CodeXL on their platforms and are maintaining their own forks of this codebase. 
+
+-------------------------
+
+
 ## CodeXL
 
 CodeXL is a comprehensive tool suite that enables developers to harness the benefits of GPUs and APUs. It includes powerful GPU debugging, comprehensive GPU profiling, and static OpenCL™, OpenGL®, Vulkan® and DirectX® kernel/shader analysis capabilities, enhancing accessibility for software developers to enter the era of heterogeneous computing. CodeXL is available as a standalone user interface application for Windows® and Linux®.
